@@ -4,3 +4,7 @@
 
 html { scroll-behavior: smooth; }
 body { @apply bg-white text-ink antialiased; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee, .animate-rise { animation: none; }
+}

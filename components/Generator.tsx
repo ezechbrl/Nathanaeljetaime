@@ -13,7 +13,7 @@ type PublishState =
   | { status: "done"; productAdminUrl: string }
   | { status: "error"; message: string };
 
-export function Generator() {
+export function Generator({ hideIntro = false }: { hideIntro?: boolean }) {
   const params = useSearchParams();
   const [brief, setBrief] = useState(params.get("brief") ?? "");
   const [productUrl, setProductUrl] = useState(params.get("url") ?? "");
@@ -64,10 +64,12 @@ export function Generator() {
 
   return (
     <div className="space-y-10">
-      <div>
-        <h1 className="text-3xl font-bold">Crée ta boutique</h1>
-        <p className="mt-2 text-black/60">Décris ton projet, l'IA pose la stratégie puis construit ta boutique.</p>
-      </div>
+      {!hideIntro && (
+        <div>
+          <h1 className="text-3xl font-bold">Crée ta boutique</h1>
+          <p className="mt-2 text-black/60">Décris ton projet, l'IA pose la stratégie puis construit ta boutique.</p>
+        </div>
+      )}
 
       <form onSubmit={generate} className="space-y-4 rounded-3xl border border-black/10 p-6">
         <label className="block">
