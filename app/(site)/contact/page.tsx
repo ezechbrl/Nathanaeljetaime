@@ -23,7 +23,7 @@ export default function ContactPage() {
           {channels.map((c, i) => (
             <Reveal key={c.title} delay={i * 60}>
               {c.href ? (
-                <a href={c.href} className="surface flex gap-4 rounded-card p-5 transition-colors hover:border-white/20">
+                <a href={c.href} className="surface flex gap-4 rounded-card p-5 transition-colors hover:border-black/20">
                   <c.icon className="mt-0.5 h-5 w-5 text-accent" /><span><span className="block">{c.title}</span><span className="text-sm text-fg-muted">{c.text}</span></span>
                 </a>
               ) : (

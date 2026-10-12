@@ -51,7 +51,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       </article>
       <Container className="mt-24 max-w-[760px]">
         <p className="text-sm text-fg-faint">À lire ensuite</p>
-        <div className="mt-4 divide-y divide-white/[0.07] border-y border-white/[0.07]">
+        <div className="mt-4 divide-y divide-black/[0.07] border-y border-black/[0.07]">
           {others.map((p) => (
             <Link key={p.slug} href={`/blog/${p.slug}`} className="block py-6 text-xl tracking-tight transition-colors hover:text-accent">{p.title}</Link>
           ))}

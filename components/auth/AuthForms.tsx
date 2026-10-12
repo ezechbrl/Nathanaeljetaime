@@ -1,26 +1,19 @@
 "use client";
 
+import { ArrowRight, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button, Spinner } from "@/components/ui/Button";
 import * as api from "@/lib/api/client";
 
-function GoogleButton() {
-  const params = useSearchParams();
-  return (
-    <a href={api.googleAuthUrl(params.get("ref") ?? undefined)} className="flex h-11 w-full items-center justify-center gap-2.5 rounded-ctl border border-white/10 bg-white/[0.03] text-sm transition-colors hover:border-white/20 hover:bg-white/[0.06]">
-      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-        <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.3 12 2.3 6.6 2.3 2.3 6.6 2.3 12s4.3 9.7 9.7 9.7c5.6 0 9.3-3.9 9.3-9.5 0-.6-.1-1.1-.2-1.6H12Z" />
-      </svg>
-      Continuer avec Google
-    </a>
-  );
-}
-
-function Divider() {
-  return <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-white/[0.08]" />ou avec ton e-mail<span className="h-px flex-1 bg-white/[0.08]" /></div>;
-}
+const ERRORS: Record<string, string> = {
+  signature: "La connexion Shopify n'a pas pu être vérifiée. Réessaie.",
+  session: "La connexion a expiré. Réessaie.",
+  "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec Google, puis relie ta boutique.",
+  google: "La connexion Google a échoué. Réessaie.",
+  lien: "Ce lien n'est plus valide.",
+};
 
 // Après connexion : on reprend là où la personne en était (brief tapé sur la landing, offre choisie…).
 function nextUrl(params: URLSearchParams) {
@@ -35,140 +28,98 @@ function nextUrl(params: URLSearchParams) {
   return carry.size ? `/app?${carry}` : "/app";
 }
 
-export function LoginForm() {
-  const router = useRouter();
-  const params = useSearchParams();
+function normalizeShop(input: string) {
+  const d = input.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  if (!d) return null;
+  const full = d.endsWith(".myshopify.com") ? d : `${d.replace(/\.myshopify$/, "")}.myshopify.com`;
+  return /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(full) ? full : null;
+}
+
+export function ShopifyForm({ next, cta = "Continuer avec Shopify" }: { next: string; cta?: string }) {
+  const [shop, setShop] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    setLoading(true);
+    const domain = normalizeShop(shop);
+    if (!domain) return setError("Saisis l'adresse de ta boutique, par exemple ma-boutique.myshopify.com");
     setError("");
-    try {
-      await api.login({ email: String(f.get("email")), password: String(f.get("password")) });
-      router.push(nextUrl(params));
-    } catch (err) {
+    setLoading(true);
+    await api.loginWithShopify(domain, next).catch((err) => {
       setError((err as Error).message);
       setLoading(false);
-    }
+    });
   }
 
   return (
-    <>
-      <GoogleButton />
-      <Divider />
-      <form onSubmit={submit} className="space-y-4">
-        <label className="block text-sm">E-mail<input name="email" type="email" required autoComplete="email" className="field mt-1.5" /></label>
-        <label className="block text-sm">
-          <span className="flex justify-between">Mot de passe <Link href="/mot-de-passe-oublie" className="text-fg-muted hover:text-fg">Oublié ?</Link></span>
-          <input name="password" type="password" required minLength={8} autoComplete="current-password" className="field mt-1.5" />
-        </label>
-        {error && <p role="alert" className="text-sm text-bad">{error}</p>}
-        <Button type="submit" size="lg" className="w-full" disabled={loading}>{loading ? <Spinner /> : "Se connecter"}</Button>
-      </form>
-      <p className="mt-8 text-center text-sm text-fg-muted">
-        Pas encore de compte ? <Link href={`/inscription?${params}`} className="text-fg underline underline-offset-4">Créer un compte</Link>
+    <form onSubmit={submit} className="space-y-3">
+      <label htmlFor="shop" className="block text-sm text-fg-muted">Adresse de ta boutique Shopify</label>
+      <div className="flex items-center rounded-ctl border border-line/15 bg-white focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
+        <ShoppingBag className="ml-3 h-4 w-4 shrink-0 text-accent" />
+        <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" className="min-w-0 flex-1 bg-transparent px-2 py-3 text-[15px] focus:outline-none" />
+        <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
+      </div>
+      {error && <p role="alert" className="text-sm text-bad">{error}</p>}
+      <Button type="submit" size="lg" className="w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
+      <p className="text-xs leading-relaxed text-fg-faint">
+        Pas encore de boutique ? <a href="https://www.shopify.com/fr/essai-gratuit" target="_blank" rel="noreferrer" className="underline underline-offset-4">Ouvre-en une gratuitement sur Shopify</a>, puis reviens ici.
       </p>
-    </>
+    </form>
   );
 }
 
-export function RegisterForm() {
+function GoogleButton({ next }: { next: string }) {
   const router = useRouter();
-  const params = useSearchParams();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const brief = params.get("brief");
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
+  async function onClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (api.API_MODE === "live") return;
     e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    setLoading(true);
-    setError("");
-    try {
-      let ref: string | undefined;
-      try { ref = document.cookie.match(/(?:^|; )ref=([^;]+)/)?.[1]; } catch { /* cookies indisponibles */ }
-      await api.register({ firstName: String(f.get("firstName")), email: String(f.get("email")), password: String(f.get("password")), ref });
-      router.push(nextUrl(params));
-    } catch (err) {
-      setError((err as Error).message);
-      setLoading(false);
-    }
+    await api.loginWithGoogleDemo();
+    router.push(api.googleAuthUrl(next));
   }
+  let ref: string | undefined;
+  try { ref = typeof document !== "undefined" ? document.cookie.match(/(?:^|; )ref=([^;]+)/)?.[1] : undefined; } catch { /* cookies indisponibles */ }
+  return (
+    <a href={api.googleAuthUrl(next, ref)} onClick={onClick} className="flex h-12 w-full items-center justify-center gap-2.5 rounded-ctl border border-line/15 bg-white text-[15px] transition-colors hover:border-line/30 hover:bg-bg-2">
+      <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden>
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
+        <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
+      </svg>
+      Continuer avec Google
+    </a>
+  );
+}
 
+// Écran unique de connexion / inscription : Shopify d'abord, Google ensuite.
+export function AuthPanel({ mode }: { mode: "login" | "register" }) {
+  const params = useSearchParams();
+  const next = nextUrl(params);
+  const brief = params.get("brief");
+  const error = params.get("error");
   return (
     <>
+      {error && ERRORS[error] && <p role="alert" className="mb-6 rounded-card border border-bad/25 bg-bad/5 p-4 text-sm text-fg">{ERRORS[error]}</p>}
       {brief && (
-        <div className="mb-6 rounded-card border border-accent/20 bg-accent-deep/20 p-4 text-sm">
-          <p className="text-xs uppercase tracking-[0.14em] text-accent">Ton projet</p>
+        <div className="mb-6 rounded-card border border-accent/25 bg-accent-soft p-4 text-sm">
+          <p className="text-xs font-medium uppercase tracking-[0.12em] text-accent">Ton projet</p>
           <p className="mt-1 line-clamp-2 text-fg-muted">« {brief} »</p>
         </div>
       )}
-      <GoogleButton />
-      <Divider />
-      <form onSubmit={submit} className="space-y-4">
-        <label className="block text-sm">Prénom<input name="firstName" required autoComplete="given-name" className="field mt-1.5" /></label>
-        <label className="block text-sm">E-mail<input name="email" type="email" required autoComplete="email" className="field mt-1.5" /></label>
-        <label className="block text-sm">Mot de passe<input name="password" type="password" required minLength={8} autoComplete="new-password" className="field mt-1.5" /><span className="mt-1 block text-xs text-fg-faint">8 caractères minimum</span></label>
-        {error && <p role="alert" className="text-sm text-bad">{error}</p>}
-        <Button type="submit" size="lg" className="w-full" disabled={loading}>{loading ? <Spinner /> : brief ? "Créer mon compte et ma boutique" : "Créer mon compte"}</Button>
-      </form>
-      <p className="mt-5 text-xs leading-relaxed text-fg-faint">
+      <ShopifyForm next={next} cta={mode === "register" ? "Créer ma boutique avec Shopify" : "Continuer avec Shopify"} />
+      <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
+      <GoogleButton next={next} />
+      <p className="mt-3 text-xs text-fg-faint">Avec Google, on te demandera ensuite de relier ta boutique Shopify.</p>
+      <p className="mt-8 text-xs leading-relaxed text-fg-faint">
         En continuant, tu acceptes les <Link href="/legal/cgu" className="underline">CGU</Link> et la <Link href="/legal/confidentialite" className="underline">politique de confidentialité</Link>.
-      </p>
-      <p className="mt-8 text-center text-sm text-fg-muted">
-        Déjà un compte ? <Link href={`/connexion?${params}`} className="text-fg underline underline-offset-4">Se connecter</Link>
       </p>
     </>
   );
 }
 
-export function ForgotForm() {
-  const [state, setState] = useState<"idle" | "loading" | "sent">("idle");
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setState("loading");
-    await api.forgotPassword(String(new FormData(e.currentTarget).get("email"))).catch(() => {});
-    setState("sent");
-  }
-  if (state === "sent") {
-    return <p className="rounded-card border border-accent/20 bg-accent-deep/20 p-4 text-sm text-fg-muted">Si un compte existe avec cette adresse, tu vas recevoir un lien pour choisir un nouveau mot de passe.</p>;
-  }
-  return (
-    <form onSubmit={submit} className="space-y-4">
-      <label className="block text-sm">E-mail<input name="email" type="email" required autoComplete="email" className="field mt-1.5" /></label>
-      <Button type="submit" size="lg" className="w-full" disabled={state === "loading"}>{state === "loading" ? <Spinner /> : "Envoyer le lien"}</Button>
-      <p className="text-center text-sm"><Link href="/connexion" className="text-fg-muted hover:text-fg">Retour à la connexion</Link></p>
-    </form>
-  );
-}
-
-export function ResetForm() {
-  const router = useRouter();
+export function ConnectShopifyPanel() {
   const params = useSearchParams();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    if (f.get("password") !== f.get("confirm")) return setError("Les deux mots de passe ne correspondent pas.");
-    setLoading(true);
-    try {
-      await api.resetPassword(params.get("token") ?? "", String(f.get("password")));
-      router.push("/connexion?reset=1");
-    } catch (err) {
-      setError((err as Error).message);
-      setLoading(false);
-    }
-  }
-  return (
-    <form onSubmit={submit} className="space-y-4">
-      <label className="block text-sm">Nouveau mot de passe<input name="password" type="password" required minLength={8} autoComplete="new-password" className="field mt-1.5" /></label>
-      <label className="block text-sm">Confirmation<input name="confirm" type="password" required minLength={8} autoComplete="new-password" className="field mt-1.5" /></label>
-      {error && <p role="alert" className="text-sm text-bad">{error}</p>}
-      <Button type="submit" size="lg" className="w-full" disabled={loading}>{loading ? <Spinner /> : "Enregistrer"}</Button>
-    </form>
-  );
+  const next = params.get("next")?.startsWith("/") ? params.get("next")! : "/app";
+  return <ShopifyForm next={next} cta="Connecter ma boutique" />;
 }

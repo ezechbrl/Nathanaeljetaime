@@ -1,8 +1,14 @@
-# Back-end : tout ce qu'il faut construire
+# Back-end : référence
 
-Ce document liste tout ce que le back-end doit faire pour que le frontend fonctionne en vrai.
-Le frontend appelle déjà toutes les routes ci-dessous. Tant qu'elles n'existent pas, il tourne sur des
-données simulées (`NEXT_PUBLIC_API_MODE=mock`). Quand une route est prête, passe en `live`.
+**Statut : toutes les routes ci-dessous sont implémentées** dans `app/api/**` (logique dans `lib/server/**`).
+Pour l'activer : remplis les clés (`docs/CLES-ET-COMPTES.md`), exécute `supabase/migrations/0001_init.sql`,
+puis passe `NEXT_PUBLIC_API_MODE=live`. En `mock`, le frontend utilise des données simulées.
+
+Choix techniques : Supabase (Postgres + Auth + Storage) ; tâches longues exécutées après la réponse avec
+`after()` de Next.js (`maxDuration` 300 s), progression enregistrée dans la table `jobs` et suivie par le frontend ;
+tâche quotidienne via Vercel Cron (`vercel.json` → `/api/cron/daily`) ; limitation de débit en base (`hit_rate_limit`).
+Thème Shopify : la v1 crée produit, prix, images, pages et mise en vente, mais ne modifie pas le thème (l'écriture
+de fichiers de thème par une app publique demande une autorisation spéciale de Shopify).
 
 - **Contrat exact des données** : `lib/api/types.ts` (source de vérité, à respecter au champ près).
 - **Appels côté frontend** : `lib/api/client.ts` (chaque fonction = une route).
@@ -100,28 +106,18 @@ Active la RLS Supabase : un utilisateur ne voit que ses lignes (`user_id = auth.
 
 ---
 
-## 3. Authentification
+## 3. Authentification (implémentée)
 
-Session par **cookie HttpOnly, Secure, SameSite=Lax** (Supabase Auth le fait pour toi).
-Toutes les routes `/api/*` sauf celles marquées « public » exigent une session ; sinon `401`.
+Pas d'e-mail ni de mot de passe : **Shopify** ou **Google**, et la boutique Shopify est obligatoire.
 
-| Route | Entrée | Sortie |
-|---|---|---|
-| `POST /api/auth/register` (public) | `{ firstName, email, password, ref? }` | `{ user: User }` + cookie. Envoie l'e-mail de vérification. `ref` = code affilié |
-| `POST /api/auth/login` (public) | `{ email, password }` | `{ user: User }` + cookie |
-| `POST /api/auth/logout` | – | `204` |
-| `GET /api/auth/google` (public) | `?ref=` | redirection OAuth Google, retour sur `/api/auth/google/callback` puis `/app` |
-| `POST /api/auth/forgot-password` (public) | `{ email }` | `204` toujours (ne révèle pas si l'e-mail existe) |
-| `POST /api/auth/reset-password` (public) | `{ token, password }` | `204` |
-| `POST /api/auth/verify-email` (public) | `{ token }` | `204` |
-| `GET /api/me` | – | `{ user: User, usage: Usage }` |
-| `PATCH /api/me` | `{ firstName?, email?, avatarUrl? }` | `{ user: User }` |
-| `POST /api/me/password` | `{ currentPassword, newPassword }` | `204` |
-| `DELETE /api/me` | `{ confirm: "SUPPRIMER" }` | `204` — supprime tout (RGPD), désinstalle les connexions Shopify, annule Stripe |
-
-Mot de passe : 8 caractères minimum. Limite : 5 tentatives de connexion / 15 min / IP.
-
----
+| Route | Rôle |
+|---|---|
+| `GET /api/shopify/install?shop=…&next=…` | Démarre l'OAuth Shopify. Sert à se connecter (sans compte) **et** à relier une boutique |
+| `GET /api/shopify/callback` | Vérifie HMAC + state, récupère le token, puis : utilisateur déjà connecté → relie la boutique ; sinon propriétaire existant de la boutique → ouvre sa session ; sinon crée le compte avec l'e-mail de la boutique (session via lien magique généré côté serveur). Si l'e-mail appartient déjà à un autre compte non relié, refus (`/connexion?error=compte-existant`) |
+| `GET /api/auth/google?next=…` | OAuth Google via Supabase |
+| `GET /api/auth/callback` | Retour Google ; sans boutique active → `/connecter-shopify` |
+| `POST /api/auth/logout` | Déconnexion |
+| `GET /api/me` · `PATCH /api/me` · `DELETE /api/me` | Profil, quotas, suppression complète (RGPD) |
 
 ## 4. Connexion Shopify (app publique)
 

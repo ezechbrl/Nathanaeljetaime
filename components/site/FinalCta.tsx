@@ -20,7 +20,7 @@ export function FinalCta({ title = "Crée des boutiques Shopify à fort potentie
   const ref = useScrollProgress<HTMLDivElement>(0.3);
   return (
     <section className="px-4 py-16 sm:px-6">
-      <div ref={ref} className="relative mx-auto max-w-[1100px] overflow-hidden rounded-[18px] border border-accent/20 bg-[linear-gradient(180deg,#073a40,#03222a_60%,#021a20)] px-6 pt-16 text-center sm:pt-20" style={{ "--p": 0 } as React.CSSProperties}>
+      <div ref={ref} className="relative mx-auto max-w-[1100px] overflow-hidden rounded-[18px] border border-accent/20 bg-[linear-gradient(180deg,#f1f8f5,#ffffff)] px-6 pt-16 text-center sm:pt-20" style={{ "--p": 0 } as React.CSSProperties}>
         <div aria-hidden className="absolute inset-0 [background:radial-gradient(ellipse_60%_40%_at_50%_0%,rgb(79_227_207/0.18),transparent)]" />
         <Reveal className="relative flex items-center justify-center gap-2 text-sm text-fg-muted"><LogoMark className="h-5 w-5" /> {site.name}</Reveal>
         <Reveal delay={80} as="h2" className="relative mx-auto mt-6 max-w-3xl text-h1">{title}</Reveal>

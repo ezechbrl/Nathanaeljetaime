@@ -36,7 +36,7 @@ function OurEditorMock() {
     <div className="surface relative overflow-hidden rounded-card p-5 sm:p-8">
       <div aria-hidden className="absolute inset-0 [background:radial-gradient(ellipse_70%_60%_at_50%_0%,rgb(22_170_156/0.22),transparent)]" />
       <p className="relative text-center text-xl tracking-tight sm:text-2xl">Une boutique à partir d'une <span className="serif-accent">phrase</span></p>
-      <div className="relative mt-5 rounded-[10px] border border-accent/25 bg-black/25 p-3">
+      <div className="relative mt-5 rounded-[10px] border border-accent/25 bg-bg-2 p-3">
         <p className="text-sm text-fg">Matcha bio d'Uji, kit de préparation inclus, ton calme et premium.</p>
         <div className="mt-3 flex justify-end"><span className="inline-flex items-center gap-1.5 rounded-[7px] border border-accent/40 bg-accent-strong/70 px-2.5 py-1 text-[11px] text-white"><Sparkles className="h-3 w-3" /> Générer</span></div>
       </div>

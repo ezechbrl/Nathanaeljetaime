@@ -31,30 +31,25 @@ async function request<T>(path: string, init: RequestInit & { json?: unknown } =
 
 const live = API_MODE === "live";
 
-// Auth et compte
-export const register = (input: { firstName: string; email: string; password: string; ref?: string }) =>
-  live ? request<{ user: User }>("/api/auth/register", { method: "POST", json: input }) : mock.register(input);
-export const login = (input: { email: string; password: string }) =>
-  live ? request<{ user: User }>("/api/auth/login", { method: "POST", json: input }) : mock.login(input);
+// Auth et compte : connexion uniquement via Shopify ou Google.
+export const shopifyLoginUrl = (shop: string, next = "/app") => `/api/shopify/install?shop=${encodeURIComponent(shop)}&next=${encodeURIComponent(next)}`;
+export const googleAuthUrl = (next = "/app", ref?: string) =>
+  live ? `/api/auth/google?next=${encodeURIComponent(next)}${ref ? `&ref=${encodeURIComponent(ref)}` : ""}` : `/connecter-shopify?next=${encodeURIComponent(next)}&demo=google`;
+// En mode démo, « se connecter avec Shopify » crée directement la session.
+export const loginWithShopify = (shop: string, next = "/app") =>
+  live ? Promise.resolve(void (window.location.href = shopifyLoginUrl(shop, next))) : mock.loginWithShopify(shop).then(() => void (window.location.href = next));
+export const loginWithGoogleDemo = () => mock.loginWithGoogle();
 export const logout = () => (live ? request<void>("/api/auth/logout", { method: "POST" }) : mock.logout());
-export const forgotPassword = (email: string) =>
-  live ? request<void>("/api/auth/forgot-password", { method: "POST", json: { email } }) : mock.ok();
-export const resetPassword = (token: string, password: string) =>
-  live ? request<void>("/api/auth/reset-password", { method: "POST", json: { token, password } }) : mock.ok();
-export const googleAuthUrl = (ref?: string) => (live ? `/api/auth/google${ref ? `?ref=${encodeURIComponent(ref)}` : ""}` : "/app");
 export const getMe = () => (live ? request<{ user: User; usage: Usage }>("/api/me") : mock.getMe());
 export const updateMe = (input: Partial<Pick<User, "firstName" | "email" | "avatarUrl">>) =>
   live ? request<{ user: User }>("/api/me", { method: "PATCH", json: input }) : mock.updateMe(input);
-export const changePassword = (currentPassword: string, newPassword: string) =>
-  live ? request<void>("/api/me/password", { method: "POST", json: { currentPassword, newPassword } }) : mock.ok();
 export const deleteAccount = () =>
   live ? request<void>("/api/me", { method: "DELETE", json: { confirm: "SUPPRIMER" } }) : mock.ok();
 
 // Shopify
-export const shopifyInstallUrl = (shop: string) => `/api/shopify/install?shop=${encodeURIComponent(shop)}`;
 export const listConnections = () =>
   live ? request<{ connections: ShopConnection[] }>("/api/shopify/connections") : mock.listConnections();
-export const connectShop = (shop: string) => (live ? Promise.resolve(void (window.location.href = shopifyInstallUrl(shop))) : mock.connectShop(shop));
+export const connectShop = (shop: string, next = "/app/parametres#shopify") => (live ? Promise.resolve(void (window.location.href = shopifyLoginUrl(shop, next))) : mock.connectShop(shop));
 export const disconnectShop = (id: string) =>
   live ? request<void>(`/api/shopify/connections/${id}`, { method: "DELETE" }) : mock.disconnectShop(id);
 

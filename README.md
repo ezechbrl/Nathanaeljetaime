@@ -1,4 +1,4 @@
-# Shopora — créateur de boutiques Shopify par IA
+# Vitrio — créateur de boutiques Shopify par IA
 
 Décris ton produit : l'IA pose la stratégie (marché, promesse, offres, objections), construit la boutique
 (marque, pages, fiches produits, FAQ, visuels), la publie sur Shopify, puis l'optimise chaque jour.
@@ -35,7 +35,13 @@ stockées dans le navigateur (compte, boutiques, chat, publication, abonnement).
 
 ## Design
 
-Fond bleu-vert profond, typographie DM Sans fine et serrée avec des accents en Instrument Serif italique,
-surfaces en verre fin, une seule couleur d'accent. Les sections apparaissent au défilement (`components/ui/Reveal.tsx`),
+Palette Shopify (blanc, gris neutres, vert #008060), titres en Bricolage Grotesque, texte en Figtree,
+une seule couleur d'accent. Les sections apparaissent au défilement (`components/ui/Reveal.tsx`),
 certaines animations suivent la position de défilement (`components/ui/useScrollProgress.ts`). Toutes les animations
 respectent le réglage « réduire les animations » du système.
+
+## Vidéos de démonstration
+
+Les vidéos de la landing (`public/videos`) sont de vraies captures de l'application, enregistrées avec
+`scripts/record-demo-videos.mjs` (Playwright). Pour les refaire après un changement d'interface : lance l'app en mode démo
+sur le port 3300 (`npm run build && npx next start -p 3300`), puis `node scripts/record-demo-videos.mjs public/videos`.

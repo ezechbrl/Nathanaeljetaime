@@ -14,7 +14,7 @@ import { formatDate } from "@/lib/format";
 
 function Card({ id, title, text, children }: { id?: string; title: string; text?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="grid scroll-mt-20 gap-6 border-b border-white/[0.06] py-8 lg:grid-cols-[280px_1fr]">
+    <section id={id} className="grid scroll-mt-20 gap-6 border-b border-black/[0.06] py-8 lg:grid-cols-[280px_1fr]">
       <div><h2 className="text-[16px] tracking-tight">{title}</h2>{text && <p className="mt-1 text-sm text-fg-muted">{text}</p>}</div>
       <div className="max-w-xl">{children}</div>
     </section>
@@ -43,19 +43,6 @@ export default function SettingsPage() {
       toast((err as Error).message, "error");
     } finally {
       setSaving(false);
-    }
-  }
-
-  async function savePassword(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const f = new FormData(form);
-    try {
-      await api.changePassword(String(f.get("current")), String(f.get("next")));
-      form.reset();
-      toast("Mot de passe modifié");
-    } catch (err) {
-      toast((err as Error).message, "error");
     }
   }
 
@@ -103,7 +90,7 @@ export default function SettingsPage() {
         <Card id="shopify" title="Boutiques Shopify" text="L'IA publie dans ces boutiques et lit leurs statistiques pour le pilotage.">
           <div className="space-y-2">
             {!connections.data ? <Skeleton className="h-16" /> : connections.data.connections.map((c) => (
-              <div key={c.id} className="flex items-center justify-between gap-3 rounded-card border border-white/[0.07] p-4">
+              <div key={c.id} className="flex items-center justify-between gap-3 rounded-card border border-black/[0.07] p-4">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-ctl bg-[#f4f6f1]"><ShoppingBag className="h-4 w-4 text-[#5e8e3e]" /></span>
                   <div className="min-w-0">
@@ -121,14 +108,6 @@ export default function SettingsPage() {
             <Button type="submit" disabled={connecting || !shop}>{connecting ? <Spinner /> : "Connecter"}</Button>
           </form>
           <p className="mt-2 text-xs text-fg-faint">Pas encore de boutique ? <a href="https://www.shopify.com/fr/essai-gratuit" target="_blank" rel="noreferrer" className="underline underline-offset-4">Ouvre-en une sur Shopify</a>, puis reviens ici.</p>
-        </Card>
-
-        <Card title="Mot de passe">
-          <form onSubmit={savePassword} className="space-y-4">
-            <label className="block text-sm">Mot de passe actuel<input name="current" type="password" required autoComplete="current-password" className="field mt-1.5" /></label>
-            <label className="block text-sm">Nouveau mot de passe<input name="next" type="password" required minLength={8} autoComplete="new-password" className="field mt-1.5" /></label>
-            <Button type="submit" variant="secondary">Modifier</Button>
-          </form>
         </Card>
 
         <Card title="Supprimer le compte" text="Supprime ton compte et toutes tes données. Tes boutiques Shopify ne sont pas touchées.">

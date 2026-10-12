@@ -29,7 +29,7 @@ export function Audience() {
           <Reveal><span className="eyebrow">Pour qui</span></Reveal>
           <Reveal delay={80} as="h2" className="mt-5 text-h1">Des marques ambitieuses, <span className="serif-accent">quel que soit</span> le point de départ.</Reveal>
         </div>
-        <div className="divide-y divide-white/[0.07] border-y border-white/[0.07]">
+        <div className="divide-y divide-black/[0.07] border-y border-black/[0.07]">
           {AUDIENCES.map((a, i) => (
             <Reveal key={a.who} delay={i * 80} className="grid gap-4 py-9 sm:grid-cols-[150px_1fr]">
               <p className="text-sm text-accent">{a.who}</p>

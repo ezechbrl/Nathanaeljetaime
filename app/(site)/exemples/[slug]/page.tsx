@@ -36,7 +36,7 @@ export default async function ExamplePage({ params }: { params: Promise<{ slug: 
             <div>
               <Reveal as="p" className="text-sm text-accent">{s.category} · boutique en {s.language}</Reveal>
               <Reveal delay={60} as="h1" className="mt-3 text-h1">{s.name}</Reveal>
-              <Reveal delay={120} className="mt-8 rounded-card border border-white/[0.08] bg-white/[0.02] p-5">
+              <Reveal delay={120} className="mt-8 rounded-card border border-black/[0.08] bg-black/[0.02] p-5">
                 <p className="text-xs uppercase tracking-[0.14em] text-fg-faint">Le brief</p>
                 <p className="mt-2 text-lg leading-snug">« {s.brief} »</p>
               </Reveal>
@@ -60,7 +60,7 @@ export default async function ExamplePage({ params }: { params: Promise<{ slug: 
       </section>
 
       <Container className="py-20">
-        <Link href={`/exemples/${next.slug}`} className="group flex items-center justify-between border-y border-white/[0.07] py-8">
+        <Link href={`/exemples/${next.slug}`} className="group flex items-center justify-between border-y border-black/[0.07] py-8">
           <span className="text-sm text-fg-muted">Exemple suivant</span>
           <span className="text-h2 transition-colors group-hover:text-accent">{next.name} →</span>
         </Link>

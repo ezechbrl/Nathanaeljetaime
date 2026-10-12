@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { AuthPanel } from "@/components/auth/AuthForms";
 import { AuthShell } from "@/components/auth/AuthShell";
-import { LoginForm } from "@/components/auth/AuthForms";
 
-export const metadata: Metadata = { title: "Bon retour", robots: { index: false } };
+export const metadata: Metadata = { title: "Connexion", robots: { index: false } };
 
 export default function Page() {
   return (
-    <AuthShell title="Bon retour" subtitle="Connecte-toi pour retrouver tes boutiques.">
-      <Suspense><LoginForm /></Suspense>
+    <AuthShell title="Connexion" subtitle="Connecte-toi avec ta boutique Shopify ou ton compte Google.">
+      <Suspense><AuthPanel mode="login" /></Suspense>
     </AuthShell>
   );
 }

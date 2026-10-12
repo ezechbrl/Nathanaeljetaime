@@ -30,7 +30,7 @@ export async function fetchProductPageText(rawUrl: string): Promise<string> {
   const res = await fetch(url, {
     redirect: "error",
     signal: AbortSignal.timeout(10_000),
-    headers: { "user-agent": "Mozilla/5.0 (compatible; ShoporaBot/0.1)" },
+    headers: { "user-agent": "Mozilla/5.0 (compatible; VitrioBot/0.1)" },
   });
   if (!res.ok) throw new Error(`La page a répondu ${res.status}`);
   const html = await res.text();

@@ -21,7 +21,7 @@ type State = {
   affiliate: Affiliate | null;
 };
 
-const KEY = "shopora-mock-v1";
+const KEY = "vitrio-mock-v1";
 const iso = () => new Date().toISOString();
 const uid = (p: string) => `${p}_${Math.random().toString(36).slice(2, 10)}`;
 const wait = (ms = 350) => new Promise((r) => setTimeout(r, ms));
@@ -29,7 +29,7 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
 const demoUser: User = {
   id: "user_demo",
-  email: "demo@shopora.app",
+  email: "demo@vitrio.ai",
   firstName: "Alex",
   avatarUrl: null,
   emailVerified: true,
@@ -58,7 +58,7 @@ function load(): State {
   if (state) return state;
   try {
     const raw = typeof window !== "undefined" ? window.localStorage.getItem(KEY) : null;
-    state = raw ? (JSON.parse(raw) as State) : initialState();
+    state = raw ? { ...initialState(), ...(JSON.parse(raw) as Partial<State>) } : initialState();
   } catch {
     state = initialState();
   }
@@ -90,21 +90,22 @@ export function resetDemo() {
   save();
 }
 
-// Auth
-export async function register(input: { firstName: string; email: string }) {
-  await wait(600);
+// Auth (démo) : Shopify crée le compte et relie la boutique ; Google crée le compte sans boutique.
+export async function loginWithShopify(shop: string) {
+  await wait(700);
   const s = load();
-  s.user = { ...demoUser, id: uid("user"), email: input.email, firstName: input.firstName, createdAt: iso() };
+  const domain = shop.includes(".") ? shop : `${shop}.myshopify.com`;
+  s.user = s.user ?? { ...demoUser, firstName: "Alex" };
+  if (!s.connections.some((c) => c.shopDomain === domain && c.status === "active")) {
+    s.connections.push({ id: uid("conn"), shopDomain: domain, shopName: domain.split(".")[0], status: "active", connectedAt: iso() });
+  }
   save();
-  return { user: s.user };
 }
-export async function login(input: { email: string; password: string }) {
+export async function loginWithGoogle() {
   await wait(500);
   const s = load();
-  if (input.password.length < 8) throw new ApiClientError(401, "invalid_credentials", "E-mail ou mot de passe incorrect.");
-  s.user = { ...(s.user ?? demoUser), email: input.email };
+  s.user = s.user ?? { ...demoUser, firstName: "Alex" };
   save();
-  return { user: s.user };
 }
 export async function logout() {
   await wait(200);

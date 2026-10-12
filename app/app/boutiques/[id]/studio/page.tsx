@@ -98,13 +98,13 @@ export default function StudioPage() {
             <fieldset className="flex items-center gap-2">
               <legend className="sr-only">Type</legend>
               {KINDS.map((k) => (
-                <button type="button" key={k.id} onClick={() => setKind(k.id)} aria-pressed={kind === k.id} className={cn("rounded-full border px-3 py-1 text-[13px]", kind === k.id ? "border-accent/40 bg-accent-deep/40 text-fg" : "border-white/[0.08] text-fg-muted hover:text-fg")}>{k.label}</button>
+                <button type="button" key={k.id} onClick={() => setKind(k.id)} aria-pressed={kind === k.id} className={cn("rounded-full border px-3 py-1 text-[13px]", kind === k.id ? "border-accent/40 bg-accent-deep/40 text-fg" : "border-black/[0.08] text-fg-muted hover:text-fg")}>{k.label}</button>
               ))}
             </fieldset>
             <fieldset className="flex items-center gap-2">
               <legend className="sr-only">Format</legend>
               {RATIOS.map((r) => (
-                <button type="button" key={r} onClick={() => setRatio(r)} aria-pressed={ratio === r} className={cn("rounded-full border px-3 py-1 font-mono text-xs", ratio === r ? "border-accent/40 text-fg" : "border-white/[0.08] text-fg-muted hover:text-fg")}>{r}</button>
+                <button type="button" key={r} onClick={() => setRatio(r)} aria-pressed={ratio === r} className={cn("rounded-full border px-3 py-1 font-mono text-xs", ratio === r ? "border-accent/40 text-fg" : "border-black/[0.08] text-fg-muted hover:text-fg")}>{r}</button>
               ))}
             </fieldset>
           </div>
@@ -113,7 +113,7 @@ export default function StudioPage() {
         <div>
           <div className="flex flex-wrap gap-1">
             {FILTERS.map((f) => (
-              <button key={f.id} onClick={() => setFilter(f.id)} aria-pressed={filter === f.id} className={cn("rounded-ctl px-3 py-1.5 text-[13px]", filter === f.id ? "bg-white/[0.07] text-fg" : "text-fg-muted hover:text-fg")}>{f.label}</button>
+              <button key={f.id} onClick={() => setFilter(f.id)} aria-pressed={filter === f.id} className={cn("rounded-ctl px-3 py-1.5 text-[13px]", filter === f.id ? "bg-black/[0.07] text-fg" : "text-fg-muted hover:text-fg")}>{f.label}</button>
             ))}
           </div>
           <div className="mt-4">
@@ -125,7 +125,7 @@ export default function StudioPage() {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
                 {job && <div className="grid aspect-square place-items-center rounded-card border border-accent/30 bg-accent-deep/20"><Spinner className="text-accent" /></div>}
                 {list.map((a) => (
-                  <figure key={a.id} className="group relative aspect-square overflow-hidden rounded-card border border-white/[0.07]">
+                  <figure key={a.id} className="group relative aspect-square overflow-hidden rounded-card border border-black/[0.07]">
                     <img src={a.url} alt={a.prompt ?? "Visuel de la boutique"} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                     <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-2.5 pt-8 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <span className="truncate text-[11px] text-white/80">{a.prompt ?? KINDS.find((k) => k.id === a.kind)?.label ?? "Importée"}</span>

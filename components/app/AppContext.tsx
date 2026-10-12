@@ -29,7 +29,12 @@ export function AppProvider({ children, fallback }: { children: React.ReactNode;
 
   const refresh = useCallback(async () => {
     try {
-      const [me, list] = await Promise.all([api.getMe(), api.listStores()]);
+      const [me, list, conns] = await Promise.all([api.getMe(), api.listStores(), api.listConnections()]);
+      // La boutique Shopify est obligatoire pour utiliser l'application.
+      if (!conns.connections.some((c) => c.status === "active")) {
+        router.replace(`/connecter-shopify?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+        return;
+      }
       setState(me);
       setStores(list.stores);
     } catch (e) {

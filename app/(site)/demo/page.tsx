@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
-import { DemoPlayer } from "@/components/site/DemoPlayer";
+import { VideoSteps } from "@/components/site/VideoSteps";
 import { PageHero } from "@/components/site/PageHero";
 import { FinalCta } from "@/components/site/FinalCta";
 
@@ -19,9 +19,9 @@ export default function DemoPage() {
   return (
     <>
       <PageHero eyebrow="Démo" title={<>Un brief de deux lignes. Une boutique <span className="serif-accent">complète</span>.</>} subtitle="Voici ce qui se passe quand tu cliques sur « Générer »." />
-      <Container className="max-w-[1100px]">
-        <Reveal><DemoPlayer /></Reveal>
-        <ol className="mt-20 grid gap-px overflow-hidden rounded-card border border-white/[0.07] bg-white/[0.07] md:grid-cols-4">
+      <Container>
+        <Reveal><VideoSteps /></Reveal>
+        <ol className="mt-20 grid gap-px overflow-hidden rounded-card border border-black/[0.07] bg-black/[0.07] md:grid-cols-4">
           {TIMELINE.map((s, i) => (
             <Reveal as="li" key={s.t} delay={i * 80} className="bg-bg p-6">
               <p className="font-mono text-xs text-accent">{s.t}</p>

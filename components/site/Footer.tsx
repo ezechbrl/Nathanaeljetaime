@@ -13,7 +13,7 @@ const COLUMNS = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-24 border-t border-white/[0.06]">
+    <footer className="relative mt-24 border-t border-black/[0.06]">
       <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.3fr_2fr]">
           <div>
@@ -38,7 +38,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 overflow-hidden border-y border-white/[0.06] py-5 [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
+        <div className="mt-16 overflow-hidden border-y border-black/[0.06] py-5 [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
           <div className="flex w-max animate-marquee gap-14 text-fg-faint">
             {[...SHOWCASE, ...SHOWCASE].map((s, i) => (
               <Link key={i} href={`/exemples/${s.slug}`} className={s.font === "serif" ? "font-serif text-xl italic hover:text-fg" : "text-lg tracking-tight hover:text-fg"}>

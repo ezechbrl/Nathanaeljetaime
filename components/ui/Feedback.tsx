@@ -17,8 +17,8 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 
 export function EmptyState({ icon: Icon, title, text, action }: { icon: React.ComponentType<{ className?: string }>; title: string; text: string; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-card border border-dashed border-white/10 px-6 py-14 text-center">
-      <span className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/[0.03]"><Icon className="h-5 w-5 text-fg-muted" /></span>
+    <div className="flex flex-col items-center rounded-card border border-dashed border-black/10 px-6 py-14 text-center">
+      <span className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-black/[0.03]"><Icon className="h-5 w-5 text-fg-muted" /></span>
       <p className="mt-4 text-lg tracking-tight">{title}</p>
       <p className="mt-1 max-w-sm text-sm text-fg-muted">{text}</p>
       {action && <div className="mt-6">{action}</div>}
@@ -34,7 +34,7 @@ export function Meter({ label, used, limit }: { label: string; used: number; lim
         <span>{label}</span>
         <span className="tabular-nums">{used} / {limit >= 999 ? "∞" : limit}</span>
       </div>
-      <div className="mt-1.5 h-1 overflow-hidden rounded bg-white/[0.06]">
+      <div className="mt-1.5 h-1 overflow-hidden rounded bg-black/[0.06]">
         <div className={cn("h-full rounded transition-[width] duration-500", pct > 85 ? "bg-warn" : "bg-accent/80")} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -49,7 +49,7 @@ export function StatusBadge({ status }: { status: string }) {
     published: ["En ligne", "border-good/30 text-good"],
     failed: ["Échec", "border-bad/30 text-bad"],
   };
-  const [label, cls] = map[status] ?? [status, "border-white/15 text-fg-muted"];
+  const [label, cls] = map[status] ?? [status, "border-black/15 text-fg-muted"];
   return (
     <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px]", cls)}>
       <span className={cn("h-1.5 w-1.5 rounded-full bg-current", (status === "generating" || status === "publishing") && "animate-pulse")} />

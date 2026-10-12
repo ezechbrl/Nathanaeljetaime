@@ -60,7 +60,7 @@ export default function AffiliateDashboard() {
                 ["Clics", String(a.stats.clicks)], ["Inscriptions", String(a.stats.signups)], ["Clients payants", String(a.stats.paidCustomers)],
                 ["Gagné", formatMoney(a.stats.earned)], ["En attente", formatMoney(a.stats.pending)],
               ].map(([k, v]) => (
-                <div key={k} className="rounded-card border border-white/[0.07] p-4"><p className="text-xs text-fg-muted">{k}</p><p className="mt-2 text-2xl tracking-tight tabular-nums">{v}</p></div>
+                <div key={k} className="rounded-card border border-black/[0.07] p-4"><p className="text-xs text-fg-muted">{k}</p><p className="mt-2 text-2xl tracking-tight tabular-nums">{v}</p></div>
               ))}
             </div>
             <p className="text-sm text-fg-muted">Paiement mensuel à {a.payoutEmail} dès {AFFILIATE.minPayout} € de commissions validées.</p>
