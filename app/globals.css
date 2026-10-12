@@ -2,9 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-html { scroll-behavior: smooth; }
-body { @apply bg-white text-ink antialiased; }
+:root {
+  color-scheme: dark;
+  --bg: 2 24 30;          /* #02181e */
+  --bg-2: 4 33 40;        /* #042128 */
+  --bg-3: 7 45 53;        /* #072d35 */
+  --fg: 232 243 242;
+  --fg-muted: 160 186 188;
+  --fg-faint: 104 133 137;
+  --line: 255 255 255;    /* utilisé avec une opacité faible */
+  --accent: 79 227 207;   /* #4fe3cf */
+  --accent-strong: 22 170 156;
+  --accent-deep: 10 92 92;
+  --good: 74 222 128;
+  --warn: 251 191 36;
+  --bad: 248 113 113;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-bg font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
+  ::selection { background: rgb(var(--accent) / 0.25); }
+  :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; border-radius: 6px; }
+  h1, h2, h3 { font-weight: 400; text-wrap: balance; }
+  p { text-wrap: pretty; }
+}
+
+@layer components {
+  /* Surface « verre » : fond très légèrement teinté, bord fin, reflet interne. */
+  .surface {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.015));
+    border: 1px solid rgb(var(--line) / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 20px 40px -24px rgb(0 0 0 / 0.6);
+  }
+  .surface-accent {
+    background: linear-gradient(180deg, rgb(var(--accent-deep) / 0.35), rgb(var(--accent-deep) / 0.12));
+    border: 1px solid rgb(var(--accent) / 0.22);
+  }
+  .hairline { border-color: rgb(var(--line) / 0.08); }
+  .field {
+    @apply w-full min-w-0 rounded-ctl border bg-white/[0.03] px-3.5 py-2.5 text-[15px] text-fg placeholder:text-fg-faint transition-colors duration-200;
+    border-color: rgb(var(--line) / 0.1);
+  }
+  .field:hover { border-color: rgb(var(--line) / 0.18); }
+  .field:focus { outline: none; border-color: rgb(var(--accent) / 0.6); box-shadow: 0 0 0 3px rgb(var(--accent) / 0.12); }
+  .eyebrow { @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-fg-muted; border-color: rgb(var(--line) / 0.1); background: rgb(255 255 255 / 0.03); }
+  .text-gradient {
+    background: linear-gradient(180deg, rgb(var(--fg)) 30%, rgb(var(--fg) / 0.45));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .serif-accent { @apply font-serif italic text-accent; letter-spacing: -0.02em; }
+  .prose-store p { @apply mb-2; }
+  .prose-store h3 { @apply mb-1 mt-3 font-medium; }
+  .prose-store ul { @apply mb-2 list-disc pl-5; }
+}
+
+/* Apparition au défilement (voir components/ui/Reveal.tsx). */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  filter: blur(6px);
+  transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1), filter .9s cubic-bezier(.22,1,.36,1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal="in"] { opacity: 1; transform: none; filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee, .animate-rise { animation: none; }
+  html { scroll-behavior: auto; }
+  [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* Animations des 3 étapes : elles démarrent quand la carte apparaît. */
+@keyframes flow-dash { to { stroke-dashoffset: -40; } }
+@keyframes pop-in { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes draw { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgb(79 227 207 / .6); } 50% { box-shadow: 0 0 0 6px rgb(79 227 207 / 0); } }
+@keyframes type-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+.anim { animation-play-state: paused; animation-fill-mode: both; }
+[data-reveal="in"] .anim { animation-play-state: running; }

@@ -1,21 +1,43 @@
 import type { Config } from "tailwindcss";
 
+// Couleurs définies en variables CSS dans app/globals.css (thème sombre bleu-vert).
+const v = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        ink: "#0b0b0f",
-        brand: { DEFAULT: "#6d4aff", soft: "#efeaff" },
+        bg: { DEFAULT: v("bg"), 2: v("bg-2"), 3: v("bg-3") },
+        fg: { DEFAULT: v("fg"), muted: v("fg-muted"), faint: v("fg-faint") },
+        line: v("line"),
+        accent: { DEFAULT: v("accent"), strong: v("accent-strong"), deep: v("accent-deep") },
+        good: v("good"),
+        warn: v("warn"),
+        bad: v("bad"),
       },
-      fontFamily: { sans: ["var(--font-sans)", "system-ui", "sans-serif"] },
+      fontFamily: {
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+      },
+      fontSize: {
+        display: ["clamp(2.75rem, 1.6rem + 4.2vw, 5.25rem)", { lineHeight: "1", letterSpacing: "-0.055em" }],
+        h1: ["clamp(2.4rem, 1.5rem + 3.2vw, 4.25rem)", { lineHeight: "1.02", letterSpacing: "-0.05em" }],
+        h2: ["clamp(2rem, 1.4rem + 2.2vw, 3.25rem)", { lineHeight: "1.05", letterSpacing: "-0.045em" }],
+        h3: ["clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem)", { lineHeight: "1.2", letterSpacing: "-0.025em" }],
+      },
+      borderRadius: { card: "12px", ctl: "9px" },
+      transitionTimingFunction: { out: "cubic-bezier(0.22, 1, 0.36, 1)" },
       keyframes: {
         marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(-50%)" } },
-        rise: { from: { opacity: "0", transform: "translateY(12px)" }, to: { opacity: "1", transform: "none" } },
+        rays: { "0%,100%": { transform: "translateX(-2%) skewX(-8deg)", opacity: ".75" }, "50%": { transform: "translateX(2%) skewX(-4deg)", opacity: "1" } },
+        shimmer: { from: { backgroundPosition: "200% 0" }, to: { backgroundPosition: "-200% 0" } },
+        "spin-slow": { to: { transform: "rotate(360deg)" } },
       },
       animation: {
-        marquee: "marquee 40s linear infinite",
-        rise: "rise .6s ease-out both",
+        marquee: "marquee 45s linear infinite",
+        rays: "rays 14s ease-in-out infinite",
+        shimmer: "shimmer 2.4s linear infinite",
       },
     },
   },

@@ -1,0 +1,146 @@
+// Contrat d'API entre le frontend et le backend.
+// Toute réponse JSON du backend doit respecter ces types (dates en ISO 8601, montants en centimes).
+// Voir docs/BACKEND.md pour la liste des routes.
+
+import type { StorePlan } from "@/lib/store-schema";
+
+export type ApiError = { error: { code: string; message: string; field?: string } };
+
+export type PlanId = "free" | "pro" | "agency";
+
+export type User = {
+  id: string;
+  email: string;
+  firstName: string;
+  avatarUrl: string | null;
+  emailVerified: boolean;
+  plan: PlanId;
+  createdAt: string;
+};
+
+export type Usage = {
+  conversations: { used: number; limit: number };
+  images: { used: number; limit: number };
+  stores: { used: number; limit: number };
+  resetsAt: string;
+};
+
+export type ShopConnection = {
+  id: string;
+  shopDomain: string; // ex. "ma-boutique.myshopify.com"
+  shopName: string;
+  status: "active" | "uninstalled" | "error";
+  connectedAt: string;
+};
+
+export type CreationMode = "start" | "link" | "recraft";
+
+export type StoreStatus = "generating" | "ready" | "publishing" | "published" | "failed";
+
+export type StoreTheme = {
+  colors: { primary: string; accent: string; background: string };
+  headingFont: string;
+  bodyFont: string;
+};
+
+export type Store = {
+  id: string;
+  name: string;
+  niche: string;
+  language: string;
+  mode: CreationMode;
+  status: StoreStatus;
+  shopConnectionId: string | null;
+  theme: StoreTheme;
+  plan: StorePlan | null; // null tant que la génération n'est pas terminée
+  previewUrl: string | null; // aperçu Shopify (thème non publié) quand disponible
+  liveUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type JobStepKey = "strategy" | "brand" | "pages" | "product" | "images" | "theme" | "publish";
+
+export type Job = {
+  id: string;
+  storeId: string;
+  kind: "generate" | "publish" | "image" | "recraft";
+  status: "queued" | "running" | "succeeded" | "failed";
+  progress: number; // 0 à 100
+  steps: { key: JobStepKey; label: string; status: "pending" | "running" | "done" | "failed" }[];
+  error: string | null;
+  createdAt: string;
+  finishedAt: string | null;
+};
+
+export type ChatChange = { path: string; label: string; before: string; after: string };
+
+export type ChatMessage = {
+  id: string;
+  storeId: string;
+  role: "user" | "assistant";
+  content: string;
+  changes: ChatChange[]; // modifications appliquées à la boutique par ce message
+  createdAt: string;
+};
+
+export type StoreVersion = { id: string; storeId: string; label: string; createdAt: string };
+
+export type Asset = {
+  id: string;
+  storeId: string;
+  kind: "product" | "lifestyle" | "banner" | "logo" | "upload";
+  url: string;
+  width: number;
+  height: number;
+  prompt: string | null;
+  createdAt: string;
+};
+
+export type MetricsPoint = { date: string; sessions: number; orders: number; revenue: number; conversionRate: number };
+
+export type StoreMetrics = {
+  range: "7d" | "30d" | "90d";
+  totals: { sessions: number; orders: number; revenue: number; conversionRate: number; averageOrderValue: number };
+  previous: { sessions: number; orders: number; revenue: number; conversionRate: number; averageOrderValue: number };
+  series: MetricsPoint[];
+};
+
+export type Recommendation = {
+  id: string;
+  storeId: string;
+  title: string;
+  rationale: string;
+  area: "copy" | "offer" | "product-page" | "trust" | "seo" | "speed";
+  expectedImpact: "low" | "medium" | "high";
+  status: "proposed" | "applied" | "dismissed";
+  createdAt: string;
+};
+
+export type Insight = { storeId: string; summary: string; createdAt: string };
+
+export type Subscription = {
+  plan: PlanId;
+  status: "active" | "trialing" | "past_due" | "canceled";
+  interval: "month" | "year" | null;
+  renewsAt: string | null;
+  cancelAtPeriodEnd: boolean;
+};
+
+export type Invoice = { id: string; number: string; amount: number; currency: string; status: "paid" | "open" | "void"; pdfUrl: string; createdAt: string };
+
+export type Affiliate = {
+  code: string;
+  link: string;
+  commissionRate: number; // ex. 0.3 pour 30 %
+  stats: { clicks: number; signups: number; paidCustomers: number; earned: number; pending: number };
+  payoutEmail: string | null;
+};
+
+export type GenerateStoreInput = {
+  mode: CreationMode;
+  brief: string;
+  productUrl?: string;
+  language: string;
+  shopConnectionId?: string;
+};

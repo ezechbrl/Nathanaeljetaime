@@ -1,39 +1,41 @@
-# Shopora — créateur de boutiques Shopify par IA (MVP)
+# Shopora — créateur de boutiques Shopify par IA
 
-SaaS inspiré de Scale Ova : le marchand décrit son produit (ou colle un lien produit),
-l'IA (Claude) pose la stratégie (marché, promesse, offres, objections) puis génère la
-boutique (marque, page d'accueil, fiche produit + SEO, FAQ, page « À propos »),
-et le tout est envoyé sur Shopify en brouillon.
+Décris ton produit : l'IA pose la stratégie (marché, promesse, offres, objections), construit la boutique
+(marque, pages, fiches produits, FAQ, visuels), la publie sur Shopify, puis l'optimise chaque jour.
 
-## Démarrer
+## Lancer en local
 
 ```bash
 npm install
-cp .env.example .env.local   # renseigner les clés
-npm run dev                  # http://localhost:3000
+cp .env.example .env.local
+npm run dev          # http://localhost:3000
 ```
 
-| Variable | Rôle |
-|---|---|
-| `ANTHROPIC_API_KEY` | Clé API Claude |
-| `SHOPIFY_STORE_DOMAIN` | `ma-boutique.myshopify.com` |
-| `SHOPIFY_ADMIN_TOKEN` | Token d'une app personnalisée Shopify (scopes `write_products`, `read_products`, `write_content`, `write_online_store_pages`) |
+Par défaut, `NEXT_PUBLIC_API_MODE=mock` : toute l'application fonctionne avec des données de démonstration
+stockées dans le navigateur (compte, boutiques, chat, publication, abonnement). Passe en `live` quand le back-end est configuré.
+
+## Documentation
+
+- [`docs/CLES-ET-COMPTES.md`](docs/CLES-ET-COMPTES.md) — les comptes à créer et où trouver chaque clé (Supabase, Claude, Shopify, Stripe).
+- [`docs/BACKEND.md`](docs/BACKEND.md) — les routes d'API, la base de données et le fonctionnement du back-end.
 
 ## Structure
 
-- `app/page.tsx` — landing page (FR)
-- `app/generer/` + `components/Generator.tsx` — brief → génération → aperçu → publication
-- `app/api/generate` — appelle Claude avec une sortie structurée (`lib/store-schema.ts`)
-- `app/api/shopify/publish` — crée produit, prix et page via l'Admin GraphQL API (`lib/shopify.ts`)
-- `lib/site.ts` — nom de la marque (à changer)
+| Dossier | Contenu |
+|---|---|
+| `app/(site)` | Site public : accueil, produit, exemples, tarifs, démo, blog, outils, affiliation, légal… |
+| `app/(auth)` | Connexion, inscription, mot de passe oublié |
+| `app/app` | Espace client : accueil, boutiques, éditeur IA, studio, pilotage, abonnement, paramètres |
+| `app/api` | Routes du back-end |
+| `components/ui` | Design system (boutons, apparitions au défilement, lumière, retours d'état) |
+| `components/site`, `components/app` | Composants du site et de l'application |
+| `lib/api` | Contrat d'API (`types.ts`), client (`client.ts`), back-end simulé (`mock.ts`) |
+| `lib/content` | Textes du site : FAQ, tarifs, exemples, blog, nouveautés, pages légales |
+| `lib/site.ts` | Nom de la marque et coordonnées |
 
-## Feuille de route vers le vrai SaaS
+## Design
 
-1. **Comptes** : auth (Supabase / Clerk) + base de données pour sauvegarder les boutiques générées.
-2. **App Shopify publique (OAuth)** : chaque client connecte *sa* boutique au lieu d'un token unique en variable d'env.
-3. **Abonnement** : Stripe (ou Shopify Billing API si l'app passe par l'App Store), quotas de générations.
-4. **Thème** : générer/paramétrer un thème (Online Store 2.0, `themeFilesUpsert`) avec les couleurs et sections générées.
-5. **Images** : génération/retouche des visuels produit.
-6. **Éditeur** : modifier le contenu par chat ou dans un éditeur visuel avant publication.
-7. **Optimisation quotidienne** : tâche planifiée qui lit les stats Shopify et propose des améliorations.
-8. **Légal** : mentions légales, CGU/CGV, politique de confidentialité (RGPD).
+Fond bleu-vert profond, typographie DM Sans fine et serrée avec des accents en Instrument Serif italique,
+surfaces en verre fin, une seule couleur d'accent. Les sections apparaissent au défilement (`components/ui/Reveal.tsx`),
+certaines animations suivent la position de défilement (`components/ui/useScrollProgress.ts`). Toutes les animations
+respectent le réglage « réduire les animations » du système.
