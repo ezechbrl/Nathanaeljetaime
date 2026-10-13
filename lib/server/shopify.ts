@@ -139,8 +139,8 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
 
   // Mise en vente sur la boutique en ligne.
   await onStep("publish");
-  const pubs = await graphql<{ publications: { nodes: { id: string; name: string }[] } }>(shop, token, `{ publications(first: 20) { nodes { id name } } }`);
-  const online = pubs.publications.nodes.find((p) => /online store|boutique en ligne/i.test(p.name));
+  const pubs = await graphql<{ publications: { nodes: { id: string; catalog: { title: string } | null }[] } }>(shop, token, `{ publications(first: 20) { nodes { id catalog { title } } } }`);
+  const online = pubs.publications.nodes.find((p) => /online store|boutique en ligne/i.test(p.catalog?.title ?? ""));
   if (online) {
     const d = await graphql<{ publishablePublish: { userErrors: UserError[] } }>(shop, token,
       `mutation ($id: ID!, $input: [PublicationInput!]!) { publishablePublish(id: $id, input: $input) { userErrors { field message } } }`,
