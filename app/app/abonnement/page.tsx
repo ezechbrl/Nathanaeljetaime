@@ -74,7 +74,7 @@ function Billing() {
                 <Meter label="Messages à l'IA" used={usage.conversations.used} limit={usage.conversations.limit} />
                 <Meter label="Images générées" used={usage.images.used} limit={usage.images.limit} />
                 <Meter label="Boutiques" used={usage.stores.used} limit={usage.stores.limit} />
-                <p className="text-xs text-fg-faint">Quotas remis à zéro le {formatDate(usage.resetsAt)}. Le budget IA est limité à {usage.aiBudget.limitEur} € par semaine ; une fois atteint, l'IA se met en pause 24 h.</p>
+                <p className="text-xs text-fg-faint">Quotas remis à zéro le {formatDate(usage.resetsAt)}. Crédit IA : {usage.aiBudget.session.limitEur} € qui se recharge toutes les {usage.aiBudget.session.hours} h, et {usage.aiBudget.limitEur} € maximum par semaine (au-delà, pause de 24 h).</p>
               </div>
             ) : <Skeleton className="mt-4 h-24" />}
           </section>

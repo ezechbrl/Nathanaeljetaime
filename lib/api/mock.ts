@@ -19,7 +19,7 @@ type State = {
   connections: ShopConnection[];
   subscription: Subscription;
   affiliate: Affiliate | null;
-  ai: { spent: number; windowStart: number; blockedUntil: number | null }; // budget IA simulé (euros)
+  ai: { spent: number; windowStart: number; blockedUntil: number | null; sessionStart?: number | null; sessionSpent?: number }; // budget IA simulé (euros)
 };
 
 const KEY = "vitrio-mock-v1";
@@ -115,29 +115,35 @@ export async function logout() {
   s.user = null;
   save();
 }
-// Même règle que le serveur : 5 € par semaine, puis 24 h de blocage et remise à zéro.
+// Même règles que le serveur : 1 € par tranche de 5 h, et 5 € par semaine puis 24 h de pause.
 const AI_LIMIT = 5;
+const SESSION_LIMIT = 1;
+const SESSION_MS = 5 * 3_600_000;
 function aiStatus() {
   const s = load();
   const now = Date.now();
   if (s.ai.blockedUntil && s.ai.blockedUntil > now) return s.ai;
-  if (s.ai.blockedUntil || s.ai.windowStart < now - 7 * 86_400_000) s.ai = { spent: 0, windowStart: now, blockedUntil: null };
+  if (s.ai.blockedUntil || s.ai.windowStart < now - 7 * 86_400_000) s.ai = { spent: 0, windowStart: now, blockedUntil: null, sessionStart: null, sessionSpent: 0 };
+  if (s.ai.sessionStart && s.ai.sessionStart + SESSION_MS <= now) { s.ai.sessionStart = null; s.ai.sessionSpent = 0; }
   return s.ai;
 }
+const waitText = (until: number) => {
+  const min = Math.max(1, Math.ceil((until - Date.now()) / 60_000));
+  return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h${min % 60 ? ` ${String(min % 60).padStart(2, "0")}` : ""}`;
+};
 function assertAi() {
   const a = aiStatus();
-  if (a.blockedUntil) {
-    const h = Math.max(1, Math.ceil((a.blockedUntil - Date.now()) / 3_600_000));
-    throw new ApiClientError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de ${AI_LIMIT} € pour la semaine. Elle se débloque dans ${h} h.`);
+  if (a.blockedUntil) throw new ApiClientError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de ${AI_LIMIT} € pour la semaine. Elle se débloque dans ${waitText(a.blockedUntil)}.`);
+  if (a.sessionStart && (a.sessionSpent ?? 0) >= SESSION_LIMIT) {
+    throw new ApiClientError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA de ${SESSION_LIMIT} € pour ces 5 heures. Il se recharge dans ${waitText(a.sessionStart + SESSION_MS)}.`);
   }
 }
 function chargeAi(eur: number) {
   const a = aiStatus();
   a.spent = +(a.spent + eur).toFixed(2);
-  if (a.spent >= AI_LIMIT) {
-    a.blockedUntil = Date.now() + 86_400_000;
-    a.spent = 0;
-  }
+  a.sessionStart = a.sessionStart ?? Date.now();
+  a.sessionSpent = +((a.sessionSpent ?? 0) + eur).toFixed(2);
+  if (a.spent >= AI_LIMIT) Object.assign(a, { blockedUntil: Date.now() + 86_400_000, spent: 0, sessionStart: null, sessionSpent: 0 });
   save();
 }
 
@@ -156,6 +162,13 @@ export function usage(): Usage {
         limitEur: AI_LIMIT,
         blockedUntil: a.blockedUntil ? new Date(a.blockedUntil).toISOString() : null,
         resetsAt: new Date(a.blockedUntil ?? a.windowStart + 7 * 86_400_000).toISOString(),
+        session: {
+          spentEur: a.sessionStart ? a.sessionSpent ?? 0 : 0,
+          limitEur: SESSION_LIMIT,
+          hours: 5,
+          resetsAt: a.sessionStart ? new Date(a.sessionStart + SESSION_MS).toISOString() : null,
+          blockedUntil: a.sessionStart && (a.sessionSpent ?? 0) >= SESSION_LIMIT ? new Date(a.sessionStart + SESSION_MS).toISOString() : null,
+        },
       };
     })(),
   };

@@ -259,14 +259,18 @@ Dépassement → `402` avec `error.code = "quota_exceeded"` (le frontend affiche
 
 ---
 
-## 9 bis. Budget d'IA par client
+## 9 bis. Crédit d'IA par client (comme Claude)
 
-Chaque client peut consommer au maximum **5 € d'IA par semaine** (`WEEKLY_AI_BUDGET_EUR` dans `lib/server/budget.ts`).
-Le coût réel de chaque appel est calculé à partir de l'usage renvoyé par l'API Claude (tarifs dans le même fichier)
-et débité via `ai_budget_add`. Dès que la limite est atteinte, l'IA est bloquée **24 h** pour ce client
-(`429 ai_budget_blocked`), puis le compteur repart de zéro. La semaine est glissante (7 jours depuis la première dépense).
-La génération, le chat et l'application de recommandations sont concernés ; la tâche quotidienne saute les clients bloqués.
-Les outils gratuits du site (sans compte) restent limités par adresse IP. Migration : `supabase/migrations/0002_ai_budget.sql`.
+Deux limites, réglables dans `lib/server/budget.ts` :
+- **Crédit de session** : `SESSION_AI_BUDGET_EUR` (1 €) par tranche de `SESSION_HOURS` (5 h). La tranche démarre à la
+  première demande ; une fois le crédit épuisé, l'IA attend la fin de la tranche (`429 ai_session_blocked`), puis se recharge.
+- **Limite de la semaine** : `WEEKLY_AI_BUDGET_EUR` (5 €) sur 7 jours glissants ; une fois atteinte, pause de 24 h
+  (`429 ai_budget_blocked`), puis remise à zéro.
+
+Le coût réel de chaque appel est calculé à partir de l'usage renvoyé par l'API Claude et débité des deux compteurs
+(`ai_budget_add`) ; la vérification se fait avant chaque action (`ai_budget_check`). Concernés : génération, chat,
+application de recommandations. La tâche quotidienne ne s'arrête que si la limite de la semaine est atteinte.
+Migrations : `0002_ai_budget.sql` puis `0003_ai_session_limit.sql`.
 
 ## 10. Affiliation
 

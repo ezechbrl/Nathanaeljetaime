@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { recommend } from "@/lib/server/ai";
-import { aiBlockedUntil } from "@/lib/server/budget";
+import { aiBlock } from "@/lib/server/budget";
 import { decrypt, safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { dailyOrders, dailySessions } from "@/lib/server/shopify";
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
       if (rows.length) await db().from("metrics_daily").upsert(rows, { onConflict: "store_id,date" });
 
       // Client bloqué (budget d'IA atteint) : on enregistre les stats mais pas de nouvelles recommandations.
-      if (await aiBlockedUntil(s.user_id)) { report[s.id] = "budget IA atteint"; continue; }
+      if ((await aiBlock(s.user_id))?.reason === "week") { report[s.id] = "budget IA de la semaine atteint"; continue; }
       const previous = (must(await db().from("recommendations").select("title").eq("store_id", s.id).order("created_at", { ascending: false }).limit(15)) as { title: string }[]).map((r) => r.title);
       const metrics = rows.sort((a, b) => a.date.localeCompare(b.date)).map((r) => ({ date: r.date, sessions: r.sessions, orders: r.orders, revenue: r.revenue_cents }));
       const out = await recommend({ plan: s.plan as StorePlan, metrics, previous, userId: s.user_id });
