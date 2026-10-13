@@ -5,6 +5,7 @@ import { badRequest, body, json, route } from "@/lib/server/http";
 import { createJob, GENERATE_STEPS, runGeneration } from "@/lib/server/jobs";
 import { toJob, toStore } from "@/lib/server/mappers";
 import { assertQuota, rateLimit } from "@/lib/server/quota";
+import { assertAiBudget } from "@/lib/server/budget";
 import { connectionFor } from "@/lib/server/shopify";
 import { db, must } from "@/lib/server/supabase";
 
@@ -30,6 +31,7 @@ export const POST = route(async (req) => {
   if (input.mode === "link" && !input.productUrl) throw badRequest("Colle le lien de la page produit.", "productUrl");
   await rateLimit(`generate:${user.id}`, 5, 3600);
   await assertQuota(user.id, user.plan, "stores");
+  await assertAiBudget(user.id);
   if (input.mode === "recraft") await connectionFor(user.id, input.shopConnectionId ?? null);
 
   const store = must(await db().from("stores").insert({

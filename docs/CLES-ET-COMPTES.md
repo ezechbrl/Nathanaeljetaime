@@ -36,7 +36,8 @@ le site fonctionne sans (le paiement affiche « bientôt disponible »).
    - Site URL : `https://ton-domaine.vercel.app` (ton adresse Vercel)
    - Redirect URLs : ajoute `https://ton-domaine.vercel.app/**` et `http://localhost:3000/**`
 6. **Créer les tables (obligatoire)** : **SQL Editor → New query**, colle tout le contenu du fichier
-   `supabase/migrations/0001_init.sql` du projet, puis **Run**. Tu dois voir « Success ». À faire une seule fois.
+   `supabase/migrations/0001_init.sql` du projet, puis **Run**. Tu dois voir « Success ».
+   Recommence avec `supabase/migrations/0002_ai_budget.sql` (limite d'IA de 5 € par client et par semaine). À faire une seule fois.
 7. **Authentication → Sign In / Providers → Email** : laisse-le **activé** (la connexion via Shopify s'en sert en interne,
    les utilisateurs ne voient jamais de mot de passe).
 
@@ -156,7 +157,7 @@ affichent « Le paiement en ligne arrive très bientôt ». Tu pourras l'ajouter
 - [ ] `NEXT_PUBLIC_SUPABASE_URL`
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] Tables créées dans Supabase (`supabase/migrations/0001_init.sql`)
+- [ ] Tables créées dans Supabase (`0001_init.sql` puis `0002_ai_budget.sql`)
 - [ ] Webhooks Shopify configurés
 - [ ] `CRON_SECRET`
 - [ ] `ANTHROPIC_API_KEY`

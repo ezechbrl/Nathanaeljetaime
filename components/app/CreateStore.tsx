@@ -23,7 +23,7 @@ export const LANGUAGES = ["français", "anglais", "espagnol", "allemand", "itali
 export function CreateStore() {
   const router = useRouter();
   const params = useSearchParams();
-  const { setStores } = useApp();
+  const { setStores, refresh } = useApp();
   const connections = useApi(() => api.listConnections(), []);
   const [mode, setMode] = useState<CreationMode>((params.get("mode") as CreationMode) || "start");
   const [brief, setBrief] = useState(params.get("brief") ?? "");
@@ -49,10 +49,12 @@ export function CreateStore() {
     try {
       const { store } = await api.createStore({ mode, brief: brief.trim() || "Boutique à partir du lien produit", productUrl: mode === "link" ? url : undefined, language, shopConnectionId: shop || undefined });
       setStores((s) => [store, ...s]);
+      refresh();
       router.push(`/app/boutiques/${store.id}`);
     } catch (err) {
       setError(err as ApiClientError);
       setLoading(false);
+      refresh();
     }
   }
 

@@ -61,13 +61,13 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
       const conn = await connectionFor(store.user_id, store.shop_connection_id);
       existingStore = await readStoreContent(conn.shop, conn.token);
     }
-    const strategy = await generateStrategy({ brief: store.brief, language: store.language, sourceText, existingStore });
+    const strategy = await generateStrategy({ brief: store.brief, language: store.language, sourceText, existingStore, userId: store.user_id });
 
     await step("brand");
     await db().from("stores").update({ name: strategy.brand.name, theme: { colors: strategy.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" } }).eq("id", store.id);
 
     await step("pages");
-    const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText });
+    const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText, userId: store.user_id });
     await step("product");
 
     await step("images");

@@ -1,5 +1,6 @@
 import "server-only";
 import type { PlanId, Usage } from "@/lib/api/types";
+import { aiBudgetStatus } from "./budget";
 import { HttpError } from "./http";
 import { db, must } from "./supabase";
 
@@ -13,9 +14,10 @@ export const LIMITS: Record<PlanId, { stores: number; conversations: number; ima
 export const period = () => new Date().toISOString().slice(0, 7);
 
 export async function getUsage(userId: string, plan: PlanId): Promise<Usage> {
-  const [u, stores] = await Promise.all([
+  const [u, stores, aiBudget] = await Promise.all([
     db().from("usage").select("conversations, images").eq("user_id", userId).eq("period", period()).maybeSingle(),
     db().from("stores").select("id", { count: "exact", head: true }).eq("user_id", userId),
+    aiBudgetStatus(userId),
   ]);
   const row = must(u) as { conversations: number; images: number } | null;
   const now = new Date();
@@ -25,6 +27,7 @@ export async function getUsage(userId: string, plan: PlanId): Promise<Usage> {
     images: { used: row?.images ?? 0, limit: l.images },
     stores: { used: stores.count ?? 0, limit: l.stores },
     resetsAt: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString(),
+    aiBudget,
   };
 }
 

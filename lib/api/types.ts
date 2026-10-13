@@ -23,6 +23,8 @@ export type Usage = {
   images: { used: number; limit: number };
   stores: { used: number; limit: number };
   resetsAt: string;
+  // Budget d'IA hebdomadaire du client : au-delà, l'IA est bloquée 24 h.
+  aiBudget: { spentEur: number; limitEur: number; blockedUntil: string | null; resetsAt: string | null };
 };
 
 export type ShopConnection = {

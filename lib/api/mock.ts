@@ -19,6 +19,7 @@ type State = {
   connections: ShopConnection[];
   subscription: Subscription;
   affiliate: Affiliate | null;
+  ai: { spent: number; windowStart: number; blockedUntil: number | null }; // budget IA simulé (euros)
 };
 
 const KEY = "vitrio-mock-v1";
@@ -49,6 +50,7 @@ function initialState(): State {
     connections: [{ id: "conn_1", shopDomain: "lumea-paris.myshopify.com", shopName: "Lumea Paris", status: "active", connectedAt: seedStores[0].createdAt }],
     subscription: { plan: "free", status: "active", interval: null, renewsAt: null, cancelAtPeriodEnd: false },
     affiliate: null,
+    ai: { spent: 1.2, windowStart: Date.now() - 2 * 86_400_000, blockedUntil: null },
   };
 }
 
@@ -113,6 +115,32 @@ export async function logout() {
   s.user = null;
   save();
 }
+// Même règle que le serveur : 5 € par semaine, puis 24 h de blocage et remise à zéro.
+const AI_LIMIT = 5;
+function aiStatus() {
+  const s = load();
+  const now = Date.now();
+  if (s.ai.blockedUntil && s.ai.blockedUntil > now) return s.ai;
+  if (s.ai.blockedUntil || s.ai.windowStart < now - 7 * 86_400_000) s.ai = { spent: 0, windowStart: now, blockedUntil: null };
+  return s.ai;
+}
+function assertAi() {
+  const a = aiStatus();
+  if (a.blockedUntil) {
+    const h = Math.max(1, Math.ceil((a.blockedUntil - Date.now()) / 3_600_000));
+    throw new ApiClientError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de ${AI_LIMIT} € pour la semaine. Elle se débloque dans ${h} h.`);
+  }
+}
+function chargeAi(eur: number) {
+  const a = aiStatus();
+  a.spent = +(a.spent + eur).toFixed(2);
+  if (a.spent >= AI_LIMIT) {
+    a.blockedUntil = Date.now() + 86_400_000;
+    a.spent = 0;
+  }
+  save();
+}
+
 export function usage(): Usage {
   const s = load();
   const limits = { free: [20, 10, 1], pro: [500, 200, 999], agency: [2000, 1000, 999] }[s.subscription.plan];
@@ -121,6 +149,15 @@ export function usage(): Usage {
     images: { used: s.assets.filter((a) => a.prompt).length, limit: limits[1] },
     stores: { used: s.stores.length, limit: limits[2] },
     resetsAt: new Date(Date.now() + 12 * 86_400_000).toISOString(),
+    aiBudget: (() => {
+      const a = aiStatus();
+      return {
+        spentEur: a.blockedUntil ? AI_LIMIT : a.spent,
+        limitEur: AI_LIMIT,
+        blockedUntil: a.blockedUntil ? new Date(a.blockedUntil).toISOString() : null,
+        resetsAt: new Date(a.blockedUntil ?? a.windowStart + 7 * 86_400_000).toISOString(),
+      };
+    })(),
   };
 }
 export async function getMe() {
@@ -241,6 +278,8 @@ export async function createStore(input: GenerateStoreInput) {
   if (u.stores.used >= u.stores.limit && s.subscription.plan === "free" && s.stores.length >= 4) {
     throw new ApiClientError(402, "quota_exceeded", "Ton offre Découverte est limitée. Passe à Pro pour créer d'autres boutiques.");
   }
+  assertAi();
+  chargeAi(0.4);
   const accent = ACCENTS[s.stores.length % ACCENTS.length];
   const store: Store = {
     id: uid("store"),
@@ -344,6 +383,8 @@ export async function sendMessage(storeId: string, content: string) {
   const s = load();
   const store = s.stores.find((x) => x.id === storeId) ?? notFound();
   if (!store.plan) throw new ApiClientError(409, "conflict", "La boutique est encore en cours de génération.");
+  assertAi();
+  chargeAi(0.07);
   const plan = store.plan;
   const t = content.toLowerCase();
   const changes: ChatChange[] = [];
@@ -443,6 +484,10 @@ export async function setRecommendation(id: string, status: Recommendation["stat
   await wait(400);
   const s = load();
   const r = s.recommendations.find((x) => x.id === id) ?? notFound();
+  if (status === "applied") {
+    assertAi();
+    chargeAi(0.07);
+  }
   r.status = status;
   save();
   const store = s.stores.find((x) => x.id === r.storeId) ?? notFound();

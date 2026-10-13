@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { recommend } from "@/lib/server/ai";
+import { aiBlockedUntil } from "@/lib/server/budget";
 import { decrypt, safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { dailyOrders, dailySessions } from "@/lib/server/shopify";
@@ -14,7 +15,7 @@ export async function GET(req: Request) {
   const auth = req.headers.get("authorization") ?? "";
   if (!secret || !safeEqual(auth, `Bearer ${secret}`)) return new NextResponse("non autorisé", { status: 401 });
 
-  const stores = must(await db().from("stores").select("id, plan, shop_connection_id, shop_connections(shop_domain, access_token_encrypted, status)").eq("status", "published")) as Record<string, any>[];
+  const stores = must(await db().from("stores").select("id, user_id, plan, shop_connection_id, shop_connections(shop_domain, access_token_encrypted, status)").eq("status", "published")) as Record<string, any>[];
   const report: Record<string, string> = {};
 
   for (const s of stores) {
@@ -27,9 +28,11 @@ export async function GET(req: Request) {
       const rows = [...days].map((date) => ({ store_id: s.id, date, sessions: sessions.get(date) ?? 0, orders: orders.get(date)?.orders ?? 0, revenue_cents: orders.get(date)?.revenue ?? 0 }));
       if (rows.length) await db().from("metrics_daily").upsert(rows, { onConflict: "store_id,date" });
 
+      // Client bloqué (budget d'IA atteint) : on enregistre les stats mais pas de nouvelles recommandations.
+      if (await aiBlockedUntil(s.user_id)) { report[s.id] = "budget IA atteint"; continue; }
       const previous = (must(await db().from("recommendations").select("title").eq("store_id", s.id).order("created_at", { ascending: false }).limit(15)) as { title: string }[]).map((r) => r.title);
       const metrics = rows.sort((a, b) => a.date.localeCompare(b.date)).map((r) => ({ date: r.date, sessions: r.sessions, orders: r.orders, revenue: r.revenue_cents }));
-      const out = await recommend({ plan: s.plan as StorePlan, metrics, previous });
+      const out = await recommend({ plan: s.plan as StorePlan, metrics, previous, userId: s.user_id });
       await db().from("insights").insert({ store_id: s.id, summary: out.insight });
       await db().from("recommendations").update({ status: "dismissed" }).eq("store_id", s.id).eq("status", "proposed");
       await db().from("recommendations").insert(out.recommendations.map((r) => ({ store_id: s.id, title: r.title, rationale: r.rationale, area: r.area, expected_impact: r.expectedImpact, instruction: r.instruction })));

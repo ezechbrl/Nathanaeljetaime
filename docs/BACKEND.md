@@ -259,6 +259,15 @@ Dépassement → `402` avec `error.code = "quota_exceeded"` (le frontend affiche
 
 ---
 
+## 9 bis. Budget d'IA par client
+
+Chaque client peut consommer au maximum **5 € d'IA par semaine** (`WEEKLY_AI_BUDGET_EUR` dans `lib/server/budget.ts`).
+Le coût réel de chaque appel est calculé à partir de l'usage renvoyé par l'API Claude (tarifs dans le même fichier)
+et débité via `ai_budget_add`. Dès que la limite est atteinte, l'IA est bloquée **24 h** pour ce client
+(`429 ai_budget_blocked`), puis le compteur repart de zéro. La semaine est glissante (7 jours depuis la première dépense).
+La génération, le chat et l'application de recommandations sont concernés ; la tâche quotidienne saute les clients bloqués.
+Les outils gratuits du site (sans compte) restent limités par adresse IP. Migration : `supabase/migrations/0002_ai_budget.sql`.
+
 ## 10. Affiliation
 
 | Route | Entrée | Sortie |

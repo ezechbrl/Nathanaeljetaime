@@ -7,7 +7,7 @@ import {
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Meter } from "@/components/ui/Feedback";
+import { AiBudgetMeter, Meter } from "@/components/ui/Feedback";
 import { Logo } from "@/components/ui/Logo";
 import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
@@ -83,6 +83,7 @@ function SidebarBody() {
 
       <div className="mt-auto space-y-3">
         <div className="space-y-2.5 rounded-card border border-black/[0.07] p-3">
+          <AiBudgetMeter budget={usage.aiBudget} />
           <Meter label="Messages IA" used={usage.conversations.used} limit={usage.conversations.limit} />
           <Meter label="Images" used={usage.images.used} limit={usage.images.limit} />
           {user.plan === "free" && (

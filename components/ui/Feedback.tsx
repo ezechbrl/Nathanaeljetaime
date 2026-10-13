@@ -57,3 +57,29 @@ export function StatusBadge({ status }: { status: string }) {
     </span>
   );
 }
+
+// Budget d'IA de la semaine : jauge, ou compte à rebours quand il est bloqué.
+export function AiBudgetMeter({ budget }: { budget: { spentEur: number; limitEur: number; blockedUntil: string | null; resetsAt: string | null } }) {
+  const euros = (n: number) => n.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+  if (budget.blockedUntil) {
+    const h = Math.max(1, Math.ceil((new Date(budget.blockedUntil).getTime() - Date.now()) / 3_600_000));
+    return (
+      <div className="rounded-ctl border border-warn/30 bg-warn/5 p-2 text-[11px] leading-snug text-fg-muted" role="status">
+        <span className="font-medium text-fg">IA en pause {h} h</span><br />
+        Limite de {euros(budget.limitEur)} atteinte cette semaine.
+      </div>
+    );
+  }
+  const pct = Math.min(100, (budget.spentEur / budget.limitEur) * 100);
+  return (
+    <div>
+      <div className="flex justify-between text-[11px] text-fg-muted">
+        <span>IA cette semaine</span>
+        <span className="tabular-nums">{euros(budget.spentEur)} / {euros(budget.limitEur)}</span>
+      </div>
+      <div className="mt-1.5 h-1 overflow-hidden rounded bg-black/[0.06]">
+        <div className={cn("h-full rounded transition-[width] duration-500", pct > 80 ? "bg-warn" : "bg-accent/80")} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}

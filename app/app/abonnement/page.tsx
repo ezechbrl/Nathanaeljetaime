@@ -6,7 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Button, Spinner } from "@/components/ui/Button";
-import { Meter, Skeleton } from "@/components/ui/Feedback";
+import { AiBudgetMeter, Meter, Skeleton } from "@/components/ui/Feedback";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
@@ -70,10 +70,11 @@ function Billing() {
             <p className="text-sm text-fg-muted">Utilisation ce mois-ci</p>
             {usage ? (
               <div className="mt-4 space-y-4">
+                <AiBudgetMeter budget={usage.aiBudget} />
                 <Meter label="Messages à l'IA" used={usage.conversations.used} limit={usage.conversations.limit} />
                 <Meter label="Images générées" used={usage.images.used} limit={usage.images.limit} />
                 <Meter label="Boutiques" used={usage.stores.used} limit={usage.stores.limit} />
-                <p className="text-xs text-fg-faint">Remise à zéro le {formatDate(usage.resetsAt)}</p>
+                <p className="text-xs text-fg-faint">Quotas remis à zéro le {formatDate(usage.resetsAt)}. Le budget IA est limité à {usage.aiBudget.limitEur} € par semaine ; une fois atteint, l'IA se met en pause 24 h.</p>
               </div>
             ) : <Skeleton className="mt-4 h-24" />}
           </section>

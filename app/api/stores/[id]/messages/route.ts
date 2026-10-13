@@ -4,6 +4,7 @@ import { editPlan } from "@/lib/server/ai";
 import { body, HttpError, json, route } from "@/lib/server/http";
 import { toMessage, toStore } from "@/lib/server/mappers";
 import { assertQuota, consume, rateLimit } from "@/lib/server/quota";
+import { assertAiBudget } from "@/lib/server/budget";
 import { db, must } from "@/lib/server/supabase";
 import type { StorePlan } from "@/lib/store-schema";
 
@@ -31,9 +32,10 @@ export const POST = route<Ctx>(async (req, { params }) => {
   const { content } = await body(req, z.object({ content: z.string().trim().min(1).max(2000) }));
   await rateLimit(`chat:${user.id}`, 20, 60);
   await assertQuota(user.id, user.plan, "conversations");
+  await assertAiBudget(user.id);
 
   const history = (must(await db().from("chat_messages").select("role, content").eq("store_id", store.id).order("created_at", { ascending: false }).limit(10)) as { role: "user" | "assistant"; content: string }[]).reverse();
-  const result = await editPlan({ plan: store.plan as StorePlan, language: store.language, history, message: content });
+  const result = await editPlan({ plan: store.plan as StorePlan, language: store.language, history, message: content, userId: user.id });
   await consume(user.id, "conversations");
 
   const theme = { ...(store.theme as Record<string, unknown>), colors: result.plan.brand.colors };
