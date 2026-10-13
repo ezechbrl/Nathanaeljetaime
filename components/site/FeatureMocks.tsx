@@ -74,8 +74,8 @@ export function PilotMock() {
         <span className="text-xs text-fg-faint">Exemple</span>
       </div>
       <svg viewBox="0 0 300 80" className="mt-4 h-20 w-full" aria-hidden>
-        <path d="M0 70 C40 66 60 64 90 58 S150 50 180 38 S250 18 300 10" fill="none" stroke="rgb(94 211 140)" strokeWidth="2" />
-        <path d="M0 70 C40 66 60 64 90 58 S150 50 180 38 S250 18 300 10 V80 H0Z" fill="rgb(94 211 140 / .1)" />
+        <path d="M0 70 C40 66 60 64 90 58 S150 50 180 38 S250 18 300 10" fill="none" stroke="rgb(212 245 156)" strokeWidth="2" />
+        <path d="M0 70 C40 66 60 64 90 58 S150 50 180 38 S250 18 300 10 V80 H0Z" fill="rgb(212 245 156 / .1)" />
       </svg>
       <div className="mt-4 rounded-ctl border border-accent/20 bg-accent-deep/20 p-3 text-sm text-fg-muted">
         <span className="text-fg">L'avis de l'IA :</span> le bouton d'achat n'est visible qu'après deux écrans sur mobile. Le remonter est la priorité de la semaine.

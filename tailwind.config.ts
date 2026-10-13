@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// Couleurs définies en variables CSS dans app/globals.css (thème sombre bleu-vert).
+// Couleurs définies en variables CSS dans app/globals.css (fond vert Shopify, boutons vert foncé).
 const v = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
 
 export default {
@@ -13,6 +13,7 @@ export default {
         line: v("line"),
         accent: { DEFAULT: v("accent"), strong: v("accent-strong"), deep: v("accent-deep"), soft: v("accent-soft") },
         leaf: v("brand-leaf"),
+        ink: v("ink"),
         good: v("good"),
         warn: v("warn"),
         bad: v("bad"),
@@ -23,8 +24,8 @@ export default {
         serif: ["var(--font-serif)", "Georgia", "serif"],
       },
       fontSize: {
-        display: ["clamp(2.75rem, 1.6rem + 4.2vw, 5.25rem)", { lineHeight: "1", letterSpacing: "-0.055em" }],
-        h1: ["clamp(2.4rem, 1.5rem + 3.2vw, 4.25rem)", { lineHeight: "1.02", letterSpacing: "-0.05em" }],
+        display: ["clamp(2.75rem, 1.6rem + 4.2vw, 5.25rem)", { lineHeight: "1", letterSpacing: "-0.035em" }],
+        h1: ["clamp(2.4rem, 1.5rem + 3.2vw, 4.25rem)", { lineHeight: "1.02", letterSpacing: "-0.04em" }],
         h2: ["clamp(2rem, 1.4rem + 2.2vw, 3.25rem)", { lineHeight: "1.05", letterSpacing: "-0.045em" }],
         h3: ["clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem)", { lineHeight: "1.2", letterSpacing: "-0.025em" }],
       },
@@ -39,6 +40,7 @@ export default {
       animation: {
         marquee: "marquee 45s linear infinite",
         rays: "rays 14s ease-in-out infinite",
+        "spin-slow": "spin-slow 60s linear infinite",
         shimmer: "shimmer 2.4s linear infinite",
       },
     },

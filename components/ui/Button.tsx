@@ -9,9 +9,9 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    "border border-accent/40 bg-[linear-gradient(180deg,#00a676,#007a5a)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_0_0_1px_rgb(0_0_0/0.25),0_8px_24px_-8px_rgb(0_166_118/0.5)] hover:border-accent/70 hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_0_0_1px_rgb(0_0_0/0.25),0_10px_32px_-8px_rgb(0_166_118/0.65)]",
-  secondary: "border border-white/10 bg-white/[0.04] text-fg hover:border-white/20 hover:bg-white/[0.07]",
-  ghost: "text-fg-muted hover:bg-white/[0.05] hover:text-fg",
+    "border border-white/10 bg-[linear-gradient(180deg,#0b3324,#041a13)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_10px_28px_-10px_rgb(4_26_19/0.8)] hover:border-accent/40 hover:bg-[linear-gradient(180deg,#0f3f2d,#06231a)] hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_14px_34px_-10px_rgb(4_26_19/0.9)]",
+  secondary: "border border-white/20 bg-white/[0.08] text-fg hover:border-white/35 hover:bg-white/[0.14]",
+  ghost: "text-fg-muted hover:bg-white/[0.08] hover:text-fg",
   danger: "border border-bad/30 bg-bad/10 text-bad hover:bg-bad/15",
 };
 

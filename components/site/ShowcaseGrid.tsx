@@ -20,7 +20,7 @@ export function ShowcaseGrid() {
             <Reveal key={s.slug} delay={(i % 4) * 70}>
               <Link
                 href={`/exemples/${s.slug}`}
-                className="surface group flex h-full flex-col overflow-hidden rounded-card p-2 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_24px_60px_-30px_rgb(0_166_118/0.55)]"
+                className="surface group flex h-full flex-col overflow-hidden rounded-card p-2 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_24px_60px_-30px_rgb(4_26_19/0.7)]"
               >
                 <div
                   className="relative overflow-hidden rounded-[14px] p-3 pb-4"
