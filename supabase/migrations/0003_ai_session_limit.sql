@@ -1,6 +1,6 @@
 -- Deux limites d'IA par client, comme Claude :
 --   1. une recharge toutes les 5 h : 1 € par tranche de 5 h (la tranche démarre à la première utilisation) ;
---   2. 5 € par semaine glissante, puis blocage de 24 h.
+--   2. 3 € par semaine glissante (montant réglé dans lib/server/budget.ts), puis blocage de 24 h.
 -- À coller dans Supabase → SQL Editor → Run (après 0001 et 0002).
 
 alter table public.users

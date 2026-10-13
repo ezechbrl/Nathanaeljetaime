@@ -6,7 +6,7 @@ import { db, must } from "./supabase";
 // Deux limites d'IA par client, comme Claude :
 //   - une recharge toutes les 5 h : SESSION_AI_BUDGET_EUR par tranche de SESSION_HOURS heures ;
 //   - WEEKLY_AI_BUDGET_EUR par semaine glissante, puis 24 h de pause.
-export const WEEKLY_AI_BUDGET_EUR = 5;
+export const WEEKLY_AI_BUDGET_EUR = 3;
 export const SESSION_AI_BUDGET_EUR = 1;
 export const SESSION_HOURS = 5;
 const USD_TO_EUR = 0.92; // à ajuster si le taux de change bouge beaucoup

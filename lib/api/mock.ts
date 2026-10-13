@@ -115,8 +115,8 @@ export async function logout() {
   s.user = null;
   save();
 }
-// Même règles que le serveur : 1 € par tranche de 5 h, et 5 € par semaine puis 24 h de pause.
-const AI_LIMIT = 5;
+// Même règles que le serveur : 1 € par tranche de 5 h, et 3 € par semaine puis 24 h de pause.
+const AI_LIMIT = 3;
 const SESSION_LIMIT = 1;
 const SESSION_MS = 5 * 3_600_000;
 function aiStatus() {

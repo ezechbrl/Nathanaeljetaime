@@ -38,7 +38,7 @@ le site fonctionne sans (le paiement affiche « bientôt disponible »).
 6. **Créer les tables (obligatoire)** : **SQL Editor → New query**, colle tout le contenu du fichier
    `supabase/migrations/0001_init.sql` du projet, puis **Run**. Tu dois voir « Success ».
    Recommence avec `supabase/migrations/0002_ai_budget.sql`, puis `0003_ai_session_limit.sql`
-   (crédit d'IA de chaque client : 1 € toutes les 5 h, 5 € par semaine). À faire une seule fois, dans cet ordre.
+   (crédit d'IA de chaque client : 1 € toutes les 5 h, 3 € par semaine). À faire une seule fois, dans cet ordre.
 7. **Authentication → Sign In / Providers → Email** : laisse-le **activé** (la connexion via Shopify s'en sert en interne,
    les utilisateurs ne voient jamais de mot de passe).
 

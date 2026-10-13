@@ -264,7 +264,7 @@ Dépassement → `402` avec `error.code = "quota_exceeded"` (le frontend affiche
 Deux limites, réglables dans `lib/server/budget.ts` :
 - **Crédit de session** : `SESSION_AI_BUDGET_EUR` (1 €) par tranche de `SESSION_HOURS` (5 h). La tranche démarre à la
   première demande ; une fois le crédit épuisé, l'IA attend la fin de la tranche (`429 ai_session_blocked`), puis se recharge.
-- **Limite de la semaine** : `WEEKLY_AI_BUDGET_EUR` (5 €) sur 7 jours glissants ; une fois atteinte, pause de 24 h
+- **Limite de la semaine** : `WEEKLY_AI_BUDGET_EUR` (3 €) sur 7 jours glissants ; une fois atteinte, pause de 24 h
   (`429 ai_budget_blocked`), puis remise à zéro.
 
 Le coût réel de chaque appel est calculé à partir de l'usage renvoyé par l'API Claude et débité des deux compteurs
