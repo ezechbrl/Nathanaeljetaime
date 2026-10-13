@@ -103,7 +103,7 @@ affichent « Le paiement en ligne arrive très bientôt ». Tu pourras l'ajouter
 
 1. **https://dashboard.stripe.com** → crée un compte. Reste en **mode test** (interrupteur en haut à droite) jusqu'au lancement.
 2. **Product catalog → Add product** :
-   - « Vitrio Pro » : prix récurrent **39 €/mois**, puis ajoute un 2ᵉ prix **390 €/an**
+   - « Vitrio Pro » : prix récurrent **31 €/mois**, puis ajoute un 2ᵉ prix **310 €/an**
    - « Vitrio Agence » : **149 €/mois** et **1 490 €/an**
    - Sur chaque prix, copie l'identifiant `price_...`
 3. **Developers → API keys** → « Secret key » (`sk_test_...`).

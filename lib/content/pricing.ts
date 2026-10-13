@@ -20,7 +20,7 @@ export const PLANS: Plan[] = [
     cta: "Commencer gratuitement",
   },
   {
-    id: "pro", name: "Pro", tagline: "Pour lancer et faire grandir ta marque.", monthly: 39, yearly: 390,
+    id: "pro", name: "Pro", tagline: "Pour lancer et faire grandir ta marque.", monthly: 31, yearly: 310,
     features: ["Boutiques illimitées", "500 messages à l'IA / mois", "Studio d'images (200 / mois)", "Optimisation quotidienne", "Import depuis un lien et refonte", "Support prioritaire"],
     limits: { stores: "Illimitées", conversations: "500 / mois", images: "200 / mois", shops: "3" },
     cta: "Passer à Pro", featured: true,

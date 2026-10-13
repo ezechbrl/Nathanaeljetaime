@@ -512,7 +512,7 @@ export async function getBilling() {
   await wait(250);
   const s = load();
   const invoices: Invoice[] = s.subscription.plan === "free" ? [] : [
-    { id: "inv_1", number: "SHP-0001", amount: s.subscription.plan === "pro" ? 3900 : 14900, currency: "EUR", status: "paid", pdfUrl: "#", createdAt: iso() },
+    { id: "inv_1", number: "SHP-0001", amount: s.subscription.plan === "pro" ? 3100 : 14900, currency: "EUR", status: "paid", pdfUrl: "#", createdAt: iso() },
   ];
   return { subscription: clone(s.subscription), usage: usage(), invoices };
 }
