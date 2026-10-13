@@ -7,8 +7,8 @@ import { db, must } from "./supabase";
 // Quotas par offre (doivent correspondre à lib/content/pricing.ts).
 export const LIMITS: Record<PlanId, { stores: number; conversations: number; images: number; shops: number }> = {
   free: { stores: 1, conversations: 20, images: 10, shops: 1 },
-  pro: { stores: 999, conversations: 500, images: 200, shops: 3 },
-  agency: { stores: 999, conversations: 2000, images: 1000, shops: 10 },
+  pro: { stores: 999, conversations: 200, images: 200, shops: 3 },
+  agency: { stores: 999, conversations: 800, images: 1000, shops: 10 },
 };
 
 export const period = () => new Date().toISOString().slice(0, 7);
@@ -17,7 +17,7 @@ export async function getUsage(userId: string, plan: PlanId): Promise<Usage> {
   const [u, stores, aiBudget] = await Promise.all([
     db().from("usage").select("conversations, images").eq("user_id", userId).eq("period", period()).maybeSingle(),
     db().from("stores").select("id", { count: "exact", head: true }).eq("user_id", userId),
-    aiBudgetStatus(userId),
+    aiBudgetStatus(userId, plan),
   ]);
   const row = must(u) as { conversations: number; images: number } | null;
   const now = new Date();

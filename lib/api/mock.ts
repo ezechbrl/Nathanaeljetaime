@@ -50,7 +50,7 @@ function initialState(): State {
     connections: [{ id: "conn_1", shopDomain: "lumea-paris.myshopify.com", shopName: "Lumea Paris", status: "active", connectedAt: seedStores[0].createdAt }],
     subscription: { plan: "free", status: "active", interval: null, renewsAt: null, cancelAtPeriodEnd: false },
     affiliate: null,
-    ai: { spent: 1.2, windowStart: Date.now() - 2 * 86_400_000, blockedUntil: null },
+    ai: { spent: 0.3, windowStart: Date.now() - 2 * 86_400_000, blockedUntil: null },
   };
 }
 
@@ -115,9 +115,9 @@ export async function logout() {
   s.user = null;
   save();
 }
-// Même règles que le serveur : 1 € par tranche de 5 h, et 3 € par semaine puis 24 h de pause.
-const AI_LIMIT = 3;
-const SESSION_LIMIT = 1;
+// Mêmes règles que le serveur (lib/server/budget.ts) : crédit toutes les 5 h et limite par semaine, selon l'offre.
+const AI_LIMITS = { free: { session: 0.5, week: 1 }, pro: { session: 1, week: 3 }, agency: { session: 3, week: 12 } } as const;
+const limits = () => AI_LIMITS[load().subscription.plan];
 const SESSION_MS = 5 * 3_600_000;
 function aiStatus() {
   const s = load();
@@ -133,9 +133,12 @@ const waitText = (until: number) => {
 };
 function assertAi() {
   const a = aiStatus();
-  if (a.blockedUntil) throw new ApiClientError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de ${AI_LIMIT} € pour la semaine. Elle se débloque dans ${waitText(a.blockedUntil)}.`);
-  if (a.sessionStart && (a.sessionSpent ?? 0) >= SESSION_LIMIT) {
-    throw new ApiClientError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA de ${SESSION_LIMIT} € pour ces 5 heures. Il se recharge dans ${waitText(a.sessionStart + SESSION_MS)}.`);
+  const l = limits();
+  const upsell = load().subscription.plan === "agency" ? "" : " Passe à l'offre supérieure pour plus d'IA.";
+  const e = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits: n % 1 ? 2 : 0 });
+  if (a.blockedUntil) throw new ApiClientError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de la semaine (${e(l.week)} €). Elle se débloque dans ${waitText(a.blockedUntil)}.${upsell}`);
+  if (a.sessionStart && (a.sessionSpent ?? 0) >= l.session) {
+    throw new ApiClientError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA (${e(l.session)} €) pour ces 5 heures. Il se recharge dans ${waitText(a.sessionStart + SESSION_MS)}.${upsell}`);
   }
 }
 function chargeAi(eur: number) {
@@ -143,31 +146,31 @@ function chargeAi(eur: number) {
   a.spent = +(a.spent + eur).toFixed(2);
   a.sessionStart = a.sessionStart ?? Date.now();
   a.sessionSpent = +((a.sessionSpent ?? 0) + eur).toFixed(2);
-  if (a.spent >= AI_LIMIT) Object.assign(a, { blockedUntil: Date.now() + 86_400_000, spent: 0, sessionStart: null, sessionSpent: 0 });
+  if (a.spent >= limits().week) Object.assign(a, { blockedUntil: Date.now() + 86_400_000, spent: 0, sessionStart: null, sessionSpent: 0 });
   save();
 }
 
 export function usage(): Usage {
   const s = load();
-  const limits = { free: [20, 10, 1], pro: [500, 200, 999], agency: [2000, 1000, 999] }[s.subscription.plan];
+  const quota = { free: [20, 10, 1], pro: [200, 200, 999], agency: [800, 1000, 999] }[s.subscription.plan];
   return {
-    conversations: { used: s.messages.filter((m) => m.role === "user").length + 4, limit: limits[0] },
-    images: { used: s.assets.filter((a) => a.prompt).length, limit: limits[1] },
-    stores: { used: s.stores.length, limit: limits[2] },
+    conversations: { used: s.messages.filter((m) => m.role === "user").length + 4, limit: quota[0] },
+    images: { used: s.assets.filter((a) => a.prompt).length, limit: quota[1] },
+    stores: { used: s.stores.length, limit: quota[2] },
     resetsAt: new Date(Date.now() + 12 * 86_400_000).toISOString(),
     aiBudget: (() => {
       const a = aiStatus();
       return {
-        spentEur: a.blockedUntil ? AI_LIMIT : a.spent,
-        limitEur: AI_LIMIT,
+        spentEur: a.blockedUntil ? limits().week : a.spent,
+        limitEur: limits().week,
         blockedUntil: a.blockedUntil ? new Date(a.blockedUntil).toISOString() : null,
         resetsAt: new Date(a.blockedUntil ?? a.windowStart + 7 * 86_400_000).toISOString(),
         session: {
           spentEur: a.sessionStart ? a.sessionSpent ?? 0 : 0,
-          limitEur: SESSION_LIMIT,
+          limitEur: limits().session,
           hours: 5,
           resetsAt: a.sessionStart ? new Date(a.sessionStart + SESSION_MS).toISOString() : null,
-          blockedUntil: a.sessionStart && (a.sessionSpent ?? 0) >= SESSION_LIMIT ? new Date(a.sessionStart + SESSION_MS).toISOString() : null,
+          blockedUntil: a.sessionStart && (a.sessionSpent ?? 0) >= limits().session ? new Date(a.sessionStart + SESSION_MS).toISOString() : null,
         },
       };
     })(),

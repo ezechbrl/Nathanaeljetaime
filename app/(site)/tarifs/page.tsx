@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Tarifs", description: "Commence grat
 const PRICING_FAQ = [
   { q: "Faut-il une carte bancaire pour commencer ?", a: "Non. L'offre Découverte est gratuite et sans carte. Tu ajoutes un moyen de paiement seulement si tu passes à Pro ou Agence." },
   { q: "Puis-je changer d'offre ou arrêter à tout moment ?", a: "Oui. Le changement est immédiat et calculé au prorata. Si tu arrêtes, ta boutique et tout son contenu restent sur ton compte Shopify." },
-  { q: "Que se passe-t-il si j'atteins mes limites ?", a: "L'IA te prévient avant. Tu peux attendre le renouvellement du mois suivant ou passer à l'offre supérieure." },
+  { q: "Que se passe-t-il si j'utilise beaucoup l'IA ?", a: "L'IA fonctionne avec un crédit qui se recharge toutes les 5 heures, et une limite par semaine. Tu vois ton crédit restant en permanence dans ton espace, et on te prévient avant la limite. Si tu l'atteins, l'IA se met en pause quelques heures (24 h pour la limite de la semaine), puis repart. Un usage normal ne l'atteint pas ; si tu as besoin de plus, l'offre Agence offre 4 fois plus d'IA." },
   { q: "L'abonnement Shopify est-il inclus ?", a: "Non. Shopify facture son propre abonnement pour héberger ta boutique. Notre offre couvre la création, l'édition et l'optimisation par l'IA." },
   { q: "Proposez-vous un remboursement ?", a: "Oui : si tu n'es pas satisfait dans les 14 jours suivant ton premier paiement, on te rembourse intégralement." },
 ];

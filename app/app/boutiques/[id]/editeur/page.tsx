@@ -31,7 +31,10 @@ function pageFor(path: string): PreviewPage | null {
 
 export default function EditorPage() {
   const { store, setStore, activeJob } = useStore();
-  const { refresh } = useApp();
+  const { refresh, usage } = useApp();
+  const weekLeft = Math.max(0, usage.aiBudget.limitEur - usage.aiBudget.spentEur);
+  const sessionLeft = Math.max(0, usage.aiBudget.session.limitEur - usage.aiBudget.session.spentEur);
+  const lowCredit = !usage.aiBudget.blockedUntil && !usage.aiBudget.session.blockedUntil && (sessionLeft <= usage.aiBudget.session.limitEur * 0.2 || weekLeft <= usage.aiBudget.limitEur * 0.2);
   const toast = useToast();
   const history = useApi(() => api.listMessages(store.id), [store.id]);
   const assets = useApi(() => api.listAssets(store.id), [store.id]);
@@ -125,6 +128,12 @@ export default function EditorPage() {
             <div ref={endRef} />
           </div>
           <div className="border-t border-black/[0.06] p-3">
+            {lowCredit && (
+              <p role="status" className="mb-2 rounded-ctl border border-warn/30 bg-warn/5 px-3 py-2 text-xs text-fg-muted">
+                Ton crédit d'IA est presque épuisé (environ {Math.max(1, Math.floor(Math.min(weekLeft, sessionLeft) / 0.07))} messages restants).
+                {sessionLeft <= weekLeft && usage.aiBudget.session.resetsAt ? " Il se recharge bientôt." : ""}
+              </p>
+            )}
             <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1">
               {SUGGESTIONS.map((s) => (
                 <button key={s} onClick={() => send(s)} disabled={sending} className="shrink-0 rounded-full border border-black/[0.08] px-2.5 py-1 text-xs text-fg-muted transition-colors hover:border-accent/40 hover:text-fg disabled:opacity-50">{s}</button>

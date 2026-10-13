@@ -1,17 +1,26 @@
 import "server-only";
 import type Anthropic from "@anthropic-ai/sdk";
+import type { PlanId } from "@/lib/api/types";
 import { HttpError } from "./http";
 import { db, must } from "./supabase";
 
-// Deux limites d'IA par client, comme Claude :
-//   - une recharge toutes les 5 h : SESSION_AI_BUDGET_EUR par tranche de SESSION_HOURS heures ;
-//   - WEEKLY_AI_BUDGET_EUR par semaine glissante, puis 24 h de pause.
-export const WEEKLY_AI_BUDGET_EUR = 3;
-export const SESSION_AI_BUDGET_EUR = 1;
+// Deux limites d'IA par client et par offre, comme Claude :
+//   - une recharge toutes les SESSION_HOURS heures (session) ;
+//   - une limite par semaine glissante, puis 24 h de pause.
+// Montants en euros. À garder cohérents avec la page Tarifs (lib/content/pricing.ts).
+export const AI_LIMITS: Record<PlanId, { session: number; week: number }> = {
+  free: { session: 0.5, week: 1 },
+  pro: { session: 1, week: 3 },
+  agency: { session: 3, week: 12 },
+};
 export const SESSION_HOURS = 5;
 const USD_TO_EUR = 0.92; // à ajuster si le taux de change bouge beaucoup
-const BUDGET_MICROS = WEEKLY_AI_BUDGET_EUR * 1_000_000;
-const SESSION_MICROS = SESSION_AI_BUDGET_EUR * 1_000_000;
+const micros = (eur: number) => Math.round(eur * 1_000_000);
+
+async function planOf(userId: string): Promise<PlanId> {
+  const row = must(await db().from("users").select("plan").eq("id", userId).maybeSingle()) as { plan: PlanId } | null;
+  return row?.plan ?? "free";
+}
 
 // Tarifs Claude Opus 5.5, en dollars par million de tokens.
 const PRICE = { input: 4, output: 20, cacheWrite: 5, cacheRead: 0.2 };
@@ -34,31 +43,39 @@ function wait(until: string) {
   return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h${min % 60 ? ` ${String(min % 60).padStart(2, "0")}` : ""}`;
 }
 
-function blockedError(until: string, reason: "week" | "session") {
+const eurText = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+
+function blockedError(until: string, reason: "week" | "session", plan: PlanId) {
+  const l = AI_LIMITS[plan];
+  const upsell = plan === "agency" ? "" : " Passe à l'offre supérieure pour plus d'IA.";
   return reason === "session"
-    ? new HttpError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA de ${SESSION_AI_BUDGET_EUR} € pour ces ${SESSION_HOURS} heures. Il se recharge dans ${wait(until)}.`)
-    : new HttpError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de ${WEEKLY_AI_BUDGET_EUR} € pour la semaine. Elle se débloque dans ${wait(until)}.`);
+    ? new HttpError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA (${eurText(l.session)} €) pour ces ${SESSION_HOURS} heures. Il se recharge dans ${wait(until)}.${upsell}`)
+    : new HttpError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de la semaine (${eurText(l.week)} €). Elle se débloque dans ${wait(until)}.${upsell}`);
 }
 
 // Renvoie la fin du blocage (et sa raison) si le client ne peut pas utiliser l'IA, sinon null.
-export async function aiBlock(userId: string): Promise<{ until: string; reason: "week" | "session" } | null> {
-  const rows = must(await db().rpc("ai_budget_check", { p_user: userId, p_week_budget: BUDGET_MICROS, p_session_budget: SESSION_MICROS, p_session_seconds: SESSION_HOURS * 3600 })) as
+export async function aiBlock(userId: string, plan?: PlanId): Promise<{ until: string; reason: "week" | "session" } | null> {
+  const l = AI_LIMITS[plan ?? (await planOf(userId))];
+  const rows = must(await db().rpc("ai_budget_check", { p_user: userId, p_week_budget: micros(l.week), p_session_budget: micros(l.session), p_session_seconds: SESSION_HOURS * 3600 })) as
     { blocked_until: string | null; reason: "week" | "session" | null }[];
   const r = rows?.[0];
   return r?.blocked_until && r.reason ? { until: r.blocked_until, reason: r.reason } : null;
 }
 
-export async function assertAiBudget(userId: string) {
-  const b = await aiBlock(userId);
-  if (b) throw blockedError(b.until, b.reason);
+export async function assertAiBudget(userId: string, plan?: PlanId) {
+  const p = plan ?? (await planOf(userId));
+  const b = await aiBlock(userId, p);
+  if (b) throw blockedError(b.until, b.reason, p);
 }
 
-export async function chargeAi(userId: string, micros: number) {
-  if (micros <= 0) return;
-  must(await db().rpc("ai_budget_add", { p_user: userId, p_micros: micros, p_week_budget: BUDGET_MICROS }));
+export async function chargeAi(userId: string, cost: number) {
+  if (cost <= 0) return;
+  const l = AI_LIMITS[await planOf(userId)];
+  must(await db().rpc("ai_budget_add", { p_user: userId, p_micros: cost, p_week_budget: micros(l.week) }));
 }
 
-export async function aiBudgetStatus(userId: string) {
+export async function aiBudgetStatus(userId: string, plan: PlanId) {
+  const l = AI_LIMITS[plan];
   const row = must(await db().from("users").select("ai_spent_micros, ai_window_start, ai_blocked_until, ai_session_start, ai_session_spent_micros").eq("id", userId).maybeSingle()) as
     { ai_spent_micros: number; ai_window_start: string; ai_blocked_until: string | null; ai_session_start: string | null; ai_session_spent_micros: number } | null;
   const now = Date.now();
@@ -69,16 +86,16 @@ export async function aiBudgetStatus(userId: string) {
   const sessionActive = !weekBlocked && sessionEnd && sessionEnd.getTime() > now;
   const sessionSpent = sessionActive ? row!.ai_session_spent_micros : 0;
   return {
-    spentEur: weekBlocked ? WEEKLY_AI_BUDGET_EUR : weekExpired ? 0 : eur(row!.ai_spent_micros),
-    limitEur: WEEKLY_AI_BUDGET_EUR,
+    spentEur: weekBlocked ? l.week : weekExpired ? 0 : eur(row!.ai_spent_micros),
+    limitEur: l.week,
     blockedUntil: weekBlocked,
     resetsAt: weekBlocked ?? (weekExpired ? null : new Date(new Date(row!.ai_window_start).getTime() + 7 * 86_400_000).toISOString()),
     session: {
       spentEur: eur(sessionSpent),
-      limitEur: SESSION_AI_BUDGET_EUR,
+      limitEur: l.session,
       hours: SESSION_HOURS,
       resetsAt: sessionActive ? sessionEnd!.toISOString() : null,
-      blockedUntil: sessionActive && sessionSpent >= SESSION_MICROS ? sessionEnd!.toISOString() : null,
+      blockedUntil: sessionActive && sessionSpent >= micros(l.session) ? sessionEnd!.toISOString() : null,
     },
   };
 }

@@ -96,8 +96,16 @@ export function AiBudgetMeter({ budget }: { budget: AiBudget }) {
     );
   }
   const s = budget.session;
+  const left = Math.max(0, budget.limitEur - budget.spentEur);
+  const low = left / budget.limitEur <= 0.25;
   return (
     <div className="space-y-2.5">
+      {low && (
+        <p className="rounded-ctl border border-warn/30 bg-warn/5 p-2 text-[11px] leading-snug text-fg-muted" role="status">
+          <span className="font-medium text-fg">Plus que {euros(left)} cette semaine</span><br />
+          Environ {Math.max(1, Math.floor(left / 0.07))} messages à l'IA avant la pause.
+        </p>
+      )}
       {s.blockedUntil ? (
         <div className="rounded-ctl border border-warn/30 bg-warn/5 p-2 text-[11px] leading-snug text-fg-muted" role="status">
           <span className="font-medium text-fg">Crédit épuisé</span><br />

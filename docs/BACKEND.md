@@ -251,7 +251,8 @@ Quotas par offre (à ajuster) :
 | | Découverte | Pro | Agence |
 |---|---|---|---|
 | Boutiques | 1 | illimitées | illimitées |
-| Conversations IA / mois | 20 | 500 | 2 000 |
+| Conversations IA / mois | 20 | 200 | 800 |
+| Crédit IA (toutes les 5 h / par semaine) | 0,50 € / 1 € | 1 € / 3 € | 3 € / 12 € |
 | Images / mois | 10 | 200 | 1 000 |
 | Boutiques Shopify connectées | 1 | 3 | 10 |
 
@@ -261,7 +262,7 @@ Dépassement → `402` avec `error.code = "quota_exceeded"` (le frontend affiche
 
 ## 9 bis. Crédit d'IA par client (comme Claude)
 
-Deux limites, réglables dans `lib/server/budget.ts` :
+Deux limites par offre, réglables dans `AI_LIMITS` (`lib/server/budget.ts`) : Découverte 0,50 € / 5 h et 1 € / semaine, Pro 1 € et 3 €, Agence 3 € et 12 €.
 - **Crédit de session** : `SESSION_AI_BUDGET_EUR` (1 €) par tranche de `SESSION_HOURS` (5 h). La tranche démarre à la
   première demande ; une fois le crédit épuisé, l'IA attend la fin de la tranche (`429 ai_session_blocked`), puis se recharge.
 - **Limite de la semaine** : `WEEKLY_AI_BUDGET_EUR` (3 €) sur 7 jours glissants ; une fois atteinte, pause de 24 h

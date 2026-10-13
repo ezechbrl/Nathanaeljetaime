@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
-import { PLANS, euro } from "@/lib/content/pricing";
+import { AI_FAIR_USE, PLANS, euro } from "@/lib/content/pricing";
 
 export function PricingCards() {
   const [yearly, setYearly] = useState(true);
@@ -52,6 +52,7 @@ const ROWS: { label: string; values: (string | boolean)[] }[] = [
   { label: "Messages à l'IA", values: PLANS.map((p) => p.limits.conversations) },
   { label: "Images générées", values: PLANS.map((p) => p.limits.images) },
   { label: "Boutiques Shopify connectées", values: PLANS.map((p) => p.limits.shops) },
+  { label: "Capacité d'IA (crédit rechargé toutes les 5 h)", values: PLANS.map((p) => p.limits.ai) },
   { label: "Stratégie et identité de marque", values: [true, true, true] },
   { label: "Import depuis un lien", values: [false, true, true] },
   { label: "Refonte de boutique existante", values: [false, true, true] },
@@ -83,6 +84,7 @@ export function PricingTable() {
           ))}
         </tbody>
       </table>
+      <p className="mt-4 max-w-2xl text-sm text-fg-faint">{AI_FAIR_USE}</p>
     </div>
   );
 }

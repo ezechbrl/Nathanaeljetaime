@@ -18,7 +18,7 @@ export const POST = route<{ params: Promise<{ id: string }> }>(async (_req, { pa
   const store = await ownedStore(user.id, reco.store_id);
   if (!store.plan) throw new HttpError(409, "conflict", "La boutique n'est pas prête.");
   await assertQuota(user.id, user.plan, "conversations");
-  await assertAiBudget(user.id);
+  await assertAiBudget(user.id, user.plan);
   const result = await editPlan({ plan: store.plan as StorePlan, language: store.language, history: [], message: reco.instruction || reco.title, userId: user.id });
   await consume(user.id, "conversations");
   const theme = { ...(store.theme as Record<string, unknown>), colors: result.plan.brand.colors };
