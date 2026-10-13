@@ -16,7 +16,7 @@ const FAN = [
   { i: 4, rot: 14, x: 88, y: 34 },
 ];
 
-export function FinalCta({ title = "Crée des boutiques Shopify à fort potentiel avec l'IA" }: { title?: string }) {
+export function FinalCta({ title = <>Ta prochaine boutique commence <span className="serif-accent">par une phrase</span>.</> }: { title?: React.ReactNode }) {
   const ref = useScrollProgress<HTMLDivElement>(0.3);
   return (
     <section className="px-4 py-16 sm:px-6">
@@ -25,9 +25,9 @@ export function FinalCta({ title = "Crée des boutiques Shopify à fort potentie
         <Reveal className="relative flex items-center justify-center gap-2 text-sm text-fg-muted"><LogoMark className="h-5 w-5" /> {site.name}</Reveal>
         <Reveal delay={80} as="h2" className="relative mx-auto mt-6 max-w-3xl text-h1">{title}</Reveal>
         <Reveal delay={160} as="p" className="relative mx-auto mt-5 max-w-xl text-fg-muted">
-          Décris ton projet. L'IA construit une boutique à l'image de ta marque, puis tu modifies tout en discutant ou dans l'éditeur avant de publier sur Shopify.
+          Écris ce que tu vends et à qui. Vitrio prépare la stratégie, les pages et les visuels ; tu ajustes en discutant, puis tu publies sur Shopify quand tu es prêt.
         </Reveal>
-        <Reveal delay={240} className="relative mt-8"><ButtonLink href="/inscription" size="lg">Créer ma boutique</ButtonLink></Reveal>
+        <Reveal delay={240} className="relative mt-8"><ButtonLink href="/inscription" size="lg">Lancer ma boutique</ButtonLink></Reveal>
 
         <div className="relative mx-auto mt-14 h-[200px] max-w-[760px] sm:h-[280px]">
           {FAN.map(({ i, rot, x, y }, k) => (

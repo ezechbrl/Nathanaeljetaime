@@ -12,8 +12,8 @@ export type DemoVideo = {
 
 export const DEMO_VIDEOS: DemoVideo[] = [
   {
-    id: "connect", step: "Étape 1", title: "Connecte ta boutique Shopify",
-    text: "Tape l'adresse de ta boutique : ton compte est créé et ta boutique est reliée en un clic. Pas de mot de passe.",
+    id: "connect", step: "Étape 1", title: "Relie Shopify",
+    text: "L'adresse de ta boutique suffit : ton espace est créé et relié à Shopify, sans mot de passe à retenir.",
     src: "/videos/connect.webm", poster: "/videos/connect.jpg",
     captions: [
       { t: 0, text: "Pas besoin de créer un compte : tu te connectes avec Shopify." },
@@ -22,8 +22,8 @@ export const DEMO_VIDEOS: DemoVideo[] = [
     ],
   },
   {
-    id: "generate", step: "Étape 2", title: "Décris ton produit, l'IA construit",
-    text: "Deux lignes suffisent. L'IA pose ton marché, ta promesse et tes offres, puis construit toute la boutique dans la langue de ton marché.",
+    id: "generate", step: "Étape 2", title: "Une phrase, une boutique",
+    text: "Tu dis ce que tu vends et à qui. Vitrio réfléchit d'abord à ta cible et à tes arguments, puis remplit chaque page.",
     src: "/videos/generate.webm", poster: "/videos/generate.jpg",
     captions: [
       { t: 0, text: "Tu décris ton produit en une phrase." },
@@ -33,7 +33,7 @@ export const DEMO_VIDEOS: DemoVideo[] = [
     ],
   },
   {
-    id: "edit", step: "Étape 3", title: "Modifie tout en une phrase",
+    id: "edit", step: "Étape 3", title: "Ajuste en discutant",
     text: "« Plus premium », « ajoute un lot de 3 » : l'IA applique, te montre l'avant/après, et garde chaque version.",
     src: "/videos/edit.webm", poster: "/videos/edit.jpg",
     captions: [
@@ -44,8 +44,8 @@ export const DEMO_VIDEOS: DemoVideo[] = [
     ],
   },
   {
-    id: "pilot", step: "Étape 4", title: "L'IA optimise chaque jour",
-    text: "Chaque matin, l'IA lit tes chiffres Shopify, te dit ce qui freine la vente et propose des corrections à appliquer en un clic.",
+    id: "pilot", step: "Étape 4", title: "Progresse chaque matin",
+    text: "Vitrio lit tes ventes et tes visites, repère ce qui bloque et te propose une correction prête à appliquer.",
     src: "/videos/pilot.webm", poster: "/videos/pilot.jpg",
     captions: [
       { t: 0, text: "Chaque matin, l'IA lit les statistiques de ta boutique." },

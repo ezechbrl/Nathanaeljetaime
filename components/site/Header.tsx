@@ -74,7 +74,7 @@ export function Header() {
 
         <div className="hidden items-center gap-2 md:flex">
           <ButtonLink href="/connexion" variant="ghost" size="sm">Connexion</ButtonLink>
-          <ButtonLink href="/inscription" size="sm">Créer ma boutique</ButtonLink>
+          <ButtonLink href="/inscription" size="sm">Essayer gratuitement</ButtonLink>
         </div>
 
         <button className="grid h-10 w-10 place-items-center rounded-ctl text-fg md:hidden" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
@@ -94,7 +94,7 @@ export function Header() {
             ))}
           </nav>
           <div className="mt-8 grid gap-2">
-            <ButtonLink href="/inscription" size="lg">Créer ma boutique</ButtonLink>
+            <ButtonLink href="/inscription" size="lg">Essayer gratuitement</ButtonLink>
             <ButtonLink href="/connexion" variant="secondary" size="lg">Connexion</ButtonLink>
           </div>
         </div>

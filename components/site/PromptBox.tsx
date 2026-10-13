@@ -6,18 +6,18 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 
 export const MODES = [
-  { id: "start", label: "Créer", icon: PenLine, placeholder: "Crée une boutique premium pour ma marque de baumes à lèvres naturels…" },
-  { id: "link", label: "Depuis un lien", icon: Link2, placeholder: "Colle le lien d'une page produit (fournisseur, marketplace, concurrent)…" },
-  { id: "recraft", label: "Refondre", icon: RefreshCw, placeholder: "Refais ma boutique : ton plus premium, fiche produit plus claire…" },
+  { id: "start", label: "Décrire", icon: PenLine, placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…" },
+  { id: "link", label: "Importer un lien", icon: Link2, placeholder: "Colle l'adresse d'un produit (fournisseur, marketplace, concurrent) : on part de là…" },
+  { id: "recraft", label: "Refaire ma boutique", icon: RefreshCw, placeholder: "Ma boutique ne convertit pas : rends-la plus rassurante et plus haut de gamme…" },
 ] as const;
 
 const EXAMPLES = [
-  "Boutique premium pour des baumes à lèvres naturels",
-  "Enceinte portable étanche pour le marché américain",
-  "Matcha bio d'Uji avec un kit de préparation",
+  "Café de spécialité en abonnement",
+  "Harnais pour chien, coloris pastel",
+  "Sac à dos cabine pour l'Espagne",
 ];
 
-export function PromptBox({ target = "/inscription", className }: { target?: string; className?: string }) {
+export function PromptBox({ target = "/inscription", className, align = "center" }: { target?: string; className?: string; align?: "center" | "left" }) {
   const router = useRouter();
   const [mode, setMode] = useState<(typeof MODES)[number]["id"]>("start");
   const [value, setValue] = useState("");
@@ -48,7 +48,7 @@ export function PromptBox({ target = "/inscription", className }: { target?: str
   }
 
   return (
-    <div className={cn("mx-auto w-full max-w-2xl", className)}>
+    <div className={cn("w-full max-w-2xl", align === "center" && "mx-auto", className)}>
       <form onSubmit={submit} className="group relative rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
         <div className="rounded-[13px] bg-[linear-gradient(180deg,#0a2a1e,#06180f)] shadow-[0_30px_80px_-30px_rgb(0_128_96/0.55)]">
           <label htmlFor="prompt" className="sr-only">Décris ta boutique</label>
@@ -72,22 +72,22 @@ export function PromptBox({ target = "/inscription", className }: { target?: str
         </div>
       </form>
 
-      <div role="tablist" aria-label="Mode de création" className="surface mx-auto mt-5 flex w-fit gap-1 rounded-ctl p-1">
+      <div role="tablist" aria-label="Mode de création" className={cn("surface mt-5 flex w-fit max-w-full gap-1 overflow-x-auto rounded-ctl p-1", align === "center" && "mx-auto")}>
         {MODES.map((m) => (
           <button
             key={m.id}
             role="tab"
             aria-selected={mode === m.id}
             onClick={() => setMode(m.id)}
-            className={cn("flex items-center gap-2 rounded-[7px] px-3 py-1.5 text-[13px] transition-colors sm:px-3.5 sm:text-sm", mode === m.id ? "border border-accent/30 bg-accent-deep/50 text-fg" : "border border-transparent text-fg-muted hover:text-fg")}
+            className={cn("flex items-center gap-2 shrink-0 rounded-[7px] px-2.5 py-1.5 text-[13px] transition-colors sm:px-3.5 sm:text-sm", mode === m.id ? "border border-accent/30 bg-accent-deep/50 text-fg" : "border border-transparent text-fg-muted hover:text-fg")}
           >
-            <m.icon className="h-3.5 w-3.5" /> {m.label}
+            <m.icon className="hidden h-3.5 w-3.5 sm:block" /> {m.label}
           </button>
         ))}
       </div>
 
       {mode === "start" && (
-        <div className="mt-4 hidden flex-wrap justify-center gap-2 sm:flex">
+        <div className={cn("mt-4 hidden flex-wrap gap-2 sm:flex", align === "center" && "justify-center")}>
           {EXAMPLES.map((ex) => (
             <button key={ex} type="button" onClick={() => setValue(ex)} className="flex items-center gap-1.5 rounded-full border border-white/[0.07] px-3 py-1 text-xs text-fg-faint transition-colors hover:border-white/15 hover:text-fg-muted">
               {ex} <ArrowUp className="h-3 w-3 rotate-45" />

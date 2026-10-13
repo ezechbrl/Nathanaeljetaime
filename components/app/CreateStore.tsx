@@ -13,9 +13,9 @@ import { cn } from "@/lib/cn";
 import { useApp } from "./AppContext";
 
 const MODES: { id: CreationMode; label: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
-  { id: "start", label: "Créer", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
-  { id: "link", label: "Depuis un lien", icon: Link2, placeholder: "Ajoute ce que tu veux changer par rapport à la page d'origine (ton, cible, prix)…", hint: "L'IA lit la page produit et écrit une fiche originale : rien n'est copié." },
-  { id: "recraft", label: "Refondre", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
+  { id: "start", label: "Décrire", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
+  { id: "link", label: "Importer un lien", icon: Link2, placeholder: "Ajoute ce que tu veux changer par rapport à la page d'origine (ton, cible, prix)…", hint: "L'IA lit la page produit et écrit une fiche originale : rien n'est copié." },
+  { id: "recraft", label: "Refaire ma boutique", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
 ];
 
 export const LANGUAGES = ["français", "anglais", "espagnol", "allemand", "italien", "néerlandais", "portugais", "polonais", "suédois", "danois", "tchèque", "roumain"];

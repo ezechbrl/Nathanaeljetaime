@@ -22,7 +22,7 @@ type State = {
   ai: { spent: number; windowStart: number; blockedUntil: number | null; sessionStart?: number | null; sessionSpent?: number }; // budget IA simulé (euros)
 };
 
-const KEY = "vitrio-mock-v1";
+const KEY = "vitrio-mock-v2";
 const iso = () => new Date().toISOString();
 const uid = (p: string) => `${p}_${Math.random().toString(36).slice(2, 10)}`;
 const wait = (ms = 350) => new Promise((r) => setTimeout(r, ms));
@@ -47,7 +47,7 @@ function initialState(): State {
     versions: seedStores.map((s) => ({ id: uid("ver"), storeId: s.id, label: "Version initiale", createdAt: s.createdAt, snapshot: { theme: s.theme, plan: s.plan } })),
     assets: seedStores.flatMap((s) => seedAssets(s.id)),
     recommendations: seedStores.flatMap((s) => seedRecommendations(s.id)),
-    connections: [{ id: "conn_1", shopDomain: "lumea-paris.myshopify.com", shopName: "Lumea Paris", status: "active", connectedAt: seedStores[0].createdAt }],
+    connections: [{ id: "conn_1", shopDomain: "oree-paris.myshopify.com", shopName: "Orée Paris", status: "active", connectedAt: seedStores[0].createdAt }],
     subscription: { plan: "free", status: "active", interval: null, renewsAt: null, cancelAtPeriodEnd: false },
     affiliate: null,
     ai: { spent: 0.3, windowStart: Date.now() - 2 * 86_400_000, blockedUntil: null },

@@ -27,7 +27,7 @@ export function Audience() {
       <Container className="grid gap-12 lg:grid-cols-[0.9fr_1.4fr] lg:gap-20">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Reveal><span className="eyebrow">Pour qui</span></Reveal>
-          <Reveal delay={80} as="h2" className="mt-5 text-h1">Des marques ambitieuses, <span className="serif-accent">quel que soit</span> le point de départ.</Reveal>
+          <Reveal delay={80} as="h2" className="mt-5 text-h1">Tu pars de zéro ou d'une boutique <span className="serif-accent">qui stagne</span> ? Les deux marchent.</Reveal>
         </div>
         <div className="divide-y divide-white/[0.07] border-y border-white/[0.07]">
           {AUDIENCES.map((a, i) => (

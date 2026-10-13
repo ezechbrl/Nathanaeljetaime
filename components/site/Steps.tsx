@@ -8,8 +8,8 @@ export function Steps() {
       <Container>
         <SectionHeading
           eyebrow="Comment ça marche"
-          title={<>Ta boutique Shopify en <span className="serif-accent">4 étapes</span>.</>}
-          subtitle="L'interface réelle de Vitrio, filmée pas à pas : de la connexion Shopify à la boutique qui s'améliore toute seule."
+          title={<>Quatre gestes, <span className="serif-accent">une</span> boutique.</>}
+          subtitle="Pas de maquette : c'est la vraie application, filmée écran par écran."
         />
         <Reveal delay={100} className="mt-14"><VideoSteps /></Reveal>
       </Container>

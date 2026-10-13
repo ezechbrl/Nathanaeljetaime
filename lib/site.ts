@@ -1,7 +1,7 @@
 // Nom et coordonnées de la marque : change-les ici, ils sont repris partout.
 export const site = {
   name: "Vitrio",
-  description: "Décris ton produit : l'IA construit une boutique Shopify complète, pensée pour vendre, puis l'optimise chaque jour.",
+  description: "Une phrase sur ton produit suffit : Vitrio étudie ton marché, écrit et met en ligne ta boutique Shopify, puis la fait progresser chaque jour.",
   email: "bonjour@vitrio.ai",
   whatsapp: "", // ex. "33600000000" pour afficher le lien WhatsApp
   legalEntity: "Vitrio SAS (à compléter)",

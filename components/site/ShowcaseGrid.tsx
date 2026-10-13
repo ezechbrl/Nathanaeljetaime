@@ -11,10 +11,10 @@ export function ShowcaseGrid() {
     <section className="py-24">
       <Container>
         <div className="text-center">
-          <Reveal as="h2" className="text-h1">Des boutiques pensées<br />pour vendre.</Reveal>
-          <Reveal delay={120} className="mt-8"><ButtonLink href="/inscription">Créer ma boutique</ButtonLink></Reveal>
+          <Reveal as="h2" className="text-h1">Huit briefs, huit boutiques.<br /><span className="serif-accent">Aucun</span> modèle.</Reveal>
+          <Reveal delay={120} className="mt-8"><ButtonLink href="/inscription">Essayer avec mon produit</ButtonLink></Reveal>
         </div>
-        <Reveal delay={80} as="p" className="mt-16 text-sm text-fg-muted">Exemples générés à partir d'un brief de deux lignes</Reveal>
+        <Reveal delay={80} as="p" className="mt-16 text-sm text-fg-muted">Chaque boutique part d'une seule phrase. Clique pour voir ce que l'IA en a tiré.</Reveal>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SHOWCASE.map((s, i) => (
             <Reveal key={s.slug} delay={(i % 4) * 70}>

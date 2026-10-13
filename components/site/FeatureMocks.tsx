@@ -12,7 +12,7 @@ export function StrategyMock() {
   ];
   return (
     <div className="surface rounded-card p-5">
-      <p className="flex items-center gap-2 text-sm text-fg"><Sparkles className="h-4 w-4 text-accent" /> Stratégie · Aurore</p>
+      <p className="flex items-center gap-2 text-sm text-fg"><Sparkles className="h-4 w-4 text-accent" /> Stratégie · Sève</p>
       <dl className="mt-4 divide-y divide-white/[0.06]">
         {rows.map(([k, v]) => (
           <div key={k} className="grid grid-cols-[90px_1fr] gap-3 py-3 text-sm">

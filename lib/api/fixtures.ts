@@ -109,14 +109,14 @@ const ago = (days: number) => new Date(now - days * 86_400_000).toISOString();
 export const seedStores: Store[] = [
   {
     id: "lumea",
-    name: "Lumea",
+    name: "Orée",
     niche: "Baumes à lèvres naturels",
     language: "français",
     mode: "start",
     status: "published",
     shopConnectionId: "conn_1",
     theme: { colors: { primary: "#2b1a22", accent: "#c8506a", background: "#fff7f4" }, headingFont: "Fraunces", bodyFont: "DM Sans" },
-    plan: samplePlan("Lumea", "Baume à lèvres"),
+    plan: samplePlan("Orée", "Baume à lèvres"),
     previewUrl: null,
     liveUrl: "https://lumea.example",
     createdAt: ago(21),

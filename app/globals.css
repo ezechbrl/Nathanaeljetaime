@@ -5,9 +5,9 @@
 :root {
   color-scheme: dark;
   /* Vert profond inspiré de Shopify : fond sombre, accents vert vif et vert feuille. */
-  --bg: 3 16 11;            /* #03100b */
-  --bg-2: 6 25 18;          /* #061912 */
-  --bg-3: 10 36 26;         /* #0a241a */
+  --bg: 7 27 20;            /* #071b14 */
+  --bg-2: 10 36 27;         /* #0a241b */
+  --bg-3: 15 48 36;         /* #0f3024 */
   --fg: 236 245 240;
   --fg-muted: 160 190 175;
   --fg-faint: 108 138 123;

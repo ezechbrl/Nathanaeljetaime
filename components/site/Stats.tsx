@@ -1,58 +1,26 @@
-"use client";
-
 import { ShoppingBag } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { Reveal } from "@/components/ui/Reveal";
 
-const STATS = [
-  { value: 5, suffix: " min", label: "pour une boutique complète" },
-  { value: 12, suffix: "", label: "langues de marché" },
-  { value: 40, suffix: "+", label: "éléments générés par boutique" },
+// Bandeau défilant : tout ce que l'IA livre pour une boutique.
+const ITEMS = [
+  "Étude de marché", "Persona", "Promesse", "Nom et ton de marque", "Palette et polices", "Page d'accueil",
+  "Fiche produit", "Offres et lots", "FAQ anti-objections", "SEO", "Visuels produit", "Pages livraison et retours", "Menus",
 ];
 
-function CountUp({ to, suffix }: { to: number; suffix: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [n, setN] = useState(to);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setN(0);
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      const start = performance.now();
-      const step = (t: number) => {
-        const k = Math.min(1, (t - start) / 1200);
-        setN(Math.round(to * (1 - Math.pow(1 - k, 3))));
-        if (k < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [to]);
-
-  return <span ref={ref} className="tabular-nums">{n}{suffix}</span>;
-}
-
 export function Stats() {
+  const row = [...ITEMS, ...ITEMS];
   return (
-    <section className="mx-auto max-w-[1000px] px-4 py-14 sm:px-6">
-      <div className="grid grid-cols-2 gap-y-10 sm:grid-cols-4">
-        {STATS.map((s, i) => (
-          <Reveal key={s.label} delay={i * 80} className="border-white/[0.06] text-center sm:border-r">
-            <p className="text-4xl tracking-[-0.04em] sm:text-5xl"><CountUp to={s.value} suffix={s.suffix} /></p>
-            <p className="mt-2 text-sm text-fg-muted">{s.label}</p>
-          </Reveal>
-        ))}
-        <Reveal delay={240} className="flex flex-col items-center justify-center text-center">
-          <p className="text-xs text-fg-faint">Conçu pour</p>
-          <p className="mt-1.5 flex items-center gap-2 text-2xl tracking-tight">
-            <ShoppingBag className="h-6 w-6 text-[#95bf47]" aria-hidden />
-            Shopify
-          </p>
-        </Reveal>
+    <section className="border-y border-white/[0.06] bg-bg-2/60 py-5">
+      <div className="mx-auto flex max-w-[1200px] items-center gap-6 px-4 sm:px-6">
+        <p className="hidden shrink-0 items-center gap-2 text-sm text-fg-muted md:flex">
+          <ShoppingBag className="h-4 w-4 text-[#95bf47]" aria-hidden /> Livré dans ta boutique
+        </p>
+        <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
+          <ul className="flex w-max animate-marquee gap-3">
+            {row.map((t, i) => (
+              <li key={i} aria-hidden={i >= ITEMS.length} className="shrink-0 rounded-full border border-white/[0.08] px-3.5 py-1.5 text-sm text-fg-muted">{t}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

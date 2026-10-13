@@ -35,9 +35,9 @@ function OurEditorMock() {
   return (
     <div className="surface relative overflow-hidden rounded-card p-5 sm:p-8">
       <div aria-hidden className="absolute inset-0 [background:radial-gradient(ellipse_70%_60%_at_50%_0%,rgb(0_96/0.22),transparent)]" />
-      <p className="relative text-center text-xl tracking-tight sm:text-2xl">Une boutique à partir d'une <span className="serif-accent">phrase</span></p>
+      <p className="relative text-center text-xl tracking-tight sm:text-2xl">Une phrase, <span className="serif-accent">une boutique</span></p>
       <div className="relative mt-5 rounded-[10px] border border-accent/25 bg-bg-2 p-3">
-        <p className="text-sm text-fg">Matcha bio d'Uji, kit de préparation inclus, ton calme et premium.</p>
+        <p className="text-sm text-fg">Café de spécialité torréfié à Lyon, en abonnement, pour les amateurs de filtre.</p>
         <div className="mt-3 flex justify-end"><span className="inline-flex items-center gap-1.5 rounded-[7px] border border-accent/40 bg-accent-strong/70 px-2.5 py-1 text-[11px] text-white"><Sparkles className="h-3 w-3" /> Générer</span></div>
       </div>
       <ul className="relative mt-4 space-y-1.5 text-xs text-fg-muted">
@@ -56,7 +56,7 @@ export function Revolution() {
       <Container>
         <h2
           ref={ref}
-          className="select-none text-center text-[clamp(4rem,14vw,11rem)] leading-[0.95] tracking-[-0.06em]"
+          className="select-none text-center text-[clamp(3.25rem,11vw,9rem)] leading-[0.95] tracking-[-0.05em]"
           style={{
             backgroundImage: "linear-gradient(90deg, rgb(var(--fg)) 0%, rgb(var(--fg)) calc(var(--p, 0) * 100%), rgb(var(--fg) / 0.14) calc(var(--p, 0) * 100% + 12%))",
             WebkitBackgroundClip: "text",
@@ -64,19 +64,19 @@ export function Revolution() {
             color: "transparent",
           }}
         >
-          Une révolution
+          Fini les réglages.
         </h2>
         <div className="mt-16 grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
           <Reveal>
             <div className="opacity-80 grayscale-[0.4] transition duration-500 hover:opacity-100 hover:grayscale-0"><ShopifyEditorMock /></div>
             <p className="surface mt-4 rounded-card px-4 py-3 text-[15px] text-fg-muted">
-              <span className="text-fg">Avant :</span> des heures dans les réglages de Shopify, section par section, sans savoir quoi écrire.
+              <span className="text-fg">Sans Vitrio :</span> un thème vide, des dizaines de sections à remplir et une page blanche pour chaque texte.
             </p>
           </Reveal>
           <Reveal delay={150}>
             <OurEditorMock />
             <p className="surface mt-4 rounded-card px-4 py-3 text-[15px] text-fg-muted">
-              <span className="text-fg">Maintenant :</span> tu décris ton produit, l'IA crée une boutique complète à l'image de ta marque, dans la langue de ton marché.
+              <span className="text-fg">Avec Vitrio :</span> une phrase sur ton produit, et tu relis une boutique déjà remplie, cohérente, écrite pour ton marché.
             </p>
           </Reveal>
         </div>
