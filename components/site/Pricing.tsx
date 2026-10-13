@@ -24,7 +24,7 @@ export function PricingCards() {
         {PLANS.map((p, i) => {
           const price = yearly ? Math.round(p.yearly / 12) : p.monthly;
           return (
-            <Reveal key={p.id} delay={i * 90} className={cn("relative flex flex-col rounded-card p-7", p.featured ? "surface-accent shadow-[0_30px_80px_-40px_rgb(4_26_19/0.6)]" : "surface")}>
+            <Reveal key={p.id} delay={i * 90} className={cn("relative flex flex-col rounded-card p-7", p.featured ? "surface-accent shadow-[0_30px_80px_-40px_rgb(0_166_118/0.5)]" : "surface")}>
               {p.featured && <span className="absolute right-5 top-5 rounded-full border border-accent/40 px-2.5 py-0.5 text-[11px] text-accent">Le plus choisi</span>}
               <h3 className="text-xl tracking-tight">{p.name}</h3>
               <p className="mt-1 text-sm text-fg-muted">{p.tagline}</p>

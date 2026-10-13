@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// Couleurs définies en variables CSS dans app/globals.css (fond vert Shopify, boutons vert foncé).
+// Couleurs définies en variables CSS dans app/globals.css (fond vert très sombre, boutons vert Shopify).
 const v = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
 
 export default {

@@ -4,34 +4,34 @@
 
 :root {
   color-scheme: dark;
-  /* Fond vert Shopify, boutons vert très foncé, accents vert tilleul. */
-  --bg: 0 128 96;           /* #008060, vert Shopify */
-  --bg-2: 0 112 84;         /* #007054 */
-  --bg-3: 0 96 72;          /* #006048 */
-  --fg: 255 255 255;
-  --fg-muted: 220 242 233;
-  --fg-faint: 170 220 200;
+  /* Vert profond inspiré de Shopify : fond sombre, accents vert vif et vert feuille. */
+  --bg: 3 16 11;            /* #03100b */
+  --bg-2: 6 25 18;          /* #061912 */
+  --bg-3: 10 36 26;         /* #0a241a */
+  --fg: 236 245 240;
+  --fg-muted: 160 190 175;
+  --fg-faint: 108 138 123;
   --line: 255 255 255;      /* utilisé avec une opacité faible */
-  --accent: 212 245 156;    /* #d4f59c, vert tilleul lisible sur le fond */
-  --accent-strong: 4 33 24; /* #042118, vert foncé des boutons */
-  --accent-deep: 4 33 24;   /* fonds teintés foncés */
-  --accent-soft: 0 90 68;
+  --accent: 94 211 140;     /* #5ed38c, lisible sur fond sombre */
+  --accent-strong: 0 128 96;/* #008060, vert Shopify des boutons */
+  --accent-deep: 0 77 58;   /* #004d3a, fonds teintés */
+  --accent-soft: 8 46 34;   /* #082e22 */
   --brand-leaf: 149 191 71; /* #95bf47, vert du logo Shopify */
-  --ink: 4 26 19;           /* #041a13 */
-  --good: 212 245 156;
-  --warn: 255 214 102;
-  --bad: 255 170 170;
+  --ink: 2 12 8;
+  --good: 94 211 140;
+  --warn: 245 190 70;
+  --bad: 248 113 113;
 }
 
 @layer base {
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   body { @apply bg-bg font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
-  ::selection { background: rgb(var(--ink) / 0.45); }
+  ::selection { background: rgb(var(--brand-leaf) / 0.35); }
   :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; border-radius: 6px; }
   h1, h2, h3, .text-display, .text-h1, .text-h2 { @apply font-display; font-weight: 500; text-wrap: balance; }
-  /* Grain léger sur tout le site : donne de la matière au fond vert. */
+  /* Grain léger sur tout le site. */
   body::after {
-    content: ""; position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+    content: ""; position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .05; mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   p { text-wrap: pretty; }
@@ -39,36 +39,34 @@
 
 @layer components {
   /* Surface « verre » : fond très légèrement teinté, bord fin, reflet interne. */
-  /* Surface « verre » : fond très légèrement teinté, bord fin, reflet interne. */
   .surface {
-    background: linear-gradient(180deg, rgb(var(--ink) / 0.26), rgb(var(--ink) / 0.16));
-    border: 1px solid rgb(var(--line) / 0.12);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 24px 48px -28px rgb(var(--ink) / 0.7);
-    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.015));
+    border: 1px solid rgb(var(--line) / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 20px 40px -24px rgb(0 0 0 / 0.6);
   }
   .surface-accent {
-    background: linear-gradient(180deg, rgb(var(--ink) / 0.5), rgb(var(--ink) / 0.3));
-    border: 1px solid rgb(var(--accent) / 0.25);
+    background: linear-gradient(180deg, rgb(var(--accent-deep) / 0.45), rgb(var(--accent-deep) / 0.15));
+    border: 1px solid rgb(var(--accent) / 0.22);
   }
   .hairline { border-color: rgb(var(--line) / 0.08); }
   .field {
-    @apply w-full min-w-0 rounded-ctl border bg-ink/25 px-3.5 py-2.5 text-[15px] text-fg placeholder:text-fg-faint transition-colors duration-200;
-    border-color: rgb(var(--line) / 0.16);
+    @apply w-full min-w-0 rounded-ctl border bg-white/[0.03] px-3.5 py-2.5 text-[15px] text-fg placeholder:text-fg-faint transition-colors duration-200;
+    border-color: rgb(var(--line) / 0.1);
   }
   .field:hover { border-color: rgb(var(--line) / 0.18); }
   .field:focus { outline: none; border-color: rgb(var(--accent) / 0.6); box-shadow: 0 0 0 3px rgb(var(--accent) / 0.12); }
-  .eyebrow { @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-fg-muted; border-color: rgb(var(--accent) / 0.2); background: rgb(var(--ink) / 0.22); }
+  .eyebrow { @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-fg-muted; border-color: rgb(var(--accent) / 0.2); background: rgb(var(--accent-deep) / 0.25); }
   .text-gradient {
     background: linear-gradient(180deg, rgb(var(--fg)) 30%, rgb(var(--fg) / 0.45));
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  /* Mot mis en avant : italique serif tilleul, souligné d'un trait vert foncé. */
+  /* Mot mis en avant : italique serif vert, souligné d'un trait vert feuille. */
   .serif-accent {
     @apply font-serif italic text-accent;
     font-weight: 400;
     letter-spacing: -0.03em;
     font-variation-settings: "SOFT" 100, "WONK" 1;
-    background: linear-gradient(transparent 82%, rgb(var(--ink) / 0.55) 82%, rgb(var(--ink) / 0.55) 92%, transparent 92%);
+    background: linear-gradient(transparent 86%, rgb(var(--brand-leaf) / 0.35) 86%, rgb(var(--brand-leaf) / 0.35) 94%, transparent 94%);
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
   .prose-store p { @apply mb-2; }
@@ -99,7 +97,7 @@
 @keyframes draw { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
-@keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgb(212 245 156 / .6); } 50% { box-shadow: 0 0 0 6px rgb(212 245 156 / 0); } }
+@keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgb(94 211 140 / .6); } 50% { box-shadow: 0 0 0 6px rgb(94 211 140 / 0); } }
 @keyframes type-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 
 .anim { animation-play-state: paused; animation-fill-mode: both; }
