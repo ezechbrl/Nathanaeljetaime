@@ -49,18 +49,18 @@ export function MetricChart({ series, metric, format, label }: { series: Metrics
         {series.map((p, i) => i % labelEvery === 0 && (
           <text key={p.date} x={pts[i].x} y={H - 8} textAnchor="middle" className="fill-fg-faint text-[11px]">{formatShortDate(p.date)}</text>
         ))}
-        <path d={area} fill="rgb(79 227 207 / 0.1)" />
-        <path d={line} fill="none" stroke="rgb(79 227 207)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-        <circle cx={last.x} cy={last.y} r="4.5" fill="rgb(79 227 207)" stroke="#ffffff" strokeWidth="2" />
+        <path d={area} fill="rgb(94 211 140 / 0.1)" />
+        <path d={line} fill="none" stroke="rgb(94 211 140)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+        <circle cx={last.x} cy={last.y} r="4.5" fill="rgb(94 211 140)" stroke="#0a1f17" strokeWidth="2" />
         {h && (
           <g>
             <line x1={h.x} x2={h.x} y1={P.t} y2={H - P.b} stroke="rgb(255 255 255 / 0.25)" strokeWidth="1" />
-            <circle cx={h.x} cy={h.y} r="5" fill="rgb(79 227 207)" stroke="#ffffff" strokeWidth="2" />
+            <circle cx={h.x} cy={h.y} r="5" fill="rgb(94 211 140)" stroke="#0a1f17" strokeWidth="2" />
           </g>
         )}
       </svg>
       {h && hover !== null && (
-        <div className="pointer-events-none absolute top-2 rounded-ctl border border-black/10 bg-bg-2/95 px-3 py-2 text-xs shadow-xl backdrop-blur" style={{ left: `clamp(0px, calc(${(h.x / W) * 100}% - 70px), calc(100% - 140px))` }}>
+        <div className="pointer-events-none absolute top-2 rounded-ctl border border-white/10 bg-bg-2/95 px-3 py-2 text-xs shadow-xl backdrop-blur" style={{ left: `clamp(0px, calc(${(h.x / W) * 100}% - 70px), calc(100% - 140px))` }}>
           <p className="text-fg-faint">{formatShortDate(series[hover].date)}</p>
           <p className="mt-0.5 flex items-center gap-1.5 text-fg"><span className="h-2 w-2 rounded-full bg-accent" />{label} : {format(h.v)}</p>
         </div>

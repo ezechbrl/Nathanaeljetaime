@@ -33,7 +33,7 @@ export default function ProductPage() {
         </div>
       </PageHero>
 
-      <Container className="divide-y divide-black/[0.06]">
+      <Container className="divide-y divide-white/[0.06]">
         <FeatureRow
           eyebrow="1 · Stratégie"
           title={<>D'abord le client. <span className="serif-accent">Ensuite</span> le design.</>}
@@ -76,7 +76,7 @@ export default function ProductPage() {
       <section className="py-24">
         <Container>
           <Reveal as="h2" className="text-center text-h2">Et tout le reste</Reveal>
-          <div className="mt-14 grid gap-px overflow-hidden rounded-card border border-black/[0.07] bg-black/[0.07] sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-14 grid gap-px overflow-hidden rounded-card border border-white/[0.07] bg-white/[0.07] sm:grid-cols-2 lg:grid-cols-3">
             {SMALL.map((f, i) => (
               <Reveal key={f.title} delay={(i % 3) * 60} className="bg-bg p-7">
                 <f.icon className="h-5 w-5 text-accent" />

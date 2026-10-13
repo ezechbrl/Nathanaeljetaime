@@ -109,6 +109,12 @@ export async function loginWithGoogle() {
   s.user = s.user ?? { ...demoUser, firstName: "Alex" };
   save();
 }
+export async function loginWithEmail(email: string) {
+  await wait(700);
+  const s = load();
+  s.user = s.user ?? { ...demoUser, email, firstName: email.split("@")[0].replace(/[^a-z]/gi, " ").trim().split(" ")[0] || "toi" };
+  save();
+}
 export async function logout() {
   await wait(200);
   const s = load();

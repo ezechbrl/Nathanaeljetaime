@@ -39,7 +39,7 @@ export default function TurnkeyPage() {
           <SectionHeading title="Ce qui est inclus" subtitle="Tout est créé dans ta boutique Shopify, prêt à relire." />
           <div className="mx-auto mt-12 grid max-w-4xl gap-x-10 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
             {INCLUDED.map((x, i) => (
-              <Reveal key={x} delay={(i % 3) * 50} className="flex gap-3 border-b border-black/[0.06] py-3 text-[15px]">
+              <Reveal key={x} delay={(i % 3) * 50} className="flex gap-3 border-b border-white/[0.06] py-3 text-[15px]">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" /> {x}
               </Reveal>
             ))}

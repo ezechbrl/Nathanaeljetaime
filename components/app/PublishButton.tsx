@@ -48,7 +48,7 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
         <Upload className="h-4 w-4" /> {store.status === "published" ? "Republier" : "Publier sur Shopify"}
       </Button>
       {confirm && (
-        <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-card border border-black/10 bg-bg-2 p-4 text-sm shadow-2xl">
+        <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-card border border-white/10 bg-bg-2 p-4 text-sm shadow-2xl">
           {needShop ? (
             <>
               <p>Aucune boutique Shopify connectée.</p>

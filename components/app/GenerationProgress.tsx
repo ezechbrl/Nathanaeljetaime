@@ -22,13 +22,13 @@ export function GenerationProgress({ store, job }: { store: Store; job: Job | nu
 
         <div className="mt-10 text-left">
           <div className="flex justify-between text-xs text-fg-muted"><span>Progression</span><span className="tabular-nums">{progress} %</span></div>
-          <div className="mt-2 h-1 overflow-hidden rounded bg-black/[0.07]" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+          <div className="mt-2 h-1 overflow-hidden rounded bg-white/[0.07]" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
             <div className="h-full rounded bg-accent transition-[width] duration-700 ease-out" style={{ width: `${Math.max(progress, 3)}%` }} />
           </div>
           <ul className="mt-6 space-y-3" aria-live="polite">
             {steps.map((s) => (
               <li key={s.key} className={cn("flex items-center gap-3 text-[15px] transition-colors", s.status === "pending" ? "text-fg-faint" : "text-fg")}>
-                <span className={cn("grid h-6 w-6 place-items-center rounded-full border", s.status === "done" ? "border-accent/50 bg-accent-deep/60" : "border-black/10")}>
+                <span className={cn("grid h-6 w-6 place-items-center rounded-full border", s.status === "done" ? "border-accent/50 bg-accent-deep/60" : "border-white/10")}>
                   {s.status === "done" ? <Check className="h-3.5 w-3.5 text-accent" /> : s.status === "running" ? <span className="h-2 w-2 animate-pulse rounded-full bg-accent" /> : null}
                 </span>
                 {s.label}

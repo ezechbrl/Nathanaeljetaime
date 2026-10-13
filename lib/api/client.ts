@@ -39,6 +39,9 @@ export const googleAuthUrl = (next = "/app", ref?: string) =>
 export const loginWithShopify = (shop: string, next = "/app") =>
   live ? Promise.resolve(void (window.location.href = shopifyLoginUrl(shop, next))) : mock.loginWithShopify(shop).then(() => void (window.location.href = next));
 export const loginWithGoogleDemo = () => mock.loginWithGoogle();
+// Lien de connexion par e-mail. En démo, la session est créée directement.
+export const sendEmailLink = (email: string, next = "/app") =>
+  live ? request<void>("/api/auth/email", { method: "POST", json: { email, next } }) : mock.loginWithEmail(email);
 export const logout = () => (live ? request<void>("/api/auth/logout", { method: "POST" }) : mock.logout());
 export const getMe = () => (live ? request<{ user: User; usage: Usage }>("/api/me") : mock.getMe());
 export const updateMe = (input: Partial<Pick<User, "firstName" | "email" | "avatarUrl">>) =>

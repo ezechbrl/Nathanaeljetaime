@@ -28,7 +28,7 @@ export function NewsletterForm() {
     <form onSubmit={submit} className="flex gap-2">
       <label className="sr-only" htmlFor="nl-email">E-mail</label>
       <input id="nl-email" required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ton@email.com" className="field" />
-      <button aria-label="S'inscrire" className="grid h-[42px] w-11 shrink-0 place-items-center rounded-ctl border border-black/10 bg-black/[0.04] text-fg transition-colors hover:border-accent/50 hover:text-accent">
+      <button aria-label="S'inscrire" className="grid h-[42px] w-11 shrink-0 place-items-center rounded-ctl border border-white/10 bg-white/[0.04] text-fg transition-colors hover:border-accent/50 hover:text-accent">
         {state === "loading" ? <Spinner /> : <ArrowRight className="h-4 w-4" />}
       </button>
       {state === "error" && <p role="alert" className="sr-only">Erreur, réessaie.</p>}

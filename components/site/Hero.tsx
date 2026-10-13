@@ -10,7 +10,7 @@ export function Hero() {
       <div className="relative mx-auto max-w-[1200px] px-4 text-center sm:px-6">
         <Reveal>
           <span className="eyebrow">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_rgb(79_227_207)]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_rgb(94_211_140)]" />
             Bêta ouverte · ta première boutique est offerte
           </span>
         </Reveal>

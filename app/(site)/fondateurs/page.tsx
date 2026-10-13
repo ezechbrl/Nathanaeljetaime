@@ -31,7 +31,7 @@ export default function StoryPage() {
       <section className="py-24">
         <Container>
           <Reveal as="h2" className="text-center text-h2">Ce qui guide nos choix</Reveal>
-          <div className="mt-12 grid gap-px overflow-hidden rounded-card border border-black/[0.07] bg-black/[0.07] sm:grid-cols-2">
+          <div className="mt-12 grid gap-px overflow-hidden rounded-card border border-white/[0.07] bg-white/[0.07] sm:grid-cols-2">
             {PRINCIPLES.map((p, i) => (
               <Reveal key={p.title} delay={(i % 2) * 70} className="bg-bg p-8">
                 <p className="font-serif text-3xl italic text-accent">{String(i + 1).padStart(2, "0")}</p>

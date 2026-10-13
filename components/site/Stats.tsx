@@ -41,7 +41,7 @@ export function Stats() {
     <section className="mx-auto max-w-[1000px] px-4 py-14 sm:px-6">
       <div className="grid grid-cols-2 gap-y-10 sm:grid-cols-4">
         {STATS.map((s, i) => (
-          <Reveal key={s.label} delay={i * 80} className="border-black/[0.06] text-center sm:border-r">
+          <Reveal key={s.label} delay={i * 80} className="border-white/[0.06] text-center sm:border-r">
             <p className="text-4xl tracking-[-0.04em] sm:text-5xl"><CountUp to={s.value} suffix={s.suffix} /></p>
             <p className="mt-2 text-sm text-fg-muted">{s.label}</p>
           </Reveal>

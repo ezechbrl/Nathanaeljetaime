@@ -139,7 +139,7 @@ export function StoreThumb({ store, className }: { store: Store; className?: str
         </div>
       ) : (
         <div className="grid h-full place-items-center bg-bg-3">
-          <div className="h-2 w-24 animate-shimmer rounded bg-[linear-gradient(90deg,rgb(255_255_255/0.05),rgb(79_227_207/0.4),rgb(255_255_255/0.05))] bg-[length:200%_100%]" />
+          <div className="h-2 w-24 animate-shimmer rounded bg-[linear-gradient(90deg,rgb(255_255_255/0.05),rgb(0_166_118/0.4),rgb(255_255_255/0.05))] bg-[length:200%_100%]" />
         </div>
       )}
     </div>

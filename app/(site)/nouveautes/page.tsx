@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Nouveautés", description: "Ce qui e
 const STYLE = {
   Disponible: "border-good/30 text-good",
   "En cours": "border-accent/30 text-accent",
-  Prévu: "border-black/15 text-fg-muted",
+  Prévu: "border-white/15 text-fg-muted",
 };
 
 export default function ChangelogPage() {
@@ -18,7 +18,7 @@ export default function ChangelogPage() {
     <>
       <PageHero eyebrow="Nouveautés" title={<>Ce qui sort, ce qui <span className="serif-accent">arrive</span></>} subtitle="Le produit évolue chaque semaine. Voici où on en est." />
       <Container className="max-w-[820px]">
-        <ol className="relative border-l border-black/[0.08] pl-8">
+        <ol className="relative border-l border-white/[0.08] pl-8">
           {CHANGELOG.map((c, i) => (
             <Reveal as="li" key={c.title} delay={i * 50} className="relative pb-12">
               <span className={cn("absolute -left-[37px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-bg", c.status === "Disponible" ? "bg-good" : c.status === "En cours" ? "bg-accent" : "bg-fg-faint")} />

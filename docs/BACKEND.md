@@ -108,14 +108,15 @@ Active la RLS Supabase : un utilisateur ne voit que ses lignes (`user_id = auth.
 
 ## 3. Authentification (implémentée)
 
-Pas d'e-mail ni de mot de passe : **Shopify** ou **Google**, et la boutique Shopify est obligatoire.
+Pas de mot de passe : **Shopify**, **Google** ou **lien magique par e-mail**, et la boutique Shopify est obligatoire (Google et e-mail redirigent vers `/connecter-shopify`).
 
 | Route | Rôle |
 |---|---|
 | `GET /api/shopify/install?shop=…&next=…` | Démarre l'OAuth Shopify. Sert à se connecter (sans compte) **et** à relier une boutique |
 | `GET /api/shopify/callback` | Vérifie HMAC + state, récupère le token, puis : utilisateur déjà connecté → relie la boutique ; sinon propriétaire existant de la boutique → ouvre sa session ; sinon crée le compte avec l'e-mail de la boutique (session via lien magique généré côté serveur). Si l'e-mail appartient déjà à un autre compte non relié, refus (`/connexion?error=compte-existant`) |
 | `GET /api/auth/google?next=…` | OAuth Google via Supabase |
-| `GET /api/auth/callback` | Retour Google ; sans boutique active → `/connecter-shopify` |
+| `POST /api/auth/email` | `{email, next}` → envoie un lien magique (Supabase `signInWithOtp`), 204 ; 5/h par IP |
+| `GET /api/auth/callback` | Retour Google ou lien e-mail ; sans boutique active → `/connecter-shopify` |
 | `POST /api/auth/logout` | Déconnexion |
 | `GET /api/me` · `PATCH /api/me` · `DELETE /api/me` | Profil, quotas, suppression complète (RGPD) |
 

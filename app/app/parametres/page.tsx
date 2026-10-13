@@ -14,7 +14,7 @@ import { formatDate } from "@/lib/format";
 
 function Card({ id, title, text, children }: { id?: string; title: string; text?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="grid scroll-mt-20 gap-6 border-b border-black/[0.06] py-8 lg:grid-cols-[280px_1fr]">
+    <section id={id} className="grid scroll-mt-20 gap-6 border-b border-white/[0.06] py-8 lg:grid-cols-[280px_1fr]">
       <div><h2 className="text-[16px] tracking-tight">{title}</h2>{text && <p className="mt-1 text-sm text-fg-muted">{text}</p>}</div>
       <div className="max-w-xl">{children}</div>
     </section>
@@ -90,7 +90,7 @@ export default function SettingsPage() {
         <Card id="shopify" title="Boutiques Shopify" text="L'IA publie dans ces boutiques et lit leurs statistiques pour le pilotage.">
           <div className="space-y-2">
             {!connections.data ? <Skeleton className="h-16" /> : connections.data.connections.map((c) => (
-              <div key={c.id} className="flex items-center justify-between gap-3 rounded-card border border-black/[0.07] p-4">
+              <div key={c.id} className="flex items-center justify-between gap-3 rounded-card border border-white/[0.07] p-4">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-ctl bg-[#f4f6f1]"><ShoppingBag className="h-4 w-4 text-[#5e8e3e]" /></span>
                   <div className="min-w-0">

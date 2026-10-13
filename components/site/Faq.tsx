@@ -13,7 +13,7 @@ export function FaqList({ items, defaultOpen = 0 }: { items: { q: string; a: str
         const isOpen = open === i;
         return (
           <Reveal key={item.q} delay={i * 50}>
-            <div className={cn("rounded-card border transition-colors duration-300", isOpen ? "border-accent/25 bg-accent-deep/20" : "border-black/[0.08] bg-black/[0.02] hover:border-black/15")}>
+            <div className={cn("rounded-card border transition-colors duration-300", isOpen ? "border-accent/25 bg-accent-deep/20" : "border-white/[0.08] bg-white/[0.02] hover:border-white/15")}>
               <h3>
                 <button
                   id={`faq-q-${i}`}
@@ -23,7 +23,7 @@ export function FaqList({ items, defaultOpen = 0 }: { items: { q: string; a: str
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-[16px] text-fg"
                 >
                   {item.q}
-                  <span className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full border border-black/15 transition-transform duration-300", isOpen && "rotate-45 border-accent/40 text-accent")}>
+                  <span className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/15 transition-transform duration-300", isOpen && "rotate-45 border-accent/40 text-accent")}>
                     <Plus className="h-3.5 w-3.5" />
                   </span>
                 </button>

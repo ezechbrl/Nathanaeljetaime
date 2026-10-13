@@ -34,7 +34,7 @@ function ShopifyEditorMock() {
 function OurEditorMock() {
   return (
     <div className="surface relative overflow-hidden rounded-card p-5 sm:p-8">
-      <div aria-hidden className="absolute inset-0 [background:radial-gradient(ellipse_70%_60%_at_50%_0%,rgb(22_170_156/0.22),transparent)]" />
+      <div aria-hidden className="absolute inset-0 [background:radial-gradient(ellipse_70%_60%_at_50%_0%,rgb(0_96/0.22),transparent)]" />
       <p className="relative text-center text-xl tracking-tight sm:text-2xl">Une boutique à partir d'une <span className="serif-accent">phrase</span></p>
       <div className="relative mt-5 rounded-[10px] border border-accent/25 bg-bg-2 p-3">
         <p className="text-sm text-fg">Matcha bio d'Uji, kit de préparation inclus, ton calme et premium.</p>

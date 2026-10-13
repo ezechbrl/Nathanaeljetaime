@@ -19,12 +19,12 @@ export function AppPreview() {
   return (
     <div ref={ref} className="mx-auto mt-16 max-w-[1100px] [perspective:1600px] sm:mt-20" style={{ "--p": 0 } as React.CSSProperties}>
       <div
-        className="relative origin-top overflow-hidden rounded-[14px] border border-black/10 bg-white shadow-[0_60px_120px_-50px_rgb(0_0_0/0.45)] will-change-transform"
+        className="relative origin-top overflow-hidden rounded-[14px] border border-white/10 bg-bg-2 shadow-[0_60px_120px_-40px_rgb(0_0_0/0.8),0_0_0_1px_rgb(0_0_0/0.3)] will-change-transform"
         style={{ transform: "rotateX(calc((1 - var(--p)) * 14deg)) scale(calc(0.94 + var(--p) * 0.06))" }}
       >
-        <div className="flex items-center gap-1.5 border-b border-black/[0.06] bg-bg-2 px-3 py-2.5">
+        <div className="flex items-center gap-1.5 border-b border-white/[0.06] bg-bg-2 px-3 py-2.5">
           <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-          <span className="ml-3 flex-1 truncate rounded-[6px] bg-white px-3 py-1 text-center text-xs text-fg-faint">vitrio.ai/app</span>
+          <span className="ml-3 flex-1 truncate rounded-[6px] bg-white/[0.06] px-3 py-1 text-center text-xs text-fg-faint">vitrio.ai/app</span>
         </div>
         <video
           ref={videoRef}

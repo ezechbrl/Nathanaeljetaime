@@ -65,10 +65,10 @@ export default function StoreDashboard() {
         <div className="min-w-0">
           <div className="flex gap-1 overflow-x-auto">
             {PAGES.map((p) => (
-              <button key={p.id} onClick={() => setPage(p.id)} aria-pressed={page === p.id} className={cn("shrink-0 rounded-t-ctl border-x border-t px-4 py-2 text-[13px] transition-colors", page === p.id ? "border-black/10 bg-black/[0.04] text-fg" : "border-transparent text-fg-muted hover:text-fg")}>{p.label}</button>
+              <button key={p.id} onClick={() => setPage(p.id)} aria-pressed={page === p.id} className={cn("shrink-0 rounded-t-ctl border-x border-t px-4 py-2 text-[13px] transition-colors", page === p.id ? "border-white/10 bg-white/[0.04] text-fg" : "border-transparent text-fg-muted hover:text-fg")}>{p.label}</button>
             ))}
           </div>
-          <div className="max-h-[720px] overflow-y-auto rounded-b-card rounded-tr-card border border-black/10">
+          <div className="max-h-[720px] overflow-y-auto rounded-b-card rounded-tr-card border border-white/10">
             <StorePreview store={store} page={page} assets={assets.data?.assets} />
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function StoreDashboard() {
               <div><dt className="text-fg-faint">Ton</dt><dd className="mt-0.5 text-fg-muted">{plan.brand.tone}</dd></div>
             </dl>
             <div className="mt-4 flex gap-1.5">
-              {Object.values(store.theme.colors).map((c) => <span key={c} title={c} className="h-6 w-6 rounded-full border border-black/15" style={{ background: c }} />)}
+              {Object.values(store.theme.colors).map((c) => <span key={c} title={c} className="h-6 w-6 rounded-full border border-white/15" style={{ background: c }} />)}
             </div>
           </section>
 
@@ -91,7 +91,7 @@ export default function StoreDashboard() {
             <h2 className="flex items-center gap-2 text-sm text-fg-muted"><History className="h-4 w-4" /> Versions</h2>
             <ul className="mt-3 max-h-56 space-y-1 overflow-y-auto">
               {versions.data?.versions.map((v, i) => (
-                <li key={v.id} className="group flex items-center justify-between gap-2 rounded-ctl px-2 py-1.5 text-sm hover:bg-black/[0.03]">
+                <li key={v.id} className="group flex items-center justify-between gap-2 rounded-ctl px-2 py-1.5 text-sm hover:bg-white/[0.03]">
                   <span className="min-w-0"><span className="block truncate">{v.label}</span><span className="text-xs text-fg-faint">{timeAgo(v.createdAt)}</span></span>
                   {i === 0 ? <span className="text-xs text-accent">Actuelle</span> : (
                     <button onClick={() => restore(v.id)} className="flex items-center gap-1 text-xs text-fg-faint opacity-0 transition-opacity hover:text-fg group-hover:opacity-100 focus:opacity-100"><RotateCcw className="h-3 w-3" /> Restaurer</button>
@@ -101,7 +101,7 @@ export default function StoreDashboard() {
             </ul>
           </section>
 
-          <section className="rounded-card border border-black/[0.07] p-5">
+          <section className="rounded-card border border-white/[0.07] p-5">
             {confirmDelete ? (
               <div className="text-sm">
                 <p>Supprimer {store.name} de ton espace ? Rien n'est supprimé sur Shopify.</p>

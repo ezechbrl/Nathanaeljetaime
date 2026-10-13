@@ -15,8 +15,8 @@ export function AffiliateCalculator() {
       <label htmlFor="refs" className="flex items-baseline justify-between text-sm text-fg-muted">
         Clients Pro parrainés <span className="text-3xl tracking-tight text-fg tabular-nums">{referrals}</span>
       </label>
-      <input id="refs" type="range" min={1} max={100} value={referrals} onChange={(e) => setReferrals(+e.target.value)} className="mt-4 w-full accent-[rgb(79_227_207)]" />
-      <div className="mt-8 grid grid-cols-2 gap-4 border-t border-black/[0.08] pt-6">
+      <input id="refs" type="range" min={1} max={100} value={referrals} onChange={(e) => setReferrals(+e.target.value)} className="mt-4 w-full accent-[rgb(94_211_140)]" />
+      <div className="mt-8 grid grid-cols-2 gap-4 border-t border-white/[0.08] pt-6">
         <div>
           <p className="text-sm text-fg-muted">Par mois</p>
           <p className="mt-1 text-4xl tracking-[-0.04em] tabular-nums">{monthly.toLocaleString("fr-FR")} €</p>

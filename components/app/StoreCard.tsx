@@ -6,7 +6,7 @@ import { StoreThumb } from "./StorePreview";
 
 export function StoreCard({ store }: { store: Store }) {
   return (
-    <Link href={`/app/boutiques/${store.id}`} className="group block rounded-card border border-black/[0.07] bg-black/[0.02] p-3 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-black/15">
+    <Link href={`/app/boutiques/${store.id}`} className="group block rounded-card border border-white/[0.07] bg-white/[0.02] p-3 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-white/15">
       <StoreThumb store={store} />
       <div className="mt-3 flex items-start justify-between gap-3 px-1">
         <div className="min-w-0">

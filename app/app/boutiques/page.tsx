@@ -26,9 +26,9 @@ export default function StoresPage() {
     <>
       <PageHeader title="Mes boutiques" subtitle={`${stores.length} boutique${stores.length > 1 ? "s" : ""}`} actions={<ButtonLink href="/app"><Plus className="h-4 w-4" /> Nouvelle boutique</ButtonLink>}>
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <div className="flex gap-1 rounded-ctl border border-black/[0.07] p-1">
+          <div className="flex gap-1 rounded-ctl border border-white/[0.07] p-1">
             {FILTERS.map((f) => (
-              <button key={f.id} onClick={() => setFilter(f.id)} aria-pressed={filter === f.id} className={cn("rounded-[7px] px-3 py-1 text-[13px] transition-colors", filter === f.id ? "bg-black/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>{f.label}</button>
+              <button key={f.id} onClick={() => setFilter(f.id)} aria-pressed={filter === f.id} className={cn("rounded-[7px] px-3 py-1 text-[13px] transition-colors", filter === f.id ? "bg-white/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>{f.label}</button>
             ))}
           </div>
           <label className="sr-only" htmlFor="q">Rechercher</label>

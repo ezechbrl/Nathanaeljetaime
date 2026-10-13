@@ -21,7 +21,7 @@ export default function DemoPage() {
       <PageHero eyebrow="Démo" title={<>Un brief de deux lignes. Une boutique <span className="serif-accent">complète</span>.</>} subtitle="Voici ce qui se passe quand tu cliques sur « Générer »." />
       <Container>
         <Reveal><VideoSteps /></Reveal>
-        <ol className="mt-20 grid gap-px overflow-hidden rounded-card border border-black/[0.07] bg-black/[0.07] md:grid-cols-4">
+        <ol className="mt-20 grid gap-px overflow-hidden rounded-card border border-white/[0.07] bg-white/[0.07] md:grid-cols-4">
           {TIMELINE.map((s, i) => (
             <Reveal as="li" key={s.t} delay={i * 80} className="bg-bg p-6">
               <p className="font-mono text-xs text-accent">{s.t}</p>

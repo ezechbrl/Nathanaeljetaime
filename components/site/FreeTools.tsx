@@ -59,7 +59,7 @@ export function FreeTools() {
     <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
       <div role="tablist" aria-label="Outils" className="flex gap-2 overflow-x-auto lg:flex-col">
         {TOOLS.map((t) => (
-          <button key={t.id} role="tab" aria-selected={t.id === toolId} onClick={() => { setToolId(t.id); setResult(null); }} className={cn("shrink-0 rounded-card border px-4 py-3 text-left transition-colors", t.id === toolId ? "border-accent/30 bg-accent-deep/25" : "border-black/[0.07] hover:border-black/15")}>
+          <button key={t.id} role="tab" aria-selected={t.id === toolId} onClick={() => { setToolId(t.id); setResult(null); }} className={cn("shrink-0 rounded-card border px-4 py-3 text-left transition-colors", t.id === toolId ? "border-accent/30 bg-accent-deep/25" : "border-white/[0.07] hover:border-white/15")}>
             <span className="block text-[15px]">{t.label}</span>
             <span className="hidden text-xs text-fg-faint lg:block">{t.description}</span>
           </button>
@@ -80,16 +80,16 @@ export function FreeTools() {
 
         {error && <p role="alert" className="mt-5 text-sm text-bad">{error}</p>}
         {result && (
-          <div className="mt-8 border-t border-black/[0.07] pt-6" aria-live="polite">
+          <div className="mt-8 border-t border-white/[0.07] pt-6" aria-live="polite">
             {(result.names ?? result.slogans)?.map((x) => (
-              <div key={x} className="flex items-center justify-between border-b border-black/[0.05] py-2.5">
+              <div key={x} className="flex items-center justify-between border-b border-white/[0.05] py-2.5">
                 <span className="text-lg tracking-tight">{x}</span>
                 <button onClick={() => copy(x)} aria-label={`Copier ${x}`} className="text-fg-faint hover:text-fg"><Copy className="h-4 w-4" /></button>
               </div>
             ))}
             {result.html && <div className="prose-store text-[15px] text-fg-muted" dangerouslySetInnerHTML={{ __html: sanitizeHtml(result.html) }} />}
             {result.items?.map((x) => (
-              <div key={x.question} className="border-b border-black/[0.05] py-3"><p>{x.question}</p><p className="mt-1 text-sm text-fg-muted">{x.answer}</p></div>
+              <div key={x.question} className="border-b border-white/[0.05] py-3"><p>{x.question}</p><p className="mt-1 text-sm text-fg-muted">{x.answer}</p></div>
             ))}
             <div className="mt-6 rounded-ctl border border-accent/20 bg-accent-deep/20 p-4 text-sm text-fg-muted">
               Envie de la boutique entière, pas seulement d'un texte ? <ButtonLink href="/inscription" variant="ghost" size="sm" className="ml-1 text-accent">Créer ma boutique →</ButtonLink>

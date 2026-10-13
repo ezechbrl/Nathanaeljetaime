@@ -83,9 +83,9 @@ function Billing() {
         <section>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg tracking-tight">Changer d'offre</h2>
-            <div className="flex rounded-full border border-black/[0.08] p-1 text-[13px]" role="radiogroup" aria-label="Période">
+            <div className="flex rounded-full border border-white/[0.08] p-1 text-[13px]" role="radiogroup" aria-label="Période">
               {[{ v: false, l: "Mensuel" }, { v: true, l: "Annuel · 2 mois offerts" }].map((o) => (
-                <button key={o.l} role="radio" aria-checked={yearly === o.v} onClick={() => setYearly(o.v)} className={cn("rounded-full px-3 py-1", yearly === o.v ? "bg-black/[0.08] text-fg" : "text-fg-muted")}>{o.l}</button>
+                <button key={o.l} role="radio" aria-checked={yearly === o.v} onClick={() => setYearly(o.v)} className={cn("rounded-full px-3 py-1", yearly === o.v ? "bg-white/[0.08] text-fg" : "text-fg-muted")}>{o.l}</button>
               ))}
             </div>
           </div>
@@ -94,7 +94,7 @@ function Billing() {
               const isCurrent = p.id === sub?.plan;
               const highlighted = params.get("plan") === p.id || (!params.get("plan") && p.featured);
               return (
-                <div key={p.id} className={cn("flex flex-col rounded-card border p-5", highlighted ? "border-accent/35 bg-accent-deep/20" : "border-black/[0.07]")}>
+                <div key={p.id} className={cn("flex flex-col rounded-card border p-5", highlighted ? "border-accent/35 bg-accent-deep/20" : "border-white/[0.07]")}>
                   <p className="text-lg tracking-tight">{p.name}</p>
                   <p className="mt-3 text-3xl tracking-tight">{euro(yearly ? Math.round(p.yearly / 12) : p.monthly)}<span className="text-sm text-fg-muted"> / mois</span></p>
                   <ul className="mt-4 flex-1 space-y-2 text-sm text-fg-muted">
@@ -118,7 +118,7 @@ function Billing() {
               <thead className="text-left text-fg-faint"><tr><th className="py-2 font-normal">Numéro</th><th className="py-2 font-normal">Date</th><th className="py-2 font-normal">Montant</th><th className="py-2 font-normal" /></tr></thead>
               <tbody>
                 {billing.data.invoices.map((i) => (
-                  <tr key={i.id} className="border-t border-black/[0.05]">
+                  <tr key={i.id} className="border-t border-white/[0.05]">
                     <td className="py-3">{i.number}</td><td className="py-3 text-fg-muted">{formatDate(i.createdAt)}</td><td className="py-3 tabular-nums">{formatMoney(i.amount, i.currency)}</td>
                     <td className="py-3 text-right"><a href={i.pdfUrl} className="text-fg-muted hover:text-fg">PDF</a></td>
                   </tr>

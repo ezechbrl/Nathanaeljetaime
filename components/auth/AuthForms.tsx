@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import { ArrowRight, Mail, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -10,9 +10,9 @@ import * as api from "@/lib/api/client";
 const ERRORS: Record<string, string> = {
   signature: "La connexion Shopify n'a pas pu être vérifiée. Réessaie.",
   session: "La connexion a expiré. Réessaie.",
-  "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec Google, puis relie ta boutique.",
+  "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec Google ou ton e-mail, puis relie ta boutique.",
   google: "La connexion Google a échoué. Réessaie.",
-  lien: "Ce lien n'est plus valide.",
+  lien: "Ce lien de connexion n'est plus valide (il expire au bout d'une heure). Demande-en un nouveau.",
 };
 
 // Après connexion : on reprend là où la personne en était (brief tapé sur la landing, offre choisie…).
@@ -55,7 +55,7 @@ export function ShopifyForm({ next, cta = "Continuer avec Shopify" }: { next: st
   return (
     <form onSubmit={submit} className="space-y-3">
       <label htmlFor="shop" className="block text-sm text-fg-muted">Adresse de ta boutique Shopify</label>
-      <div className="flex items-center rounded-ctl border border-line/15 bg-white focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
+      <div className="flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
         <ShoppingBag className="ml-3 h-4 w-4 shrink-0 text-accent" />
         <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" className="min-w-0 flex-1 bg-transparent px-2 py-3 text-[15px] focus:outline-none" />
         <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
@@ -80,7 +80,7 @@ function GoogleButton({ next }: { next: string }) {
   let ref: string | undefined;
   try { ref = typeof document !== "undefined" ? document.cookie.match(/(?:^|; )ref=([^;]+)/)?.[1] : undefined; } catch { /* cookies indisponibles */ }
   return (
-    <a href={api.googleAuthUrl(next, ref)} onClick={onClick} className="flex h-12 w-full items-center justify-center gap-2.5 rounded-ctl border border-line/15 bg-white text-[15px] transition-colors hover:border-line/30 hover:bg-bg-2">
+    <a href={api.googleAuthUrl(next, ref)} onClick={onClick} className="flex h-12 w-full items-center justify-center gap-2.5 rounded-ctl border border-line/15 bg-white/[0.03] text-[15px] transition-colors hover:border-line/30 hover:bg-white/[0.06]">
       <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden>
         <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
         <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
@@ -92,7 +92,61 @@ function GoogleButton({ next }: { next: string }) {
   );
 }
 
-// Écran unique de connexion / inscription : Shopify d'abord, Google ensuite.
+function EmailOption({ next }: { next: string }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "loading" | "sent">("idle");
+  const [error, setError] = useState("");
+  const demo = api.API_MODE !== "live";
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setState("loading");
+    try {
+      await api.sendEmailLink(email, next);
+      setState("sent");
+    } catch (err) {
+      setError((err as Error).message);
+      setState("idle");
+    }
+  }
+
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="flex h-12 w-full items-center justify-center gap-2.5 rounded-ctl border border-line/15 bg-white/[0.03] text-[15px] transition-colors hover:border-line/30 hover:bg-white/[0.06]">
+        <Mail className="h-4 w-4 text-fg-muted" /> Continuer avec mon e-mail
+      </button>
+    );
+  }
+  if (state === "sent") {
+    return (
+      <div role="status" className="rounded-card border border-accent/25 bg-accent-deep/25 p-4 text-sm">
+        <p className="text-fg">Vérifie ta boîte mail</p>
+        <p className="mt-1 text-fg-muted">On a envoyé un lien de connexion à <span className="text-fg">{email}</span>. Clique dessus pour continuer (pense aux spams).</p>
+        {demo && (
+          <button type="button" onClick={() => router.push(`/connecter-shopify?next=${encodeURIComponent(next)}`)} className="mt-3 text-accent underline underline-offset-4">
+            Ouvrir le lien (démo)
+          </button>
+        )}
+      </div>
+    );
+  }
+  return (
+    <form onSubmit={submit} className="space-y-3">
+      <label htmlFor="email" className="block text-sm text-fg-muted">Ton adresse e-mail</label>
+      <input id="email" type="email" required autoFocus autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.com" className="field" />
+      {error && <p role="alert" className="text-sm text-bad">{error}</p>}
+      <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={state === "loading"}>
+        {state === "loading" ? <Spinner /> : "Recevoir mon lien de connexion"}
+      </Button>
+      <p className="text-xs text-fg-faint">Pas de mot de passe : tu reçois un lien valable une heure.</p>
+    </form>
+  );
+}
+
+// Écran unique de connexion / inscription : Shopify d'abord, puis Google ou e-mail.
 export function AuthPanel({ mode }: { mode: "login" | "register" }) {
   const params = useSearchParams();
   const next = nextUrl(params);
@@ -102,15 +156,18 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
     <>
       {error && ERRORS[error] && <p role="alert" className="mb-6 rounded-card border border-bad/25 bg-bad/5 p-4 text-sm text-fg">{ERRORS[error]}</p>}
       {brief && (
-        <div className="mb-6 rounded-card border border-accent/25 bg-accent-soft p-4 text-sm">
+        <div className="mb-6 rounded-card border border-accent/25 bg-accent-deep/25 p-4 text-sm">
           <p className="text-xs font-medium uppercase tracking-[0.12em] text-accent">Ton projet</p>
           <p className="mt-1 line-clamp-2 text-fg-muted">« {brief} »</p>
         </div>
       )}
       <ShopifyForm next={next} cta={mode === "register" ? "Créer ma boutique avec Shopify" : "Continuer avec Shopify"} />
       <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
-      <GoogleButton next={next} />
-      <p className="mt-3 text-xs text-fg-faint">Avec Google, on te demandera ensuite de relier ta boutique Shopify.</p>
+      <div className="space-y-2.5">
+        <GoogleButton next={next} />
+        <EmailOption next={next} />
+      </div>
+      <p className="mt-3 text-xs text-fg-faint">Avec Google ou ton e-mail, on te demandera ensuite de relier ta boutique Shopify.</p>
       <p className="mt-8 text-xs leading-relaxed text-fg-faint">
         En continuant, tu acceptes les <Link href="/legal/cgu" className="underline">CGU</Link> et la <Link href="/legal/confidentialite" className="underline">politique de confidentialité</Link>.
       </p>

@@ -26,7 +26,7 @@ export default function BlogPage() {
             </div>
           </Link>
         </Reveal>
-        <div className="mt-6 divide-y divide-black/[0.07] border-y border-black/[0.07]">
+        <div className="mt-6 divide-y divide-white/[0.07] border-y border-white/[0.07]">
           {rest.map((p, i) => (
             <Reveal key={p.slug} delay={i * 60}>
               <Link href={`/blog/${p.slug}`} className="group grid gap-3 py-8 sm:grid-cols-[160px_1fr_auto] sm:items-baseline sm:gap-8">

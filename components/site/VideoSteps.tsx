@@ -61,14 +61,14 @@ export function VideoSteps({ videos = DEMO_VIDEOS, className }: { videos?: DemoV
               <button
                 onClick={() => { setUserPaused(false); setIndex(i); }}
                 aria-current={active ? "step" : undefined}
-                className={cn("w-full rounded-card border p-4 text-left transition-colors duration-300", active ? "border-accent/30 bg-accent-soft" : "border-black/[0.08] bg-white hover:border-black/20")}
+                className={cn("w-full rounded-card border p-4 text-left transition-colors duration-300", active ? "border-accent/30 bg-accent-deep/30" : "border-white/[0.08] bg-white/[0.02] hover:border-white/20")}
               >
                 <span className={cn("text-xs font-medium", active ? "text-accent" : "text-fg-faint")}>{v.step}</span>
-                <span className="mt-1 block font-display text-lg font-semibold tracking-tight">{v.title}</span>
+                <span className="mt-1 block text-lg tracking-tight">{v.title}</span>
                 <span className={cn("grid transition-[grid-template-rows] duration-500", active ? "grid-rows-[1fr]" : "grid-rows-[0fr] lg:grid-rows-[0fr]")}>
                   <span className="overflow-hidden text-sm leading-relaxed text-fg-muted"><span className="block pt-1.5">{v.text}</span></span>
                 </span>
-                <span className="mt-3 block h-0.5 overflow-hidden rounded bg-black/[0.07]">
+                <span className="mt-3 block h-0.5 overflow-hidden rounded bg-white/[0.07]">
                   <span className="block h-full rounded bg-accent transition-[width] duration-200 ease-linear" style={{ width: `${progress}%` }} />
                 </span>
               </button>
@@ -78,10 +78,10 @@ export function VideoSteps({ videos = DEMO_VIDEOS, className }: { videos?: DemoV
       </ol>
 
       <div className="relative">
-        <div className="overflow-hidden rounded-[14px] border border-black/10 bg-white shadow-[0_40px_80px_-40px_rgb(0_0_0/0.35)]">
-          <div className="flex items-center gap-1.5 border-b border-black/[0.06] bg-bg-2 px-3 py-2.5">
+        <div className="overflow-hidden rounded-[14px] border border-white/10 bg-bg-2 shadow-[0_40px_80px_-40px_rgb(0_0_0/0.7)]">
+          <div className="flex items-center gap-1.5 border-b border-white/[0.06] bg-bg-2 px-3 py-2.5">
             <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-            <span className="ml-3 flex-1 truncate rounded-[6px] bg-white px-3 py-1 text-center text-xs text-fg-faint">vitrio.ai/app</span>
+            <span className="ml-3 flex-1 truncate rounded-[6px] bg-white/[0.06] px-3 py-1 text-center text-xs text-fg-faint">vitrio.ai/app</span>
           </div>
           <div className="relative aspect-[16/10] bg-bg-2">
             <video

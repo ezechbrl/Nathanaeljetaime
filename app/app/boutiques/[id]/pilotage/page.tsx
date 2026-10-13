@@ -78,9 +78,9 @@ export default function PilotPage() {
   return (
     <>
       <PageHeader title="Pilotage" subtitle="Comparé à la période précédente de même durée." actions={
-        <div className="flex rounded-ctl border border-black/[0.07] p-1" role="group" aria-label="Période">
+        <div className="flex rounded-ctl border border-white/[0.07] p-1" role="group" aria-label="Période">
           {(["7d", "30d", "90d"] as const).map((r) => (
-            <button key={r} onClick={() => setRange(r)} aria-pressed={range === r} className={cn("rounded-[7px] px-3 py-1 text-[13px]", range === r ? "bg-black/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>{r.replace("d", " j")}</button>
+            <button key={r} onClick={() => setRange(r)} aria-pressed={range === r} className={cn("rounded-[7px] px-3 py-1 text-[13px]", range === r ? "bg-white/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>{r.replace("d", " j")}</button>
           ))}
         </div>
       } />
@@ -95,7 +95,7 @@ export default function PilotPage() {
         {metrics.error ? <ErrorState message={metrics.error.message} onRetry={metrics.reload} /> : (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {METRICS.map((x) => (
-              <button key={x.id} onClick={() => setMetric(x.id)} aria-pressed={metric === x.id} className={cn("rounded-card border p-4 text-left transition-colors", metric === x.id ? "border-accent/35 bg-accent-deep/20" : "border-black/[0.07] bg-black/[0.02] hover:border-black/15")}>
+              <button key={x.id} onClick={() => setMetric(x.id)} aria-pressed={metric === x.id} className={cn("rounded-card border p-4 text-left transition-colors", metric === x.id ? "border-accent/35 bg-accent-deep/20" : "border-white/[0.07] bg-white/[0.02] hover:border-white/15")}>
                 <p className="text-xs text-fg-muted">{x.label}</p>
                 {t && p ? (
                   <>
@@ -118,7 +118,7 @@ export default function PilotPage() {
               <div className="max-h-72 overflow-y-auto">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-bg-2 text-left text-fg-faint"><tr><th className="py-2 font-normal">Date</th><th className="py-2 text-right font-normal">{m.label}</th></tr></thead>
-                  <tbody>{metrics.data.series.map((s) => <tr key={s.date} className="border-t border-black/[0.05]"><td className="py-1.5 text-fg-muted">{formatShortDate(s.date)}</td><td className="py-1.5 text-right tabular-nums">{m.format(s[metric])}</td></tr>)}</tbody>
+                  <tbody>{metrics.data.series.map((s) => <tr key={s.date} className="border-t border-white/[0.05]"><td className="py-1.5 text-fg-muted">{formatShortDate(s.date)}</td><td className="py-1.5 text-right tabular-nums">{m.format(s[metric])}</td></tr>)}</tbody>
                 </table>
               </div>
             ) : <MetricChart series={metrics.data.series} metric={metric} format={m.format} label={m.label} />}
@@ -129,12 +129,12 @@ export default function PilotPage() {
           <h2 className="text-lg tracking-tight">Recommandations</h2>
           <div className="mt-4 space-y-2">
             {!recos.data ? <Skeleton className="h-24 w-full" /> : proposed.length === 0 ? (
-              <p className="rounded-card border border-black/[0.07] p-5 text-sm text-fg-muted">Rien à corriger aujourd'hui. Les prochaines recommandations arrivent demain matin.</p>
+              <p className="rounded-card border border-white/[0.07] p-5 text-sm text-fg-muted">Rien à corriger aujourd'hui. Les prochaines recommandations arrivent demain matin.</p>
             ) : proposed.map((r) => (
               <article key={r.id} className="surface rounded-card p-5">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="rounded-full border border-black/10 px-2 py-0.5 text-fg-muted">{AREA[r.area]}</span>
-                  <span className={cn("rounded-full border px-2 py-0.5", r.expectedImpact === "high" ? "border-accent/30 text-accent" : "border-black/10 text-fg-muted")}>{IMPACT[r.expectedImpact]}</span>
+                  <span className="rounded-full border border-white/10 px-2 py-0.5 text-fg-muted">{AREA[r.area]}</span>
+                  <span className={cn("rounded-full border px-2 py-0.5", r.expectedImpact === "high" ? "border-accent/30 text-accent" : "border-white/10 text-fg-muted")}>{IMPACT[r.expectedImpact]}</span>
                 </div>
                 <h3 className="mt-3 text-[16px] tracking-tight">{r.title}</h3>
                 <p className="mt-1.5 text-sm text-fg-muted">{r.rationale}</p>

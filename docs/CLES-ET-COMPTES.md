@@ -39,8 +39,12 @@ le site fonctionne sans (le paiement affiche « bientôt disponible »).
    `supabase/migrations/0001_init.sql` du projet, puis **Run**. Tu dois voir « Success ».
    Recommence avec `supabase/migrations/0002_ai_budget.sql`, puis `0003_ai_session_limit.sql`
    (crédit d'IA de chaque client : 1 € toutes les 5 h, 3 € par semaine). À faire une seule fois, dans cet ordre.
-7. **Authentication → Sign In / Providers → Email** : laisse-le **activé** (la connexion via Shopify s'en sert en interne,
-   les utilisateurs ne voient jamais de mot de passe).
+7. **Authentication → Sign In / Providers → Email** : laisse-le **activé** (connexion par lien e-mail, et la connexion
+   via Shopify s'en sert en interne ; les utilisateurs ne voient jamais de mot de passe).
+8. **Envoi des e-mails de connexion** : le service d'e-mail intégré de Supabase est limité à quelques e-mails par heure,
+   suffisant pour tester. Avant le lancement, **Authentication → Emails → SMTP Settings** : branche Resend
+   (hôte `smtp.resend.com`, port 465, utilisateur `resend`, mot de passe = ta clé `RESEND_API_KEY`).
+   Dans **Emails → Templates → Magic Link**, tu peux traduire le message en français.
 
 ### Connexion avec Google
 

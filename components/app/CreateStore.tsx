@@ -60,10 +60,10 @@ export function CreateStore() {
 
   return (
     <div className="mx-auto w-full max-w-[720px]">
-      <form onSubmit={submit} className="rounded-[14px] p-px [background:linear-gradient(180deg,rgb(79_227_207/0.45),rgb(79_227_207/0.08)_45%,rgb(255_255_255/0.06))]">
-        <div className="rounded-[13px] bg-white">
+      <form onSubmit={submit} className="rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
+        <div className="rounded-[13px] bg-[linear-gradient(180deg,#0a2a1e,#06180f)]">
           {mode === "link" && (
-            <div className="flex items-center gap-2 border-b border-black/[0.06] px-4 py-3">
+            <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
               <Link2 className="h-4 w-4 shrink-0 text-accent" />
               <label htmlFor="url" className="sr-only">Lien de la page produit</label>
               <input id="url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://… lien de la page produit" className="w-full bg-transparent text-[15px] placeholder:text-fg-faint focus:outline-none" />
@@ -82,19 +82,19 @@ export function CreateStore() {
           <div className="flex flex-wrap items-center justify-between gap-2 px-3 pb-3">
             <div className="flex flex-wrap gap-2">
               <label className="sr-only" htmlFor="lang">Langue de la boutique</label>
-              <select id="lang" value={language} onChange={(e) => setLanguage(e.target.value)} className="h-8 rounded-[7px] border border-black/10 bg-black/[0.03] px-2 text-xs text-fg-muted">
+              <select id="lang" value={language} onChange={(e) => setLanguage(e.target.value)} className="h-8 rounded-[7px] border border-white/10 bg-white/[0.03] px-2 text-xs text-fg-muted">
                 {LANGUAGES.map((l) => <option key={l} value={l} className="bg-bg-2">{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
               </select>
               {shops.length > 0 && (
                 <>
                   <label className="sr-only" htmlFor="shop">Boutique Shopify</label>
-                  <select id="shop" value={shop} onChange={(e) => setShop(e.target.value)} className="h-8 max-w-[200px] rounded-[7px] border border-black/10 bg-black/[0.03] px-2 text-xs text-fg-muted">
+                  <select id="shop" value={shop} onChange={(e) => setShop(e.target.value)} className="h-8 max-w-[200px] rounded-[7px] border border-white/10 bg-white/[0.03] px-2 text-xs text-fg-muted">
                     {shops.map((c) => <option key={c.id} value={c.id} className="bg-bg-2">{c.shopDomain}</option>)}
                   </select>
                 </>
               )}
             </div>
-            <button type="submit" disabled={loading} className="inline-flex h-9 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#008060,#006e52)] px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_6px_20px_-6px_rgb(79_227_207/0.6)] disabled:opacity-60">
+            <button type="submit" disabled={loading} className="inline-flex h-9 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#00a676,#007a5a)] px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_6px_20px_-6px_rgb(0_166_118/0.6)] disabled:opacity-60">
               {loading ? <Spinner /> : <Sparkles className="h-4 w-4" />} Générer
             </button>
           </div>
