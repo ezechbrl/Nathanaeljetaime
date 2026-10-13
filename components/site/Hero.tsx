@@ -51,13 +51,19 @@ export function Hero() {
             </span>
           </Reveal>
           <Reveal delay={80} as="h1" className="mt-7 max-w-2xl text-[clamp(2.6rem,1.5rem+3.3vw,4.4rem)] leading-[1.02] tracking-[-0.045em]">
-            Décris ton produit. On s'occupe de la <span className="serif-accent pr-1">vitrine</span>.
+            Ta boutique Shopify prête à vendre en <span className="serif-accent whitespace-nowrap pr-1">10 minutes</span>.
+            <span className="mt-2 block text-fg-faint">Pas en <s className="decoration-bad/70 decoration-[3px]">3 semaines</s>.</span>
           </Reveal>
           <Reveal delay={180} as="p" className="mt-6 max-w-xl text-[17px] leading-relaxed text-fg-muted sm:text-lg">
-            Vitrio étudie ton marché, écrit chaque page, crée tes visuels et publie une boutique Shopify prête à encaisser. Toi, tu valides.
+            Étude de marché, textes, visuels, fiche produit et mise en ligne : Vitrio fait le travail d'une agence pendant que tu décris ton produit. Toi, tu valides et tu vends.
           </Reveal>
           <Reveal delay={260} className="mt-9">
             <PromptBox align="left" />
+          </Reveal>
+          <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-fg-muted">
+            {["Première boutique offerte", "Sans carte bancaire", "Publiée directement dans Shopify"].map((t) => (
+              <li key={t} className="flex items-center gap-1.5"><Check className="h-4 w-4 text-accent" /> {t}</li>
+            ))}</ul>
           </Reveal>
         </div>
         <Reveal delay={200} className="hidden pb-8 lg:block"><HeroVisual /></Reveal>
