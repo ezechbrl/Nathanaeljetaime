@@ -83,7 +83,10 @@ Il te faut une **app Shopify publique** à toi :
 6. **Webhooks obligatoires** (dans la configuration de l'app, rubrique « Webhooks » / « Compliance webhooks ») :
    mets l'URL `https://ton-domaine.vercel.app/api/webhooks/shopify` pour **app/uninstalled**,
    **customers/data_request**, **customers/redact** et **shop/redact**. Format : JSON.
-7. **Accès aux données protégées** (« Protected customer data access ») : pas nécessaire, on ne lit que des totaux de commandes.
+7. **Accès aux données protégées** (« API access » → « Protected customer data access ») : demande le **niveau 1**
+   (accès aux commandes, sans aucun champ personnel : ni nom, ni e-mail, ni adresse). Raison à indiquer :
+   « Calcul du chiffre d'affaires et du nombre de commandes par jour pour recommander des améliorations de la boutique. »
+   Nécessaire pour la partie Pilotage ; le reste fonctionne sans.
 
 Les autorisations (scopes) sont demandées par le code au moment de la connexion, tu n'as rien à cocher.
 Connexion des utilisateurs : ils tapent l'adresse de leur boutique, valident sur Shopify, et leur compte Vitrio est créé
