@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Caveat, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Bodoni_Moda, Bricolage_Grotesque, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { site } from "@/lib/site";
 import "./globals.css";
 
 const sans = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-sans", display: "swap" });
 // Titres : grotesque à caractère. Mots mis en avant : Fraunces en italique.
 const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-display", display: "swap" });
-// Mots soulignés dans les titres : écriture manuscrite.
-const accent = Caveat({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-accent", display: "swap" });
+// Mots soulignés dans les titres : Bodoni moderne en italique.
+const accent = Bodoni_Moda({ subsets: ["latin"], weight: ["500"], style: ["italic"], variable: "--font-accent", display: "swap" });
 const serif = Fraunces({ subsets: ["latin"], style: ["italic", "normal"], axes: ["SOFT", "WONK", "opsz"], variable: "--font-serif", display: "swap" });
 
 export const metadata: Metadata = {
