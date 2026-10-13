@@ -60,13 +60,15 @@
     background: linear-gradient(180deg, rgb(var(--fg)) 30%, rgb(var(--fg) / 0.45));
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  /* Mot mis en avant : italique serif vert, souligné d'un trait vert feuille. */
+  /* Mot mis en avant : écriture manuscrite verte, soulignée d'un trait vert feuille. */
   .serif-accent {
-    @apply font-serif italic text-accent;
-    font-weight: 400;
-    letter-spacing: -0.03em;
-    font-variation-settings: "SOFT" 100, "WONK" 1;
-    background: linear-gradient(transparent 86%, rgb(var(--brand-leaf) / 0.35) 86%, rgb(var(--brand-leaf) / 0.35) 94%, transparent 94%);
+    @apply font-accent text-accent;
+    font-weight: 700;
+    font-size: 1.18em;
+    line-height: 0.85;
+    letter-spacing: -0.01em;
+    padding: 0 0.04em;
+    background: linear-gradient(transparent 83%, rgb(var(--brand-leaf) / 0.45) 83%, rgb(var(--brand-leaf) / 0.45) 89%, transparent 89%);
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
   .prose-store p { @apply mb-2; }

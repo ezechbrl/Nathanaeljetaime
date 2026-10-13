@@ -22,6 +22,7 @@ export default {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
+        accent: ["var(--font-accent)", "cursive"],
       },
       fontSize: {
         display: ["clamp(2.75rem, 1.6rem + 4.2vw, 5.25rem)", { lineHeight: "1", letterSpacing: "-0.035em" }],

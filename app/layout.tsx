@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Bricolage_Grotesque, Caveat, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { site } from "@/lib/site";
 import "./globals.css";
 
 const sans = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-sans", display: "swap" });
 // Titres : grotesque à caractère. Mots mis en avant : Fraunces en italique.
 const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-display", display: "swap" });
+// Mots soulignés dans les titres : écriture manuscrite.
+const accent = Caveat({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-accent", display: "swap" });
 const serif = Fraunces({ subsets: ["latin"], style: ["italic", "normal"], axes: ["SOFT", "WONK", "opsz"], variable: "--font-serif", display: "swap" });
 
 export const metadata: Metadata = {
@@ -19,7 +21,7 @@ export const viewport: Viewport = { themeColor: "#03100b" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${sans.variable} ${display.variable} ${serif.variable}`}>
+    <html lang="fr" className={`${sans.variable} ${display.variable} ${serif.variable} ${accent.variable}`}>
       <head>
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;filter:none!important}`}</style>
