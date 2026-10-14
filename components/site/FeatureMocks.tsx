@@ -5,10 +5,10 @@ import { StoreFrame } from "./StoreFrame";
 
 export function StrategyMock() {
   const rows = [
-    ["Marché", "Femmes 25-40 ans, urbaines, attentives aux compositions"],
-    ["Promesse", "Des lèvres nourries toute la journée avec 6 ingrédients"],
-    ["Offres", "Livraison offerte dès 39 € · Lot de 3 à −20 % · 30 jours"],
-    ["Objection", "« Ça colle ? » → Texture fondante, absorbée en 30 s"],
+    ["Marché", "Femmes 28-45 ans, peaux sensibles, lassées des formules à rallonge"],
+    ["Promesse", "Une peau apaisée en 10 gouttes, avec 92 % de sève de bouleau"],
+    ["Offres", "Duo sérum + crème −15 % · Livraison offerte dès 39 € · 30 jours"],
+    ["Objection", "« Ça va me faire réagir ? » → Testé sur peaux réactives"],
   ];
   return (
     <div className="surface rounded-card p-5">
@@ -33,7 +33,7 @@ export function ChatMock() {
         <div className="max-w-[90%] rounded-[12px] rounded-bl-[4px] border border-accent/20 bg-accent-deep/25 px-3.5 py-2.5 text-fg-muted">
           J'ai réécrit l'accroche avec des phrases plus courtes et ajouté le lot sous le prix.
           <div className="mt-3 space-y-1.5 text-xs">
-            <p className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-accent" /> Titre d'accueil <span className="text-fg-faint line-through">Le baume qui change tout</span> <ArrowRight className="h-3 w-3" /> <span className="text-fg">L'essentiel, rien de plus.</span></p>
+            <p className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-accent" /> Titre d'accueil <span className="text-fg-faint line-through">Un sérum naturel pour vous</span> <ArrowRight className="h-3 w-3" /> <span className="text-fg">Dix gouttes. C'est tout.</span></p>
             <p className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-accent" /> Offres <ArrowRight className="h-3 w-3" /> <span className="text-fg">+ Lot de 3 à −20 %</span></p>
           </div>
         </div>
@@ -44,16 +44,16 @@ export function ChatMock() {
 }
 
 export function StudioMock() {
-  const tones = ["#f1d3d6", "#e9c3a8", "#d8e4cf", "#cfd8f0", "#f3dfc6", "#e3d3ef"];
+  const tones = ["#e0e3cf", "#ead6bf", "#d8e4cf", "#f3f0e8", "#cfe7e6", "#e8e6dd"];
   return (
     <div className="surface rounded-card p-4">
       <div className="flex items-center gap-2 rounded-ctl border border-white/10 bg-bg-2 px-3 py-2 text-sm text-fg-muted">
-        <Wand2 className="h-4 w-4 text-accent" /> Le baume posé sur du lin, lumière du matin
+        <Wand2 className="h-4 w-4 text-accent" /> Le flacon sur une pierre, lumière du matin
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2">
         {tones.map((c, i) => (
-          <div key={c} className="relative aspect-square overflow-hidden rounded-[8px]" style={{ background: `linear-gradient(150deg, ${c}, ${i % 2 ? "#b3264a" : "#7a4a2a"}66)` }}>
-            <div className="absolute left-1/2 top-1/2 h-1/2 w-1/4 -translate-x-1/2 -translate-y-1/2 rounded-[30%] bg-[#8f1f3d] shadow-lg" />
+          <div key={c} className="relative aspect-square overflow-hidden rounded-[8px]" style={{ background: `linear-gradient(150deg, ${c}, ${i % 2 ? "#5c6b3c" : "#22261c"}55)` }}>
+            <div className="absolute left-1/2 top-1/2 h-1/2 w-1/4 -translate-x-1/2 -translate-y-1/2 rounded-[30%] bg-[#5c6b3c] shadow-lg" />
             {i === 0 && <span className="absolute right-1.5 top-1.5 rounded bg-black/40 px-1.5 text-[10px] text-white">Choisie</span>}
           </div>
         ))}

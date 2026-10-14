@@ -2,7 +2,6 @@ import { Check, Sparkles } from "lucide-react";
 import { LightRays } from "@/components/ui/LightRays";
 import { Reveal } from "@/components/ui/Reveal";
 import { SHOWCASE } from "@/lib/content/showcase";
-import { AppPreview } from "./AppPreview";
 import { PromptBox } from "./PromptBox";
 import { StoreFrame } from "./StoreFrame";
 
@@ -40,7 +39,7 @@ function HeroVisual() {
 
 export function Hero() {
   return (
-    <section className="relative pb-10 pt-28 sm:pt-36">
+    <section className="relative pb-20 pt-28 sm:pt-36">
       <LightRays />
       <div className="relative mx-auto grid max-w-[1200px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10">
         <div>
@@ -67,9 +66,6 @@ export function Hero() {
           </Reveal>
         </div>
         <Reveal delay={200} className="hidden pb-8 lg:block"><HeroVisual /></Reveal>
-      </div>
-      <div className="relative px-4 sm:px-6">
-        <AppPreview />
       </div>
     </section>
   );

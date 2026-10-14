@@ -1,49 +1,34 @@
-"use client";
-
-import { ButtonLink } from "@/components/ui/Button";
-import { LogoMark } from "@/components/ui/Logo";
+import { Check } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
-import { useScrollProgress } from "@/components/ui/useScrollProgress";
-import { SHOWCASE } from "@/lib/content/showcase";
-import { site } from "@/lib/site";
-import { StoreFrame } from "./StoreFrame";
+import { Container } from "@/components/ui/Section";
+import { PromptBox } from "./PromptBox";
 
-const FAN = [
-  { i: 0, rot: -14, x: -88, y: 34 },
-  { i: 2, rot: -7, x: -44, y: 12 },
-  { i: 1, rot: 0, x: 0, y: 0 },
-  { i: 3, rot: 7, x: 44, y: 12 },
-  { i: 4, rot: 14, x: 88, y: 34 },
-];
-
-export function FinalCta({ title = <>Ta prochaine boutique commence <span className="serif-accent">par une phrase</span>.</> }: { title?: React.ReactNode }) {
-  const ref = useScrollProgress<HTMLDivElement>(0.3);
+// Dernier appel : le générateur directement, à côté de la promesse.
+export function FinalCta({ title = <>Ta boutique Shopify, prête <span className="serif-accent">ce soir</span>.</> }: { title?: React.ReactNode }) {
   return (
-    <section className="px-4 py-16 sm:px-6">
-      <div ref={ref} className="relative mx-auto max-w-[1100px] overflow-hidden rounded-[18px] border border-accent/20 bg-[linear-gradient(180deg,#0b3324,#06180f_60%,#04140e)] px-6 pt-16 text-center sm:pt-20" style={{ "--p": 0 } as React.CSSProperties}>
-        <div aria-hidden className="absolute inset-0 [background:radial-gradient(ellipse_60%_40%_at_50%_0%,rgb(0_166_118/0.18),transparent)]" />
-        <Reveal className="relative flex items-center justify-center gap-2 text-sm text-fg-muted"><LogoMark className="h-5 w-5" /> {site.name}</Reveal>
-        <Reveal delay={80} as="h2" className="relative mx-auto mt-6 max-w-3xl text-h1">{title}</Reveal>
-        <Reveal delay={160} as="p" className="relative mx-auto mt-5 max-w-xl text-fg-muted">
-          Écris ce que tu vends et à qui. Vitrio prépare la stratégie, les pages et les visuels ; tu ajustes en discutant, puis tu publies sur Shopify quand tu es prêt.
-        </Reveal>
-        <Reveal delay={240} className="relative mt-8"><ButtonLink href="/inscription" size="lg">Lancer ma boutique</ButtonLink></Reveal>
-
-        <div className="relative mx-auto mt-14 h-[200px] max-w-[760px] sm:h-[280px]">
-          {FAN.map(({ i, rot, x, y }, k) => (
-            <div
-              key={i}
-              className="absolute left-1/2 top-0 w-[46%] sm:w-[38%]"
-              style={{
-                zIndex: k === 2 ? 5 : 5 - Math.abs(k - 2),
-                transform: `translateX(calc(-50% + ${x}% * var(--p))) translateY(calc(${y}px + (1 - var(--p)) * 120px)) rotate(calc(${rot}deg * var(--p)))`,
-              }}
-            >
-              <StoreFrame s={SHOWCASE[i]} phone={false} />
+    <section className="py-20">
+      <Container>
+        <div className="relative overflow-hidden rounded-[22px] border border-white/[0.08] bg-bg-2 p-6 sm:p-10 lg:p-14">
+          <div aria-hidden className="absolute inset-0 [background:repeating-linear-gradient(135deg,rgb(94_211_140/0.06)_0_1px,transparent_1px_16px)] [mask-image:linear-gradient(90deg,transparent_40%,black)]" />
+          <div aria-hidden className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgb(0_128_96/0.35),transparent)]" />
+          <div className="relative grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <Reveal as="h2" className="text-h1">{title}</Reveal>
+              <Reveal delay={80} as="p" className="mt-5 max-w-md text-[17px] leading-relaxed text-fg-muted">
+                Écris ce que tu vends et à qui. Dans dix minutes, tu relis ta boutique ; demain matin, tu as tes premières recommandations.
+              </Reveal>
+              <Reveal delay={140} className="mt-6">
+                <ul className="space-y-2 text-sm text-fg-muted">
+                  {["Première boutique offerte, sans carte bancaire", "Tu gardes tout, même si tu arrêtes", "Annulable en un clic"].map((t) => (
+                    <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-accent" /> {t}</li>
+                  ))}
+                </ul>
+              </Reveal>
             </div>
-          ))}
+            <Reveal delay={200}><PromptBox align="left" inputId="prompt-fin" className="max-w-none" /></Reveal>
+          </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

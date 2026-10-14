@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
-import { SHOWCASE } from "@/lib/content/showcase";
 import { site } from "@/lib/site";
 import { NewsletterForm } from "./NewsletterForm";
 
@@ -38,17 +37,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 overflow-hidden border-y border-white/[0.06] py-5 [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
-          <div className="flex w-max animate-marquee gap-14 text-fg-faint">
-            {[...SHOWCASE, ...SHOWCASE].map((s, i) => (
-              <Link key={i} href={`/exemples/${s.slug}`} className={s.font === "serif" ? "font-serif text-xl italic hover:text-fg" : "text-lg tracking-tight hover:text-fg"}>
-                {s.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-8 flex flex-col gap-3 text-xs text-fg-faint sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-16 flex flex-col gap-3 border-t border-white/[0.06] pt-8 text-xs text-fg-faint sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {site.name}. Shopify est une marque de Shopify Inc. {site.name} n'est pas affilié à Shopify.</p>
           <p>Fait en France</p>
         </div>

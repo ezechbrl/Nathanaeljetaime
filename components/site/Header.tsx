@@ -46,9 +46,10 @@ export function Header() {
     <header className={cn("fixed inset-x-0 top-0 z-50 transition-[background,border-color,backdrop-filter] duration-300", scrolled || open ? "border-b border-white/[0.06] bg-bg/75 backdrop-blur-xl" : "border-b border-transparent")}>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-bg-3 focus:px-3 focus:py-2">Aller au contenu</a>
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-8">
         <Logo />
 
-        <nav aria-label="Navigation principale" className="surface hidden items-center gap-0.5 rounded-full p-1 text-sm md:flex">
+        <nav aria-label="Navigation principale" className="hidden items-center gap-0.5 text-sm md:flex">
           {NAV.map((n) => (
             <Link key={n.href} href={n.href} className={cn("rounded-full px-3.5 py-1.5 transition-colors", active(n.href) ? "bg-white/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>
               {n.label}
@@ -58,7 +59,7 @@ export function Header() {
             <button className="flex items-center gap-1 rounded-full px-3.5 py-1.5 text-fg-muted transition-colors hover:text-fg group-focus-within:text-fg" aria-haspopup="true">
               Ressources <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180" />
             </button>
-            <div className="invisible absolute left-1/2 top-full w-72 -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+            <div className="invisible absolute left-0 top-full w-72 pt-3 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
               <div className="rounded-card border border-white/10 bg-bg-2/95 p-1.5 shadow-2xl backdrop-blur-xl">
                 {RESOURCES.map((r) => (
                   <Link key={r.href} href={r.href} className="block rounded-ctl px-3 py-2.5 hover:bg-white/[0.05]">
@@ -71,6 +72,7 @@ export function Header() {
           </div>
           <Link href="/contact" className={cn("rounded-full px-3.5 py-1.5 transition-colors", active("/contact") ? "bg-white/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>Contact</Link>
         </nav>
+        </div>
 
         <div className="hidden items-center gap-2 md:flex">
           <ButtonLink href="/connexion" variant="ghost" size="sm">Connexion</ButtonLink>

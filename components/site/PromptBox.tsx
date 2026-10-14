@@ -17,7 +17,7 @@ const EXAMPLES = [
   "Sac à dos cabine pour l'Espagne",
 ];
 
-export function PromptBox({ target = "/inscription", className, align = "center" }: { target?: string; className?: string; align?: "center" | "left" }) {
+export function PromptBox({ target = "/inscription", className, align = "center", inputId = "prompt" }: { target?: string; className?: string; align?: "center" | "left"; inputId?: string }) {
   const router = useRouter();
   const [mode, setMode] = useState<(typeof MODES)[number]["id"]>("start");
   const [value, setValue] = useState("");
@@ -51,9 +51,9 @@ export function PromptBox({ target = "/inscription", className, align = "center"
     <div className={cn("w-full max-w-2xl", align === "center" && "mx-auto", className)}>
       <form onSubmit={submit} className="group relative rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
         <div className="rounded-[13px] bg-[linear-gradient(180deg,#0a2a1e,#06180f)] shadow-[0_30px_80px_-30px_rgb(0_128_96/0.55)]">
-          <label htmlFor="prompt" className="sr-only">Décris ta boutique</label>
+          <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
           <textarea
-            id="prompt"
+            id={inputId}
             rows={3}
             value={value}
             onChange={(e) => setValue(e.target.value)}

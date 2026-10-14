@@ -1,8 +1,9 @@
 import { Audience } from "@/components/site/Audience";
+import { Bento } from "@/components/site/Bento";
+import { Compare } from "@/components/site/Compare";
 import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Hero } from "@/components/site/Hero";
-import { Revolution } from "@/components/site/Revolution";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
 import { Stats } from "@/components/site/Stats";
 import { Steps } from "@/components/site/Steps";
@@ -13,9 +14,10 @@ export default function HomePage() {
     <>
       <Hero />
       <Stats />
+      <Compare />
+      <Bento />
       <Steps />
       <ShowcaseGrid />
-      <Revolution />
       <Audience />
       <FaqSection
         title={<>Les questions qu'on nous <span className="serif-accent">pose vraiment</span></>}
