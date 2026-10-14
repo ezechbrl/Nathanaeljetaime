@@ -4,6 +4,7 @@ import { Compare } from "@/components/site/Compare";
 import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Hero } from "@/components/site/Hero";
+import { Playground } from "@/components/site/Playground";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
 import { Stats } from "@/components/site/Stats";
 import { Steps } from "@/components/site/Steps";
@@ -14,6 +15,7 @@ export default function HomePage() {
     <>
       <Hero />
       <Stats />
+      <Playground />
       <Compare />
       <Bento />
       <Steps />

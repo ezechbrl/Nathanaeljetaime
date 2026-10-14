@@ -2,6 +2,7 @@ import { Check, Clock, Minus } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { Container } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
+import { SavingsCalculator } from "./SavingsCalculator";
 
 // Comparatif du temps et du coût pour lancer une boutique (fourchettes indicatives).
 const ROWS = [
@@ -55,7 +56,8 @@ export function Compare() {
             </tbody>
           </table>
         </Reveal>
-        <p className="mt-3 text-xs text-fg-faint">Délais et tarifs : fourchettes habituelles du marché français, à titre indicatif.</p>
+        <p className="mt-3 text-xs text-fg-faint">Délais et tarifs : fourchettes habituelles du marché français, à titre indicatif. Le simulateur compte 45 h par boutique faite seul et 2 000 € par boutique en agence.</p>
+        <Reveal delay={100}><SavingsCalculator /></Reveal>
       </Container>
     </section>
   );
