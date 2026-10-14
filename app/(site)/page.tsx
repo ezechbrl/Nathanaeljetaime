@@ -1,5 +1,7 @@
 import { Audience } from "@/components/site/Audience";
+import { BeforeAfter } from "@/components/site/BeforeAfter";
 import { Bento } from "@/components/site/Bento";
+import { ChatDemo } from "@/components/site/ChatDemo";
 import { Compare } from "@/components/site/Compare";
 import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
@@ -16,8 +18,10 @@ export default function HomePage() {
       <Hero />
       <Stats />
       <Playground />
+      <BeforeAfter />
       <Compare />
       <Bento />
+      <ChatDemo />
       <Steps />
       <ShowcaseGrid />
       <Audience />

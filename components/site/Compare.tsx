@@ -56,7 +56,7 @@ export function Compare() {
             </tbody>
           </table>
         </Reveal>
-        <p className="mt-3 text-xs text-fg-faint">Délais et tarifs : fourchettes habituelles du marché français, à titre indicatif. Le simulateur compte 45 h par boutique faite seul et 2 000 € par boutique en agence.</p>
+        <p className="mt-3 text-xs text-fg-faint">Délais et tarifs : fourchettes habituelles du marché français, à titre indicatif.</p>
         <Reveal delay={100}><SavingsCalculator /></Reveal>
       </Container>
     </section>

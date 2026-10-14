@@ -3,62 +3,54 @@
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 
-// Simulateur : temps et budget économisés par rapport à une boutique faite seul ou par une agence.
-const HOURS_PER_STORE = 45; // ~3 semaines à temps partiel
-const AGENCY_PER_STORE = 2000;
-const VITRIO_HOURS = 0.5; // brief, relecture et publication
-
-function Slider({ id, label, value, min, max, step = 1, suffix, onChange }: { id: string; label: string; value: number; min: number; max: number; step?: number; suffix: string; onChange: (v: number) => void }) {
-  const pct = ((value - min) / (max - min)) * 100;
-  return (
-    <div>
-      <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="text-sm text-fg-muted">{label}</label>
-        <span className="text-lg tabular-nums text-fg">{value}{suffix}</span>
-      </div>
-      <input
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(+e.target.value)}
-        className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full accent-[rgb(94_211_140)]"
-        style={{ background: `linear-gradient(90deg, rgb(94 211 140) ${pct}%, rgb(255 255 255 / 0.1) ${pct}%)` }}
-      />
-    </div>
-  );
-}
-
-function Big({ value, label, className }: { value: string; label: string; className?: string }) {
-  return (
-    <div className={cn("rounded-card border border-white/[0.07] bg-bg/60 p-5", className)}>
-      <p className="whitespace-nowrap text-[clamp(1.6rem,1.2rem+1.2vw,2.2rem)] leading-none tracking-[-0.04em] tabular-nums text-fg">{value}</p>
-      <p className="mt-2 text-sm text-fg-muted">{label}</p>
-    </div>
-  );
-}
+// Simulateur simple : combien de temps tu gagnes selon le nombre de boutiques.
+const CHOICES = [1, 3, 5, 10];
+const WEEKS_ALONE = 3; // une boutique faite seul : ~3 semaines
+const AGENCY = 2000; // une boutique en agence : ~2 000 €
 
 export function SavingsCalculator() {
-  const [stores, setStores] = useState(3);
-  const [rate, setRate] = useState(25);
-  const hours = Math.round(stores * (HOURS_PER_STORE - VITRIO_HOURS));
-  const money = stores * AGENCY_PER_STORE;
-  const fmt = (n: number) => n.toLocaleString("fr-FR");
+  const [n, setN] = useState(3);
+  const weeks = n * WEEKS_ALONE;
+  const minutes = n * 10;
 
   return (
-    <div className="mt-6 grid gap-6 rounded-[18px] border border-accent/20 bg-accent-deep/20 p-6 sm:p-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
-      <div className="space-y-7">
-        <p className="text-h3">Calcule ce que tu gagnes</p>
-        <Slider id="calc-stores" label="Boutiques à lancer cette année" value={stores} min={1} max={20} suffix="" onChange={setStores} />
-        <Slider id="calc-rate" label="Ce que vaut une heure de ton temps" value={rate} min={10} max={150} step={5} suffix=" €" onChange={setRate} />
+    <div className="mt-6 rounded-[18px] border border-accent/20 bg-accent-deep/20 p-6 sm:p-8">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+        <p className="text-h3">Combien de boutiques veux-tu lancer ?</p>
+        <div className="flex gap-2" role="group" aria-label="Nombre de boutiques">
+          {CHOICES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              aria-pressed={n === c}
+              onClick={() => setN(c)}
+              className={cn("h-10 min-w-10 rounded-full border px-3 text-[15px] tabular-nums transition-colors", n === c ? "border-accent/60 bg-accent text-bg" : "border-white/15 text-fg-muted hover:border-white/30 hover:text-fg")}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Big value={`${fmt(hours)} h`} label="de travail en moins" />
-        <Big value={`${fmt(hours * rate)} €`} label="de ton temps économisé" />
-        <Big value={`${fmt(money)} €`} label="d'agence évités" className="border-accent/30" />
+
+      <div className="mt-8 space-y-5">
+        <div>
+          <div className="flex justify-between text-sm"><span className="text-fg-muted">Seul, dans Shopify</span><span className="tabular-nums text-fg">{weeks} semaines</span></div>
+          <div className="mt-2 h-4 overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="h-full rounded-full bg-[linear-gradient(90deg,#f59e8b,#f87171)] transition-[width] duration-700 ease-out" style={{ width: `${Math.min(100, (weeks / 30) * 100)}%` }} />
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between text-sm"><span className="text-fg-muted">Avec Vitrio</span><span className="tabular-nums text-accent">{minutes} minutes</span></div>
+          <div className="mt-2 h-4 overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="h-full w-[1.5%] min-w-3 rounded-full bg-accent" />
+          </div>
+        </div>
       </div>
+
+      <p className="mt-8 text-[clamp(1.25rem,1rem+1vw,1.75rem)] leading-snug tracking-tight">
+        Tu gagnes <span className="text-accent">{weeks} semaines</span> de travail
+        {" "}et tu évites environ <span className="whitespace-nowrap text-accent">{(n * AGENCY).toLocaleString("fr-FR")} €</span> d'agence.
+      </p>
     </div>
   );
 }

@@ -1,7 +1,7 @@
-import { Globe2 } from "lucide-react";
+import { Check, Globe2, ShoppingBag } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { Container } from "@/components/ui/Section";
-import { ChatMock, PilotMock, StrategyMock, StudioMock } from "./FeatureMocks";
+import { PilotMock, StrategyMock, StudioMock } from "./FeatureMocks";
 
 const LANGS = ["Français", "English", "Español", "Deutsch", "Italiano", "Nederlands", "Português", "Polski", "Svenska"];
 
@@ -25,8 +25,13 @@ export function Bento() {
           <Tile className="lg:col-span-4" title="Il réfléchit avant d'écrire" text="Cible, promesse, offres, objections : la stratégie est posée en premier, et chaque page en découle.">
             <StrategyMock />
           </Tile>
-          <Tile className="lg:col-span-2" delay={80} title="Tu corriges en parlant" text="« Plus premium », « ajoute un lot de 3 » : c'est appliqué tout de suite.">
-            <ChatMock />
+          <Tile className="lg:col-span-2" delay={80} title="Il installe tout dans Shopify" text="Pas de copier-coller : tout arrive directement dans ta boutique.">
+            <ul className="surface space-y-2.5 rounded-card p-4 text-sm">
+              <li className="flex items-center gap-2 text-fg-faint"><ShoppingBag className="h-4 w-4 text-[#95bf47]" /> ta-boutique.myshopify.com</li>
+              {["Fiche produit et prix", "Page d'accueil", "FAQ, livraison, à propos", "Menus et réglages du thème"].map((t, i) => (
+                <li key={t} className="anim flex items-center gap-2 text-fg-muted" style={{ animationName: "pop-in", animationDuration: ".4s", animationDelay: `${0.3 + i * 0.25}s` }}><Check className="h-4 w-4 text-accent" /> {t}</li>
+              ))}
+            </ul>
           </Tile>
           <Tile className="lg:col-span-2" delay={60} title="Il parle la langue de tes clients" text="Textes écrits directement dans la langue du marché, pas traduits.">
             <ul className="flex flex-wrap gap-2">
