@@ -1,14 +1,9 @@
-import { Audience } from "@/components/site/Audience";
-import { BeforeAfter } from "@/components/site/BeforeAfter";
-import { Bento } from "@/components/site/Bento";
-import { ChatDemo } from "@/components/site/ChatDemo";
 import { Compare } from "@/components/site/Compare";
 import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Hero } from "@/components/site/Hero";
 import { Playground } from "@/components/site/Playground";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
-import { Stats } from "@/components/site/Stats";
 import { Steps } from "@/components/site/Steps";
 import { HOME_FAQ } from "@/lib/content/faq";
 
@@ -16,19 +11,14 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <Stats />
       <Playground />
-      <BeforeAfter />
-      <Compare />
-      <Bento />
-      <ChatDemo />
       <Steps />
+      <Compare />
       <ShowcaseGrid />
-      <Audience />
       <FaqSection
         title={<>Les questions qu'on nous <span className="serif-accent">pose vraiment</span></>}
-        subtitle="Prix, Shopify, langues, propriété de la boutique : on répond franchement."
-        items={HOME_FAQ}
+        subtitle="Prix, Shopify, résultat : on répond franchement."
+        items={HOME_FAQ.slice(0, 5)}
       />
       <FinalCta />
     </>

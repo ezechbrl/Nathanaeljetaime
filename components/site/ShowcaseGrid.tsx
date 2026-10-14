@@ -14,7 +14,7 @@ export function ShowcaseGrid() {
   const track = useRef<HTMLDivElement>(null);
   const scroll = (dir: number) => track.current?.scrollBy({ left: dir * 340, behavior: "smooth" });
   return (
-    <section className="py-24">
+    <section className="py-20">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>

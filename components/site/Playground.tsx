@@ -142,7 +142,7 @@ export function Playground() {
   const brief = `${PRODUCTS[pi].brief}, ton ${TONES.find((t) => t.id === tone)!.label.toLowerCase()}, boutique en ${LANGS.find((l) => l.id === lang)!.fr}`;
 
   return (
-    <section className="py-24">
+    <section className="py-20">
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
