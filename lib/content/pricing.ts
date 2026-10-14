@@ -25,12 +25,6 @@ export const PLANS: Plan[] = [
     limits: { stores: "Illimitées", conversations: "Jusqu'à 200 / mois", images: "200 / mois", shops: "3", ai: "3× Découverte" },
     cta: "Passer à Pro", featured: true,
   },
-  {
-    id: "agency", name: "Agence", tagline: "Pour gérer les boutiques de tes clients.", monthly: 149, yearly: 1490,
-    features: ["Tout Pro", "4× plus d'IA que Pro (jusqu'à 800 messages / mois)", "1 000 images / mois", "10 boutiques Shopify connectées", "Accès multi-utilisateurs", "Accompagnement au lancement"],
-    limits: { stores: "Illimitées", conversations: "Jusqu'à 800 / mois", images: "1 000 / mois", shops: "10", ai: "4× Pro" },
-    cta: "Choisir Agence",
-  },
 ];
 
 // Explication affichée sous les offres (doit correspondre à lib/server/budget.ts).

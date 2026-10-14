@@ -7,7 +7,7 @@ export const HOME_FAQ = [
   },
   {
     q: "Combien ça coûte pour commencer ?",
-    a: "Rien. Ta première boutique est gratuite, sans carte bancaire. Si tu veux plusieurs boutiques, plus d'échanges avec l'IA, le studio d'images ou le suivi quotidien, il y a les offres Pro et Agence.",
+    a: "Rien. Ta première boutique est gratuite, sans carte bancaire. Si tu veux plusieurs boutiques, plus d'échanges avec l'IA, le studio d'images ou le suivi quotidien, il y a l'offre Pro à 31 € par mois.",
   },
   {
     q: "Il faut déjà avoir une boutique Shopify ?",

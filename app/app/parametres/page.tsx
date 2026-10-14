@@ -1,5 +1,6 @@
 "use client";
 
+import { site } from "@/lib/site";
 import { ShoppingBag, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -107,7 +108,7 @@ export default function SettingsPage() {
             <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} placeholder="ma-boutique.myshopify.com" className="field" />
             <Button type="submit" disabled={connecting || !shop}>{connecting ? <Spinner /> : "Connecter"}</Button>
           </form>
-          <p className="mt-2 text-xs text-fg-faint">Pas encore de boutique ? <a href="https://www.shopify.com/fr/essai-gratuit" target="_blank" rel="noreferrer" className="underline underline-offset-4">Ouvre-en une sur Shopify</a>, puis reviens ici.</p>
+          <p className="mt-2 text-xs text-fg-faint">Pas encore de boutique ? <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="underline underline-offset-4">Ouvre-en une sur Shopify</a>{site.shopifyReferral && " (lien partenaire)"}, puis reviens ici.</p>
         </Card>
 
         <Card title="Supprimer le compte" text="Supprime ton compte et toutes tes données. Tes boutiques Shopify ne sont pas touchées.">

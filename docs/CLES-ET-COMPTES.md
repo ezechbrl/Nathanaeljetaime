@@ -103,7 +103,7 @@ automatiquement avec l'e-mail de la boutique.
 
 ---
 
-## 4. Paiement par Shopify (abonnements Pro et Agence)
+## 4. Paiement par Shopify (abonnement Pro)
 
 Le client paie depuis Shopify : l'abonnement s'ajoute à sa facture Shopify, et Shopify te reverse l'argent
 (0 % de commission sur ton premier million de dollars, 2,9 % de frais de paiement, inscription unique de 19 $).
@@ -111,9 +111,8 @@ Tant que ces variables sont vides, les boutons « Passer à Pro » affichent « 
 
 1. **Partner Dashboard → Settings → App Store registration** : inscris-toi (19 $, une fois).
 2. **Apps → Vitrio → Distribution → Manage listing → Pricing content → Settings** : choisis **Shopify App Pricing**.
-3. Crée les offres (le **handle** doit contenir `pro` ou `agence`) :
+3. Crée les offres (le **handle** de l'offre payante doit contenir `pro`) :
    - `pro` : 31 €/mois et 310 €/an ;
-   - `agence` : 149 €/mois et 1 490 €/an ;
    - (option) une offre gratuite `decouverte`.
    Dans chaque offre, **Welcome link** : `https://ton-domaine.vercel.app/api/billing/shopify/return`
 4. **Settings → Partner API clients → Create** : coche **Manage apps** et **View financials**, copie le jeton.
@@ -151,6 +150,7 @@ Elle fonctionne avec Dawn et les thèmes qui en dérivent.
 | `ENCRYPTION_KEY` | Sert à chiffrer les accès Shopify. Va sur https://generate-secret.vercel.app/32 et copie le résultat (ou `openssl rand -base64 32` dans un terminal). **Ne la change plus jamais** après le lancement. |
 | `NEXT_PUBLIC_APP_URL` | Ton adresse : `https://ton-domaine.vercel.app` (sans `/` à la fin) |
 | `NEXT_PUBLIC_API_MODE` | `live` quand le back-end est branché (`mock` = démo avec fausses données) |
+| `NEXT_PUBLIC_SHOPIFY_REFERRAL_URL` | Facultatif : ton lien d'affilié Shopify (programme Affiliés de Shopify ou rubrique « Affiliés / Referrals » de ton espace Partenaire, selon ce qui t'est proposé). Il remplace le lien « Ouvre une boutique sur Shopify » : tu touches une commission quand un client ouvre sa boutique grâce à toi. Vide = lien Shopify normal. |
 | `NEXT_PUBLIC_LAUNCH_MODE` | `waitlist` (par défaut) : les boutons mènent à la liste d'attente. Le jour du lancement : `open`, puis « Redeploy ». Les inscrits sont dans Supabase → Table Editor → `waitlist`. |
 | `CRON_SECRET` | Protège la tâche quotidienne d'optimisation. Génère-le comme `ENCRYPTION_KEY`. Vercel l'envoie automatiquement à `/api/cron/daily` (déclarée dans `vercel.json`). |
 

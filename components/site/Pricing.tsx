@@ -20,7 +20,7 @@ export function PricingCards() {
           ))}
         </div>
       </div>
-      <div className="mt-12 grid gap-5 lg:grid-cols-3">
+      <div className="mx-auto mt-12 grid max-w-[860px] gap-5 md:grid-cols-2">
         {PLANS.map((p, i) => {
           const price = yearly ? Math.round(p.yearly / 12) : p.monthly;
           return (
@@ -53,12 +53,11 @@ const ROWS: { label: string; values: (string | boolean)[] }[] = [
   { label: "Images générées", values: PLANS.map((p) => p.limits.images) },
   { label: "Boutiques Shopify connectées", values: PLANS.map((p) => p.limits.shops) },
   { label: "Capacité d'IA (crédit rechargé toutes les 5 h)", values: PLANS.map((p) => p.limits.ai) },
-  { label: "Stratégie et identité de marque", values: [true, true, true] },
-  { label: "Import depuis un lien", values: [false, true, true] },
-  { label: "Refonte de boutique existante", values: [false, true, true] },
-  { label: "Optimisation quotidienne", values: [false, true, true] },
-  { label: "Multi-utilisateurs", values: [false, false, true] },
-  { label: "Support", values: ["E-mail", "Prioritaire", "Dédié"] },
+  { label: "Stratégie et identité de marque", values: [true, true] },
+  { label: "Import depuis un lien", values: [false, true] },
+  { label: "Refonte de boutique existante", values: [false, true] },
+  { label: "Optimisation quotidienne", values: [false, true] },
+  { label: "Support", values: ["E-mail", "Prioritaire"] },
 ];
 
 export function PricingTable() {

@@ -31,7 +31,7 @@ function Billing() {
     }
   }, [params, refresh, router, toast]);
 
-  async function choose(plan: "pro" | "agency") {
+  async function choose(plan: "pro") {
     setBusy(plan);
     try {
       const { url } = await api.startCheckout(plan, yearly ? "year" : "month");
@@ -89,7 +89,7 @@ function Billing() {
               ))}
             </div>
           </div>
-          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          <div className="mt-4 grid max-w-[760px] gap-4 md:grid-cols-2">
             {PLANS.map((p) => {
               const isCurrent = p.id === sub?.plan;
               const highlighted = params.get("plan") === p.id || (!params.get("plan") && p.featured);
@@ -103,7 +103,7 @@ function Billing() {
                   {isCurrent ? <p className="mt-5 text-center text-sm text-fg-faint">Offre actuelle</p> : p.id === "free" ? (
                     <Button variant="ghost" className="mt-5" onClick={portal}>Revenir à Découverte</Button>
                   ) : (
-                    <Button className="mt-5" variant={highlighted ? "primary" : "secondary"} disabled={!!busy} onClick={() => choose(p.id as "pro" | "agency")}>{busy === p.id ? <Spinner /> : `Passer à ${p.name}`}</Button>
+                    <Button className="mt-5" variant={highlighted ? "primary" : "secondary"} disabled={!!busy} onClick={() => choose(p.id as "pro")}>{busy === p.id ? <Spinner /> : `Passer à ${p.name}`}</Button>
                   )}
                 </div>
               );

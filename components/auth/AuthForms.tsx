@@ -1,5 +1,6 @@
 "use client";
 
+import { site } from "@/lib/site";
 import { ArrowRight, Mail, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -63,7 +64,7 @@ export function ShopifyForm({ next, cta = "Continuer avec Shopify" }: { next: st
       {error && <p role="alert" className="text-sm text-bad">{error}</p>}
       <Button type="submit" size="lg" className="w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
       <p className="text-xs leading-relaxed text-fg-faint">
-        Pas encore de boutique ? <a href="https://www.shopify.com/fr/essai-gratuit" target="_blank" rel="noreferrer" className="underline underline-offset-4">Ouvre-en une gratuitement sur Shopify</a>, puis reviens ici.
+        Pas encore de boutique ? <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="underline underline-offset-4">Ouvre-en une gratuitement sur Shopify</a>{site.shopifyReferral && " (lien partenaire)"}, puis reviens ici.
       </p>
     </form>
   );
