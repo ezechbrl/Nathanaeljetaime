@@ -1,4 +1,5 @@
 import "server-only";
+import type { StoreTheme } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
 import { decrypt, hmacHex, safeEqual } from "./crypto";
 import { env } from "./env";
@@ -101,7 +102,35 @@ const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "
 export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string };
 
 // Envoie le contenu de la boutique dans Shopify. Crée les objets la première fois, les met à jour ensuite.
-export async function publish(shop: string, token: string, plan: StorePlan, imageUrls: string[], ids: ShopifyIds, onStep: (key: string) => Promise<void>): Promise<ShopifyIds> {
+const rgb = (hex: string) => {
+  const h = hex.replace("#", "").padEnd(6, "0");
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) || 0);
+};
+const triplet = (hex: string) => rgb(hex).join(",");
+// Texte lisible (blanc ou presque noir) sur une couleur donnée.
+const onColor = (hex: string) => {
+  const [r, g, b] = rgb(hex).map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.4 ? "18,18,18" : "255,255,255";
+};
+
+// Couleurs et polices de la marque, lues par l'extension de thème « Couleurs de marque »
+// (métachamp de l'installation de l'app : aucun fichier du thème n'est modifié).
+export async function saveBrandForTheme(shop: string, token: string, theme: StoreTheme) {
+  const { currentAppInstallation } = await graphql<{ currentAppInstallation: { id: string } }>(shop, token, `{ currentAppInstallation { id } }`);
+  const { colors } = theme;
+  const value = {
+    primaryRgb: triplet(colors.primary), onPrimaryRgb: onColor(colors.primary),
+    accentRgb: triplet(colors.accent), onAccentRgb: onColor(colors.accent),
+    backgroundRgb: triplet(colors.background), textRgb: onColor(colors.background) === "255,255,255" ? "245,245,245" : "24,24,24",
+    headingFont: theme.headingFont, bodyFont: theme.bodyFont,
+  };
+  const d = await graphql<{ metafieldsSet: { userErrors: UserError[] } }>(shop, token,
+    `mutation ($metafields: [MetafieldsSetInput!]!) { metafieldsSet(metafields: $metafields) { metafields { id } userErrors { field message } } }`,
+    { metafields: [{ ownerId: currentAppInstallation.id, namespace: "vitrio", key: "brand", type: "json", value: JSON.stringify(value) }] });
+  check(d.metafieldsSet.userErrors);
+}
+
+export async function publish(shop: string, token: string, plan: StorePlan, imageUrls: string[], ids: ShopifyIds, onStep: (key: string) => Promise<void>, theme?: StoreTheme): Promise<ShopifyIds> {
   const next: ShopifyIds = { ...ids };
   const productInput = {
     title: plan.product.title,
@@ -168,6 +197,9 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
       next[key] = d.pageCreate.page!.id as never;
     }
   }
+
+  // Couleurs et polices pour l'extension de thème (sans effet tant qu'elle n'est pas activée).
+  if (theme) await saveBrandForTheme(shop, token, theme).catch((e) => console.error("Couleurs de marque", e));
   return next;
 }
 

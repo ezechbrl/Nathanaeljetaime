@@ -6,6 +6,7 @@ import { useRef } from "react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { Container } from "@/components/ui/Section";
+import { isWaitlist } from "@/lib/launch";
 import { SHOWCASE } from "@/lib/content/showcase";
 import { StoreFrame } from "./StoreFrame";
 
@@ -24,7 +25,7 @@ export function ShowcaseGrid() {
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => scroll(-1)} aria-label="Boutiques précédentes" className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-fg-muted transition-colors hover:border-white/30 hover:text-fg"><ArrowLeft className="h-4 w-4" /></button>
             <button type="button" onClick={() => scroll(1)} aria-label="Boutiques suivantes" className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-fg-muted transition-colors hover:border-white/30 hover:text-fg"><ArrowRight className="h-4 w-4" /></button>
-            <ButtonLink href="/inscription" className="ml-2">Essayer avec mon produit</ButtonLink>
+            <ButtonLink href="/inscription" className="ml-2">{isWaitlist ? "Réserver ma place" : "Essayer avec mon produit"}</ButtonLink>
           </div>
         </div>
       </Container>

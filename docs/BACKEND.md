@@ -26,7 +26,7 @@ de fichiers de thème par une app publique demande une autorisation spéciale de
 | Tâches longues | **Inngest** ou **Trigger.dev** | Une génération dure 1 à 3 min, plus que la limite d'une fonction Vercel |
 | IA texte | API Claude (`@anthropic-ai/sdk`, déjà en place dans `lib/generate-store.ts`) | Sorties structurées validées par Zod |
 | IA images | Un fournisseur d'images (ex. fal.ai, Replicate, OpenAI Images) | Visuels produit et bannières |
-| Paiement | **Stripe** (Checkout + Customer Portal + webhooks) | Ou Shopify Billing API si l'app passe par l'App Store Shopify |
+| Paiement | **Shopify App Pricing** (offres créées dans le Partner Dashboard, vérifiées par la Partner API) | Obligatoire pour une app de l'App Store Shopify ; le code Stripe reste dans `lib/server/stripe.ts` mais n'est plus utilisé |
 | E-mails | Resend (+ React Email) | Vérification, mot de passe oublié, notifications |
 | Limitation de débit | Upstash Redis (`@upstash/ratelimit`) | Protéger les routes IA et publiques |
 | Suivi d'erreurs | Sentry | |
@@ -240,8 +240,11 @@ Offres affichées dans le frontend (`lib/content/pricing.ts`) : Découverte (gra
 | Route | Entrée | Sortie |
 |---|---|---|
 | `GET /api/billing` | – | `{ subscription: Subscription, usage: Usage, invoices: Invoice[] }` |
-| `POST /api/billing/checkout` | `{ plan: "pro" \| "agency", interval: "month" \| "year" }` | `{ url }` (Stripe Checkout) |
-| `POST /api/billing/portal` | – | `{ url }` (Stripe Customer Portal) |
+| `GET /api/billing?sync=1` | – | idem, après relecture de l'abonnement chez Shopify |
+| `POST /api/billing/checkout` | – | `{ url }` : page d'offres hébergée par Shopify |
+| `POST /api/billing/portal` | – | `{ url }` : même page (changer d'offre, revenir à Découverte) |
+| `GET /api/billing/shopify/return?shop=…` | « Welcome link » Shopify | relit l'abonnement puis redirige vers `/app/abonnement` |
+| `POST /api/waitlist` | `{ email, brief? }` | `204` (liste d'attente, 5/h par IP) |
 | `POST /api/webhooks/stripe` (public, signature vérifiée) | événements Stripe | `200` |
 
 Événements Stripe à traiter : `checkout.session.completed`, `customer.subscription.created/updated/deleted`,

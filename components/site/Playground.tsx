@@ -6,6 +6,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { Container } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
+import { isWaitlist } from "@/lib/launch";
 import type { ShowcaseStore } from "@/lib/content/showcase";
 import { StoreFrame } from "./StoreFrame";
 
@@ -154,7 +155,7 @@ export function Playground() {
               <Chips label="3. La langue du marché" items={LANGS} value={lang} onChange={setLang} />
             </Reveal>
             <Reveal delay={180} className="mt-9">
-              <ButtonLink href={`/inscription?mode=start&brief=${encodeURIComponent(brief)}`} size="lg">Générer la vraie boutique <ArrowRight className="h-4 w-4" /></ButtonLink>
+              <ButtonLink href={`/inscription?mode=start&brief=${encodeURIComponent(brief)}`} size="lg">{isWaitlist ? "Réserver ma place avec ce produit" : "Générer la vraie boutique"} <ArrowRight className="h-4 w-4" /></ButtonLink>
             </Reveal>
           </div>
 

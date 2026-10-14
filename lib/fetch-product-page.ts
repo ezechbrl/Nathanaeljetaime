@@ -18,7 +18,7 @@ function isPrivateAddress(ip: string): boolean {
   );
 }
 
-// Récupère le texte d'une page produit (concurrent, AliExpress, etc.) pour nourrir le brief.
+// Récupère le texte de la page produit du marchand (sa propre page ou celle de son fournisseur) pour nourrir le brief.
 // Refuse les adresses internes pour éviter que le serveur serve de proxy vers le réseau privé.
 export async function fetchProductPageText(rawUrl: string): Promise<string> {
   const url = new URL(rawUrl);

@@ -16,7 +16,7 @@ const STYLE = {
 export default function ChangelogPage() {
   return (
     <>
-      <PageHero eyebrow="Nouveautés" title={<>Ce qui sort, ce qui <span className="serif-accent">arrive</span></>} subtitle="Le produit évolue chaque semaine. Voici où on en est." />
+      <PageHero eyebrow="Feuille de route" title={<>Ce qui sort, ce qui <span className="serif-accent">arrive</span></>} subtitle="Le produit évolue chaque semaine. Voici où on en est." />
       <Container className="max-w-[820px]">
         <ol className="relative border-l border-white/[0.08] pl-8">
           {CHANGELOG.map((c, i) => (

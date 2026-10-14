@@ -21,7 +21,7 @@ const FAQ = [
 export default function AffiliatePage() {
   return (
     <>
-      <PageHero eyebrow="Affiliation" title={<><span className="serif-accent">{AFFILIATE.rate * 100} %</span> sur chaque client que tu recommandes</>} subtitle={`Une commission récurrente pendant ${AFFILIATE.months} mois. Un lien, un tableau de bord, des paiements mensuels.`}>
+      <PageHero eyebrow="Devenir partenaire" title={<><span className="serif-accent">{AFFILIATE.rate * 100} %</span> sur chaque client que tu recommandes</>} subtitle={`Une commission récurrente pendant ${AFFILIATE.months} mois. Un lien, un tableau de bord, des paiements mensuels.`}>
         <ButtonLink href="/inscription?next=/app/affiliation" size="lg">Devenir affilié</ButtonLink>
       </PageHero>
       <Container className="grid max-w-[1050px] items-center gap-12 lg:grid-cols-2">

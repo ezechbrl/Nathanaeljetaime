@@ -1,0 +1,10 @@
+# Configuration de l'app pour Shopify CLI (sert uniquement à déployer l'extension de thème).
+# Remplace client_id par le « Client ID » de ton app (même valeur que SHOPIFY_API_KEY).
+client_id = "REMPLACE_PAR_TON_CLIENT_ID"
+name = "Vitrio"
+application_url = "https://ton-domaine.vercel.app"
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = false
+include_config_on_deploy = false

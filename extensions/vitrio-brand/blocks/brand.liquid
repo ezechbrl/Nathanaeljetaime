@@ -1,0 +1,42 @@
+{%- comment -%}
+  Intégration d'app « Vitrio – couleurs de marque ».
+  Lit les couleurs et polices enregistrées par Vitrio (métachamp d'app vitrio.brand)
+  et les applique aux variables CSS des thèmes Dawn et de ceux qui en dérivent.
+  Aucun fichier du thème n'est modifié : désactiver l'intégration suffit pour revenir en arrière.
+{%- endcomment -%}
+{%- assign brand = app.metafields.vitrio.brand.value -%}
+{%- if brand -%}
+  {%- if brand.headingFont != blank -%}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family={{ brand.headingFont | url_encode }}:wght@400;600&family={{ brand.bodyFont | url_encode }}:wght@400;600&display=swap">
+  {%- endif -%}
+  <style>
+    html body,
+    html body [class*="color-scheme-"] {
+      --color-button: {{ brand.primaryRgb }};
+      --color-button-text: {{ brand.onPrimaryRgb }};
+      --color-secondary-button-text: {{ brand.primaryRgb }};
+      --color-link: {{ brand.accentRgb }};
+      --color-badge-background: {{ brand.accentRgb }};
+      --color-badge-foreground: {{ brand.onAccentRgb }};
+    }
+    html body,
+    html body .color-scheme-1 {
+      --color-background: {{ brand.backgroundRgb }};
+      --color-foreground: {{ brand.textRgb }};
+    }
+    html body {
+      --font-heading-family: "{{ brand.headingFont }}", serif;
+      --font-body-family: "{{ brand.bodyFont }}", sans-serif;
+    }
+  </style>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Couleurs de marque",
+  "target": "head",
+  "settings": []
+}
+{% endschema %}

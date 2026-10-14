@@ -1,4 +1,5 @@
 import "server-only";
+import type { StoreTheme } from "@/lib/api/types";
 import type { JobStepKey } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
 import { generatePages, generateStrategy } from "./ai";
@@ -106,7 +107,7 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     const conn = await connectionFor(store.user_id, store.shop_connection_id);
     const assets = must(await db().from("assets").select("url, kind").eq("store_id", store.id).order("created_at")) as { url: string; kind: string }[];
     const images = assets.filter((a) => a.kind === "product" || a.kind === "upload" || a.kind === "lifestyle").map((a) => a.url);
-    const ids = await publish(conn.shop, conn.token, store.plan as StorePlan, images, store.shopify as ShopifyIds, step);
+    const ids = await publish(conn.shop, conn.token, store.plan as StorePlan, images, store.shopify as ShopifyIds, step, store.theme as StoreTheme | undefined);
     const liveUrl = ids.productHandle ? `https://${conn.shop}/products/${ids.productHandle}` : `https://${conn.shop}`;
     await db().from("stores").update({ shopify: ids, status: "published", live_url: liveUrl, shop_connection_id: conn.id, updated_at: new Date().toISOString() }).eq("id", store.id);
     await finish(job.id, steps);

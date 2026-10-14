@@ -16,7 +16,7 @@ stockées dans le navigateur (compte, boutiques, chat, publication, abonnement).
 
 ## Documentation
 
-- [`docs/CLES-ET-COMPTES.md`](docs/CLES-ET-COMPTES.md) — les comptes à créer et où trouver chaque clé (Supabase, Claude, Shopify, Stripe).
+- [`docs/CLES-ET-COMPTES.md`](docs/CLES-ET-COMPTES.md) — les comptes à créer et où trouver chaque clé (Supabase, Claude, Shopify, paiement par Shopify).
 - [`docs/BACKEND.md`](docs/BACKEND.md) — les routes d'API, la base de données et le fonctionnement du back-end.
 
 ## Structure

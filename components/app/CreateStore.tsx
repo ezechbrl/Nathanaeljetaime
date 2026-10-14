@@ -14,7 +14,7 @@ import { useApp } from "./AppContext";
 
 const MODES: { id: CreationMode; label: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
   { id: "start", label: "Décrire", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
-  { id: "link", label: "Importer un lien", icon: Link2, placeholder: "Ajoute ce que tu veux changer par rapport à la page d'origine (ton, cible, prix)…", hint: "L'IA lit la page produit et écrit une fiche originale : rien n'est copié." },
+  { id: "link", label: "Importer un lien", icon: Link2, placeholder: "Ajoute ce que tu veux changer par rapport à la page d'origine (ton, cible, prix)…", hint: "Uniquement un produit que tu vends : ta propre page ou celle de ton fournisseur. L'IA en tire les caractéristiques et écrit une fiche originale." },
   { id: "recraft", label: "Refaire ma boutique", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
 ];
 
@@ -66,7 +66,7 @@ export function CreateStore() {
             <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
               <Link2 className="h-4 w-4 shrink-0 text-accent" />
               <label htmlFor="url" className="sr-only">Lien de la page produit</label>
-              <input id="url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://… lien de la page produit" className="w-full bg-transparent text-[15px] placeholder:text-fg-faint focus:outline-none" />
+              <input id="url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://… ta page produit ou celle de ton fournisseur" className="w-full bg-transparent text-[15px] placeholder:text-fg-faint focus:outline-none" />
             </div>
           )}
           <label htmlFor="brief" className="sr-only">Ton brief</label>

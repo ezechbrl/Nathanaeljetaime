@@ -7,20 +7,21 @@ import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
+import { CTA } from "@/lib/launch";
 
 const NAV = [
-  { href: "/produit", label: "Produit" },
+  { href: "/produit", label: "Fonctionnalités" },
   { href: "/exemples", label: "Exemples" },
   { href: "/tarifs", label: "Tarifs" },
-  { href: "/demo", label: "Démo" },
+  { href: "/demo", label: "Comment ça marche" },
 ];
 
 const RESOURCES = [
   { href: "/blog", label: "Blog", text: "Guides pour vendre sur Shopify" },
   { href: "/outils", label: "Outils gratuits", text: "Noms, slogans, descriptions" },
-  { href: "/nouveautes", label: "Nouveautés", text: "Ce qui sort et ce qui arrive" },
+  { href: "/nouveautes", label: "Feuille de route", text: "Ce qui sort et ce qui arrive" },
   { href: "/fondateurs", label: "Notre histoire", text: "Pourquoi on construit ça" },
-  { href: "/affiliation", label: "Affiliation", text: "30 % de commission récurrente" },
+  { href: "/affiliation", label: "Devenir partenaire", text: "30 % de commission récurrente" },
 ];
 
 export function Header() {
@@ -76,7 +77,7 @@ export function Header() {
 
         <div className="hidden items-center gap-2 md:flex">
           <ButtonLink href="/connexion" variant="ghost" size="sm">Connexion</ButtonLink>
-          <ButtonLink href="/inscription" size="sm">Essayer gratuitement</ButtonLink>
+          <ButtonLink href="/inscription" size="sm">{CTA.main}</ButtonLink>
         </div>
 
         <button className="grid h-10 w-10 place-items-center rounded-ctl text-fg md:hidden" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
@@ -96,7 +97,7 @@ export function Header() {
             ))}
           </nav>
           <div className="mt-8 grid gap-2">
-            <ButtonLink href="/inscription" size="lg">Essayer gratuitement</ButtonLink>
+            <ButtonLink href="/inscription" size="lg">{CTA.main}</ButtonLink>
             <ButtonLink href="/connexion" variant="secondary" size="lg">Connexion</ButtonLink>
           </div>
         </div>

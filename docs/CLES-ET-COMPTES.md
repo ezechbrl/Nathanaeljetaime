@@ -1,8 +1,8 @@
 # Les clés à récupérer (et où les trouver)
 
 C'est moi qui code le back-end. Toi, tu crées les comptes et tu copies les clés dans Vercel.
-Obligatoires pour lancer : **Supabase, Claude, Shopify, les clés générées**. Stripe, Resend et les images peuvent attendre :
-le site fonctionne sans (le paiement affiche « bientôt disponible »).
+Obligatoires pour lancer : **Supabase, Claude, Shopify, les clés générées**. Le paiement passe par **Shopify** (pas besoin de Stripe).
+Resend et les images peuvent attendre.
 
 ### Ordre pour passer en production
 1. Remplir les variables ci-dessous dans Vercel.
@@ -37,8 +37,8 @@ le site fonctionne sans (le paiement affiche « bientôt disponible »).
    - Redirect URLs : ajoute `https://ton-domaine.vercel.app/**` et `http://localhost:3000/**`
 6. **Créer les tables (obligatoire)** : **SQL Editor → New query**, colle tout le contenu du fichier
    `supabase/migrations/0001_init.sql` du projet, puis **Run**. Tu dois voir « Success ».
-   Recommence avec `supabase/migrations/0002_ai_budget.sql`, puis `0003_ai_session_limit.sql`
-   (crédit d'IA de chaque client : 1 € toutes les 5 h, 3 € par semaine). À faire une seule fois, dans cet ordre.
+   Recommence avec `0002_ai_budget.sql`, `0003_ai_session_limit.sql`, `0004_waitlist.sql` puis `0005_shopify_billing.sql`.
+   À faire une seule fois, dans cet ordre.
 7. **Authentication → Sign In / Providers → Email** : laisse-le **activé** (connexion par lien e-mail, et la connexion
    via Shopify s'en sert en interne ; les utilisateurs ne voient jamais de mot de passe).
 8. **Envoi des e-mails de connexion** : le service d'e-mail intégré de Supabase est limité à quelques e-mails par heure,
@@ -78,7 +78,10 @@ Il te faut une **app Shopify publique** à toi :
 4. Dans la configuration de l'app :
    - **App URL** : `https://ton-domaine.vercel.app`
    - **Allowed redirection URL(s)** : `https://ton-domaine.vercel.app/api/shopify/callback`
-   - **Distribution** : « Custom distribution » au début (puis App Store plus tard).
+   - **Distribution** : ⚠️ ce choix est **définitif**. Le plus simple : **deux apps**.
+     - « Vitrio dev » en **Custom distribution** pour tester sur tes boutiques de développement ;
+     - « Vitrio » en **Public distribution** pour la vraie version (validation Shopify, App Store).
+     Mets les clés de « Vitrio dev » dans Vercel pendant les tests, puis celles de « Vitrio » au lancement.
 5. Dans **Overview / Settings** (ou « Client credentials ») :
 
 | Variable Vercel | Où la trouver |
@@ -100,31 +103,44 @@ automatiquement avec l'e-mail de la boutique.
 
 ---
 
-## 4. Stripe (abonnements payants) — quand tu veux encaisser
+## 4. Paiement par Shopify (abonnements Pro et Agence)
 
-Tant que `STRIPE_SECRET_KEY` est vide, tout le monde reste en offre Découverte et les boutons de paiement
-affichent « Le paiement en ligne arrive très bientôt ». Tu pourras l'ajouter plus tard sans rien changer au code.
+Le client paie depuis Shopify : l'abonnement s'ajoute à sa facture Shopify, et Shopify te reverse l'argent
+(0 % de commission sur ton premier million de dollars, 2,9 % de frais de paiement, inscription unique de 19 $).
+Tant que ces variables sont vides, les boutons « Passer à Pro » affichent « Le paiement arrive très bientôt ».
 
-1. **https://dashboard.stripe.com** → crée un compte. Reste en **mode test** (interrupteur en haut à droite) jusqu'au lancement.
-2. **Product catalog → Add product** :
-   - « Vitrio Pro » : prix récurrent **31 €/mois**, puis ajoute un 2ᵉ prix **310 €/an**
-   - « Vitrio Agence » : **149 €/mois** et **1 490 €/an**
-   - Sur chaque prix, copie l'identifiant `price_...`
-3. **Developers → API keys** → « Secret key » (`sk_test_...`).
-4. **Developers → Webhooks → Add endpoint** :
-   - URL : `https://ton-domaine.vercel.app/api/webhooks/stripe`
-   - Événements : `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`
-   - Copie le **Signing secret** (`whsec_...`).
-5. **Settings → Billing → Customer portal** → « Activate » (pour que les clients gèrent leur abonnement).
+1. **Partner Dashboard → Settings → App Store registration** : inscris-toi (19 $, une fois).
+2. **Apps → Vitrio → Distribution → Manage listing → Pricing content → Settings** : choisis **Shopify App Pricing**.
+3. Crée les offres (le **handle** doit contenir `pro` ou `agence`) :
+   - `pro` : 31 €/mois et 310 €/an ;
+   - `agence` : 149 €/mois et 1 490 €/an ;
+   - (option) une offre gratuite `decouverte`.
+   Dans chaque offre, **Welcome link** : `https://ton-domaine.vercel.app/api/billing/shopify/return`
+4. **Settings → Partner API clients → Create** : coche **Manage apps** et **View financials**, copie le jeton.
+
+| Variable Vercel | Où la trouver |
+|---|---|
+| `SHOPIFY_APP_HANDLE` | le « handle » de l'app (dans l'URL de la page d'offres ou le fichier `shopify.app.toml`), ex. `vitrio` |
+| `SHOPIFY_APP_ID` | le nombre dans l'URL de l'app : `partners.shopify.com/<ORG_ID>/apps/<APP_ID>/…` |
+| `SHOPIFY_PARTNER_ORG_ID` | le premier nombre de cette même URL |
+| `SHOPIFY_PARTNER_TOKEN` | le jeton du Partner API client (étape 4) |
+
+Sur une boutique de développement, les offres payantes sont gratuites : tu peux tout tester sans payer.
+
+## 4 bis. Couleurs de la marque dans le thème Shopify
+
+Vitrio applique les couleurs et polices de la marque grâce à une « intégration d'app » (dossier `extensions/vitrio-brand`) :
+le marchand l'active d'un clic dans son éditeur de thème, sans qu'aucun fichier du thème soit modifié.
+Elle fonctionne avec Dawn et les thèmes qui en dérivent.
+
+À faire une fois (et après chaque modification du dossier `extensions`), sur ton ordinateur :
+1. Installe Node.js (https://nodejs.org), puis récupère le projet (`git clone …`).
+2. Dans `shopify.app.toml`, remplace `client_id` par ton Client ID (= `SHOPIFY_API_KEY`) et `application_url` par ton adresse.
+3. Dans le dossier du projet : `npx @shopify/cli@latest app deploy` (connecte-toi avec ton compte Partenaire).
 
 | Variable Vercel | Valeur |
 |---|---|
-| `STRIPE_SECRET_KEY` | `sk_test_...` (puis `sk_live_...` au lancement) |
-| `STRIPE_WEBHOOK_SECRET` | `whsec_...` |
-| `STRIPE_PRICE_PRO_MONTH` | `price_...` |
-| `STRIPE_PRICE_PRO_YEAR` | `price_...` |
-| `STRIPE_PRICE_AGENCY_MONTH` | `price_...` |
-| `STRIPE_PRICE_AGENCY_YEAR` | `price_...` |
+| `NEXT_PUBLIC_SHOPIFY_API_KEY` | la même valeur que `SHOPIFY_API_KEY` (sert au bouton « Activer dans Shopify ») |
 
 ---
 
@@ -135,6 +151,7 @@ affichent « Le paiement en ligne arrive très bientôt ». Tu pourras l'ajouter
 | `ENCRYPTION_KEY` | Sert à chiffrer les accès Shopify. Va sur https://generate-secret.vercel.app/32 et copie le résultat (ou `openssl rand -base64 32` dans un terminal). **Ne la change plus jamais** après le lancement. |
 | `NEXT_PUBLIC_APP_URL` | Ton adresse : `https://ton-domaine.vercel.app` (sans `/` à la fin) |
 | `NEXT_PUBLIC_API_MODE` | `live` quand le back-end est branché (`mock` = démo avec fausses données) |
+| `NEXT_PUBLIC_LAUNCH_MODE` | `waitlist` (par défaut) : les boutons mènent à la liste d'attente. Le jour du lancement : `open`, puis « Redeploy ». Les inscrits sont dans Supabase → Table Editor → `waitlist`. |
 | `CRON_SECRET` | Protège la tâche quotidienne d'optimisation. Génère-le comme `ENCRYPTION_KEY`. Vercel l'envoie automatiquement à `/api/cron/daily` (déclarée dans `vercel.json`). |
 
 ---
@@ -162,13 +179,15 @@ affichent « Le paiement en ligne arrive très bientôt ». Tu pourras l'ajouter
 - [ ] `NEXT_PUBLIC_SUPABASE_URL`
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] Tables créées dans Supabase (`0001_init.sql`, `0002_ai_budget.sql`, `0003_ai_session_limit.sql`)
+- [ ] Tables créées dans Supabase (`0001` à `0005`)
 - [ ] Webhooks Shopify configurés
 - [ ] `CRON_SECRET`
 - [ ] `ANTHROPIC_API_KEY`
 - [ ] `SHOPIFY_API_KEY`
 - [ ] `SHOPIFY_API_SECRET`
-- [ ] (plus tard) `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*`
+- [ ] Offres Shopify + `SHOPIFY_APP_HANDLE`, `SHOPIFY_APP_ID`, `SHOPIFY_PARTNER_ORG_ID`, `SHOPIFY_PARTNER_TOKEN`
+- [ ] Extension de thème déployée + `NEXT_PUBLIC_SHOPIFY_API_KEY`
+- [ ] `NEXT_PUBLIC_LAUNCH_MODE` (`waitlist` puis `open`)
 - [ ] `ENCRYPTION_KEY`
 - [ ] `NEXT_PUBLIC_APP_URL`
 - [ ] `NEXT_PUBLIC_API_MODE`

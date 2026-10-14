@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { CTA } from "@/lib/launch";
 import { LightRays } from "@/components/ui/LightRays";
 import { Reveal } from "@/components/ui/Reveal";
 import { PromptBox } from "./PromptBox";
@@ -13,7 +14,7 @@ export function Hero() {
           <Reveal>
             <span className="eyebrow">
               <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_rgb(94_211_140)]" />
-              Bêta ouverte · ta première boutique est offerte
+              {CTA.eyebrow}
             </span>
           </Reveal>
           <Reveal delay={80} as="h1" className="mt-7 max-w-2xl text-[clamp(2.6rem,1.5rem+3.3vw,4.4rem)] leading-[1.02] tracking-[-0.045em]">

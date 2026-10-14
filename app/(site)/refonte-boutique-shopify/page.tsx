@@ -31,7 +31,7 @@ const FAQ = [
 export default function RecraftPage() {
   return (
     <>
-      <PageHero eyebrow="Refonte de boutique" title={<>Ta boutique a du trafic. Elle mérite de <span className="serif-accent">vendre</span>.</>} subtitle="Connecte ta boutique Shopify : l'IA analyse tes pages, repère ce qui freine la vente et propose une version réécrite, sans toucher à tes commandes.">
+      <PageHero eyebrow="Relancer ma boutique" title={<>Des visiteurs, mais pas de ventes ? <span className="serif-accent">On trouve pourquoi.</span></>} subtitle="Connecte ta boutique Shopify : l'IA analyse tes pages, repère ce qui freine la vente et propose une version réécrite, sans toucher à tes commandes.">
         <div className="flex flex-wrap justify-center gap-3">
           <ButtonLink href="/inscription?mode=recraft" size="lg">Analyser ma boutique</ButtonLink>
           <ButtonLink href="/demo" variant="secondary" size="lg">Voir la démo</ButtonLink>

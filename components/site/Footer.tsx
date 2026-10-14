@@ -4,8 +4,8 @@ import { site } from "@/lib/site";
 import { NewsletterForm } from "./NewsletterForm";
 
 const COLUMNS = [
-  { title: "Produit", links: [["/produit", "Fonctionnalités"], ["/demo", "Démo"], ["/tarifs", "Tarifs"], ["/exemples", "Exemples"], ["/nouveautes", "Nouveautés"]] },
-  { title: "Solutions", links: [["/boutique-shopify-cle-en-main", "Boutique clé en main"], ["/refonte-boutique-shopify", "Refonte de boutique"], ["/outils", "Outils gratuits"], ["/affiliation", "Programme d'affiliation"]] },
+  { title: "Produit", links: [["/produit", "Fonctionnalités"], ["/demo", "Comment ça marche"], ["/tarifs", "Tarifs"], ["/exemples", "Exemples"], ["/nouveautes", "Feuille de route"]] },
+  { title: "Solutions", links: [["/boutique-shopify-cle-en-main", "Boutique prête à vendre"], ["/refonte-boutique-shopify", "Relancer ma boutique"], ["/outils", "Outils gratuits"], ["/affiliation", "Devenir partenaire"]] },
   { title: "Entreprise", links: [["/fondateurs", "Notre histoire"], ["/blog", "Blog"], ["/contact", "Contact"]] },
   { title: "Légal", links: [["/legal/mentions-legales", "Mentions légales"], ["/legal/confidentialite", "Confidentialité"], ["/legal/cgv", "CGV"], ["/legal/cgu", "CGU"], ["/legal/conditions-affiliation", "Conditions d'affiliation"]] },
 ] as const;

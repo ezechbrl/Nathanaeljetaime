@@ -19,13 +19,13 @@ function Billing() {
   const params = useSearchParams();
   const router = useRouter();
   const toast = useToast();
-  const billing = useApi(() => api.getBilling(), []);
+  const billing = useApi(() => api.getBilling(params.get("checkout") === "success"), []);
   const [yearly, setYearly] = useState(params.get("interval") !== "month");
   const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
     if (params.get("checkout") === "success") {
-      toast("Abonnement activé, merci !");
+      toast("Offre mise à jour, merci !");
       refresh();
       router.replace("/app/abonnement");
     }
@@ -54,7 +54,7 @@ function Billing() {
 
   return (
     <>
-      <PageHeader title="Abonnement" actions={sub && sub.plan !== "free" && <Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Gérer le paiement</Button>} />
+      <PageHeader title="Abonnement" actions={sub && sub.plan !== "free" && <Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Gérer dans Shopify</Button>} />
       <div className="space-y-8 p-5 sm:p-8">
         <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
           <section className="surface rounded-card p-5">
@@ -109,6 +109,7 @@ function Billing() {
               );
             })}
           </div>
+          <p className="mt-4 text-sm text-fg-faint">Le paiement passe par Shopify : tu valides l'offre sur une page Shopify, et elle s'ajoute à ta facture Shopify habituelle. Changement d'offre ou retour à Découverte à tout moment.</p>
         </section>
 
         <section>
@@ -125,7 +126,7 @@ function Billing() {
                 ))}
               </tbody>
             </table>
-          ) : <p className="mt-3 text-sm text-fg-muted">Aucune facture pour l'instant.</p>}
+          ) : <p className="mt-3 text-sm text-fg-muted">Tes factures sont dans ton admin Shopify : <span className="text-fg">Paramètres → Facturation</span>. L'abonnement Vitrio y apparaît à côté de ton forfait Shopify.</p>}
         </section>
       </div>
     </>

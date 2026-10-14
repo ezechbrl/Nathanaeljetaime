@@ -30,7 +30,7 @@ const FAQ = [
 export default function TurnkeyPage() {
   return (
     <>
-      <PageHero eyebrow="Boutique clé en main" title={<>Ta boutique Shopify <span className="serif-accent">clé en main</span>, en 5 minutes</>} subtitle="Tout ce qu'une agence livrerait en trois semaines : stratégie, design, textes, pages et SEO. Généré pour ta marque, publié dans ta boutique.">
+      <PageHero eyebrow="Boutique prête à vendre" title={<>Une boutique Shopify <span className="serif-accent">prête à vendre</span>, dès ce soir</>} subtitle="Stratégie, textes, visuels, pages et SEO : ce qui prend trois semaines à la main est prêt en une dizaine de minutes, directement dans ta boutique.">
         <PromptBox />
       </PageHero>
 

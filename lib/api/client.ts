@@ -106,8 +106,8 @@ export const dismissRecommendation = (id: string) =>
   live ? request<{ recommendation: Recommendation }>(`/api/recommendations/${id}/dismiss`, { method: "POST" }) : mock.setRecommendation(id, "dismissed");
 
 // Facturation
-export const getBilling = () =>
-  live ? request<{ subscription: Subscription; usage: Usage; invoices: Invoice[] }>("/api/billing") : mock.getBilling();
+export const getBilling = (sync = false) =>
+  live ? request<{ subscription: Subscription; usage: Usage; invoices: Invoice[] }>(`/api/billing${sync ? "?sync=1" : ""}`) : mock.getBilling();
 export const startCheckout = (plan: "pro" | "agency", interval: "month" | "year") =>
   live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan, interval } }) : mock.checkout(plan);
 export const openBillingPortal = () => (live ? request<{ url: string }>("/api/billing/portal", { method: "POST" }) : Promise.resolve({ url: "/app/abonnement" }));
@@ -120,6 +120,9 @@ export const joinAffiliate = (payoutEmail: string) =>
 // Public
 export const sendContact = (input: { name: string; email: string; topic: string; message: string; website: string }) =>
   live ? request<void>("/api/contact", { method: "POST", json: input }) : mock.ok(600);
+export const joinWaitlist = (email: string, brief?: string) =>
+  live ? request<void>("/api/waitlist", { method: "POST", json: { email, brief } }) : mock.ok(500);
+
 export const subscribeNewsletter = (email: string) =>
   live ? request<void>("/api/newsletter", { method: "POST", json: { email } }) : mock.ok(400);
 export function runTool<T>(tool: string, input: Record<string, string>): Promise<{ result: T }> {

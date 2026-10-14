@@ -1,9 +1,9 @@
 import { requireUser } from "@/lib/server/auth";
-import { HttpError, json, route } from "@/lib/server/http";
-import { portalUrl } from "@/lib/server/stripe";
+import { planSelectionUrl } from "@/lib/server/billing";
+import { json, route } from "@/lib/server/http";
 
+// Changer d'offre ou revenir à Découverte se fait aussi sur la page d'offres Shopify.
 export const POST = route(async () => {
   const user = await requireUser();
-  if (!process.env.STRIPE_SECRET_KEY) throw new HttpError(503, "not_configured", "Le paiement en ligne arrive très bientôt.");
-  return json({ url: await portalUrl(user) });
+  return json({ url: await planSelectionUrl(user) });
 });

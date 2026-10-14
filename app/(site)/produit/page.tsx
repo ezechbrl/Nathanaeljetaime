@@ -23,9 +23,9 @@ export default function ProductPage() {
   return (
     <>
       <PageHero
-        eyebrow="Produit"
-        title={<>De l'idée à la boutique qui <span className="serif-accent">vend</span>, sans quitter une conversation</>}
-        subtitle="Une IA qui raisonne comme un expert e-commerce : elle pose la stratégie, construit la boutique, puis l'améliore chaque jour."
+        eyebrow="Fonctionnalités"
+        title={<>Tout ce qu'une agence ferait. <span className="serif-accent">En une conversation.</span></>}
+        subtitle="Stratégie, textes, visuels, mise en ligne, puis un suivi chaque matin : voici ce que Vitrio fait pour ta boutique Shopify."
       >
         <div className="flex flex-wrap justify-center gap-3">
           <ButtonLink href="/inscription" size="lg">Créer ma boutique</ButtonLink>
