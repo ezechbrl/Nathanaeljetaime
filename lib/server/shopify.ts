@@ -65,7 +65,7 @@ export async function connectionFor(userId: string, connectionId: string | null)
   const q = db().from("shop_connections").select("*").eq("user_id", userId).eq("status", "active");
   const row = must(await (connectionId ? q.eq("id", connectionId) : q.order("created_at")).limit(1).maybeSingle()) as Record<string, any> | null;
   if (!row?.access_token_encrypted) throw new HttpError(409, "no_shop", "Connecte d'abord une boutique Shopify dans les paramètres.");
-  return { id: row.id as string, shop: row.shop_domain as string, token: decrypt(row.access_token_encrypted) };
+  return { id: row.id as string, shop: row.shop_domain as string, token: decrypt(row.access_token_encrypted), scopes: String(row.scopes ?? "") };
 }
 
 export async function shopInfo(shop: string, token: string) {
@@ -99,7 +99,7 @@ const faqHtml = (plan: StorePlan) =>
 
 const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
-export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string };
+export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string };
 
 // Envoie le contenu de la boutique dans Shopify. Crée les objets la première fois, les met à jour ensuite.
 const rgb = (hex: string) => {
@@ -194,7 +194,7 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
   if (variantId) {
     const d = await graphql<{ productVariantsBulkUpdate: { userErrors: UserError[] } }>(shop, token,
       `mutation ($productId: ID!, $variants: [ProductVariantsBulkInput!]!) { productVariantsBulkUpdate(productId: $productId, variants: $variants) { userErrors { field message } } }`,
-      { productId: next.productId, variants: [{ id: variantId, price: plan.product.price, compareAtPrice: plan.product.compareAtPrice || null }] });
+      { productId: next.productId, variants: [{ id: variantId, price: plan.product.price, compareAtPrice: plan.product.compareAtPrice || null, inventoryPolicy: "CONTINUE", inventoryItem: { tracked: false } }] });
     check(d.productVariantsBulkUpdate.userErrors);
   }
 
@@ -204,22 +204,25 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
 
   // Pages À propos et FAQ.
   await onStep("pages");
-  const pages: [keyof ShopifyIds, string, string][] = [
-    ["aboutPageId", plan.aboutPage.title, plan.aboutPage.bodyHtml],
-    ["faqPageId", "FAQ", faqHtml(plan)],
+  const pages: { id: "aboutPageId" | "faqPageId"; handle: "aboutPageHandle" | "faqPageHandle"; title: string; html: string; templateSuffix: string }[] = [
+    { id: "aboutPageId", handle: "aboutPageHandle", title: plan.aboutPage.title, html: plan.aboutPage.bodyHtml, templateSuffix: "" },
+    { id: "faqPageId", handle: "faqPageHandle", title: "FAQ", html: faqHtml(plan), templateSuffix: "faq" },
   ];
-  for (const [key, title, html] of pages) {
-    if (next[key]) {
-      const d = await graphql<{ pageUpdate: { userErrors: UserError[] } }>(shop, token,
-        `mutation ($id: ID!, $page: PageUpdateInput!) { pageUpdate(id: $id, page: $page) { userErrors { field message } } }`,
-        { id: next[key], page: { title, body: html, isPublished: true } });
+  for (const pg of pages) {
+    const page = { title: pg.title, body: pg.html, isPublished: true, templateSuffix: pg.templateSuffix };
+    if (next[pg.id]) {
+      const d = await graphql<{ pageUpdate: { page: { handle: string } | null; userErrors: UserError[] } }>(shop, token,
+        `mutation ($id: ID!, $page: PageUpdateInput!) { pageUpdate(id: $id, page: $page) { page { handle } userErrors { field message } } }`,
+        { id: next[pg.id], page });
       check(d.pageUpdate.userErrors);
+      next[pg.handle] = d.pageUpdate.page?.handle ?? next[pg.handle];
     } else {
-      const d = await graphql<{ pageCreate: { page: { id: string } | null; userErrors: UserError[] } }>(shop, token,
-        `mutation ($page: PageCreateInput!) { pageCreate(page: $page) { page { id } userErrors { field message } } }`,
-        { page: { title, body: html, isPublished: true } });
+      const d = await graphql<{ pageCreate: { page: { id: string; handle: string } | null; userErrors: UserError[] } }>(shop, token,
+        `mutation ($page: PageCreateInput!) { pageCreate(page: $page) { page { id handle } userErrors { field message } } }`,
+        { page });
       check(d.pageCreate.userErrors);
-      next[key] = d.pageCreate.page!.id as never;
+      next[pg.id] = d.pageCreate.page!.id;
+      next[pg.handle] = d.pageCreate.page!.handle;
     }
   }
 
@@ -269,4 +272,36 @@ export async function dailySessions(shop: string, token: string, days = 30) {
     console.warn("ShopifyQL indisponible :", (e as Error).message);
   }
   return out;
+}
+
+// Installe le thème Vitrio de la boutique (archive générée par /api/shopify/theme) et, si demandé, le met en ligne.
+// L'ancien thème Vitrio non publié est supprimé pour ne pas encombrer la bibliothèque de thèmes.
+export async function installTheme(shop: string, token: string, opts: { zipUrl: string; name: string; publish: boolean; previousThemeId?: string }) {
+  const c = await graphql<{ themeCreate: { theme: { id: string } | null; userErrors: UserError[] } }>(shop, token,
+    `mutation ($source: URL!, $name: String!) { themeCreate(source: $source, name: $name, role: UNPUBLISHED) { theme { id } userErrors { field message } } }`,
+    { source: opts.zipUrl, name: opts.name.slice(0, 50) });
+  check(c.themeCreate.userErrors);
+  const id = c.themeCreate.theme!.id;
+
+  // Shopify télécharge et vérifie l'archive en arrière-plan.
+  for (let i = 0; i < 40; i++) {
+    const t = await graphql<{ theme: { processing: boolean; processingFailed: boolean } | null }>(shop, token, `query ($id: ID!) { theme(id: $id) { processing processingFailed } }`, { id });
+    if (t.theme?.processingFailed) throw new HttpError(502, "upstream_error", "Shopify a refusé le thème Vitrio. Réessaie dans un instant.");
+    if (t.theme && !t.theme.processing) break;
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+
+  if (opts.publish) {
+    const p = await graphql<{ themePublish: { userErrors: UserError[] } }>(shop, token,
+      `mutation ($id: ID!) { themePublish(id: $id) { theme { id } userErrors { field message } } }`, { id });
+    check(p.themePublish.userErrors);
+  }
+
+  if (opts.previousThemeId && opts.previousThemeId !== id) {
+    const old = await graphql<{ theme: { role: string } | null }>(shop, token, `query ($id: ID!) { theme(id: $id) { role } }`, { id: opts.previousThemeId }).catch(() => null);
+    if (old?.theme && old.theme.role !== "MAIN") {
+      await graphql(shop, token, `mutation ($id: ID!) { themeDelete(id: $id) { deletedThemeId userErrors { field message } } }`, { id: opts.previousThemeId }).catch(() => {});
+    }
+  }
+  return id;
 }

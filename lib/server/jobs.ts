@@ -5,7 +5,8 @@ import type { StorePlan } from "@/lib/store-schema";
 import { generatePages, generateStrategy } from "./ai";
 import { fetchProductPageText } from "@/lib/fetch-product-page";
 import { generateImage, storeImage, type AspectRatio } from "./images";
-import { connectionFor, publish, readStoreContent, type ShopifyIds } from "./shopify";
+import { connectionFor, installTheme, publish, readStoreContent, type ShopifyIds } from "./shopify";
+import { themeZipUrl } from "./theme/link";
 import { db, must } from "./supabase";
 import type { StoreRow } from "./auth";
 import { env } from "./env";
@@ -25,6 +26,7 @@ export const PUBLISH_STEPS: Omit<Step, "status">[] = [
   { key: "product", label: "Produit, prix et images" },
   { key: "publish", label: "Mise en vente" },
   { key: "pages", label: "Pages À propos et FAQ" },
+  { key: "theme", label: "Installation du thème Vitrio" },
 ];
 
 export async function createJob(storeId: string, userId: string, kind: "generate" | "publish" | "image" | "recraft", steps: Omit<Step, "status">[], input: Record<string, unknown> = {}) {
@@ -109,12 +111,25 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     const assets = must(await db().from("assets").select("url, kind").eq("store_id", store.id).order("created_at")) as { url: string; kind: string }[];
     const images = assets.filter((a) => a.kind === "product" || a.kind === "upload" || a.kind === "lifestyle").map((a) => a.url);
     const ids = await publish(conn.shop, conn.token, store.plan as StorePlan, images, store.shopify as ShopifyIds, step, store.theme as StoreTheme | undefined);
-    const liveUrl = ids.productHandle ? `https://${conn.shop}/products/${ids.productHandle}` : `https://${conn.shop}`;
+    const liveUrl = `https://${conn.shop}`;
     await db().from("stores").update({ shopify: ids, status: "published", live_url: liveUrl, shop_connection_id: conn.id, updated_at: new Date().toISOString() }).eq("id", store.id);
+
+    // Thème Vitrio : produit et pages sont déjà enregistrés, un échec ici ne crée pas de doublon.
+    await step("theme");
+    const plan = store.plan as StorePlan;
+    const themeId = await installTheme(conn.shop, conn.token, {
+      zipUrl: themeZipUrl(store.id),
+      name: `Vitrio · ${plan.brand.name}`,
+      publish: Boolean((job.input as { publishTheme?: boolean } | null)?.publishTheme),
+      previousThemeId: ids.themeId,
+    });
+    await db().from("stores").update({ shopify: { ...ids, themeId } }).eq("id", store.id);
     await finish(job.id, steps);
   } catch (e) {
     console.error("Publication échouée", e);
-    await db().from("stores").update({ status: previousStatus }).eq("id", store.id);
+    const { data: now } = await db().from("stores").select("shopify").eq("id", store.id).maybeSingle();
+    const saved = (now?.shopify ?? {}) as ShopifyIds;
+    await db().from("stores").update({ status: saved.productId ? "published" : previousStatus }).eq("id", store.id);
     await finish(job.id, steps, errorMessage(e));
   }
 }
