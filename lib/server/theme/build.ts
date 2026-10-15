@@ -1,60 +1,73 @@
 import { strToU8, zipSync } from "fflate";
-import type { StorePlan } from "@/lib/store-schema";
+import type { IconName, StorePlan } from "@/lib/store-schema";
 import { staticThemeFiles } from "./files";
+import { labelsFor } from "./labels";
 
 export type ThemeContext = {
   plan: StorePlan;
   theme: { colors: { primary: string; accent: string; background: string }; headingFont: string; bodyFont: string };
+  language?: string;
   productHandle?: string;
   aboutHandle?: string;
   faqHandle?: string;
+  // Visuels envoyés dans les fichiers Shopify, par emplacement (hero, moment1…, story).
+  files?: Record<string, { filename: string }>;
 };
 
 const SERIF = /serif|fraunces|playfair|cormorant|garamond|bodoni|lora|libre baskerville|dm serif/i;
 
+const rgb = (hex: string) => {
+  const h = hex.replace("#", "").padEnd(6, "0");
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) || 0);
+};
+const toHex = (c: number[]) => `#${c.map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, "0")).join("")}`;
+const mix = (a: string, b: string, t: number) => { const [x, y] = [rgb(a), rgb(b)]; return toHex(x.map((v, i) => v + (y[i] - v) * t)); };
+
 // Texte lisible (blanc ou presque noir) sur une couleur donnée.
 function onColor(hex: string) {
-  const h = hex.replace("#", "").padEnd(6, "0");
-  const [r, g, b] = [0, 2, 4].map((i) => {
-    const c = (parseInt(h.slice(i, i + 2), 16) || 0) / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
+  const [r, g, b] = rgb(hex).map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
   return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.45 ? "#141414" : "#ffffff";
 }
 
+// Nom d'une offre par quantité : le même côté variantes Shopify et côté thème.
+export const bundleLabel = (b: { label: string; quantity: number }) => b.label.trim() || String(b.quantity);
+
 const plain = (html: string) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
-const blocks = <T,>(items: T[], type: string, settings: (x: T) => Record<string, string>) => {
-  const out: Record<string, { type: string; settings: Record<string, string> }> = {};
-  items.forEach((x, i) => { out[`${type}_${i + 1}`] = { type, settings: settings(x) }; });
+// Les réglages « richtext » de Shopify n'acceptent que des paragraphes et des listes.
+const richtext = (html: string) => {
+  const h = html.replace(/<h[1-6][^>]*>/gi, "<p><strong>").replace(/<\/h[1-6]>/gi, "</strong></p>").trim();
+  return /^<(p|ul|ol)[\s>]/i.test(h) ? h : `<p>${h}</p>`;
+};
+type Block = { type: string; settings: Record<string, unknown> };
+const blocks = (list: Block[]) => {
+  const out: Record<string, Block> = {};
+  list.forEach((b, i) => { out[`${b.type}_${i + 1}`] = b; });
   return { blocks: out, block_order: Object.keys(out) };
 };
+
+const BENEFIT_ICONS: IconName[] = ["sparkle", "heart", "leaf", "shield", "clock", "star"];
 
 // Contenu propre à la boutique : réglages globaux et modèles de page.
 export function themeContent(ctx: ThemeContext): Record<string, string> {
   const { plan, theme } = ctx;
+  const home = plan.homepage;
+  const prod = plan.product;
+  const L = labelsFor(ctx.language ?? "français");
   const product = ctx.productHandle;
   const aboutUrl = ctx.aboutHandle ? `/pages/${ctx.aboutHandle}` : "";
   const faqUrl = ctx.faqHandle ? `/pages/${ctx.faqHandle}` : "";
   const shopUrl = product ? `/products/${product}` : "/collections/all";
+  const file = (slot: string) => (ctx.files?.[slot] ? `shopify://shop_images/${ctx.files[slot].filename}` : undefined);
   const offers = plan.strategy.offers;
-  const faqItems = [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))].slice(0, 10);
-  const freeShip = offers.map((o) => (/livraison|shipping|envío|versand|spedizione/i.test(o) ? o.match(/(\d+(?:[.,]\d+)?)\s?(?:€|eur|\$)/i) : null)).find(Boolean);
+  const find = (re: RegExp) => offers.find((o) => re.test(o)) ?? "";
+  const shipOffer = find(/livraison|shipping|envío|envio|versand|spedizione|verzending|portes/i);
+  const returnOffer = find(/retour|return|échange|devolu|rückgabe|reso|retourn|troca/i);
+  const freeShip = shipOffer.match(/(\d+(?:[.,]\d+)?)\s?(?:€|eur|\$|£)/i);
   const freeShippingThreshold = freeShip ? Math.round(Number(freeShip[1].replace(",", "."))) : 0;
-  const shippingHtml = `<p><strong>Livraison</strong> : suivie, avec un numéro de suivi dès l'expédition.${freeShippingThreshold ? ` Offerte dès ${freeShippingThreshold} €.` : ""}</p><p><strong>Retours</strong> : 30 jours pour changer d'avis.</p>`;
-  const trust = {
-    blocks: {
-      t1: { type: "item", settings: { icon: "truck", title: "Livraison suivie", text: freeShippingThreshold ? `Offerte dès ${freeShippingThreshold} €` : "Expédiée rapidement" } },
-      t2: { type: "item", settings: { icon: "return", title: "30 jours", text: "Pour changer d'avis" } },
-      t3: { type: "item", settings: { icon: "lock", title: "Paiement sécurisé", text: "Carte, Apple Pay, PayPal" } },
-      t4: { type: "item", settings: { icon: "chat", title: "Une question ?", text: "On répond vite" } },
-    },
-    block_order: ["t1", "t2", "t3", "t4"],
-  };
-  const marqueeItems = [...offers, ...plan.homepage.benefits.map((b) => b.title)].slice(0, 6);
-  const story = { title: plan.aboutPage.title, text: clip(plain(plan.aboutPage.bodyHtml), 320) };
-  const reassure = { r1_title: "Livraison", r1_text: "Suivie, partout en France", r2_title: "Retours", r2_text: "30 jours pour changer d'avis", r3_title: "Paiement", r3_text: "100 % sécurisé" };
+  const faqItems = [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))].slice(0, 10);
 
+  const labels = Object.fromEntries(Object.entries(L).map(([k, v]) => [`label_${k}`, v]));
   const settingsData = {
     current: {
       brand_name: plan.brand.name,
@@ -62,60 +75,118 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
       color_accent: theme.colors.accent,
       color_on_accent: onColor(theme.colors.accent),
       color_background: theme.colors.background,
+      color_tint: mix(theme.colors.background, theme.colors.accent, 0.14),
       heading_font: theme.headingFont,
       heading_style: SERIF.test(theme.headingFont) ? "serif" : "sans",
       body_font: theme.bodyFont,
       free_shipping_threshold: freeShippingThreshold,
+      ...labels,
       sections: {
-        announcement: { type: "announcement", settings: { text: clip(offers[0] ?? plan.brand.tagline, 120) } },
-        header: { type: "header", settings: { shop_url: shopUrl, about_url: aboutUrl, about_label: "Notre histoire", faq_url: faqUrl } },
-        footer: { type: "footer", settings: { tagline: plan.brand.tagline, about_url: aboutUrl, faq_url: faqUrl } },
+        announcement: { type: "announcement", ...blocks((home.announcements?.length ? home.announcements : [shipOffer, returnOffer, plan.brand.tagline].filter(Boolean)).slice(0, 3).map((text, i) => ({ type: "msg", settings: { icon: (["truck", "return", "gift"] as const)[i] ?? "sparkle", text: clip(text, 110) } }))) },
+        header: { type: "header", settings: { scheme: "base", shop_url: shopUrl, about_url: aboutUrl, faq_url: faqUrl } },
+        footer: { type: "footer", settings: { scheme: "dark", tagline: plan.brand.tagline, about_url: aboutUrl, faq_url: faqUrl } },
       },
     },
   };
 
-  const faqSection = (title: string) => ({ type: "faq", settings: { eyebrow: "FAQ", title, open_first: true }, ...blocks(faqItems, "q", (f) => ({ question: clip(f.question, 250), answer: f.answer })) });
+  const faqSection = (title: string, scheme = "tint") => ({ type: "faq", settings: { scheme, eyebrow: "FAQ", title, open_first: true }, ...blocks(faqItems.map((f) => ({ type: "q", settings: { question: clip(f.question, 250), answer: f.answer } }))) });
 
-  const lifestyle = (eyebrow: string, title: string, text: string, reverse: boolean, hint: string, cta = "", url = "") => ({ type: "lifestyle", settings: { ...(product ? { product } : {}), media_hint: hint, reverse, eyebrow, title, text, cta, url } });
+  const features = home.features?.length
+    ? home.features
+    : home.benefits.map((b, i) => ({ icon: BENEFIT_ICONS[i % BENEFIT_ICONS.length], title: b.title, text: clip(b.text, 70) }));
+  const featuresSection = { type: "features", settings: { scheme: "tint", title: home.featuresTitle ?? plan.brand.tagline, subtitle: home.featuresSubtitle ?? "" }, ...blocks(features.slice(0, 6).map((f) => ({ type: "feat", settings: { icon: f.icon, title: f.title, text: f.text } }))) };
 
-  const index = {
-    sections: {
-      hero: { type: "hero", settings: { eyebrow: plan.brand.tagline, title: plan.homepage.heroTitle, subtitle: plan.homepage.heroSubtitle, cta: plan.homepage.ctaLabel, ...(product ? { product } : {}), t1: clip(offers[0] ?? "", 60), t2: clip(offers[1] ?? "", 60), t3: clip(offers[2] ?? "", 60) } },
-      marquee: { type: "marquee", settings: { speed: 35 }, ...blocks(marqueeItems, "item", (t) => ({ text: clip(t, 60) })) },
-      benefits: { type: "benefits", settings: { eyebrow: "Pourquoi nous", title: plan.strategy.promise }, ...blocks(plan.homepage.benefits.slice(0, 6), "benefit", (b) => ({ title: b.title, text: b.text })) },
-      ...(product ? { featured: { type: "featured-product", settings: { product, eyebrow: "Notre produit", add_label: "Ajouter au panier", ...reassure }, ...blocks(plan.product.bulletPoints.slice(0, 6), "bullet", (t) => ({ text: t })) } } : {}),
-      story: lifestyle("Notre histoire", story.title, story.text, false, "situation", aboutUrl ? "Lire notre histoire" : "", aboutUrl),
-      trust: { type: "trust", settings: {}, ...trust },
-      promise: { type: "promise", settings: { text: plan.strategy.promise, cta: plan.homepage.ctaLabel, url: shopUrl } },
-      faq: faqSection("Tes questions, nos réponses"),
-      news: { type: "newsletter", settings: { eyebrow: "Restons en contact", title: "Les nouveautés en avant-première", text: `Reçois les nouveautés de ${plan.brand.name}, sans spam.`, cta: "Je m'inscris" } },
-    },
-    order: ["hero", "marquee", "benefits", ...(product ? ["featured"] : []), "story", "trust", "promise", "faq", "news"],
+  const benefitsSection = {
+    type: "image-list",
+    settings: { scheme: "base", ...(product ? { product } : {}), media_hint: "situation", reverse: false, eyebrow: home.benefitsEyebrow ?? "", title: home.benefitsTitle ?? plan.strategy.promise, text: "", cta: home.ctaLabel, url: shopUrl, cta_style: "button" },
+    ...blocks(home.benefits.slice(0, 5).map((b, i) => ({ type: "item", settings: { icon: home.benefitIcons?.[i] ?? BENEFIT_ICONS[i % BENEFIT_ICONS.length], title: b.title, text: b.text } }))),
   };
 
-  const productBlocks = [
-    ...plan.product.bulletPoints.slice(0, 6).map((text) => ({ type: "bullet", settings: { text } })),
-    ...offers.filter((o) => /lot|pack|bundle|offert|achet/i.test(o)).slice(0, 2).map((text) => ({ type: "offer", settings: { text } })),
-  ];
+  const comparisonSection = home.comparison && {
+    type: "comparison",
+    settings: { scheme: "dark", eyebrow: "", title: home.comparison.title, text: home.comparison.text, us: home.comparison.usLabel, them: home.comparison.themLabel },
+    ...blocks(home.comparison.rows.slice(0, 6).map((r) => ({ type: "row", settings: { us: r.us, them: r.them } }))),
+  };
+
+  const productSettings = {
+    subtitle: prod.subtitle,
+    bundle_label: "",
+    sticky: true,
+    dynamic_checkout: false,
+    show_description: true,
+    guarantee: prod.guarantee ?? "",
+    t1: shipOffer ? clip(shipOffer, 80) : "",
+    t2: returnOffer ? clip(returnOffer, 80) : "",
+    t3: L.secure,
+    t4: "",
+  };
+  const productBlocks = blocks([
+    ...prod.bulletPoints.slice(0, 6).map((text) => ({ type: "bullet", settings: { text } })),
+    ...(prod.highlights ?? []).slice(0, 3).map((h) => ({ type: "highlight", settings: { icon: h.icon, title: h.title } })),
+    ...((prod.bundles?.length ?? 0) > 1 ? prod.bundles! : []).slice(0, 4).map((b) => ({ type: "bundle", settings: { label: bundleLabel(b), quantity: b.quantity, badge: b.badge } })),
+    ...(prod.details ?? []).slice(0, 5).map((d) => ({ type: "detail", settings: { title: d.title, content: richtext(d.html) } })),
+  ]);
+
+  const story = home.story;
+  const storySection = {
+    type: "image-list",
+    settings: {
+      scheme: "base", image: file("story"), reverse: true,
+      eyebrow: story?.eyebrow ?? L.about, title: story?.title ?? plan.aboutPage.title,
+      text: story ? story.paragraphs.map((p) => `<p>${p}</p>`).join("") : `<p>${clip(plain(plan.aboutPage.bodyHtml), 420)}</p>`,
+      cta: aboutUrl ? L.about : "", url: aboutUrl, cta_style: "link",
+    },
+  };
+
+  const moments = home.moments;
+  const momentsSection = moments && {
+    type: "moments",
+    settings: { scheme: "base", title: moments.title },
+    ...blocks(moments.items.slice(0, 3).map((m, i) => ({ type: "moment", settings: { image: file(`moment${i + 1}`), title: m.title } }))),
+  };
+
+  const sections: Record<string, unknown> = {
+    hero: { type: "hero", settings: { image: file("hero"), ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
+    features: featuresSection,
+    benefits: benefitsSection,
+    ...(momentsSection ? { moments: momentsSection } : {}),
+    ...(comparisonSection ? { comparison: comparisonSection } : {}),
+    ...(product ? { buy: { type: "featured-product", settings: { scheme: "tint", product, heading_tag: "h2", eyebrow: "", ...productSettings, sticky: false, bundle_label: "" }, ...productBlocks } } : {}),
+    story: storySection,
+    reviews: { type: "testimonials", settings: { scheme: "base", title: "" } },
+    faq: faqSection(L.faq === "FAQ" ? "FAQ" : L.faq),
+    banner: { type: "image-banner", settings: { image: file("moment3") || file("hero"), title: home.finalCta?.title ?? plan.strategy.promise, text: home.finalCta?.text ?? "", cta: home.ctaLabel, url: shopUrl } },
+    news: { type: "newsletter", settings: { scheme: "base", eyebrow: plan.brand.name, title: plan.brand.tagline, text: "" } },
+  };
+  const index = { sections, order: Object.keys(sections) };
+
   const productTpl = {
     sections: {
-      main: { type: "main-product", settings: { subtitle: plan.product.subtitle, add_label: "Ajouter au panier", sticky: true, shipping: shippingHtml, ...reassure }, blocks: Object.fromEntries(productBlocks.map((b, i) => [`b${i + 1}`, b])), block_order: productBlocks.map((_, i) => `b${i + 1}`) },
-      trust: { type: "trust", settings: {}, ...trust },
-      benefits: { type: "benefits", settings: { eyebrow: "Ce qui change", title: plan.homepage.heroTitle }, ...blocks(plan.homepage.benefits.slice(0, 3), "benefit", (b) => ({ title: b.title, text: b.text })) },
-      detail: lifestyle("Dans le détail", plan.product.subtitle || plan.product.title, clip(plan.product.bulletPoints.join(" · "), 300), true, "détail"),
-      faq: faqSection("Questions fréquentes"),
+      main: { type: "main-product", settings: { scheme: "base", heading_tag: "h1", eyebrow: "", ...productSettings }, ...productBlocks },
+      features: { ...featuresSection, settings: { ...featuresSection.settings, title: "" } },
+      benefits: { ...benefitsSection, settings: { ...benefitsSection.settings, cta: "" } },
+      ...(comparisonSection ? { comparison: comparisonSection } : {}),
+      faq: faqSection(L.faq),
     },
-    order: ["main", "trust", "benefits", "detail", "faq"],
+    order: ["main", "features", "benefits", ...(comparisonSection ? ["comparison"] : []), "faq"],
   };
 
+  // Réglages vides (liens, images) retirés : Shopify refuse une valeur vide pour ces types.
+  const EMPTYABLE = new Set(["image", "url", "about_url", "faq_url", "shop_url"]);
+  const clean = (v: unknown): unknown => {
+    if (Array.isArray(v)) return v.map(clean);
+    if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).filter(([k, x]) => x !== undefined && !(EMPTYABLE.has(k) && x === "")).map(([k, x]) => [k, clean(x)]));
+    return v;
+  };
+  const json = (o: unknown) => JSON.stringify(clean(o), null, 2);
   const simple = (type: string) => JSON.stringify({ sections: { main: { type, settings: {} } }, order: ["main"] }, null, 2);
 
   return {
-    "config/settings_data.json": JSON.stringify(settingsData, null, 2),
-    "templates/index.json": JSON.stringify(index, null, 2),
-    "templates/product.json": JSON.stringify(productTpl, null, 2),
+    "config/settings_data.json": json(settingsData),
+    "templates/index.json": json(index),
+    "templates/product.json": json(productTpl),
     "templates/page.json": simple("main-page"),
-    "templates/page.faq.json": JSON.stringify({ sections: { faq: faqSection("Questions fréquentes") }, order: ["faq"] }, null, 2),
+    "templates/page.faq.json": json({ sections: { faq: faqSection(L.faq, "base") }, order: ["faq"] }),
     "templates/collection.json": simple("main-collection"),
     "templates/list-collections.json": simple("main-list-collections"),
     "templates/cart.json": simple("main-cart"),

@@ -3,6 +3,47 @@ import type { Asset, Recommendation, Store, StoreMetrics } from "./types";
 
 // Contenu de démonstration (mode mock uniquement). Marques fictives.
 
+// Sections enrichies communes aux boutiques de démo.
+function rich(name: string, short: string): { home: Partial<StorePlan["homepage"]>; product: Partial<StorePlan["product"]> } {
+  return {
+    home: {
+      features: [
+        { icon: "leaf", title: "Ingrédients choisis", text: "Une liste courte et lisible" },
+        { icon: "hand", title: "Fait avec soin", text: "Petites séries contrôlées" },
+        { icon: "truck", title: "Expédié sous 24 h", text: "Suivi inclus" },
+        { icon: "recycle", title: "Emballage recyclable", text: "Zéro plastique inutile" },
+        { icon: "shield", title: "30 jours", text: "Pour changer d'avis" },
+      ],
+      featuresTitle: "Pensé pour ton quotidien",
+      featuresSubtitle: `${name}, l'essentiel sans compromis.`,
+      benefitsEyebrow: "Au quotidien",
+      benefitsTitle: "Ce que ça change pour toi",
+      benefitIcons: ["sparkle", "clock", "heart"],
+      moments: { title: "Pour chaque moment de ta journée", items: [{ title: "Le matin", imagePrompt: "" }, { title: "En journée", imagePrompt: "" }, { title: "Le soir", imagePrompt: "" }] },
+      comparison: {
+        title: `${name} vs l'option classique`,
+        text: "On a gardé l'essentiel et retiré le superflu. Voilà ce que ça change concrètement.",
+        usLabel: name,
+        themLabel: "Option classique",
+        rows: [{ us: "Composition courte et lisible", them: "Liste longue et floue" }, { us: "Expédié sous 24 h", them: "Délais variables" }, { us: "30 jours pour changer d'avis", them: "Retours compliqués" }],
+      },
+      story: { eyebrow: "Notre histoire", title: `Pourquoi ${name} existe`, paragraphs: [`Tout est parti d'une frustration : trouver ${short.toLowerCase()} de qualité, sans y passer des heures.`, "Alors on a sélectionné chaque détail, et on a gardé uniquement ce qui compte."], imagePrompt: "" },
+      finalCta: { title: "Prêt à essayer ?", text: "Livraison rapide, 30 jours pour changer d'avis." },
+      announcements: ["Livraison offerte dès 39 €", "Satisfait ou remboursé 30 jours"],
+    },
+    product: {
+      highlights: [{ icon: "leaf", title: "Naturel" }, { icon: "award", title: "Qualité contrôlée" }, { icon: "truck", title: "Expédié en 24 h" }],
+      details: [
+        { title: "Composition", html: "<p>Ingrédients sélectionnés, liste complète sur l'emballage.</p>" },
+        { title: "Utilisation", html: "<ul><li>Simple au quotidien</li><li>Se garde 12 mois après ouverture</li></ul>" },
+        { title: "Livraison et retours", html: "<p>Expédition sous 24 h, livraison suivie en 48 à 72 h. 30 jours pour changer d'avis.</p>" },
+      ],
+      guarantee: "Satisfait ou remboursé pendant 30 jours.",
+      bundles: [{ quantity: 1, label: "1 unité", discountPercent: 0, badge: "" }, { quantity: 2, label: "Lot de 2", discountPercent: 15, badge: "Populaire" }, { quantity: 3, label: "Lot de 3", discountPercent: 20, badge: "Meilleure offre" }],
+    },
+  };
+}
+
 export function samplePlan(name: string, niche: string): StorePlan {
   if (!/baume|lèvre/i.test(niche)) return genericPlan(name, niche);
   return {
@@ -32,6 +73,7 @@ export function samplePlan(name: string, niche: string): StorePlan {
         { title: "Fabriqué à Grasse", text: "Petites séries, contrôlées une par une." },
       ],
       socialProofIdea: "Demander une photo avant/après aux 50 premières clientes en échange d'un baume offert.",
+      ...rich(name, niche).home,
     },
     product: {
       title: `${name} — Baume nourrissant`,
@@ -44,6 +86,7 @@ export function samplePlan(name: string, niche: string): StorePlan {
       seoTitle: `Baume à lèvres naturel nourrissant | ${name}`,
       seoDescription: "Baume à lèvres en 6 ingrédients naturels, fabriqué en France. Livraison offerte dès 39 €.",
       tags: ["baume", "lèvres", "naturel"],
+      ...rich(name, niche).product,
     },
     faq: [
       { question: "Quels sont les délais de livraison ?", answer: "48 à 72 h en France métropolitaine." },
@@ -82,6 +125,7 @@ function genericPlan(name: string, niche: string): StorePlan {
         { title: "30 jours pour changer d'avis", text: "Retour simple, remboursement rapide." },
       ],
       socialProofIdea: "Demander un avis avec photo aux 30 premiers clients, en échange d'un code de réduction.",
+      ...rich(name, short).home,
     },
     product: {
       title: `${name} — ${short.split(" ").slice(0, 3).join(" ")}`,
@@ -93,6 +137,7 @@ function genericPlan(name: string, niche: string): StorePlan {
       seoTitle: `${short} | ${name}`,
       seoDescription: `${short}. Livraison offerte dès 39 €, satisfait ou remboursé 30 jours.`,
       tags: short.toLowerCase().split(" ").filter((w) => w.length > 3).slice(0, 4),
+      ...rich(name, short).product,
     },
     faq: [
       { question: "Quels sont les délais de livraison ?", answer: "48 à 72 h en France métropolitaine." },

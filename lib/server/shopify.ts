@@ -1,6 +1,7 @@
 import "server-only";
 import type { StoreTheme } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
+import { bundleLabel } from "./theme/build";
 import { decrypt, hmacHex, safeEqual } from "./crypto";
 import { env } from "./env";
 import { HttpError } from "./http";
@@ -99,7 +100,7 @@ const faqHtml = (plan: StorePlan) =>
 
 const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
-export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string };
+export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string; files?: Record<string, { url: string; filename: string }>; bundleOption?: string };
 
 // Envoie le contenu de la boutique dans Shopify. Crée les objets la première fois, les met à jour ensuite.
 const rgb = (hex: string) => {
@@ -208,6 +209,11 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
     check(d.productVariantsBulkUpdate.userErrors);
   }
 
+  // Offres par quantité : de vraies variantes Shopify, avec leur propre prix.
+  if ((plan.product.bundles?.length ?? 0) > 1) {
+    await syncBundles(shop, token, next.productId!, plan).then((name) => { next.bundleOption = name; }).catch((e) => console.warn("Offres par quantité non créées :", (e as Error).message));
+  }
+
   // Mise en vente sur la boutique en ligne.
   await onStep("publish");
   await publishToOnlineStore(shop, token, next.productId!);
@@ -314,4 +320,78 @@ export async function installTheme(shop: string, token: string, opts: { zipUrl: 
     }
   }
   return id;
+}
+
+// Visuels du thème (héros, moments, histoire) envoyés dans les fichiers Shopify, pour que le thème
+// les référence (shopify://shop_images/…) et que le marchand puisse les changer dans l'éditeur.
+export async function uploadSceneFiles(shop: string, token: string, scenes: Record<string, string>, known: Record<string, { url: string; filename: string }>, brand: string) {
+  const out = { ...known };
+  const slug = brand.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || "boutique";
+  const todo = Object.entries(scenes).filter(([slot, url]) => out[slot]?.url !== url);
+  if (!todo.length) return out;
+  const files = todo.map(([slot, url]) => ({ slot, url, filename: `vitrio-${slug}-${slot}-${Math.random().toString(36).slice(2, 8)}.jpg` }));
+  const d = await graphql<{ fileCreate: { userErrors: UserError[] } }>(shop, token,
+    `mutation ($files: [FileCreateInput!]!) { fileCreate(files: $files) { files { id } userErrors { field message } } }`,
+    { files: files.map((f) => ({ originalSource: f.url, filename: f.filename, contentType: "IMAGE", alt: `${brand} — ${f.slot}` })) });
+  check(d.fileCreate.userErrors);
+  for (const f of files) out[f.slot] = { url: f.url, filename: f.filename };
+  return out;
+}
+
+export const BUNDLE_OPTION = "Offre";
+const money2 = (n: number) => (Math.round(n * 100) / 100).toFixed(2);
+
+export function bundlePrices(plan: StorePlan) {
+  const unit = Number(plan.product.price) || 0;
+  const cmp = Number(plan.product.compareAtPrice) || 0;
+  const ref = cmp > unit ? cmp : unit;
+  return (plan.product.bundles ?? []).map((b) => {
+    const price = unit * b.quantity * (1 - b.discountPercent / 100);
+    const compare = ref * b.quantity;
+    return { ...b, label: bundleLabel(b), price: money2(price), compareAtPrice: compare > price + 0.001 ? money2(compare) : null };
+  });
+}
+
+async function syncBundles(shop: string, token: string, productId: string, plan: StorePlan) {
+  const offers = bundlePrices(plan);
+  type Q = { product: { options: { id: string; name: string; optionValues: { name: string }[] }[]; variants: { nodes: { id: string; selectedOptions: { name: string; value: string }[] }[] } } };
+  const read = () => graphql<Q>(shop, token, `query ($id: ID!) { product(id: $id) { options { id name optionValues { name } } variants(first: 50) { nodes { id selectedOptions { name value } } } } }`, { id: productId });
+  let q = await read();
+  const opt = q.product.options.find((o) => o.name === BUNDLE_OPTION);
+  if (!opt) {
+    if (q.product.options.length > 1 || (q.product.options[0] && q.product.options[0].name !== "Title")) return undefined; // le marchand a ses propres options : on n'y touche pas
+    const d = await graphql<{ productOptionsCreate: { userErrors: UserError[] } }>(shop, token,
+      `mutation ($id: ID!, $options: [OptionCreateInput!]!) { productOptionsCreate(productId: $id, options: $options, variantStrategy: CREATE) { userErrors { field message } } }`,
+      { id: productId, options: [{ name: BUNDLE_OPTION, values: offers.map((o) => ({ name: o.label })) }] });
+    check(d.productOptionsCreate.userErrors);
+  } else {
+    const missing = offers.filter((o) => !opt.optionValues.some((v) => v.name === o.label));
+    if (missing.length) {
+      const d = await graphql<{ productOptionUpdate: { userErrors: UserError[] } }>(shop, token,
+        `mutation ($id: ID!, $option: OptionUpdateInput!, $add: [OptionValueCreateInput!]) { productOptionUpdate(productId: $id, option: $option, optionValuesToAdd: $add, variantStrategy: MANAGE) { userErrors { field message } } }`,
+        { id: productId, option: { id: opt.id }, add: missing.map((o) => ({ name: o.label })) });
+      check(d.productOptionUpdate.userErrors);
+    }
+  }
+  q = await read();
+  const updates = q.product.variants.nodes.flatMap((v) => {
+    const value = v.selectedOptions.find((o) => o.name === BUNDLE_OPTION)?.value;
+    const o = offers.find((x) => x.label === value);
+    return o ? [{ id: v.id, price: o.price, compareAtPrice: o.compareAtPrice, inventoryPolicy: "CONTINUE", inventoryItem: { tracked: false } }] : [];
+  });
+  const existing = new Set(q.product.variants.nodes.map((v) => v.selectedOptions.find((o) => o.name === BUNDLE_OPTION)?.value));
+  const toCreate = offers.filter((o) => !existing.has(o.label));
+  if (toCreate.length) {
+    const c = await graphql<{ productVariantsBulkCreate: { userErrors: UserError[] } }>(shop, token,
+      `mutation ($id: ID!, $variants: [ProductVariantsBulkInput!]!) { productVariantsBulkCreate(productId: $id, variants: $variants) { userErrors { field message } } }`,
+      { id: productId, variants: toCreate.map((o) => ({ optionValues: [{ optionName: BUNDLE_OPTION, name: o.label }], price: o.price, compareAtPrice: o.compareAtPrice, inventoryPolicy: "CONTINUE", inventoryItem: { tracked: false } })) });
+    check(c.productVariantsBulkCreate.userErrors);
+  }
+  if (updates.length) {
+    const d = await graphql<{ productVariantsBulkUpdate: { userErrors: UserError[] } }>(shop, token,
+      `mutation ($productId: ID!, $variants: [ProductVariantsBulkInput!]!) { productVariantsBulkUpdate(productId: $productId, variants: $variants) { userErrors { field message } } }`,
+      { productId, variants: updates });
+    check(d.productVariantsBulkUpdate.userErrors);
+  }
+  return BUNDLE_OPTION;
 }

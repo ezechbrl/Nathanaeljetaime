@@ -1,5 +1,76 @@
 import { z } from "zod";
 
+// Icônes disponibles dans le thème (le même jeu côté aperçu Vitrio et côté Shopify).
+export const ICONS = ["bolt", "leaf", "heart", "check", "shield", "truck", "star", "sparkle", "drop", "sun", "clock", "gift", "recycle", "hand", "award", "feather", "smile", "home", "moon", "flame"] as const;
+export const IconSchema = z.enum(ICONS);
+export type IconName = z.infer<typeof IconSchema>;
+
+// Sections enrichies (facultatives pour les boutiques créées avant leur arrivée).
+export const RichHomeSchema = z.object({
+  features: z.array(z.object({ icon: IconSchema, title: z.string().describe("2 à 4 mots"), text: z.string().describe("Une ligne courte") })).describe("4 à 6 atouts concrets du produit, affichés en bandeau d'icônes"),
+  featuresTitle: z.string().describe("Titre du bandeau d'atouts, ex. « Ta nouvelle routine »"),
+  featuresSubtitle: z.string(),
+  benefitsEyebrow: z.string().describe("Sur-titre court en majuscules, ex. « UN RITUEL, DE VRAIS EFFETS »"),
+  benefitsTitle: z.string().describe("Titre de la section bénéfices, ex. « Ce que ça change pour toi »"),
+  benefitIcons: z.array(IconSchema).describe("Une icône par bénéfice de homepage.benefits, dans le même ordre"),
+  moments: z.object({
+    title: z.string().describe("Ex. « Pour chaque moment de ta journée »"),
+    items: z.array(z.object({ title: z.string().describe("2 à 4 mots"), imagePrompt: z.string().describe("Scène photo EN ANGLAIS où le produit est utilisé à ce moment, sans texte") })).describe("Exactement 3 moments ou usages"),
+  }),
+  comparison: z.object({
+    title: z.string().describe("Ex. « Notre produit vs l'option classique »"),
+    text: z.string().describe("2 phrases qui expliquent la différence, sans dénigrer"),
+    usLabel: z.string().describe("Nom court de notre produit"),
+    themLabel: z.string().describe("Alternative générique (catégorie), jamais une marque"),
+    rows: z.array(z.object({ us: z.string(), them: z.string() })).describe("3 à 4 lignes, factuelles et vérifiables"),
+  }),
+  story: z.object({
+    eyebrow: z.string(),
+    title: z.string(),
+    paragraphs: z.array(z.string()).describe("2 paragraphes courts sur l'origine, la fabrication ou la sélection du produit, sans inventer de faits invérifiables"),
+    imagePrompt: z.string().describe("Scène photo EN ANGLAIS liée à l'origine ou la fabrication, avec le produit, sans texte"),
+  }),
+  finalCta: z.object({ title: z.string(), text: z.string() }),
+  announcements: z.array(z.string()).describe("2 à 3 messages courts pour la barre d'annonce défilante (livraison, retours, offre)"),
+});
+
+export const RichProductSchema = z.object({
+  highlights: z.array(z.object({ icon: IconSchema, title: z.string().describe("2 à 4 mots") })).describe("3 points forts affichés sous la galerie"),
+  details: z.array(z.object({ title: z.string(), html: z.string().describe("HTML simple : p, ul, li, strong") })).describe("3 à 4 rubriques dépliables : composition ou matières, utilisation ou entretien, livraison et retours, origine ou qualité"),
+  guarantee: z.string().describe("Garantie en une phrase, ex. « 30 jours satisfait ou remboursé »"),
+  bundles: z.array(z.object({
+    quantity: z.number().describe("Nombre d'unités, entier de 1 à 6"),
+    label: z.string().describe("Ex. « 1 paire », « Lot de 2 »"),
+    discountPercent: z.number().describe("Remise réelle appliquée au prix, entre 0 et 30, 0 pour l'unité"),
+    badge: z.string().describe("Ex. « Populaire », « Meilleure offre », ou chaîne vide"),
+  })).describe("1 à 3 offres par quantité, la première est toujours 1 unité à 0 %. Cohérent avec les offres de la stratégie."),
+});
+
+export const VisualSchema = z.object({
+  productLook: z.string().describe("Description visuelle précise du produit EN ANGLAIS (forme, matière, couleurs, emballage) pour des photos cohérentes"),
+  scene: z.string().describe("Univers photo EN ANGLAIS : décor, lumière, ambiance"),
+});
+
+export const HomeBaseSchema = z.object({
+    heroTitle: z.string(),
+    heroSubtitle: z.string(),
+    ctaLabel: z.string(),
+    benefits: z.array(z.object({ title: z.string(), text: z.string() })),
+    socialProofIdea: z.string().describe("Idée de preuve sociale à collecter (pas d'avis inventés)"),
+  });
+
+export const ProductBaseSchema = z.object({
+    title: z.string(),
+    subtitle: z.string(),
+    price: z.string().describe("Prix conseillé, nombre décimal sans devise, ex. 29.90"),
+    compareAtPrice: z.string().describe("Prix barré conseillé, ou chaîne vide"),
+    descriptionHtml: z.string().describe("Description produit en HTML simple (p, ul, li, strong, h3)"),
+    bulletPoints: z.array(z.string()),
+    seoTitle: z.string(),
+    seoDescription: z.string(),
+    tags: z.array(z.string()),
+  });
+
 export const StorePlanSchema = z.object({
   brand: z.object({
     name: z.string(),
@@ -19,26 +90,11 @@ export const StorePlanSchema = z.object({
       .array(z.object({ objection: z.string(), answer: z.string() }))
       .describe("Objections d'achat et réponses"),
   }),
-  homepage: z.object({
-    heroTitle: z.string(),
-    heroSubtitle: z.string(),
-    ctaLabel: z.string(),
-    benefits: z.array(z.object({ title: z.string(), text: z.string() })),
-    socialProofIdea: z.string().describe("Idée de preuve sociale à collecter (pas d'avis inventés)"),
-  }),
-  product: z.object({
-    title: z.string(),
-    subtitle: z.string(),
-    price: z.string().describe("Prix conseillé, nombre décimal sans devise, ex. 29.90"),
-    compareAtPrice: z.string().describe("Prix barré conseillé, ou chaîne vide"),
-    descriptionHtml: z.string().describe("Description produit en HTML simple (p, ul, li, strong, h3)"),
-    bulletPoints: z.array(z.string()),
-    seoTitle: z.string(),
-    seoDescription: z.string(),
-    tags: z.array(z.string()),
-  }),
+  homepage: HomeBaseSchema.merge(RichHomeSchema.partial()),
+  product: ProductBaseSchema.merge(RichProductSchema.partial()),
   faq: z.array(z.object({ question: z.string(), answer: z.string() })),
   aboutPage: z.object({ title: z.string(), bodyHtml: z.string() }),
+  visual: VisualSchema.optional(),
 });
 
 export type StorePlan = z.infer<typeof StorePlanSchema>;

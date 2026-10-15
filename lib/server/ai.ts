@@ -2,7 +2,7 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
-import { StorePlanSchema, type StorePlan } from "@/lib/store-schema";
+import { HomeBaseSchema, ProductBaseSchema, RichHomeSchema, RichProductSchema, StorePlanSchema, VisualSchema, type StorePlan } from "@/lib/store-schema";
 import { env } from "./env";
 import { chargeAi, costMicros } from "./budget";
 import { HttpError } from "./http";
@@ -64,7 +64,14 @@ export async function generateStrategy(input: { brief: string; language: string;
 }
 
 // Étape 2 : pages et fiche produit à partir de la stratégie.
-const PagesSchema = StorePlanSchema.pick({ homepage: true, product: true, faq: true, aboutPage: true });
+// La génération remplit toutes les sections enrichies (facultatives seulement pour les anciennes boutiques).
+const PagesSchema = z.object({
+  homepage: HomeBaseSchema.merge(RichHomeSchema),
+  product: ProductBaseSchema.merge(RichProductSchema),
+  faq: StorePlanSchema.shape.faq,
+  aboutPage: StorePlanSchema.shape.aboutPage,
+  visual: VisualSchema,
+});
 
 export async function generatePages(input: { brief: string; language: string; strategy: StrategyResult; sourceText?: string; userId: string }): Promise<StorePlan> {
   const parts = [
@@ -77,9 +84,26 @@ export async function generatePages(input: { brief: string; language: string; st
     schema: PagesSchema,
     effort: "medium",
     userId: input.userId,
-    system: `Tu es copywriter e-commerce. À partir d'une stratégie validée, tu écris la page d'accueil (accroche, sous-titre, appel à l'action, 3 bénéfices), la fiche produit complète (titre court, bénéfices avant caractéristiques, réponses aux objections dans la description, prix conseillé en nombre décimal sans devise, prix barré ou chaîne vide, SEO), une FAQ de 5 à 7 questions et la page « À propos ». Chaque texte découle de la promesse et répond aux objections.\n\n${BASE_RULES}`,
+    maxTokens: 24000,
+    system: `Tu es copywriter et directeur artistique e-commerce. À partir d'une stratégie validée, tu écris tout le contenu d'une boutique Shopify premium pensée pour vendre, section par section :
+- Accueil : accroche forte, sous-titre, appel à l'action, 3 bénéfices (avec une icône chacun), un bandeau de 4 à 6 atouts courts avec icônes, 3 moments d'usage illustrés, une comparaison honnête avec l'alternative habituelle (catégorie générique, jamais une marque), une section « histoire » (origine, fabrication ou sélection), un appel final et 2 à 3 messages d'annonce.
+- Fiche produit : titre court, sous-titre, bénéfices avant caractéristiques, réponses aux objections dans la description, prix conseillé en nombre décimal sans devise, prix barré ou chaîne vide, SEO, 3 points forts avec icônes, 3 à 4 rubriques dépliables, une garantie, et 1 à 3 offres par quantité (la première = 1 unité à 0 %, remises réalistes de 5 à 25 % pour les lots, cohérentes avec les offres de la stratégie).
+- Une FAQ de 5 à 7 questions et la page « À propos ».
+- La direction artistique (visual) : description visuelle précise du produit et univers photo, en anglais, pour générer des photos cohérentes ; chaque imagePrompt décrit une scène réaliste avec le produit.
+Chaque texte découle de la promesse et répond aux objections. N'invente ni avis clients, ni chiffres de vente, ni notes, ni labels, ni études.
+
+${BASE_RULES}`,
     user: parts.join("\n\n"),
   });
+  // Offres par quantité : la première est l'unité, remises bornées, quantités distinctes.
+  const seen = new Set<number>();
+  const bundles = (pages.product.bundles ?? [])
+    .map((b) => ({ ...b, quantity: Math.min(6, Math.max(1, Math.round(b.quantity))), discountPercent: Math.min(30, Math.max(0, Math.round(b.discountPercent))) }))
+    .filter((b) => !seen.has(b.quantity) && seen.add(b.quantity))
+    .sort((a, b) => a.quantity - b.quantity);
+  if (bundles[0]?.quantity === 1) bundles[0].discountPercent = 0;
+  else bundles.unshift({ quantity: 1, label: "1", discountPercent: 0, badge: "" });
+  pages.product.bundles = bundles.slice(0, 3);
   return { brand: input.strategy.brand, strategy: input.strategy.strategy, ...pages };
 }
 

@@ -166,8 +166,13 @@ Elle fonctionne avec Dawn et les thèmes qui en dérivent.
 |---|---|
 | `CONTACT_EMAIL` | l'adresse qui reçoit les messages du formulaire de contact |
 
-### Génération d'images (Studio)
-**https://fal.ai** → compte → **Dashboard → Keys → Add key**.
+### Génération d'images (photos des boutiques) — fortement conseillé
+**https://fal.ai** → compte → **Billing** (ajoute 10 $) → **Dashboard → Keys → Add key**.
+
+Chaque boutique reçoit 8 visuels : une photo produit, puis 7 scènes construites à partir de cette photo
+pour garder le même produit partout (héros, gros plan, en situation, 3 moments, histoire).
+Coût : environ 0,30 $ par boutique (FLUX dev + FLUX Kontext). Sans clé, la boutique est publiée sans photos.
+Modèles modifiables avec `FAL_MODEL` (défaut `fal-ai/flux/dev`) et `FAL_EDIT_MODEL` (défaut `fal-ai/flux-pro/kontext`).
 
 | `FAL_KEY` | la clé |
 |---|---|

@@ -99,6 +99,7 @@ export type Asset = {
   width: number;
   height: number;
   prompt: string | null;
+  slot?: string | null; // emplacement dans la boutique : packshot, detail, inuse, hero, moment1…3, story
   createdAt: string;
 };
 

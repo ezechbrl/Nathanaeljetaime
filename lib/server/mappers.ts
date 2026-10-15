@@ -1,5 +1,6 @@
 import "server-only";
 import type { StorePlan } from "@/lib/store-schema";
+import { slotOf } from "./images";
 import type { Asset, ChatMessage, Job, Recommendation, ShopConnection, Store, StoreTheme, User } from "@/lib/api/types";
 import type { StoreRow, UserRow } from "./auth";
 
@@ -70,6 +71,7 @@ export const toAsset = (a: Record<string, any>): Asset => ({
   width: a.width,
   height: a.height,
   prompt: a.prompt,
+  slot: slotOf({ storage_path: a.storage_path, kind: a.kind }) ?? null,
   createdAt: a.created_at,
 });
 
