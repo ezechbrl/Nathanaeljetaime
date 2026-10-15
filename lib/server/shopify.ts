@@ -130,6 +130,38 @@ export async function saveBrandForTheme(shop: string, token: string, theme: Stor
   check(d.metafieldsSet.userErrors);
 }
 
+// Met le produit en vente sur la boutique en ligne. Le titre du canal varie selon les boutiques
+// (et le catalogue peut être illisible) : à défaut de le reconnaître, on publie sur tous les canaux.
+type Pub = { id: string; name?: string | null; catalog: { title: string } | null };
+async function publishToOnlineStore(shop: string, token: string, productId: string) {
+  let nodes: Pub[];
+  try {
+    nodes = (await graphql<{ publications: { nodes: Pub[] } }>(shop, token, `{ publications(first: 50) { nodes { id name catalog { title } } } }`)).publications.nodes;
+  } catch {
+    nodes = (await graphql<{ publications: { nodes: Pub[] } }>(shop, token, `{ publications(first: 50) { nodes { id catalog { title } } } }`)).publications.nodes;
+  }
+  const isOnline = (p: Pub) => /online store|boutique en ligne|onlinestore/i.test(`${p.catalog?.title ?? ""} ${p.name ?? ""}`);
+  const online = nodes.filter(isOnline);
+  const targets = online.length ? online : nodes;
+  if (!online.length) console.warn("Canal « Boutique en ligne » non reconnu, publication sur tous les canaux :", nodes.map((p) => p.catalog?.title ?? p.name));
+  let ok = 0;
+  let lastError: unknown = null;
+  for (const p of targets) {
+    try {
+      const d = await graphql<{ publishablePublish: { userErrors: UserError[] } }>(shop, token,
+        `mutation ($id: ID!, $input: [PublicationInput!]!) { publishablePublish(id: $id, input: $input) { userErrors { field message } } }`,
+        { id: productId, input: [{ publicationId: p.id }] });
+      check(d.publishablePublish.userErrors);
+      ok += 1;
+    } catch (e) {
+      lastError = e;
+      console.warn("Publication sur un canal refusée", p.catalog?.title ?? p.name, (e as Error).message);
+    }
+  }
+  if (!ok && targets.length) throw lastError;
+  if (!targets.length) throw new Error("Aucun canal de vente trouvé dans la boutique Shopify (vérifie que la Boutique en ligne est installée).");
+}
+
 export async function publish(shop: string, token: string, plan: StorePlan, imageUrls: string[], ids: ShopifyIds, onStep: (key: string) => Promise<void>, theme?: StoreTheme): Promise<ShopifyIds> {
   const next: ShopifyIds = { ...ids };
   const productInput = {
@@ -168,14 +200,7 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
 
   // Mise en vente sur la boutique en ligne.
   await onStep("publish");
-  const pubs = await graphql<{ publications: { nodes: { id: string; catalog: { title: string } | null }[] } }>(shop, token, `{ publications(first: 20) { nodes { id catalog { title } } } }`);
-  const online = pubs.publications.nodes.find((p) => /online store|boutique en ligne/i.test(p.catalog?.title ?? ""));
-  if (online) {
-    const d = await graphql<{ publishablePublish: { userErrors: UserError[] } }>(shop, token,
-      `mutation ($id: ID!, $input: [PublicationInput!]!) { publishablePublish(id: $id, input: $input) { userErrors { field message } } }`,
-      { id: next.productId, input: [{ publicationId: online.id }] });
-    check(d.publishablePublish.userErrors);
-  }
+  await publishToOnlineStore(shop, token, next.productId!);
 
   // Pages À propos et FAQ.
   await onStep("pages");
