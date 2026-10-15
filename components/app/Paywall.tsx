@@ -1,17 +1,38 @@
 "use client";
 
-import { Check, ShieldCheck, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { Check, ShieldCheck, Sparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button, Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
+import type { GenerateStoreInput } from "@/lib/api/types";
 import { PLANS, euro } from "@/lib/content/pricing";
 
 export const PENDING_BRIEF_KEY = "vitrio-pending-brief";
 
+// Projet saisi avant l'activation : il est relancé tout seul au retour du paiement.
+export type PendingDraft = GenerateStoreInput & { autostart?: boolean };
+
+export function readPendingDraft(): PendingDraft | null {
+  try {
+    const raw = localStorage.getItem(PENDING_BRIEF_KEY);
+    if (!raw) return null;
+    localStorage.removeItem(PENDING_BRIEF_KEY);
+    try {
+      const v = JSON.parse(raw) as PendingDraft;
+      if (v && typeof v.brief === "string") return v;
+    } catch {
+      // ancien format : texte brut
+    }
+    return { mode: "start", brief: raw, language: "français" };
+  } catch {
+    return null;
+  }
+}
+
 // Écran d'activation : sans abonnement, l'IA n'est pas disponible (pas d'offre gratuite).
-export function Paywall({ brief }: { brief?: string }) {
+export function Paywall({ brief, draft }: { brief?: string; draft?: GenerateStoreInput }) {
   const pro = PLANS.find((p) => p.id === "pro")!;
   const toast = useToast();
   const [yearly, setYearly] = useState(false);
@@ -20,7 +41,8 @@ export function Paywall({ brief }: { brief?: string }) {
   async function activate() {
     setBusy(true);
     try {
-      if (brief) localStorage.setItem(PENDING_BRIEF_KEY, brief);
+      if (draft) localStorage.setItem(PENDING_BRIEF_KEY, JSON.stringify({ ...draft, autostart: true }));
+      else if (brief) localStorage.setItem(PENDING_BRIEF_KEY, JSON.stringify({ mode: "start", brief, language: "français" }));
     } catch {
       // stockage indisponible : le brief sera simplement à retaper
     }
@@ -36,8 +58,9 @@ export function Paywall({ brief }: { brief?: string }) {
   return (
     <div className="mx-auto w-full max-w-[560px] rounded-[18px] border border-accent/25 bg-[linear-gradient(180deg,rgb(var(--accent-deep)/0.45),rgb(var(--bg-2)/0.9))] p-6 shadow-[0_40px_80px_-40px_rgb(0_0_0/0.8)] sm:p-8">
       <p className="flex items-center gap-2 text-sm text-accent"><Sparkles className="h-4 w-4" /> Dernière étape</p>
-      <h2 className="mt-3 text-h3">Active Vitrio Pro pour créer ta boutique</h2>
-      {brief && <p className="mt-3 rounded-ctl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-fg-muted">Ton projet : « {brief.length > 120 ? `${brief.slice(0, 120)}…` : brief} »</p>}
+      <h2 className="mt-3 text-h3">{draft ? "Ta boutique est prête à être construite" : "Active Vitrio Pro pour créer ta boutique"}</h2>
+      {draft && <p className="mt-2 text-[15px] text-fg-muted">Active Vitrio Pro : la génération démarre toute seule dès ton retour, avec tout ce que tu as rempli.</p>}
+      {(draft?.brief || brief) && <Recap text={draft?.brief || brief!} />}
 
       <div className="mt-6 flex w-fit rounded-full border border-white/10 p-1 text-[13px]" role="radiogroup" aria-label="Période">
         {[{ v: false, l: "Mensuel" }, { v: true, l: "Annuel · 2 mois offerts" }].map((o) => (
@@ -58,6 +81,28 @@ export function Paywall({ brief }: { brief?: string }) {
         <ShieldCheck className="mt-px h-3.5 w-3.5 shrink-0" />
         Paiement sécurisé par Shopify, ajouté à ta facture Shopify. Sans engagement : tu arrêtes en un clic et tu gardes tout ce qui a été créé.
       </p>
+    </div>
+  );
+}
+
+function Recap({ text }: { text: string }) {
+  return <p className="mt-3 rounded-ctl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-fg-muted">Ton projet : « {text.length > 120 ? `${text.slice(0, 120)}…` : text} »</p>;
+}
+
+// Le même écran, par-dessus le formulaire de création.
+export function PaywallDialog({ draft, onClose }: { draft: GenerateStoreInput; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [onClose]);
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Activer Vitrio Pro" className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm [animation:fade-in_.2s_ease-out] sm:items-center" onClick={onClose}>
+      <div className="relative w-full max-w-[560px] [animation:rise_.35s_cubic-bezier(.2,.8,.2,1)]" onClick={(e) => e.stopPropagation()}>
+        <button type="button" onClick={onClose} aria-label="Fermer" className="absolute right-3 top-3 z-10 rounded-full p-1.5 text-fg-muted hover:bg-white/10 hover:text-fg"><X className="h-4 w-4" /></button>
+        <Paywall draft={draft} />
+      </div>
     </div>
   );
 }

@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { CreateStore } from "@/components/app/CreateStore";
-import { Paywall } from "@/components/app/Paywall";
 import { StoreCard } from "@/components/app/StoreCard";
 import { useToast } from "@/components/ui/Toast";
 import { LightRays } from "@/components/ui/LightRays";
@@ -30,11 +29,6 @@ function Welcome() {
   return null;
 }
 
-function Start() {
-  const { user } = useApp();
-  const params = useSearchParams();
-  return user.plan === "free" ? <Paywall brief={params.get("brief") ?? undefined} /> : <CreateStore />;
-}
 
 export default function AppHome() {
   const { user, stores } = useApp();
@@ -47,7 +41,7 @@ export default function AppHome() {
           <h1 className="mx-auto mt-3 max-w-2xl text-h1">Qu'est-ce qu'on <span className="serif-accent">construit</span> aujourd'hui ?</h1>
         </div>
         <div className="relative mt-10">
-          <Suspense><Welcome /><Start /></Suspense>
+          <Suspense><Welcome /><CreateStore /></Suspense>
         </div>
       </section>
 
