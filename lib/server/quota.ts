@@ -16,7 +16,7 @@ export const period = () => new Date().toISOString().slice(0, 7);
 export async function getUsage(userId: string, plan: PlanId): Promise<Usage> {
   const [u, stores, aiBudget] = await Promise.all([
     db().from("usage").select("conversations, images").eq("user_id", userId).eq("period", period()).maybeSingle(),
-    db().from("stores").select("id", { count: "exact", head: true }).eq("user_id", userId),
+    db().from("stores").select("id", { count: "exact", head: true }).eq("user_id", userId).neq("status", "failed"), // une génération ratée ne compte pas
     aiBudgetStatus(userId, plan),
   ]);
   const row = must(u) as { conversations: number; images: number } | null;

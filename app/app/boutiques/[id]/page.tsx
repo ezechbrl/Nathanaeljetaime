@@ -38,7 +38,12 @@ export default function StoreDashboard() {
 
   if (store.status === "generating") return <GenerationProgress store={store} job={activeJob} />;
   if (store.status === "failed" || !store.plan) {
-    return <div className="p-8"><ErrorState message="La génération a échoué. Tu n'as pas été décompté ; réessaie avec un brief un peu plus précis." onRetry={reload} /></div>;
+    const restart = async () => {
+      await api.deleteStore(store.id).catch(() => {});
+      setStores((list) => list.filter((s) => s.id !== store.id));
+      router.push("/app");
+    };
+    return <div className="p-8"><ErrorState message="La génération a échoué. Elle n'est pas décomptée de ton offre : relance-la depuis l'accueil." onRetry={restart} /></div>;
   }
 
   const plan = store.plan;
