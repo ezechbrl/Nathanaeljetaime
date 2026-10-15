@@ -302,7 +302,10 @@ export async function installTheme(shop: string, token: string, opts: { zipUrl: 
   // Shopify télécharge et vérifie l'archive en arrière-plan.
   for (let i = 0; i < 40; i++) {
     const t = await graphql<{ theme: { processing: boolean; processingFailed: boolean } | null }>(shop, token, `query ($id: ID!) { theme(id: $id) { processing processingFailed } }`, { id });
-    if (t.theme?.processingFailed) throw new HttpError(502, "upstream_error", "Shopify a refusé le thème Vitrio. Réessaie dans un instant.");
+    if (t.theme?.processingFailed) {
+      await graphql(shop, token, `mutation ($id: ID!) { themeDelete(id: $id) { deletedThemeId } }`, { id }).catch(() => {});
+      throw new HttpError(502, "upstream_error", "Shopify a refusé le thème Vitrio. Réessaie dans un instant.");
+    }
     if (t.theme && !t.theme.processing) break;
     await new Promise((r) => setTimeout(r, 2000));
   }
@@ -330,11 +333,20 @@ export async function uploadSceneFiles(shop: string, token: string, scenes: Reco
   const todo = Object.entries(scenes).filter(([slot, url]) => out[slot]?.url !== url);
   if (!todo.length) return out;
   const files = todo.map(([slot, url]) => ({ slot, url, filename: `vitrio-${slug}-${slot}-${Math.random().toString(36).slice(2, 8)}.jpg` }));
-  const d = await graphql<{ fileCreate: { userErrors: UserError[] } }>(shop, token,
+  const d = await graphql<{ fileCreate: { files: { id: string }[] | null; userErrors: UserError[] } }>(shop, token,
     `mutation ($files: [FileCreateInput!]!) { fileCreate(files: $files) { files { id } userErrors { field message } } }`,
     { files: files.map((f) => ({ originalSource: f.url, filename: f.filename, contentType: "IMAGE", alt: `${brand} — ${f.slot}` })) });
   check(d.fileCreate.userErrors);
-  for (const f of files) out[f.slot] = { url: f.url, filename: f.filename };
+  // Le thème ne doit référencer que des fichiers prêts : on attend leur traitement (30 s maximum).
+  const ids = (d.fileCreate.files ?? []).map((f) => f.id);
+  let status: Record<string, string> = {};
+  for (let i = 0; i < 15 && ids.length; i++) {
+    const q = await graphql<{ nodes: ({ id: string; fileStatus: string } | null)[] }>(shop, token, `query ($ids: [ID!]!) { nodes(ids: $ids) { ... on MediaImage { id fileStatus } } }`, { ids });
+    status = Object.fromEntries(q.nodes.filter(Boolean).map((n) => [n!.id, n!.fileStatus]));
+    if (Object.values(status).every((v) => v === "READY" || v === "FAILED")) break;
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  files.forEach((f, i) => { if (status[ids[i]] === "READY") out[f.slot] = { url: f.url, filename: f.filename }; });
   return out;
 }
 

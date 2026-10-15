@@ -171,11 +171,17 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Thème Vitrio : produit et pages sont déjà enregistrés, un échec ici ne crée pas de doublon.
     await step("theme");
     const plan = store.plan as StorePlan;
-    const themeId = await installTheme(conn.shop, conn.token, {
-      zipUrl: themeZipUrl(store.id),
+    const install = (withFiles: boolean) => installTheme(conn.shop, conn.token, {
+      zipUrl: themeZipUrl(store.id, { withFiles }),
       name: `Vitrio · ${plan.brand.name}`,
       publish: Boolean((job.input as { publishTheme?: boolean } | null)?.publishTheme),
       previousThemeId: ids.themeId,
+    });
+    // Si Shopify refuse le thème à cause d'un visuel, on réessaie sans les visuels de scène.
+    const themeId = await install(true).catch((e) => {
+      if (!Object.keys(ids.files ?? {}).length) throw e;
+      console.warn("Thème refusé avec les visuels, nouvel essai sans :", errorMessage(e));
+      return install(false);
     });
     await db().from("stores").update({ shopify: { ...ids, themeId } }).eq("id", store.id);
     await finish(job.id, steps);
