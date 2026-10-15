@@ -1,11 +1,13 @@
 import "server-only";
-import { createCipheriv, createDecipheriv, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { env } from "./env";
 
+// Clé AES de 32 octets : ENCRYPTION_KEY en base64 (32 octets), sinon dérivée par SHA-256
+// (accepte donc aussi un code hexadécimal ou un texte quelconque, comme celui de generate-secret.vercel.app).
 function key() {
-  const k = Buffer.from(env.encryptionKey(), "base64");
-  if (k.length !== 32) throw new Error("ENCRYPTION_KEY doit faire 32 octets encodés en base64.");
-  return k;
+  const raw = env.encryptionKey().trim();
+  const k = Buffer.from(raw, "base64");
+  return k.length === 32 ? k : createHash("sha256").update(raw).digest();
 }
 
 // AES-256-GCM : iv.tag.contenu, en base64.
