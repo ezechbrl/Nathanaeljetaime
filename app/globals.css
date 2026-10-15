@@ -103,3 +103,9 @@
 
 .anim { animation-play-state: paused; animation-fill-mode: both; }
 [data-reveal="in"] .anim { animation-play-state: running; }
+@keyframes chip-in { from { opacity: 0; transform: translateY(14px) scale(.6); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes scan { 0% { top: -4rem; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+@keyframes shine { from { left: -50%; } to { left: 130%; } }
+@keyframes ring-out { from { transform: scale(.6); opacity: .9; } to { transform: scale(2.4); opacity: 0; } }
+@keyframes draw-check { from { stroke-dashoffset: 30; } to { stroke-dashoffset: 0; } }

@@ -7,6 +7,7 @@ import * as api from "@/lib/api/client";
 import { usePoll } from "@/lib/api/hooks";
 import type { Job, Store } from "@/lib/api/types";
 import { useApp } from "./AppContext";
+import { LaunchCelebration } from "./LaunchCelebration";
 
 type Ctx = { store: Store; activeJob: Job | null; setStore: (s: Store) => void; reload: () => Promise<void>; trackJob: (job: Job) => void };
 const StoreCtx = createContext<Ctx | null>(null);
@@ -23,6 +24,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
   const [store, setStoreState] = useState<Store | null>(null);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
 
   const setStore = useCallback((s: Store) => {
     setStoreState(s);
@@ -52,7 +54,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
     setActiveJob(job.status === "queued" || job.status === "running" ? job : null);
     if (job.status === "succeeded" || job.status === "failed") {
       if (job.kind === "publish") toast(job.status === "succeeded" ? "Boutique publiée sur Shopify" : job.error ?? "La publication a échoué.", job.status === "succeeded" ? "ok" : "error");
-      if (job.kind === "generate" && job.status === "succeeded") toast("Ta boutique est prête");
+      if (job.kind === "generate" && job.status === "succeeded") setCelebrate(true);
       reload();
     }
   }, 1500, !!activeJob);
@@ -67,5 +69,10 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
       </div>
     );
   }
-  return <StoreCtx.Provider value={{ store, activeJob, setStore, reload, trackJob: setActiveJob }}>{children}</StoreCtx.Provider>;
+  return (
+    <StoreCtx.Provider value={{ store, activeJob, setStore, reload, trackJob: setActiveJob }}>
+      {children}
+      {celebrate && store.status !== "generating" && <LaunchCelebration store={store} onClose={() => setCelebrate(false)} />}
+    </StoreCtx.Provider>
+  );
 }

@@ -3,6 +3,7 @@
 import { Check, ChevronLeft, ChevronRight, Lightbulb, Monitor, Smartphone, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LightRays } from "@/components/ui/LightRays";
+import { BuildStage } from "./BuildStage";
 import type { Job, JobStepKey, Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
@@ -45,64 +46,10 @@ function useElapsed() {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-const Bar = ({ w, className }: { w: string; className?: string }) => (
-  <span className={cn("block h-2 animate-shimmer rounded bg-[linear-gradient(90deg,rgb(0_0_0/0.06),rgb(0_0_0/0.14),rgb(0_0_0/0.06))] bg-[length:200%_100%]", className)} style={{ width: w }} />
-);
-
-// Aperçu qui se remplit au fil des étapes.
-function BuildPreview({ stage, colors, mobile }: { stage: number; colors: Store["theme"]["colors"]; mobile: boolean }) {
-  const on = (n: number) => stage >= n;
-  const accent = on(1) ? colors.accent : "#c9cfcc";
-  const pop = "animate-[pop-in_.45s_cubic-bezier(.22,1,.36,1)_both]";
-  return (
-    <div className={cn("mx-auto overflow-hidden rounded-[14px] border border-white/10 bg-[#f7f6f2] text-[#1d1d22] shadow-[0_40px_80px_-30px_rgb(0_0_0/0.8)] transition-[max-width] duration-500", mobile ? "max-w-[300px]" : "max-w-[560px]")}>
-      <div className="flex items-center gap-1.5 border-b border-black/5 bg-black/[0.03] px-3 py-2">
-        <span className="h-2 w-2 rounded-full bg-black/15" /><span className="h-2 w-2 rounded-full bg-black/15" /><span className="h-2 w-2 rounded-full bg-black/15" />
-        <span className="ml-3 h-3.5 flex-1 rounded bg-black/[0.05]" />
-      </div>
-      {on(1) ? <div key="ann" className={cn("py-1.5 text-center text-[8px] tracking-wide text-white", pop)} style={{ background: colors.primary }}>Livraison offerte · Retours 30 jours</div> : <div className="h-[22px] bg-black/[0.04]" />}
-      <div className="flex items-center justify-between px-4 py-3">
-        {on(1) ? <span key="logo" className={cn("flex items-center gap-1.5 text-[12px] font-medium", pop)}><span className="h-4 w-4 rounded-full" style={{ background: accent }} /> Ta marque</span> : <Bar w="70px" />}
-        <span className="flex gap-2"><Bar w="26px" /><Bar w="26px" /><Bar w="18px" /></span>
-      </div>
-      <div className={cn("grid gap-4 px-4 pb-5", !mobile && "grid-cols-[1.1fr_1fr] items-center")}>
-        <div className="space-y-2">
-          {on(2) ? (
-            <div key="hero" className={cn("space-y-1.5", pop)}>
-              <p className="overflow-hidden whitespace-nowrap text-[18px] font-semibold leading-tight tracking-tight [animation:type-in_1.6s_steps(28)_both]">Ta promesse, en grand.</p>
-              <p className="text-[9px] text-black/55">Une phrase qui dit pourquoi on doit acheter chez toi.</p>
-            </div>
-          ) : (<><Bar w="85%" className="h-3.5" /><Bar w="60%" className="h-3.5" /><Bar w="70%" /></>)}
-          {on(3) ? (
-            <div key="cta" className={cn("flex items-center gap-2 pt-1", pop)}>
-              <span className="rounded-full px-3 py-1 text-[8px] font-medium text-white" style={{ background: accent }}>Acheter · 29,00 €</span>
-              <span className="text-[8px] text-black/50">★ 4,8</span>
-            </div>
-          ) : <Bar w="90px" className="h-5 rounded-full" />}
-        </div>
-        <div className="relative aspect-square overflow-hidden rounded-lg" style={on(4) ? { background: `linear-gradient(150deg, ${colors.background}, ${accent}66)` } : undefined}>
-          {on(4) ? (
-            <div key="img" className={cn("absolute left-1/2 top-1/2 h-[55%] w-[32%] -translate-x-1/2 -translate-y-1/2 rounded-[18%] shadow-xl", pop)} style={{ background: `linear-gradient(160deg, ${accent}, ${colors.primary})` }} />
-          ) : <span className="absolute inset-0 animate-shimmer bg-[linear-gradient(90deg,rgb(0_0_0/0.05),rgb(0_0_0/0.12),rgb(0_0_0/0.05))] bg-[length:200%_100%]" />}
-        </div>
-      </div>
-      <div className={cn("grid gap-2 border-t border-black/5 px-4 py-4", mobile ? "grid-cols-1" : "grid-cols-3")}>
-        {[0, 1, 2].map((k) => (
-          <div key={k} className="space-y-1.5 rounded-md bg-black/[0.03] p-2">
-            {on(2) ? <span className={cn("block text-[9px] font-medium", pop)} style={{ animationDelay: `${k * 0.15}s` }}>{["Pourquoi nous", "Ce qui change", "Garantie"][k]}</span> : <Bar w="60%" />}
-            <Bar w="90%" /><Bar w="70%" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function GenerationProgress({ store, job }: { store: Store; job: Job | null }) {
   const steps = job?.steps ?? [];
   const progress = job?.progress ?? 3;
   const running = steps.find((s) => s.status === "running") ?? steps.find((s) => s.status === "pending");
-  const stage = Math.max(0, steps.filter((s) => s.status === "done").length);
   const thoughts = (running && THOUGHTS[running.key]) ?? ["L'IA travaille…"];
   const t = useTicker(thoughts.length, 2600, running?.key);
   const [tip, setTip] = useState(0);
@@ -113,7 +60,7 @@ export function GenerationProgress({ store, job }: { store: Store; job: Job | nu
   return (
     <div className="relative min-h-[calc(100dvh-3.5rem)] overflow-hidden px-5 py-12 lg:min-h-dvh lg:py-16">
       <LightRays />
-      <div className="relative mx-auto grid max-w-[1100px] items-center gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+      <div className="relative mx-auto grid max-w-[1100px] items-center gap-12 lg:grid-cols-[0.8fr_1.2fr]">
         <div>
           <p className="flex items-center gap-2 text-sm text-fg-muted">
             <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" /><span className="relative h-2 w-2 rounded-full bg-accent" /></span>
@@ -160,9 +107,9 @@ export function GenerationProgress({ store, job }: { store: Store; job: Job | nu
           <p className="mt-6 text-xs text-fg-faint">Tu peux quitter cette page : la génération continue, on te prévient quand c'est prêt.</p>
         </div>
 
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-fg-muted">Aperçu en direct</p>
+        <div className="order-first lg:order-none">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="flex items-center gap-2 text-sm text-fg-muted"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> Chantier en direct</p>
             <div className="flex rounded-full border border-white/10 p-0.5 text-xs" role="radiogroup" aria-label="Format d'aperçu">
               {[{ v: false, l: "Ordinateur", I: Monitor }, { v: true, l: "Mobile", I: Smartphone }].map(({ v, l, I }) => (
                 <button key={l} type="button" role="radio" aria-checked={mobile === v} onClick={() => setMobile(v)} className={cn("flex items-center gap-1.5 rounded-full px-3 py-1 transition-colors", mobile === v ? "bg-white/10 text-fg" : "text-fg-muted hover:text-fg")}>
@@ -171,7 +118,7 @@ export function GenerationProgress({ store, job }: { store: Store; job: Job | nu
               ))}
             </div>
           </div>
-          <BuildPreview stage={publishing ? 6 : stage} colors={store.theme.colors} mobile={mobile} />
+          <BuildStage store={store} job={job} mobile={mobile} />
         </div>
       </div>
     </div>
