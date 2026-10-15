@@ -24,7 +24,8 @@ async function request<T>(path: string, init: RequestInit & { json?: unknown } =
   const body = (await res.json().catch(() => null)) as T | ApiError | null;
   if (!res.ok) {
     const err = (body as ApiError | null)?.error;
-    throw new ApiClientError(res.status, err?.code ?? "unknown", err?.message ?? "Une erreur est survenue.", err?.field);
+    const fallback = res.status === 504 ? "Le serveur a mis trop de temps à répondre. Réessaie dans un instant." : `Une erreur est survenue (code ${res.status}).`;
+    throw new ApiClientError(res.status, err?.code ?? "unknown", err?.message ?? fallback, err?.field);
   }
   return body as T;
 }

@@ -7,7 +7,7 @@ import { assertAiBudget } from "@/lib/server/budget";
 import { db, must } from "@/lib/server/supabase";
 import type { StorePlan } from "@/lib/store-schema";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 // Applique une recommandation en la rejouant comme une demande dans l'éditeur IA.
 export const POST = route<{ params: Promise<{ id: string }> }>(async (_req, { params }) => {

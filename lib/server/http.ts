@@ -42,7 +42,8 @@ function errorResponse(e: unknown) {
     return NextResponse.json({ error: { code: "not_configured", message: "Ce service n'est pas encore configuré." } }, { status: 503 });
   }
   console.error(e);
-  return NextResponse.json({ error: { code: "internal", message: "Une erreur est survenue." } }, { status: 500 });
+  const hint = e instanceof Error && e.message.startsWith("Supabase") ? " (base de données)" : "";
+  return NextResponse.json({ error: { code: "internal", message: `Une erreur est survenue${hint}. Réessaie ; si ça continue, écris-nous.` } }, { status: 500 });
 }
 
 type Handler<C> = (req: Request, ctx: C) => Promise<Response>;

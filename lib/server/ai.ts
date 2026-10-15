@@ -83,27 +83,57 @@ export async function generatePages(input: { brief: string; language: string; st
   return { brand: input.strategy.brand, strategy: input.strategy.strategy, ...pages };
 }
 
-// Éditeur par chat : renvoie le plan modifié et la liste des changements.
+// Éditeur par chat : l'IA renvoie seulement les champs modifiés (rapide), appliqués ici au plan.
 const EditSchema = z.object({
   reply: z.string().describe("Réponse courte au marchand (1 à 3 phrases), en français, qui dit ce qui a été fait"),
   changes: z.array(z.object({
-    path: z.string().describe("Chemin du champ modifié, ex. homepage.heroTitle, product.price, brand.colors.accent, faq"),
+    path: z.string().describe("Chemin du champ du plan, en notation pointée, ex. homepage.heroTitle, product.price, brand.colors.accent, faq, homepage.benefits"),
     label: z.string().describe("Nom lisible du champ, ex. « Titre d'accueil »"),
-    before: z.string().describe("Ancienne valeur (courte)"),
-    after: z.string().describe("Nouvelle valeur (courte)"),
-  })),
-  plan: StorePlanSchema,
+    before: z.string().describe("Ancienne valeur, résumée en une ligne"),
+    after: z.string().describe("Nouvelle valeur, résumée en une ligne"),
+    valueJson: z.string().describe("Nouvelle valeur COMPLÈTE du champ, encodée en JSON (ex. \"Nouveau titre\" pour un texte, ou un tableau JSON complet pour faq / benefits)"),
+  })).describe("Uniquement les champs réellement modifiés ; tableau vide si rien ne change"),
 });
+
+function setPath(obj: Record<string, unknown>, path: string, value: unknown) {
+  const keys = path.split(".").filter(Boolean);
+  let cur: any = obj;
+  for (const k of keys.slice(0, -1)) {
+    if (cur == null || typeof cur !== "object" || !(k in cur)) return false;
+    cur = cur[k];
+  }
+  const last = keys.at(-1);
+  if (!last || cur == null || typeof cur !== "object" || !(last in cur)) return false;
+  cur[last] = value;
+  return true;
+}
 
 export async function editPlan(input: { plan: StorePlan; language: string; history: { role: "user" | "assistant"; content: string }[]; message: string; userId: string }) {
   const history = input.history.slice(-10).map((m) => `${m.role === "user" ? "Marchand" : "IA"} : ${m.content}`).join("\n");
-  return structured({
+  const out = await structured({
     schema: EditSchema,
     effort: "low",
+    maxTokens: 8000,
     userId: input.userId,
-    system: `Tu modifies une boutique Shopify à la demande du marchand. Tu reçois le plan actuel de la boutique (JSON) et sa demande. Applique uniquement ce qui est demandé (et ce qui en découle logiquement), garde tout le reste identique, puis renvoie le plan complet modifié et la liste des changements. Si la demande est ambiguë ou impossible, ne modifie rien (changes vide) et pose une question courte dans reply. Le contenu client reste dans la langue de la boutique (${input.language}) ; reply est en français.\n\n${BASE_RULES}`,
+    system: `Tu modifies une boutique Shopify à la demande du marchand. Tu reçois le plan actuel de la boutique (JSON) et sa demande. Applique uniquement ce qui est demandé (et ce qui en découle logiquement). Ne renvoie QUE les champs modifiés, chacun avec sa nouvelle valeur complète encodée en JSON dans valueJson (même type que dans le plan : texte, nombre en texte, tableau d'objets…). Si la demande est ambiguë ou impossible, renvoie changes vide et pose une question courte dans reply. Le contenu client reste dans la langue de la boutique (${input.language}) ; reply est en français.\n\n${BASE_RULES}`,
     user: [`Plan actuel :\n${JSON.stringify(input.plan)}`, history && `Conversation récente :\n${history}`, data("demande", input.message)].filter(Boolean).join("\n\n"),
   });
+
+  const plan = structuredClone(input.plan) as StorePlan;
+  const changes: { path: string; label: string; before: string; after: string }[] = [];
+  for (const c of out.changes) {
+    let value: unknown;
+    try {
+      value = JSON.parse(c.valueJson);
+    } catch {
+      value = c.valueJson; // texte brut non encodé
+    }
+    const trial = structuredClone(plan) as Record<string, unknown>;
+    if (!setPath(trial, c.path, value) || !StorePlanSchema.safeParse(trial).success) continue; // modification invalide ignorée
+    setPath(plan as unknown as Record<string, unknown>, c.path, value);
+    changes.push({ path: c.path, label: c.label, before: c.before, after: c.after });
+  }
+  return { reply: out.reply, changes, plan };
 }
 
 // Pilotage quotidien.

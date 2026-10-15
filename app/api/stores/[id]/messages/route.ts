@@ -8,7 +8,7 @@ import { assertAiBudget } from "@/lib/server/budget";
 import { db, must } from "@/lib/server/supabase";
 import type { StorePlan } from "@/lib/store-schema";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 type Ctx = { params: Promise<{ id: string }> };
 
 export const GET = route<Ctx>(async (req, { params }) => {
