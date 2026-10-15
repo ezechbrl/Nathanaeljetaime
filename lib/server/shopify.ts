@@ -162,7 +162,7 @@ async function publishToOnlineStore(shop: string, token: string, productId: stri
   if (!targets.length) throw new Error("Aucun canal de vente trouvé dans la boutique Shopify (vérifie que la Boutique en ligne est installée).");
 }
 
-export async function publish(shop: string, token: string, plan: StorePlan, imageUrls: string[], ids: ShopifyIds, onStep: (key: string) => Promise<void>, theme?: StoreTheme): Promise<ShopifyIds> {
+export async function publish(shop: string, token: string, plan: StorePlan, images: { url: string; alt: string }[], ids: ShopifyIds, onStep: (key: string) => Promise<void>, theme?: StoreTheme): Promise<ShopifyIds> {
   const next: ShopifyIds = { ...ids };
   const productInput = {
     title: plan.product.title,
@@ -178,10 +178,20 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
       { product: { id: next.productId, ...productInput } });
     check(d.productUpdate.userErrors);
     next.productHandle = d.productUpdate.product?.handle ?? next.productHandle;
+    // Photos ajoutées après la première publication (le marchand peut aussi en avoir mis lui-même).
+    const m = await graphql<{ product: { media: { nodes: { alt: string | null }[] } } }>(shop, token, `query ($id: ID!) { product(id: $id) { media(first: 50) { nodes { alt } } } }`, { id: next.productId });
+    const have = new Set(m.product.media.nodes.map((n) => n.alt ?? ""));
+    const missing = m.product.media.nodes.length >= 8 ? [] : images.filter((i) => !have.has(i.alt)).slice(0, 8 - m.product.media.nodes.length);
+    if (missing.length) {
+      const u = await graphql<{ productUpdate: { userErrors: UserError[] } }>(shop, token,
+        `mutation ($product: ProductUpdateInput!, $media: [CreateMediaInput!]) { productUpdate(product: $product, media: $media) { product { id } userErrors { field message } } }`,
+        { product: { id: next.productId }, media: missing.map((i) => ({ originalSource: i.url, mediaContentType: "IMAGE", alt: i.alt })) });
+      check(u.productUpdate.userErrors);
+    }
   } else {
     const d = await graphql<{ productCreate: { product: { id: string; handle: string } | null; userErrors: UserError[] } }>(shop, token,
       `mutation ($product: ProductCreateInput!, $media: [CreateMediaInput!]) { productCreate(product: $product, media: $media) { product { id handle } userErrors { field message } } }`,
-      { product: { ...productInput, status: "ACTIVE" }, media: imageUrls.slice(0, 6).map((u) => ({ originalSource: u, mediaContentType: "IMAGE", alt: plan.product.title })) });
+      { product: { ...productInput, status: "ACTIVE" }, media: images.slice(0, 8).map((i) => ({ originalSource: i.url, mediaContentType: "IMAGE", alt: i.alt })) });
     check(d.productCreate.userErrors);
     next.productId = d.productCreate.product!.id;
     next.productHandle = d.productCreate.product!.handle;

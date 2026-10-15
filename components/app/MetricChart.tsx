@@ -51,11 +51,11 @@ export function MetricChart({ series, metric, format, label }: { series: Metrics
         ))}
         <path d={area} fill="rgb(94 211 140 / 0.1)" />
         <path d={line} fill="none" stroke="rgb(94 211 140)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-        <circle cx={last.x} cy={last.y} r="4.5" fill="rgb(94 211 140)" stroke="#0a1f17" strokeWidth="2" />
+        <circle cx={last.x} cy={last.y} r="4.5" fill="rgb(94 211 140)" stroke="#0f2e29" strokeWidth="2" />
         {h && (
           <g>
             <line x1={h.x} x2={h.x} y1={P.t} y2={H - P.b} stroke="rgb(255 255 255 / 0.25)" strokeWidth="1" />
-            <circle cx={h.x} cy={h.y} r="5" fill="rgb(94 211 140)" stroke="#0a1f17" strokeWidth="2" />
+            <circle cx={h.x} cy={h.y} r="5" fill="rgb(94 211 140)" stroke="#0f2e29" strokeWidth="2" />
           </g>
         )}
       </svg>

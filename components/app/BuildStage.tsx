@@ -76,7 +76,7 @@ function Layer({ built, depth, label, className, children, delay = 0 }: { built:
       }}
     >
       <div className={cn("transition-opacity duration-700", built ? "opacity-100" : "opacity-0")}>{children}</div>
-      <div aria-hidden className={cn("absolute inset-0 rounded-md border border-dashed border-[#5ed38c]/70 bg-[#0b2a1d]/85 transition-opacity duration-500 [background-image:linear-gradient(rgb(94_211_140/.12)_1px,transparent_1px),linear-gradient(90deg,rgb(94_211_140/.12)_1px,transparent_1px)] [background-size:12px_12px]", built ? "opacity-0" : "opacity-100")}>
+      <div aria-hidden className={cn("absolute inset-0 rounded-md border border-dashed border-[#5ed38c]/70 bg-[#103a32]/85 transition-opacity duration-500 [background-image:linear-gradient(rgb(94_211_140/.12)_1px,transparent_1px),linear-gradient(90deg,rgb(94_211_140/.12)_1px,transparent_1px)] [background-size:12px_12px]", built ? "opacity-0" : "opacity-100")}>
         <span className="absolute left-2 top-1.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[#5ed38c]">{label}</span>
       </div>
     </div>
@@ -88,7 +88,7 @@ function Chip({ show, className, children, delay = 0 }: { show: boolean; classNa
   if (!show) return null;
   return (
     <div className={cn("absolute z-20 [animation:chip-in_.7s_cubic-bezier(.34,1.56,.64,1)_both]", className)} style={{ animationDelay: `${delay}ms` }}>
-      <div className="flex items-center gap-2 rounded-full border border-white/15 bg-[#0d2419]/90 px-3 py-1.5 text-[11px] text-fg shadow-[0_12px_30px_-10px_rgb(0_0_0/.8)] backdrop-blur [animation:float_5s_ease-in-out_infinite]" style={{ animationDelay: `${delay}ms` }}>
+      <div className="flex items-center gap-2 rounded-full border border-white/15 bg-[#123a33]/90 px-3 py-1.5 text-[11px] text-fg shadow-[0_12px_30px_-10px_rgb(0_0_0/.8)] backdrop-blur [animation:float_5s_ease-in-out_infinite]" style={{ animationDelay: `${delay}ms` }}>
         {children}
       </div>
     </div>
@@ -184,7 +184,7 @@ export function BuildStage({ store, job, mobile }: { store: Store; job: Job | nu
       </div>
 
       <Chip show={brand || running === "brand"} className="left-[2%] top-[10%] sm:left-[4%]">
-        {brand ? <span className="flex -space-x-1">{[colors.primary, colors.accent, colors.background].map((c) => <span key={c} className="h-3.5 w-3.5 rounded-full ring-2 ring-[#0d2419]" style={{ background: c }} />)}</span> : <span className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-r-transparent" />}
+        {brand ? <span className="flex -space-x-1">{[colors.primary, colors.accent, colors.background].map((c) => <span key={c} className="h-3.5 w-3.5 rounded-full ring-2 ring-[#123a33]" style={{ background: c }} />)}</span> : <span className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-r-transparent" />}
         {brand ? "Palette choisie" : "Palette…"}
       </Chip>
       <Chip show={brand} className="right-[3%] top-[16%] sm:right-[6%]" delay={300}>
@@ -200,7 +200,7 @@ export function BuildStage({ store, job, mobile }: { store: Store; job: Job | nu
         <ImageIcon className="h-3.5 w-3.5 text-accent" /> {done("images") ? "Visuels prêts" : "Visuels…"}
       </Chip>
       <Chip show={finished} className="bottom-[6%] left-[12%]" delay={500}>
-        <span className="grid h-4 w-4 place-items-center rounded-full bg-accent text-[#06180f]"><Check className="h-3 w-3" /></span> {publishing ? "Envoi à Shopify…" : "Thème appliqué"}
+        <span className="grid h-4 w-4 place-items-center rounded-full bg-accent text-[#0c2b26]"><Check className="h-3 w-3" /></span> {publishing ? "Envoi à Shopify…" : "Thème appliqué"}
       </Chip>
     </div>
   );

@@ -120,7 +120,7 @@ export function CreateStore() {
   return (
     <div className="mx-auto w-full max-w-[720px]">
       <form onSubmit={submit} className="rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
-        <div className="rounded-[13px] bg-[linear-gradient(180deg,#0a2a1e,#06180f)]">
+        <div className="rounded-[13px] bg-[linear-gradient(180deg,#123d35,#0c2b26)]">
           {mode === "link" && (
             <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
               <Link2 className="h-4 w-4 shrink-0 text-accent" />
@@ -154,7 +154,7 @@ export function CreateStore() {
                 </>
               )}
             </div>
-            <button type="submit" disabled={loading} className="inline-flex h-9 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#00a676,#007a5a)] px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_6px_20px_-6px_rgb(0_166_118/0.6)] disabled:opacity-60">
+            <button type="submit" disabled={loading} className="inline-flex h-9 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_6px_20px_-6px_rgb(0_166_118/0.6)] disabled:opacity-60">
               {loading ? <Spinner /> : <Sparkles className="h-4 w-4" />} Générer
             </button>
           </div>

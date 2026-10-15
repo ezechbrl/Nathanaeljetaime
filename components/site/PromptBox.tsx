@@ -50,7 +50,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
   return (
     <div className={cn("w-full max-w-2xl", align === "center" && "mx-auto", className)}>
       <form onSubmit={submit} className="group relative rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
-        <div className="rounded-[13px] bg-[linear-gradient(180deg,#0a2a1e,#06180f)] shadow-[0_30px_80px_-30px_rgb(0_128_96/0.55)]">
+        <div className="rounded-[13px] bg-[linear-gradient(180deg,#123d35,#0c2b26)] shadow-[0_30px_80px_-30px_rgb(0_128_96/0.55)]">
           <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
           <textarea
             id={inputId}
@@ -65,7 +65,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             <button type="button" aria-label="Ajouter une image" className="grid h-8 w-8 place-items-center rounded-ctl text-fg-faint transition-colors hover:bg-white/5 hover:text-fg">
               <Plus className="h-4 w-4" />
             </button>
-            <button type="submit" className="inline-flex h-9 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#00a676,#007a5a)] px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_6px_20px_-6px_rgb(0_166_118/0.6)] transition-shadow hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_28px_-6px_rgb(0_166_118/0.8)]">
+            <button type="submit" className="inline-flex h-9 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_6px_20px_-6px_rgb(0_166_118/0.6)] transition-shadow hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_28px_-6px_rgb(0_166_118/0.8)]">
               <Sparkles className="h-4 w-4" /> Générer
             </button>
           </div>

@@ -7,6 +7,7 @@ import { Button, Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { ApiClientError } from "@/lib/api/errors";
+import { PUBLISH_LIVE_KEY } from "./PublishShow";
 import { useStore } from "./StoreContext";
 
 export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
@@ -30,6 +31,7 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
 
   async function publish(publishTheme: boolean) {
     setLoading(true);
+    try { sessionStorage.setItem(`${PUBLISH_LIVE_KEY}-${store.id}`, publishTheme ? "1" : "0"); } catch { /* stockage indisponible */ }
     try {
       const { job } = await api.publishStore(store.id, publishTheme);
       setStore({ ...store, status: "publishing" });
@@ -47,7 +49,7 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
   return (
     <div className="relative">
       <Button size={size} onClick={() => setConfirm((c) => !c)} disabled={!!activeJob}>
-        <Upload className="h-4 w-4" /> {store.status === "published" ? "Republier" : "Publier sur Shopify"}
+        <Upload className="h-4 w-4" /> {store.status === "published" ? "Mettre à jour sur Shopify" : "Publier sur Shopify"}
       </Button>
       {confirm && (
         <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-card border border-white/10 bg-bg-2 p-4 text-sm shadow-2xl">

@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import type { Store } from "@/lib/api/types";
 
 // Explosion de confettis aux couleurs de la marque.
-function Confetti({ colors }: { colors: string[] }) {
+export function Confetti({ colors }: { colors: string[] }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -56,13 +56,13 @@ export function LaunchCelebration({ store, onClose }: { store: Store; onClose: (
   }, [onClose]);
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Ta boutique est prête" onClick={onClose} className="fixed inset-0 z-50 grid place-items-center bg-[#020a06]/80 p-5 backdrop-blur-md [animation:fade-in_.4s_ease-out]">
+    <div role="dialog" aria-modal="true" aria-label="Ta boutique est prête" onClick={onClose} className="fixed inset-0 z-50 grid place-items-center bg-[#061815]/80 p-5 backdrop-blur-md [animation:fade-in_.4s_ease-out]">
       <Confetti colors={[c.accent, c.primary, "#5ed38c", "#ffffff", "#f5c451"]} />
       <div onClick={(e) => e.stopPropagation()} className="relative w-full max-w-[460px] text-center [animation:rise_.6s_.15s_cubic-bezier(.2,.8,.2,1)_both]">
         <div className="relative mx-auto grid h-24 w-24 place-items-center">
           <span className="absolute inset-0 rounded-full border-2 border-accent [animation:ring-out_1.6s_.3s_ease-out_infinite]" />
           <span className="absolute inset-0 rounded-full border-2 border-accent [animation:ring-out_1.6s_.9s_ease-out_infinite]" />
-          <span className="grid h-20 w-20 place-items-center rounded-full bg-[linear-gradient(160deg,#00a676,#007a5a)] shadow-[0_0_60px_rgb(0_166_118/.6)] [animation:pop-in_.5s_.2s_cubic-bezier(.34,1.56,.64,1)_both]">
+          <span className="grid h-20 w-20 place-items-center rounded-full bg-[linear-gradient(160deg,#10b07f,#00876a)] shadow-[0_0_60px_rgb(0_166_118/.6)] [animation:pop-in_.5s_.2s_cubic-bezier(.34,1.56,.64,1)_both]">
             <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="white" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" strokeDasharray={30} className="[animation:draw-check_.5s_.6s_ease-out_both]" /></svg>
           </span>
         </div>
@@ -70,7 +70,7 @@ export function LaunchCelebration({ store, onClose }: { store: Store; onClose: (
         <h2 className="mt-2 text-h2">Ta boutique <span className="serif-accent">{store.name}</span> est née</h2>
         <p className="mx-auto mt-3 max-w-sm text-fg-muted">Textes, fiche produit, pages et couleurs : tout est en place. Jette un œil, ajuste ce que tu veux, puis publie sur Shopify.</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#00a676,#007a5a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(0_166_118/0.7)]">
+          <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(0_166_118/0.7)]">
             Découvrir ma boutique <ArrowRight className="h-4 w-4" />
           </button>
           <Link href={`/app/boutiques/${store.id}/editeur`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">

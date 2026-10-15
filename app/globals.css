@@ -4,19 +4,19 @@
 
 :root {
   color-scheme: dark;
-  /* Vert profond inspiré de Shopify : fond sombre, accents vert vif et vert feuille. */
-  --bg: 7 27 20;            /* #071b14 */
-  --bg-2: 10 36 27;         /* #0a241b */
-  --bg-3: 15 48 36;         /* #0f3024 */
-  --fg: 236 245 240;
-  --fg-muted: 160 190 175;
-  --fg-faint: 108 138 123;
+  /* Vert émeraude frais (plus clair et plus bleuté) : fond profond, accents menthe. */
+  --bg: 15 49 44;           /* #0f312c */
+  --bg-2: 19 59 53;         /* #133b35 */
+  --bg-3: 26 72 64;         /* #1a4840 */
+  --fg: 238 248 245;
+  --fg-muted: 172 208 199;
+  --fg-faint: 124 164 154;
   --line: 255 255 255;      /* utilisé avec une opacité faible */
-  --accent: 94 211 140;     /* #5ed38c, lisible sur fond sombre */
-  --accent-strong: 0 128 96;/* #008060, vert Shopify des boutons */
-  --accent-deep: 0 77 58;   /* #004d3a, fonds teintés */
-  --accent-soft: 8 46 34;   /* #082e22 */
-  --brand-leaf: 149 191 71; /* #95bf47, vert du logo Shopify */
+  --accent: 104 230 176;    /* #68e6b0, menthe lisible sur fond sombre */
+  --accent-strong: 0 150 110;/* #00966e, boutons */
+  --accent-deep: 8 96 74;   /* #08604a, fonds teintés */
+  --accent-soft: 14 62 52;  /* #0e3e34 */
+  --brand-leaf: 140 232 200;/* #8ce8c8, touches claires */
   --ink: 2 12 8;
   --good: 94 211 140;
   --warn: 245 190 70;
@@ -109,3 +109,4 @@
 @keyframes shine { from { left: -50%; } to { left: 130%; } }
 @keyframes ring-out { from { transform: scale(.6); opacity: .9; } to { transform: scale(2.4); opacity: 0; } }
 @keyframes draw-check { from { stroke-dashoffset: 30; } to { stroke-dashoffset: 0; } }
+@keyframes travel { 0% { offset-distance: 0%; opacity: 0; transform: scale(.6); } 12% { opacity: 1; transform: none; } 88% { opacity: 1; transform: none; } 100% { offset-distance: 100%; opacity: 0; transform: scale(.6); } }

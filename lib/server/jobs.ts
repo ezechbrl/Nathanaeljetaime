@@ -74,20 +74,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     await step("product");
 
     await step("images");
-    if (env.falKey()) {
-      for (const [kind, ratio, prompt] of [
-        ["product", "1:1", `Studio product photo of ${plan.product.title}, ${plan.product.subtitle}, clean background in ${plan.brand.colors.background}, soft light, e-commerce packshot, no text`],
-        ["banner", "16:9", `Lifestyle hero photo for the brand ${plan.brand.name}: ${plan.strategy.promise}. Mood: ${plan.brand.tone}. Color palette ${plan.brand.colors.accent} and ${plan.brand.colors.background}, no text`],
-      ] as const) {
-        try {
-          const img = await generateImage(prompt, ratio as AspectRatio);
-          const saved = await storeImage(store.id, img.bytes, img.contentType);
-          await db().from("assets").insert({ store_id: store.id, kind, storage_path: saved.path, url: saved.url, width: img.width, height: img.height, prompt });
-        } catch (e) {
-          console.warn("Image non générée :", errorMessage(e)); // la boutique reste utilisable sans visuel
-        }
-      }
-    }
+    await generateStoreImages(store.id, plan);
 
     await step("theme");
     const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" };
@@ -102,14 +89,54 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
   }
 }
 
+// Visuels de départ (packshot, détail, en situation, ambiance) : illustrations IA que le marchand
+// remplacera idéalement par ses vraies photos. Sans FAL_KEY, la boutique reste utilisable sans visuel.
+export async function generateStoreImages(storeId: string, plan: StorePlan) {
+  if (!env.falKey()) return;
+  const c = plan.brand.colors;
+  const subject = `${plan.product.title} (${plan.product.subtitle})`;
+  const shots: [string, AspectRatio, string][] = [
+    ["product", "1:1", `Professional e-commerce studio packshot of ${subject}. Product centered, full view, on a seamless backdrop in ${c.background}, soft diffused light, subtle shadow, photorealistic, sharp focus, high-end catalog photography, no text, no logo`],
+    ["product", "1:1", `Macro close-up photo showing the materials and finish of ${subject}. Shallow depth of field, natural light, photorealistic, premium catalog detail shot, no text, no logo`],
+    ["lifestyle", "4:5", `Lifestyle photo of ${subject} being used in everyday life by the target customer (${plan.strategy.market}). Natural setting, warm natural light, candid, editorial magazine style, photorealistic, color accents ${c.accent}, no text, no logo`],
+    ["banner", "16:9", `Wide editorial hero photograph for the brand ${plan.brand.name}: ${plan.strategy.promise}. Featuring ${subject} in a beautiful styled scene, mood: ${plan.brand.tone}. Palette ${c.background} and ${c.accent}, soft light, lots of negative space, photorealistic, no text, no logo`],
+  ];
+  await Promise.all(shots.map(async ([kind, ratio, prompt]) => {
+    try {
+      const img = await generateImage(prompt, ratio);
+      const saved = await storeImage(storeId, img.bytes, img.contentType);
+      await db().from("assets").insert({ store_id: storeId, kind, storage_path: saved.path, url: saved.url, width: img.width, height: img.height, prompt });
+    } catch (e) {
+      console.warn("Image non générée :", errorMessage(e));
+    }
+  }));
+}
+
 export async function runPublish(job: Record<string, any>, store: StoreRow) {
   const steps: Step[] = job.steps;
   const step = tracker(job.id, steps);
   const previousStatus = store.shopify && (store.shopify as ShopifyIds).productId ? "published" : "ready";
   try {
     const conn = await connectionFor(store.user_id, store.shop_connection_id);
-    const assets = must(await db().from("assets").select("url, kind").eq("store_id", store.id).order("created_at")) as { url: string; kind: string }[];
-    const images = assets.filter((a) => a.kind === "product" || a.kind === "upload" || a.kind === "lifestyle").map((a) => a.url);
+    const listAssets = async () => must(await db().from("assets").select("url, kind").eq("store_id", store.id).order("created_at")) as { url: string; kind: string }[];
+    let assets = await listAssets();
+    // Boutique créée avant l'activation des visuels : on les génère maintenant.
+    if (!assets.length && env.falKey()) {
+      await step("product");
+      await generateStoreImages(store.id, store.plan as StorePlan);
+      assets = await listAssets();
+    }
+    const title = (store.plan as StorePlan).product.title;
+    const brand = (store.plan as StorePlan).brand.name;
+    const rank = { upload: 0, product: 1, lifestyle: 2, banner: 3 } as Record<string, number>;
+    let productShots = 0;
+    const images = assets
+      .filter((a) => a.kind in rank)
+      .sort((a, b) => rank[a.kind] - rank[b.kind])
+      .map((a) => ({
+        url: a.url,
+        alt: a.kind === "banner" ? `${brand} — ambiance` : a.kind === "lifestyle" ? `${title} — en situation` : a.kind === "product" && productShots++ > 0 ? `${title} — détail` : title,
+      }));
     const ids = await publish(conn.shop, conn.token, store.plan as StorePlan, images, store.shopify as ShopifyIds, step, store.theme as StoreTheme | undefined);
     const liveUrl = `https://${conn.shop}`;
     await db().from("stores").update({ shopify: ids, status: "published", live_url: liveUrl, shop_connection_id: conn.id, updated_at: new Date().toISOString() }).eq("id", store.id);

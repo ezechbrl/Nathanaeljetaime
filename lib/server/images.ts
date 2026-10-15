@@ -12,7 +12,7 @@ export async function generateImage(prompt: string, ratio: AspectRatio) {
   const key = env.falKey();
   if (!key) throw new HttpError(503, "not_configured", "La génération d'images n'est pas encore activée (FAL_KEY manquante).");
   const size = SIZES[ratio];
-  const res = await fetch("https://fal.run/fal-ai/flux/schnell", {
+  const res = await fetch(`https://fal.run/${process.env.FAL_MODEL ?? "fal-ai/flux/dev"}`, {
     method: "POST",
     headers: { authorization: `Key ${key}`, "content-type": "application/json" },
     body: JSON.stringify({ prompt, image_size: size, num_images: 1, enable_safety_checker: true }),

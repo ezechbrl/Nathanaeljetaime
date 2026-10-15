@@ -356,11 +356,11 @@ export async function publishStore(id: string) {
   }
   store.status = "publishing";
   const job = newJob(id, "publish", [
-    { key: "theme", label: "Création du thème" },
-    { key: "product", label: "Produits et prix" },
-    { key: "pages", label: "Pages et menus" },
-    { key: "publish", label: "Mise en ligne" },
-  ], 6_000);
+    { key: "product", label: "Produit, prix et images" },
+    { key: "publish", label: "Mise en vente" },
+    { key: "pages", label: "Pages À propos et FAQ" },
+    { key: "theme", label: "Installation du thème Vitrio" },
+  ], 9_000);
   save();
   return { job: clone(job) as Job };
 }

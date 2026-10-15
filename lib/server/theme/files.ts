@@ -47,6 +47,18 @@ const LAYOUT = `<!doctype html>
   {% section 'header' %}
   <main id="main">{{ content_for_layout }}</main>
   {% section 'footer' %}
+  <div class="drawer-bg" data-drawer-close hidden></div>
+  <aside class="drawer" id="cart-drawer" aria-label="Panier" aria-hidden="true" data-currency="{{ cart.currency.iso_code }}" data-locale="{{ request.locale.iso_code }}" data-free="{{ settings.free_shipping_threshold | times: 100 }}">
+    <div class="drawer__head"><p class="h" style="font-size:24px">Ton panier</p><button type="button" class="icon-btn" data-drawer-close aria-label="Fermer">✕</button></div>
+    <div class="ship" data-ship hidden><p data-ship-text></p><div class="ship__bar"><span data-ship-fill></span></div></div>
+    <div class="drawer__lines" data-lines></div>
+    <div class="drawer__foot">
+      <div class="cart-total"><span>Total</span><span data-total></span></div>
+      <a class="btn btn--block" href="/checkout" data-checkout>Passer commande</a>
+      <p class="muted" style="font-size:13px;text-align:center;margin-top:10px">Paiement sécurisé · Taxes incluses</p>
+    </div>
+  </aside>
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
   <script src="{{ 'vitrio.js' | asset_url }}" defer></script>
 </body>
 </html>
@@ -143,7 +155,7 @@ p{margin:0}
 .buy{margin-top:26px;display:grid;gap:12px}
 .field label{display:block;font-size:13px;margin-bottom:6px;color:var(--c-muted)}
 .field select,.qty input{width:100%;min-height:50px;border:1.5px solid var(--c-line);border-radius:14px;background:transparent;color:inherit;font:inherit;padding:0 14px}
-.buy__row{display:grid;grid-template-columns:120px 1fr;gap:12px}
+.buy__row{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
 .qty{display:flex}
 .shopify-payment-button__button{border-radius:999px!important;min-height:52px!important}
 .reassure{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
@@ -193,10 +205,147 @@ p{margin:0}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
 .reveal.is-in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.visual__blob,.visual__card{animation:none}}
+/* tiroir panier */
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:80;opacity:0;transition:opacity .3s}
+.drawer-bg.is-open{opacity:1}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--c-bg);z-index:90;display:flex;flex-direction:column;transform:translateX(100%);visibility:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),visibility 0s .45s}
+.drawer.is-open{transform:none;visibility:visible;transition:transform .45s cubic-bezier(.2,.8,.2,1);box-shadow:-30px 0 60px -30px rgba(0,0,0,.4)}
+.drawer__head{display:flex;justify-content:space-between;align-items:center;padding:22px 24px;border-bottom:1px solid var(--c-line)}
+.drawer__lines{flex:1;overflow:auto;padding:4px 24px}
+.drawer__foot{padding:18px 24px 24px;border-top:1px solid var(--c-line)}
+.drawer__foot .cart-total{margin:0 0 14px}
+.line{display:grid;grid-template-columns:76px 1fr auto;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--c-line);animation:line-in .4s ease both}
+.line img,.line__ph{width:76px;height:76px;border-radius:14px;object-fit:cover;background:var(--c-accent-soft)}
+.line__t{font-weight:600;font-size:15px;line-height:1.3}
+.icon-btn{background:none;border:0;color:inherit;font-size:18px;cursor:pointer;padding:6px;border-radius:10px}
+.icon-btn:hover{background:var(--c-soft)}
+.ship{margin:16px 24px 4px;padding:14px;border-radius:16px;background:var(--c-accent-soft);font-size:14px}
+.ship__bar{height:8px;border-radius:99px;background:var(--c-line);margin-top:10px;overflow:hidden}
+.ship__bar span{display:block;height:100%;width:0;background:var(--c-accent);border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes line-in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+/* sélecteur de quantité */
+.stepper{display:inline-flex;align-items:center;border:1.5px solid var(--c-line);border-radius:999px;overflow:hidden}
+.stepper button{width:40px;height:40px;border:0;background:none;color:inherit;font-size:18px;cursor:pointer}
+.stepper button:hover{background:var(--c-soft)}
+.stepper input{width:36px;border:0;background:none;text-align:center;font:inherit;color:inherit;-moz-appearance:textfield}
+.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+.stepper--lg button{width:48px;height:50px}
+/* toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;background:var(--c-primary);color:var(--c-bg);padding:12px 20px;border-radius:999px;font-size:14px;z-index:95;transition:all .35s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+/* barre d'achat collante */
+.sticky-atc{position:fixed;left:0;right:0;bottom:0;z-index:60;background:color-mix(in srgb,var(--c-bg) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--c-line);transform:translateY(110%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.sticky-atc.is-on{transform:none}
+.sticky-atc__in{display:flex;align-items:center;gap:14px;padding:12px 0}
+.sticky-atc img,.sticky-atc .line__ph{width:48px;height:48px;border-radius:10px;object-fit:cover}
+.sticky-atc__t{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:600px){.sticky-atc img,.sticky-atc .line__ph{display:none}.sticky-atc .btn{padding:0 18px}}
+/* défilement d'arguments */
+.marquee{overflow:hidden;background:var(--c-accent);color:var(--c-on-accent);padding:16px 0;white-space:nowrap}
+.marquee__track{display:inline-flex;gap:48px;padding-right:48px;animation:marquee var(--speed,30s) linear infinite}
+.marquee:hover .marquee__track{animation-play-state:paused}
+.marquee span{font-family:var(--f-heading);font-size:22px;display:inline-flex;align-items:center;gap:48px}
+.marquee span::after{content:"✦";font-size:14px;opacity:.7}
+@keyframes marquee{to{transform:translateX(-100%)}}
+/* image + texte */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.split--rev .split__img{order:2}
+.split__img{border-radius:28px;overflow:hidden;aspect-ratio:4/5;background:linear-gradient(150deg,var(--c-soft),var(--c-accent-soft));position:relative}
+.split__img img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.split:hover .split__img img{transform:scale(1.04)}
+.split h2{font-size:clamp(30px,3.6vw,46px);margin-top:10px}
+.split p.muted{margin-top:18px;font-size:17px}
+@media (max-width:900px){.split{grid-template-columns:1fr;gap:28px}.split--rev .split__img{order:0}}
+/* réassurance avec icônes */
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.trust__i{display:flex;gap:14px;align-items:flex-start;padding:22px;border-radius:20px;border:1px solid var(--c-line);transition:transform .3s,border-color .3s}
+.trust__i:hover{transform:translateY(-4px);border-color:var(--c-accent)}
+.trust__i svg{flex:none;width:28px;height:28px;color:var(--c-accent)}
+.trust__i strong{display:block;font-size:15px}
+.trust__i span{font-size:14px}
+@media (max-width:900px){.trust{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.trust{grid-template-columns:1fr}}
+/* onglets produit */
+.tabs{margin-top:28px;border-top:1px solid var(--c-line)}
+.tabs details{border-bottom:1px solid var(--c-line)}
+.tabs summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;padding:18px 0;font-weight:600}
+.tabs summary::-webkit-details-marker{display:none}
+.tabs summary::after{content:"+";color:var(--c-accent);font-size:22px;line-height:1;transition:transform .25s}
+.tabs details[open] summary::after{transform:rotate(45deg)}
+.tabs .rte{margin:0;padding:0 0 18px;border:0}
+/* zoom galerie */
+.gallery__main{position:relative;cursor:zoom-in}
+.gallery__main img{transition:transform .25s ease}
+.gallery__main.is-zoom img{transform:scale(1.8)}
+@media (max-width:900px){.gallery__thumbs{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.gallery__thumbs button{flex:0 0 22%;scroll-snap-align:start}}
+/* lettre d'info */
+.news{text-align:center;max-width:620px;margin:0 auto}
+.news h2{font-size:clamp(28px,3.2vw,40px)}
+.news form{display:flex;gap:10px;margin-top:24px}
+.news input{flex:1;min-height:52px;border:1.5px solid var(--c-line);border-radius:999px;background:var(--c-bg);color:inherit;font:inherit;padding:0 20px}
+@media (max-width:520px){.news form{flex-direction:column}}
 .form input[type=email],.form input[type=password],.form input[type=text]{width:100%;min-height:50px;border:1.5px solid var(--c-line);border-radius:14px;background:transparent;color:inherit;font:inherit;padding:0 14px;margin-bottom:12px}
 `;
 
 const JS = `(function(){
+  var drawer = document.getElementById('cart-drawer'), bg = document.querySelector('.drawer-bg'), toastEl = document.querySelector('[data-toast]');
+  var cur = drawer ? drawer.dataset.currency : 'EUR', loc = drawer ? drawer.dataset.locale : 'fr', free = drawer ? Number(drawer.dataset.free || 0) : 0;
+  function money(c){ try { return (c/100).toLocaleString(loc, { style: 'currency', currency: cur }); } catch(e) { return (c/100).toFixed(2) + ' ' + cur; } }
+  function toast(t){ if(!toastEl) return; toastEl.textContent = t; toastEl.classList.add('is-on'); clearTimeout(toast._t); toast._t = setTimeout(function(){ toastEl.classList.remove('is-on') }, 2200); }
+  function esc(s){ var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function render(cart){
+    document.querySelectorAll('.cart-count').forEach(function(el){ el.textContent = cart.item_count; el.animate && el.animate([{transform:'scale(1.5)'},{transform:'scale(1)'}],{duration:400,easing:'cubic-bezier(.34,1.56,.64,1)'}) });
+    if (!drawer) return;
+    var lines = drawer.querySelector('[data-lines]');
+    lines.innerHTML = cart.items.length ? cart.items.map(function(i, n){
+      return '<div class="line" style="animation-delay:' + (n*60) + 'ms">' + (i.image ? '<img src="' + i.image + '&width=160" alt="" width="76" height="76">' : '<span class="line__ph"></span>') +
+        '<div><p class="line__t">' + esc(i.product_title) + '</p>' + (i.variant_title ? '<p class="muted" style="font-size:13px">' + esc(i.variant_title) + '</p>' : '') +
+        '<div class="stepper" style="margin-top:8px"><button type="button" data-change="' + i.key + '" data-q="' + (i.quantity - 1) + '" aria-label="Retirer">−</button><input value="' + i.quantity + '" readonly aria-label="Quantité"><button type="button" data-change="' + i.key + '" data-q="' + (i.quantity + 1) + '" aria-label="Ajouter">+</button></div></div>' +
+        '<strong>' + money(i.final_line_price) + '</strong></div>';
+    }).join('') : '<p class="muted" style="padding:32px 0;text-align:center">Ton panier est vide.</p>';
+    drawer.querySelector('[data-total]').textContent = money(cart.total_price);
+    var ship = drawer.querySelector('[data-ship]');
+    if (free > 0 && cart.item_count > 0) {
+      ship.hidden = false;
+      var left = free - cart.total_price;
+      drawer.querySelector('[data-ship-text]').innerHTML = left > 0 ? 'Plus que <strong>' + money(left) + '</strong> pour la livraison offerte' : '🎉 Livraison offerte débloquée !';
+      requestAnimationFrame(function(){ drawer.querySelector('[data-ship-fill]').style.width = Math.min(100, cart.total_price / free * 100) + '%'; });
+    } else ship.hidden = true;
+  }
+  function refresh(){ return fetch('/cart.js').then(function(r){ return r.json() }).then(render); }
+  function open(){ if(!drawer) return; refresh(); bg.hidden = false; requestAnimationFrame(function(){ bg.classList.add('is-open'); drawer.classList.add('is-open'); drawer.setAttribute('aria-hidden','false'); }); document.body.style.overflow = 'hidden'; }
+  function close(){ if(!drawer) return; bg.classList.remove('is-open'); drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden','true'); document.body.style.overflow = ''; setTimeout(function(){ bg.hidden = true }, 300); }
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-drawer-close]'); if (t) { close(); return; }
+    var c = e.target.closest('.cart-link'); if (c && drawer) { e.preventDefault(); open(); return; }
+    var ch = e.target.closest('[data-change]');
+    if (ch) { fetch('/cart/change.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: ch.dataset.change, quantity: Math.max(0, Number(ch.dataset.q)) }) }).then(function(r){ return r.json() }).then(render); return; }
+    var st = e.target.closest('[data-step]');
+    if (st) { var inp = st.parentNode.querySelector('input'); inp.value = Math.max(1, Number(inp.value || 1) + Number(st.dataset.step)); return; }
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
+  document.querySelectorAll('form[action*="/cart/add"]').forEach(function(f){
+    f.addEventListener('submit', function(e){
+      if (!drawer) return; e.preventDefault();
+      var btn = f.querySelector('[data-add]'); if (btn) { btn.disabled = true; btn.dataset.prev = btn.textContent; btn.textContent = 'Ajout…'; }
+      fetch('/cart/add.js', { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(f) })
+        .then(function(r){ if (!r.ok) throw r; return r.json(); })
+        .then(function(){ toast('Ajouté au panier ✓'); open(); })
+        .catch(function(){ toast('Ce produit est indisponible pour le moment.'); })
+        .finally(function(){ if (btn) { btn.disabled = false; btn.textContent = btn.dataset.prev; } });
+    });
+  });
+  var main = document.querySelector('[data-main-add]'), bar = document.querySelector('.sticky-atc');
+  if (main && bar && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function(es){ bar.classList.toggle('is-on', !es[0].isIntersecting && es[0].boundingClientRect.top < 0) }).observe(main);
+    bar.querySelector('button').addEventListener('click', function(){ var f = main.closest('form'); f.requestSubmit ? f.requestSubmit() : f.submit(); });
+  }
+  document.querySelectorAll('.gallery__main').forEach(function(g){
+    var img = g.querySelector('img'); if (!img || matchMedia('(hover: none)').matches) return;
+    g.addEventListener('mousemove', function(e){ var r = g.getBoundingClientRect(); img.style.transformOrigin = ((e.clientX - r.left) / r.width * 100) + '% ' + ((e.clientY - r.top) / r.height * 100) + '%'; });
+    g.addEventListener('mouseenter', function(){ g.classList.add('is-zoom') });
+    g.addEventListener('mouseleave', function(){ g.classList.remove('is-zoom') });
+  });
   var io = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'}) : null;
   document.querySelectorAll('.reveal').forEach(function(el){io ? io.observe(el) : el.classList.add('is-in')});
   var b = document.querySelector('.burger'), n = document.querySelector('.nav');
@@ -229,8 +378,8 @@ const BUY_FORM = `{%- assign current = product.selected_or_first_available_varia
     <input type="hidden" name="id" value="{{ current.id }}">
   {%- endunless -%}
   <div class="buy__row">
-    <div class="qty field"><input type="number" name="quantity" value="1" min="1" aria-label="Quantité"></div>
-    <button type="submit" class="btn btn--block" data-add data-label="{{ section.settings.add_label | escape }}" data-soldout="Épuisé" {% unless current.available %}disabled{% endunless %}>{% if current.available %}{{ section.settings.add_label }}{% else %}Épuisé{% endif %}</button>
+    <div class="stepper stepper--lg"><button type="button" data-step="-1" aria-label="Moins">−</button><input type="number" name="quantity" value="1" min="1" aria-label="Quantité"><button type="button" data-step="1" aria-label="Plus">+</button></div>
+    <button type="submit" class="btn btn--block" data-add {% if section.settings.sticky %}data-main-add{% endif %} data-label="{{ section.settings.add_label | escape }}" data-soldout="Épuisé" {% unless current.available %}disabled{% endunless %}>{% if current.available %}{{ section.settings.add_label }}{% else %}Épuisé{% endif %}</button>
   </div>
   {{ form | payment_button }}
 {%- endform -%}`;
@@ -322,6 +471,7 @@ ${schema({ name: "Pied de page", settings: [
   ] })}`,
 
   hero: `{%- assign p = all_products[section.settings.product] -%}
+{%- assign ambiance = nil -%}{%- if p -%}{%- for m in p.media -%}{%- if m.alt contains 'ambiance' -%}{%- assign ambiance = m -%}{%- endif -%}{%- endfor -%}{%- endif -%}
 <section class="hero">
   <div class="wrap hero__grid">
     <div class="reveal">
@@ -341,6 +491,8 @@ ${schema({ name: "Pied de page", settings: [
     <div class="visual reveal">
       {%- if section.settings.image -%}
         <img src="{{ section.settings.image | image_url: width: 1400 }}" alt="" width="1400" height="1500" loading="eager">
+      {%- elsif ambiance -%}
+        <img src="{{ ambiance | image_url: width: 1600 }}" alt="{{ ambiance.alt | escape }}" width="1600" height="1700" loading="eager">
       {%- elsif p and p.featured_media -%}
         <img src="{{ p.featured_media | image_url: width: 1400 }}" alt="{{ p.title | escape }}" width="1400" height="1500" loading="eager">
       {%- else -%}
@@ -428,11 +580,70 @@ ${schema({ name: "FAQ", settings: [{ type: "text", id: "eyebrow", label: "Sur-ti
       {%- for block in section.blocks -%}{%- if block.type == 'offer' -%}<div class="offer" {{ block.shopify_attributes }}><span class="tick">★</span>{{ block.settings.text }}</div>{%- endif -%}{%- endfor -%}
       ${BUY_FORM}
       ${REASSURE}
-      <div class="rte">{{ product.description }}</div>
+      <div class="tabs">
+        <details open><summary>Description</summary><div class="rte">{{ product.description }}</div></details>
+        {% if section.settings.shipping != blank %}<details><summary>Livraison et retours</summary><div class="rte">{{ section.settings.shipping }}</div></details>{% endif %}
+      </div>
     </div>
   </div>
 </section>
-${schema({ name: "Fiche produit", settings: [{ type: "text", id: "subtitle", label: "Sous-titre" }, { type: "text", id: "add_label", label: "Bouton", default: "Ajouter au panier" }, ...REASSURE_SETTINGS], blocks: [{ type: "bullet", name: "Point fort", settings: [{ type: "text", id: "text", label: "Texte" }] }, { type: "offer", name: "Offre", settings: [{ type: "text", id: "text", label: "Texte" }] }] })}`,
+{%- if section.settings.sticky -%}
+<div class="sticky-atc" aria-hidden="true">
+  <div class="wrap sticky-atc__in">
+    {% if product.featured_media %}<img src="{{ product.featured_media | image_url: width: 120 }}" alt="" width="48" height="48">{% else %}<span class="line__ph"></span>{% endif %}
+    <div class="sticky-atc__t">{{ product.title }}<div class="muted" style="font-weight:400;font-size:14px">{{ product.selected_or_first_available_variant.price | money }}</div></div>
+    <button type="button" class="btn" tabindex="-1">{{ section.settings.add_label }}</button>
+  </div>
+</div>
+{%- endif -%}
+${schema({ name: "Fiche produit", settings: [{ type: "text", id: "subtitle", label: "Sous-titre" }, { type: "text", id: "add_label", label: "Bouton", default: "Ajouter au panier" }, { type: "checkbox", id: "sticky", label: "Barre d'achat qui suit le défilement", default: true }, { type: "richtext", id: "shipping", label: "Livraison et retours" }, ...REASSURE_SETTINGS], blocks: [{ type: "bullet", name: "Point fort", settings: [{ type: "text", id: "text", label: "Texte" }] }, { type: "offer", name: "Offre", settings: [{ type: "text", id: "text", label: "Texte" }] }] })}`,
+
+  marquee: `<div class="marquee" style="--speed:{{ section.settings.speed }}s" aria-label="Nos engagements">
+  {%- for i in (1..2) -%}<div class="marquee__track" {% if forloop.last %}aria-hidden="true"{% endif %}>{%- for block in section.blocks -%}<span {{ block.shopify_attributes }}>{{ block.settings.text }}</span>{%- endfor -%}{%- for block in section.blocks -%}<span>{{ block.settings.text }}</span>{%- endfor -%}</div>{%- endfor -%}
+</div>
+${schema({ name: "Défilement", settings: [{ type: "range", id: "speed", label: "Durée d'un tour (s)", min: 10, max: 80, step: 5, default: 35 }], blocks: [{ type: "item", name: "Texte", settings: [{ type: "text", id: "text", label: "Texte" }] }], presets: [{ name: "Défilement" }] })}`,
+
+  lifestyle: `{%- assign p = all_products[section.settings.product] -%}
+{%- assign pic = nil -%}{%- if p -%}{%- for m in p.media -%}{%- if m.alt contains section.settings.media_hint -%}{%- assign pic = m -%}{%- endif -%}{%- endfor -%}{%- if pic == nil and p.media.size > 1 -%}{%- assign pic = p.media[1] -%}{%- endif -%}{%- endif -%}
+<section class="section">
+  <div class="wrap split {% if section.settings.reverse %}split--rev{% endif %}">
+    <div class="split__img reveal">
+      {%- if section.settings.image -%}<img src="{{ section.settings.image | image_url: width: 1400 }}" alt="" width="1400" height="1750" loading="lazy">
+      {%- elsif pic -%}<img src="{{ pic | image_url: width: 1400 }}" alt="{{ pic.alt | escape }}" width="1400" height="1750" loading="lazy">
+      {%- else -%}<div class="visual__art"><div class="visual__blob"></div><div class="visual__card"></div></div>{%- endif -%}
+    </div>
+    <div class="reveal">
+      {% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{% endif %}
+      <h2>{{ section.settings.title }}</h2>
+      <p class="muted">{{ section.settings.text }}</p>
+      {% if section.settings.cta != blank %}<p style="margin-top:28px"><a class="btn btn--ghost" href="{{ section.settings.url }}">{{ section.settings.cta }}</a></p>{% endif %}
+    </div>
+  </div>
+</section>
+${schema({ name: "Image et texte", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "product", id: "product", label: "Produit (pour reprendre une de ses photos)" }, { type: "text", id: "media_hint", label: "Mot repère dans le texte alternatif de la photo", default: "situation" }, { type: "checkbox", id: "reverse", label: "Image à droite", default: false }, { type: "text", id: "eyebrow", label: "Sur-titre" }, { type: "text", id: "title", label: "Titre" }, { type: "textarea", id: "text", label: "Texte" }, { type: "text", id: "cta", label: "Bouton" }, { type: "url", id: "url", label: "Lien du bouton" }], presets: [{ name: "Image et texte" }] })}`,
+
+  trust: `<section class="section" style="padding-block:48px">
+  <div class="wrap trust">
+    {%- for block in section.blocks -%}
+      <div class="trust__i reveal" style="transition-delay:{{ forloop.index0 | times: 80 }}ms" {{ block.shopify_attributes }}>{%- case block.settings.icon -%}{%- when 'truck' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v9H3zM14 9h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>{%- when 'return' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>{%- when 'lock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{%- when 'chat' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>{%- when 'star' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>{%- endcase -%}<div><strong>{{ block.settings.title }}</strong><span class="muted">{{ block.settings.text }}</span></div></div>
+    {%- endfor -%}
+  </div>
+</section>
+${schema({ name: "Réassurance", blocks: [{ type: "item", name: "Engagement", settings: [{ type: "select", id: "icon", label: "Icône", options: [{ value: "truck", label: "Livraison" }, { value: "return", label: "Retour" }, { value: "lock", label: "Cadenas" }, { value: "chat", label: "Message" }, { value: "star", label: "Étoile" }], default: "truck" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Réassurance" }] })}`,
+
+  newsletter: `<section class="section" style="background:var(--c-soft)">
+  <div class="wrap news reveal">
+    <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+    <h2 style="margin-top:10px">{{ section.settings.title }}</h2>
+    <p class="muted" style="margin-top:12px">{{ section.settings.text }}</p>
+    {%- form 'customer' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      {%- if form.posted_successfully? -%}<p style="margin:0 auto;font-weight:600">Merci, c'est noté ✓</p>
+      {%- else -%}<input type="email" name="contact[email]" placeholder="Ton e-mail" required aria-label="E-mail"><button class="btn" type="submit">{{ section.settings.cta }}</button>{%- endif -%}
+    {%- endform -%}
+  </div>
+</section>
+${schema({ name: "Lettre d'info", settings: [{ type: "text", id: "eyebrow", label: "Sur-titre", default: "Restons en contact" }, { type: "text", id: "title", label: "Titre", default: "Les nouveautés en avant-première" }, { type: "text", id: "text", label: "Texte" }, { type: "text", id: "cta", label: "Bouton", default: "Je m'inscris" }], presets: [{ name: "Lettre d'info" }] })}`,
 
   "main-page": `<div class="wrap page"><h1>{{ page.title }}</h1><div class="rte" style="border:0;padding:0;margin:0">{{ page.content }}</div></div>
 ${schema({ name: "Page" })}`,
@@ -522,6 +733,9 @@ export const SETTINGS_SCHEMA = [
     { type: "text", id: "heading_font", label: "Police des titres (Google Fonts)", default: "Instrument Serif" },
     { type: "select", id: "heading_style", label: "Style des titres", options: [{ value: "serif", label: "Serif" }, { value: "sans", label: "Sans serif" }], default: "serif" },
     { type: "text", id: "body_font", label: "Police du texte (Google Fonts)", default: "DM Sans" },
+  ] },
+  { name: "Panier", settings: [
+    { type: "number", id: "free_shipping_threshold", label: "Livraison offerte à partir de (0 = pas de barre)", default: 0 },
   ] },
 ];
 

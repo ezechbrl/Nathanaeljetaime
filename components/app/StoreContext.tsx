@@ -8,6 +8,7 @@ import { usePoll } from "@/lib/api/hooks";
 import type { Job, Store } from "@/lib/api/types";
 import { useApp } from "./AppContext";
 import { LaunchCelebration } from "./LaunchCelebration";
+import { PUBLISH_LIVE_KEY, PublishedCelebration, PublishProgress } from "./PublishShow";
 
 type Ctx = { store: Store; activeJob: Job | null; setStore: (s: Store) => void; reload: () => Promise<void>; trackJob: (job: Job) => void };
 const StoreCtx = createContext<Ctx | null>(null);
@@ -25,6 +26,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
   const [activeJob, setActiveJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState(false);
+  const [published, setPublished] = useState<null | { live: boolean }>(null);
 
   const setStore = useCallback((s: Store) => {
     setStoreState(s);
@@ -53,7 +55,13 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
     const { job } = await api.getJob(activeJob.id);
     setActiveJob(job.status === "queued" || job.status === "running" ? job : null);
     if (job.status === "succeeded" || job.status === "failed") {
-      if (job.kind === "publish") toast(job.status === "succeeded" ? "Boutique publiée sur Shopify" : job.error ?? "La publication a échoué.", job.status === "succeeded" ? "ok" : "error");
+      if (job.kind === "publish") {
+        if (job.status === "succeeded") {
+          let live = true;
+          try { live = sessionStorage.getItem(`${PUBLISH_LIVE_KEY}-${id}`) !== "0"; } catch { /* stockage indisponible */ }
+          setPublished({ live });
+        } else toast(job.error ?? "La publication a échoué.", "error");
+      }
       if (job.kind === "generate" && job.status === "succeeded") setCelebrate(true);
       reload();
     }
@@ -73,6 +81,8 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
     <StoreCtx.Provider value={{ store, activeJob, setStore, reload, trackJob: setActiveJob }}>
       {children}
       {celebrate && store.status !== "generating" && <LaunchCelebration store={store} onClose={() => setCelebrate(false)} />}
+      {activeJob?.kind === "publish" && <PublishProgress store={store} job={activeJob} />}
+      {published && !activeJob && <PublishedCelebration store={store} live={published.live} onClose={() => setPublished(null)} />}
     </StoreCtx.Provider>
   );
 }
