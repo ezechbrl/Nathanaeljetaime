@@ -29,6 +29,9 @@ export async function GET(req: Request) {
       const rows = [...days].map((date) => ({ store_id: s.id, date, sessions: sessions.get(date) ?? 0, orders: orders.get(date)?.orders ?? 0, revenue_cents: orders.get(date)?.revenue ?? 0 }));
       if (rows.length) await db().from("metrics_daily").upsert(rows, { onConflict: "store_id,date" });
 
+      // Sans abonnement : statistiques seulement, pas de recommandations (pas de coût d'IA).
+      const owner = must(await db().from("users").select("plan").eq("id", s.user_id).maybeSingle()) as { plan: string } | null;
+      if (!owner || owner.plan === "free") { report[s.id] = "sans abonnement"; continue; }
       // Client bloqué (budget d'IA atteint) : on enregistre les stats mais pas de nouvelles recommandations.
       if ((await aiBlock(s.user_id))?.reason === "week") { report[s.id] = "budget IA de la semaine atteint"; continue; }
       const previous = (must(await db().from("recommendations").select("title").eq("store_id", s.id).order("created_at", { ascending: false }).limit(15)) as { title: string }[]).map((r) => r.title);

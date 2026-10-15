@@ -74,7 +74,7 @@ export default function EditorPage() {
     } catch (e) {
       setMessages((m) => m.filter((x) => x.id !== optimistic.id));
       setDraft(content);
-      const limit = e instanceof ApiClientError && ["quota_exceeded", "ai_session_blocked", "ai_budget_blocked"].includes(e.code);
+      const limit = e instanceof ApiClientError && ["quota_exceeded", "ai_session_blocked", "ai_budget_blocked", "subscription_required"].includes(e.code);
       if (limit) setUpsell(e.code === "quota_exceeded" ? "Tu as utilisé tous tes messages à l'IA ce mois-ci." : (e as Error).message);
       else toast((e as Error).message, "error");
     } finally {
@@ -137,7 +137,7 @@ export default function EditorPage() {
                 <p>{upsell}</p>
                 {user.plan === "free" && (
                   <Link href="/app/abonnement?plan=pro" className="mt-2 inline-flex items-center gap-1 rounded-ctl bg-accent-strong px-3 py-1.5 text-[13px] font-medium text-white hover:brightness-110">
-                    Passer à Pro · 31 €/mois <ArrowRight className="h-3.5 w-3.5" />
+                    Activer Vitrio Pro · 31 €/mois <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}
               </div>

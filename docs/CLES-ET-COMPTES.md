@@ -107,13 +107,13 @@ automatiquement avec l'e-mail de la boutique.
 
 Le client paie depuis Shopify : l'abonnement s'ajoute à sa facture Shopify, et Shopify te reverse l'argent
 (0 % de commission sur ton premier million de dollars, 2,9 % de frais de paiement, inscription unique de 19 $).
-Tant que ces variables sont vides, les boutons « Passer à Pro » affichent « Le paiement arrive très bientôt ».
+Il n'y a pas d'offre gratuite : sans abonnement actif, le client voit la page « Active Vitrio Pro » et l'IA reste bloquée. Tant que ces variables sont vides, le bouton d'activation affiche « Le paiement arrive très bientôt ».
+Pour tester sans payer : sur ta boutique de développement, les offres payantes sont gratuites. Ou, dans Supabase → Table Editor → `users`, mets ta ligne à `plan = pro`.
 
 1. **Partner Dashboard → Settings → App Store registration** : inscris-toi (19 $, une fois).
 2. **Apps → Vitrio → Distribution → Manage listing → Pricing content → Settings** : choisis **Shopify App Pricing**.
 3. Crée les offres (le **handle** de l'offre payante doit contenir `pro`) :
    - `pro` : 31 €/mois et 310 €/an ;
-   - (option) une offre gratuite `decouverte`.
    Dans chaque offre, **Welcome link** : `https://ton-domaine.vercel.app/api/billing/shopify/return`
 4. **Settings → Partner API clients → Create** : coche **Manage apps** et **View financials**, copie le jeton.
 

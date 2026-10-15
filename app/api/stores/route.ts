@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { z } from "zod";
 import { requireUser, type StoreRow } from "@/lib/server/auth";
-import { badRequest, HttpError, body, json, route } from "@/lib/server/http";
+import { badRequest, body, json, route } from "@/lib/server/http";
 import { createJob, GENERATE_STEPS, runGeneration } from "@/lib/server/jobs";
 import { toJob, toStore } from "@/lib/server/mappers";
 import { assertQuota, rateLimit } from "@/lib/server/quota";
@@ -30,11 +30,8 @@ export const POST = route(async (req) => {
   const input = await body(req, Input);
   if (input.mode === "link" && !input.productUrl) throw badRequest("Colle le lien de la page produit.", "productUrl");
   await rateLimit(`generate:${user.id}`, 5, 3600);
-  if (user.plan === "free" && user.free_store_used) {
-    throw new HttpError(402, "quota_exceeded", "Ta boutique offerte a déjà été créée. Pour créer d'autres boutiques, passe à Pro : boutiques illimitées et plus de crédit d'IA.");
-  }
+  await assertAiBudget(user.id, user.plan); // abonnement requis
   await assertQuota(user.id, user.plan, "stores");
-  await assertAiBudget(user.id, user.plan);
   if (input.mode === "recraft") await connectionFor(user.id, input.shopConnectionId ?? null);
 
   const store = must(await db().from("stores").insert({

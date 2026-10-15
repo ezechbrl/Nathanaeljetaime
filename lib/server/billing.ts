@@ -118,7 +118,7 @@ export async function billingFor(user: UserRow): Promise<{ subscription: Subscri
   return { subscription, invoices: [] };
 }
 
-// Désinstallation de l'app : Shopify arrête la facturation, on repasse l'utilisateur en Découverte.
+// Désinstallation de l'app : Shopify arrête la facturation, l'utilisateur repasse sans abonnement.
 export async function endSubscriptionForShop(shop: string) {
   const rows = must(await db().from("subscriptions").select("user_id").eq("shop_domain", shop)) as { user_id: string }[];
   for (const r of rows) {

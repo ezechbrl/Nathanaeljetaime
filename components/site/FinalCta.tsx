@@ -19,7 +19,7 @@ export function FinalCta({ title = <>Ta boutique Shopify, prête <span className
               </Reveal>
               <Reveal delay={140} className="mt-6">
                 <ul className="space-y-2 text-sm text-fg-muted">
-                  {["Première boutique offerte, sans carte bancaire", "Tu gardes tout, même si tu arrêtes", "Annulable en un clic"].map((t) => (
+                  {["31 €/mois, sans engagement", "Tu gardes tout, même si tu arrêtes", "Payé directement sur ta facture Shopify"].map((t) => (
                     <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-accent" /> {t}</li>
                   ))}
                 </ul>

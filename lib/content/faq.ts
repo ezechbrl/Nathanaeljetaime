@@ -6,8 +6,8 @@ export const HOME_FAQ = [
     a: `Tu écris une phrase sur ton produit (ou tu colles un lien, ou tu relies ta boutique actuelle). ${site.name} commence par la stratégie : à qui tu vends, quelle promesse, quelles offres, quelles hésitations lever. Ensuite seulement, il écrit les pages, crée les visuels et installe le tout dans ta boutique Shopify.`,
   },
   {
-    q: "Combien ça coûte pour commencer ?",
-    a: "Rien. Ta première boutique est gratuite, sans carte bancaire. Si tu veux plusieurs boutiques, plus d'échanges avec l'IA, le studio d'images ou le suivi quotidien, il y a l'offre Pro à 31 € par mois.",
+    q: "Combien ça coûte ?",
+    a: "31 € par mois, ou 310 € par an (2 mois offerts), sans engagement. Boutiques illimitées, éditeur IA, visuels et suivi quotidien inclus. Le paiement s'ajoute à ta facture Shopify, et tu arrêtes en un clic.",
   },
   {
     q: "Il faut déjà avoir une boutique Shopify ?",

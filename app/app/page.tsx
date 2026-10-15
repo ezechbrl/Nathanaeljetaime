@@ -2,15 +2,38 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { CreateStore } from "@/components/app/CreateStore";
+import { Paywall } from "@/components/app/Paywall";
 import { StoreCard } from "@/components/app/StoreCard";
+import { useToast } from "@/components/ui/Toast";
 import { LightRays } from "@/components/ui/LightRays";
 
 function greeting() {
   const h = new Date().getHours();
   return h < 5 ? "Bonsoir" : h < 18 ? "Bonjour" : "Bonsoir";
+}
+
+function Welcome() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const toast = useToast();
+  const { refresh } = useApp();
+  useEffect(() => {
+    if (params.get("checkout") !== "success") return;
+    refresh();
+    toast("Vitrio Pro est activé. À toi de jouer !");
+    router.replace("/app");
+  }, [params, refresh, router, toast]);
+  return null;
+}
+
+function Start() {
+  const { user } = useApp();
+  const params = useSearchParams();
+  return user.plan === "free" ? <Paywall brief={params.get("brief") ?? undefined} /> : <CreateStore />;
 }
 
 export default function AppHome() {
@@ -24,7 +47,7 @@ export default function AppHome() {
           <h1 className="mx-auto mt-3 max-w-2xl text-h1">Qu'est-ce qu'on <span className="serif-accent">construit</span> aujourd'hui ?</h1>
         </div>
         <div className="relative mt-10">
-          <Suspense><CreateStore /></Suspense>
+          <Suspense><Welcome /><Start /></Suspense>
         </div>
       </section>
 

@@ -6,7 +6,7 @@ import { db, must } from "./supabase";
 
 // Quotas par offre (doivent correspondre à lib/content/pricing.ts).
 export const LIMITS: Record<PlanId, { stores: number; conversations: number; images: number; shops: number }> = {
-  free: { stores: 1, conversations: 20, images: 10, shops: 1 },
+  free: { stores: 0, conversations: 0, images: 0, shops: 1 }, // sans abonnement
   pro: { stores: 999, conversations: 200, images: 200, shops: 3 },
   agency: { stores: 999, conversations: 800, images: 1000, shops: 10 },
 };

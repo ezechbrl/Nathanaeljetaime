@@ -9,7 +9,7 @@ import { db, must } from "./supabase";
 //   - une limite par semaine glissante, puis 24 h de pause.
 // Montants en euros. À garder cohérents avec la page Tarifs (lib/content/pricing.ts).
 export const AI_LIMITS: Record<PlanId, { session: number; week: number }> = {
-  free: { session: 0.6, week: 1 },
+  free: { session: 0, week: 0 }, // sans abonnement : pas d'IA
   pro: { session: 1, week: 3 },
   agency: { session: 3, week: 12 },
 };
@@ -64,6 +64,8 @@ export async function aiBlock(userId: string, plan?: PlanId): Promise<{ until: s
 
 export async function assertAiBudget(userId: string, plan?: PlanId) {
   const p = plan ?? (await planOf(userId));
+  // Pas d'offre gratuite : l'IA est réservée aux abonnés.
+  if (p === "free") throw new HttpError(402, "subscription_required", "Active Vitrio Pro pour utiliser l'IA : 31 € par mois, sans engagement.");
   const b = await aiBlock(userId, p);
   if (b) throw blockedError(b.until, b.reason, p);
 }

@@ -18,7 +18,7 @@ export const POST = route(async (req) => {
     await sendEmail(
       input.email,
       `Ta place est réservée sur ${site.name}`,
-      `Merci ! Tu fais partie des premiers inscrits sur ${site.name}.\n\nOn t'écrit dès l'ouverture : ta première boutique Shopify sera offerte.\n\nÀ très vite,\nL'équipe ${site.name}`,
+      `Merci ! Tu fais partie des premiers inscrits sur ${site.name}.\n\nOn t'écrit dès l'ouverture.\n\nÀ très vite,\nL'équipe ${site.name}`,
     );
   }
   return noContent();

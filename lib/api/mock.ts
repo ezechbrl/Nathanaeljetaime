@@ -122,7 +122,7 @@ export async function logout() {
   save();
 }
 // Mêmes règles que le serveur (lib/server/budget.ts) : crédit toutes les 5 h et limite par semaine, selon l'offre.
-const AI_LIMITS = { free: { session: 0.6, week: 1 }, pro: { session: 1, week: 3 }, agency: { session: 3, week: 12 } } as const;
+const AI_LIMITS = { free: { session: 0, week: 0 }, pro: { session: 1, week: 3 }, agency: { session: 3, week: 12 } } as const;
 const limits = () => AI_LIMITS[load().subscription.plan];
 const SESSION_MS = 5 * 3_600_000;
 function aiStatus() {
@@ -138,6 +138,7 @@ const waitText = (until: number) => {
   return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h${min % 60 ? ` ${String(min % 60).padStart(2, "0")}` : ""}`;
 };
 function assertAi() {
+  if (load().subscription.plan === "free") throw new ApiClientError(402, "subscription_required", "Active Vitrio Pro pour utiliser l'IA : 31 € par mois, sans engagement.");
   const a = aiStatus();
   const l = limits();
   const upsell = load().subscription.plan === "agency" ? "" : " Passe à l'offre supérieure pour plus d'IA.";
@@ -296,10 +297,6 @@ export async function createStore(input: GenerateStoreInput) {
   await wait(500);
   requireUser();
   const s = load();
-  const u = usage();
-  if (u.stores.used >= u.stores.limit && s.subscription.plan === "free" && s.stores.length >= 4) {
-    throw new ApiClientError(402, "quota_exceeded", "Ton offre Découverte est limitée. Passe à Pro pour créer d'autres boutiques.");
-  }
   assertAi();
   chargeAi(0.4);
   const accent = ACCENTS[s.stores.length % ACCENTS.length];
@@ -531,7 +528,7 @@ export async function checkout(plan: "pro" | "agency") {
   s.subscription = { plan, status: "active", interval: "month", renewsAt: new Date(Date.now() + 30 * 86_400_000).toISOString(), cancelAtPeriodEnd: false };
   if (s.user) s.user.plan = plan;
   save();
-  return { url: "/app/abonnement?checkout=success" };
+  return { url: "/app?checkout=success" };
 }
 
 // Affiliation

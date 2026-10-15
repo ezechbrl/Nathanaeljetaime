@@ -11,6 +11,7 @@ import { useApi } from "@/lib/api/hooks";
 import type { CreationMode } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { useApp } from "./AppContext";
+import { PENDING_BRIEF_KEY } from "./Paywall";
 
 const MODES: { id: CreationMode; label: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
   { id: "start", label: "Décrire", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
@@ -38,6 +39,19 @@ export function CreateStore() {
   useEffect(() => {
     if (!shop && shops[0]) setShop(shops[0].id);
   }, [shops, shop]);
+
+  // Brief saisi avant l'activation de l'abonnement.
+  useEffect(() => {
+    try {
+      const pending = localStorage.getItem(PENDING_BRIEF_KEY);
+      if (pending) {
+        if (!params.get("brief")) setBrief(pending);
+        localStorage.removeItem(PENDING_BRIEF_KEY);
+      }
+    } catch {
+      // stockage indisponible
+    }
+  }, [params]);
 
   async function submit(e?: React.FormEvent) {
     e?.preventDefault();
@@ -115,7 +129,7 @@ export function CreateStore() {
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-bad" />
           <div className="text-fg-muted">
             {error.message}
-            {error.code === "quota_exceeded" && <Link href="/app/abonnement" className="ml-1 text-fg underline underline-offset-4">Voir les offres</Link>}
+            {(error.code === "quota_exceeded" || error.code === "subscription_required") && <Link href="/app/abonnement" className="ml-1 text-fg underline underline-offset-4">Voir les offres</Link>}
             {(error.code === "no_shop") && <Link href="/app/parametres#shopify" className="ml-1 text-fg underline underline-offset-4">Connecter Shopify</Link>}
           </div>
         </div>

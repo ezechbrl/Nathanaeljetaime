@@ -20,8 +20,8 @@ export function PricingCards() {
           ))}
         </div>
       </div>
-      <div className="mx-auto mt-12 grid max-w-[860px] gap-5 md:grid-cols-2">
-        {PLANS.map((p, i) => {
+      <div className="mx-auto mt-12 grid max-w-[460px] gap-5">
+        {PLANS.filter((p) => !p.hidden).map((p, i) => {
           const price = yearly ? Math.round(p.yearly / 12) : p.monthly;
           return (
             <Reveal key={p.id} delay={i * 90} className={cn("relative flex flex-col rounded-card p-7", p.featured ? "surface-accent shadow-[0_30px_80px_-40px_rgb(0_166_118/0.5)]" : "surface")}>
@@ -32,8 +32,8 @@ export function PricingCards() {
                 <span className="text-5xl tracking-[-0.04em] tabular-nums">{euro(price)}</span>
                 {p.monthly > 0 && <span className="text-sm text-fg-muted">/ mois</span>}
               </p>
-              <p className="mt-1 h-5 text-xs text-fg-faint">{p.monthly > 0 && yearly ? `Facturé ${euro(p.yearly)} par an` : p.monthly > 0 ? "Sans engagement" : "Sans carte bancaire"}</p>
-              <ButtonLink href={p.id === "free" ? "/inscription" : `/inscription?plan=${p.id}&interval=${yearly ? "year" : "month"}`} variant={p.featured ? "primary" : "secondary"} className="mt-7">
+              <p className="mt-1 h-5 text-xs text-fg-faint">{p.monthly > 0 && yearly ? `Facturé ${euro(p.yearly)} par an` : "Sans engagement · annulable en un clic"}</p>
+              <ButtonLink href={`/inscription?plan=${p.id}&interval=${yearly ? "year" : "month"}`} variant={p.featured ? "primary" : "secondary"} className="mt-7">
                 {p.cta}
               </ButtonLink>
               <ul className="mt-8 space-y-3 border-t border-white/[0.07] pt-6 text-[15px]">

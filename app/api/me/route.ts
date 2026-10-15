@@ -37,10 +37,10 @@ export const DELETE = route(async (req) => {
   const user = await requireUser();
   const { confirm } = await body(req, z.object({ confirm: z.literal("SUPPRIMER") }));
   void confirm;
-  // Shopify facture tant que l'offre payante est active : il faut d'abord revenir à Découverte (ou désinstaller l'app).
+  // Shopify facture tant que l'offre payante est active : il faut d'abord arrêter l'abonnement (ou désinstaller l'app).
   const { subscription } = await billingFor(user);
   if (subscription.plan !== "free" && subscription.status !== "canceled") {
-    throw new HttpError(409, "subscription_active", "Reviens d'abord à l'offre Découverte depuis la page Abonnement (ou désinstalle Vitrio dans Shopify), puis supprime ton compte.");
+    throw new HttpError(409, "subscription_active", "Arrête d'abord ton abonnement depuis la page Abonnement (ou désinstalle Vitrio dans Shopify), puis supprime ton compte.");
   }
   const assets = must(await db().from("assets").select("storage_path, stores!inner(user_id)").eq("stores.user_id", user.id)) as { storage_path: string | null }[];
   const paths = assets.map((a) => a.storage_path).filter(Boolean) as string[];

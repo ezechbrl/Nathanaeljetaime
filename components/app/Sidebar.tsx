@@ -82,14 +82,18 @@ function SidebarBody() {
       )}
 
       <div className="mt-auto space-y-3">
-        <div className="space-y-2.5 rounded-card border border-white/[0.07] p-3">
-          <AiBudgetMeter budget={usage.aiBudget} />
-          <Meter label="Messages IA" used={usage.conversations.used} limit={usage.conversations.limit} />
-          <Meter label="Images" used={usage.images.used} limit={usage.images.limit} />
-          {user.plan === "free" && (
-            <Link href="/app/abonnement" className="block rounded-ctl border border-accent/30 bg-accent-deep/40 py-1.5 text-center text-xs text-fg transition-colors hover:border-accent/60">Passer à Pro</Link>
-          )}
-        </div>
+        {user.plan === "free" ? (
+          <div className="rounded-card border border-accent/25 bg-accent-deep/30 p-3">
+            <p className="text-xs leading-relaxed text-fg-muted">Active Vitrio Pro pour créer et modifier tes boutiques avec l'IA.</p>
+            <Link href="/app" className="mt-2.5 block rounded-ctl bg-accent-strong py-1.5 text-center text-xs font-medium text-white transition hover:brightness-110">Activer Pro · 31 €/mois</Link>
+          </div>
+        ) : (
+          <div className="space-y-2.5 rounded-card border border-white/[0.07] p-3">
+            <AiBudgetMeter budget={usage.aiBudget} />
+            <Meter label="Messages IA" used={usage.conversations.used} limit={usage.conversations.limit} />
+            <Meter label="Images" used={usage.images.used} limit={usage.images.limit} />
+          </div>
+        )}
         <div className="space-y-0.5">
           <NavLink href="/app/abonnement" icon={CreditCard}>Abonnement</NavLink>
           <NavLink href="/app/affiliation" icon={Gift}>Affiliation</NavLink>

@@ -31,8 +31,8 @@ export const POST = route<Ctx>(async (req, { params }) => {
   if (!store.plan) throw new HttpError(409, "conflict", "La boutique est encore en cours de génération.");
   const { content } = await body(req, z.object({ content: z.string().trim().min(1).max(2000) }));
   await rateLimit(`chat:${user.id}`, 20, 60);
+  await assertAiBudget(user.id, user.plan); // abonnement requis + crédit d'IA
   await assertQuota(user.id, user.plan, "conversations");
-  await assertAiBudget(user.id, user.plan);
 
   const history = (must(await db().from("chat_messages").select("role, content").eq("store_id", store.id).order("created_at", { ascending: false }).limit(10)) as { role: "user" | "assistant"; content: string }[]).reverse();
   const result = await editPlan({ plan: store.plan as StorePlan, language: store.language, history, message: content, userId: user.id });

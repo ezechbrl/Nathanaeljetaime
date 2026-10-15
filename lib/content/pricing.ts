@@ -10,20 +10,20 @@ export type Plan = {
   limits: { stores: string; conversations: string; images: string; shops: string; ai: string };
   cta: string;
   featured?: boolean;
+  hidden?: boolean;
 };
 
 export const PLANS: Plan[] = [
   {
-    id: "free", name: "Découverte", tagline: "Pour tester sur ton projet.", monthly: 0, yearly: 0,
-    features: ["1 boutique offerte (une seule fois)", "Stratégie + identité de marque", "Publication sur Shopify", "20 messages à l'IA / mois"],
-    limits: { stores: "1", conversations: "20 / mois", images: "10 / mois", shops: "1", ai: "Standard" },
-    cta: "Commencer gratuitement",
+    // Compte sans abonnement (pas affiché sur la page Tarifs : il n'y a pas d'offre gratuite).
+    id: "free", name: "Sans abonnement", tagline: "", monthly: 0, yearly: 0, hidden: true,
+    features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
     id: "pro", name: "Pro", tagline: "Pour lancer et faire grandir ta marque.", monthly: 31, yearly: 310,
     features: ["Boutiques illimitées", "Jusqu'à 200 messages à l'IA / mois", "Studio d'images (200 / mois)", "Optimisation quotidienne", "Import depuis un lien et refonte", "Support prioritaire"],
-    limits: { stores: "Illimitées", conversations: "Jusqu'à 200 / mois", images: "200 / mois", shops: "3", ai: "3× Découverte" },
-    cta: "Passer à Pro", featured: true,
+    limits: { stores: "Illimitées", conversations: "Jusqu'à 200 / mois", images: "200 / mois", shops: "3", ai: "1 € toutes les 5 h, 3 € / semaine" },
+    cta: "Commencer", featured: true,
   },
 ];
 

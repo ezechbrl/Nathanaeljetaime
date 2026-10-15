@@ -32,7 +32,7 @@ export function WaitlistForm() {
     return (
       <div className="rounded-card border border-accent/30 bg-accent-deep/25 p-5">
         <p className="flex items-center gap-2 text-lg text-fg"><Check className="h-5 w-5 text-accent" /> Ta place est réservée</p>
-        <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">On t'écrit à <span className="text-fg">{email}</span> dès l'ouverture. Ta première boutique sera offerte.</p>
+        <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">On t'écrit à <span className="text-fg">{email}</span> dès l'ouverture.</p>
         <Link href="/" className="mt-4 inline-block text-sm text-accent underline-offset-4 hover:underline">Retour à l'accueil</Link>
       </div>
     );

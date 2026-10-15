@@ -10,5 +10,5 @@ export async function GET(req: Request) {
     const owners = must(await db().from("shop_connections").select("user_id").eq("shop_domain", shop).eq("status", "active")) as { user_id: string }[];
     for (const o of owners) await syncShopifySubscription(o.user_id).catch((e) => console.error("Abonnement Shopify", e));
   }
-  return NextResponse.redirect(`${env.appUrl()}/app/abonnement?checkout=success`);
+  return NextResponse.redirect(`${env.appUrl()}/app?checkout=success`);
 }

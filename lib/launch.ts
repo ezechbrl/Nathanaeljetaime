@@ -5,4 +5,4 @@ export const isWaitlist = LAUNCH_MODE === "waitlist";
 
 export const CTA = isWaitlist
   ? { main: "Réserver ma place", short: "Réserver ma place", eyebrow: "Ouverture très bientôt · réserve ta place" }
-  : { main: "Essayer gratuitement", short: "Essayer gratuitement", eyebrow: "Bêta ouverte · ta première boutique est offerte" };
+  : { main: "Créer ma boutique", short: "Créer ma boutique", eyebrow: "Nouveau · ta boutique Shopify prête en quelques minutes" };
