@@ -10,6 +10,7 @@ export type UserRow = {
   plan: "free" | "pro" | "agency";
   stripe_customer_id: string | null;
   referred_by: string | null;
+  free_store_used?: boolean;
   created_at: string;
 };
 

@@ -9,7 +9,7 @@ import { db, must } from "./supabase";
 //   - une limite par semaine glissante, puis 24 h de pause.
 // Montants en euros. À garder cohérents avec la page Tarifs (lib/content/pricing.ts).
 export const AI_LIMITS: Record<PlanId, { session: number; week: number }> = {
-  free: { session: 0.5, week: 1 },
+  free: { session: 0.6, week: 1 },
   pro: { session: 1, week: 3 },
   agency: { session: 3, week: 12 },
 };
@@ -47,7 +47,7 @@ const eurText = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits
 
 function blockedError(until: string, reason: "week" | "session", plan: PlanId) {
   const l = AI_LIMITS[plan];
-  const upsell = plan === "agency" ? "" : " Passe à l'offre supérieure pour plus d'IA.";
+  const upsell = plan === "free" ? " Tu aimes Vitrio ? Passe à Pro : 1 € de crédit toutes les 5 h, 3 € par semaine, et des boutiques illimitées." : plan === "pro" ? " Besoin de plus ? Écris-nous." : "";
   return reason === "session"
     ? new HttpError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA (${eurText(l.session)} €) pour ces ${SESSION_HOURS} heures. Il se recharge dans ${wait(until)}.${upsell}`)
     : new HttpError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de la semaine (${eurText(l.week)} €). Elle se débloque dans ${wait(until)}.${upsell}`);

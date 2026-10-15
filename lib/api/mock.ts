@@ -122,7 +122,7 @@ export async function logout() {
   save();
 }
 // Mêmes règles que le serveur (lib/server/budget.ts) : crédit toutes les 5 h et limite par semaine, selon l'offre.
-const AI_LIMITS = { free: { session: 0.5, week: 1 }, pro: { session: 1, week: 3 }, agency: { session: 3, week: 12 } } as const;
+const AI_LIMITS = { free: { session: 0.6, week: 1 }, pro: { session: 1, week: 3 }, agency: { session: 3, week: 12 } } as const;
 const limits = () => AI_LIMITS[load().subscription.plan];
 const SESSION_MS = 5 * 3_600_000;
 function aiStatus() {

@@ -91,6 +91,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" };
     await db().from("stores").update({ plan, theme, name: plan.brand.name, status: "ready", updated_at: new Date().toISOString() }).eq("id", store.id);
     await db().from("store_versions").insert({ store_id: store.id, label: "Version initiale", snapshot: { plan, theme } });
+    await db().from("users").update({ free_store_used: true }).eq("id", store.user_id); // boutique offerte utilisée (une seule fois)
     await finish(job.id, steps);
   } catch (e) {
     console.error("Génération échouée", e);

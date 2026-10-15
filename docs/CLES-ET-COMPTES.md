@@ -37,7 +37,7 @@ Resend et les images peuvent attendre.
    - Redirect URLs : ajoute `https://ton-domaine.vercel.app/**` et `http://localhost:3000/**`
 6. **Créer les tables (obligatoire)** : **SQL Editor → New query**, colle tout le contenu du fichier
    `supabase/migrations/0001_init.sql` du projet, puis **Run**. Tu dois voir « Success ».
-   Recommence avec `0002_ai_budget.sql`, `0003_ai_session_limit.sql`, `0004_waitlist.sql` puis `0005_shopify_billing.sql`.
+   Recommence avec `0002_ai_budget.sql`, `0003_ai_session_limit.sql`, `0004_waitlist.sql`, `0005_shopify_billing.sql` puis `0006_free_store_once.sql`. (Ou tout d'un coup : `supabase/installation-complete.sql`.)
    À faire une seule fois, dans cet ordre.
 7. **Authentication → Sign In / Providers → Email** : laisse-le **activé** (connexion par lien e-mail, et la connexion
    via Shopify s'en sert en interne ; les utilisateurs ne voient jamais de mot de passe).
@@ -179,7 +179,7 @@ Elle fonctionne avec Dawn et les thèmes qui en dérivent.
 - [ ] `NEXT_PUBLIC_SUPABASE_URL`
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] Tables créées dans Supabase (`0001` à `0005`)
+- [ ] Tables créées dans Supabase (`0001` à `0006`)
 - [ ] Webhooks Shopify configurés
 - [ ] `CRON_SECRET`
 - [ ] `ANTHROPIC_API_KEY`

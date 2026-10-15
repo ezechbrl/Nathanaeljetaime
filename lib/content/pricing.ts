@@ -15,7 +15,7 @@ export type Plan = {
 export const PLANS: Plan[] = [
   {
     id: "free", name: "Découverte", tagline: "Pour tester sur ton projet.", monthly: 0, yearly: 0,
-    features: ["1 boutique complète", "Stratégie + identité de marque", "Publication sur Shopify", "20 messages à l'IA / mois"],
+    features: ["1 boutique offerte (une seule fois)", "Stratégie + identité de marque", "Publication sur Shopify", "20 messages à l'IA / mois"],
     limits: { stores: "1", conversations: "20 / mois", images: "10 / mois", shops: "1", ai: "Standard" },
     cta: "Commencer gratuitement",
   },
