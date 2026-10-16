@@ -84,7 +84,7 @@ export async function generatePages(input: { brief: string; language: string; st
     schema: PagesSchema,
     effort: "medium",
     userId: input.userId,
-    maxTokens: 24000,
+    maxTokens: 16000, // au-delà, le SDK exige le streaming (requête potentiellement > 10 min)
     system: `Tu es copywriter et directeur artistique e-commerce. À partir d'une stratégie validée, tu écris le contenu d'une boutique Shopify moderne et très visuelle : les photos font le travail, les textes sont COURTS et percutants (pas de pavés).
 - Accueil : accroche forte (8 mots maximum), sous-titre d'une phrase (15 mots maximum), appel à l'action de 2 à 4 mots, 3 bénéfices (titre de 2 à 5 mots + une phrase courte, une icône chacun), un bandeau de 4 à 6 atouts de 2 à 4 mots avec icônes, 3 moments d'usage illustrés (2 à 4 mots chacun), une comparaison honnête avec l'alternative habituelle (catégorie générique, jamais une marque ; lignes de 2 à 6 mots), un appel final court et 2 à 3 messages d'annonce courts.
 - Fiche produit : titre court, sous-titre d'une ligne, description courte (un paragraphe + une liste de 3 à 5 points), prix conseillé en nombre décimal sans devise, prix barré ou chaîne vide, SEO, 3 points forts de 2 à 3 mots avec icônes, 3 rubriques dépliables brèves, une garantie en une phrase, et 1 à 3 offres par quantité (la première = 1 unité à 0 %, remises réalistes de 5 à 25 % pour les lots, cohérentes avec les offres de la stratégie).
