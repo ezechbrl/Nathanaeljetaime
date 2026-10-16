@@ -59,7 +59,6 @@ export default function StudioPage() {
   }
 
   async function regenerate() {
-    if (!window.confirm("Refaire toutes les photos générées de la boutique ? Tes photos importées sont gardées.")) return;
     try {
       const res = await api.regenerateImages(store.id);
       setRegen(true);
