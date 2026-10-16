@@ -64,14 +64,18 @@ export async function generateStrategy(input: { brief: string; language: string;
 }
 
 // Étape 2 : pages et fiche produit à partir de la stratégie.
-// La génération remplit toutes les sections enrichies (facultatives seulement pour les anciennes boutiques).
-const PagesSchema = z.object({
-  homepage: HomeBaseSchema.merge(RichHomeSchema.omit({ story: true })),
-  product: ProductBaseSchema.merge(RichProductSchema),
+// La génération est découpée en trois appels parallèles : un seul schéma avec toutes les sections
+// dépasse la taille de grammaire acceptée par l'API (« compiled grammar is too large »).
+const CoreSchema = z.object({
+  homepage: HomeBaseSchema,
+  product: ProductBaseSchema,
   faq: StorePlanSchema.shape.faq,
   aboutPage: StorePlanSchema.shape.aboutPage,
-  visual: VisualSchema,
 });
+const HomeExtrasSchema = z.object({ homepage: RichHomeSchema.omit({ story: true }) });
+const ProductExtrasSchema = z.object({ product: RichProductSchema, visual: VisualSchema });
+
+const STYLE = `Boutique Shopify moderne et très visuelle : les photos font le travail, les textes sont COURTS et percutants (pas de pavés). Chaque texte découle de la promesse et répond aux objections. N'invente ni avis clients, ni chiffres de vente, ni notes, ni labels, ni études.`;
 
 export async function generatePages(input: { brief: string; language: string; strategy: StrategyResult; sourceText?: string; userId: string }): Promise<StorePlan> {
   const parts = [
@@ -80,21 +84,25 @@ export async function generatePages(input: { brief: string; language: string; st
     `Stratégie validée (JSON) :\n${JSON.stringify({ brand: input.strategy.brand, strategy: input.strategy.strategy })}`,
   ];
   if (input.sourceText) parts.push(data("page-produit", input.sourceText));
-  const pages = await structured({
-    schema: PagesSchema,
-    effort: "medium",
-    userId: input.userId,
-    maxTokens: 16000, // au-delà, le SDK exige le streaming (requête potentiellement > 10 min)
-    system: `Tu es copywriter et directeur artistique e-commerce. À partir d'une stratégie validée, tu écris le contenu d'une boutique Shopify moderne et très visuelle : les photos font le travail, les textes sont COURTS et percutants (pas de pavés).
-- Accueil : accroche forte (8 mots maximum), sous-titre d'une phrase (15 mots maximum), appel à l'action de 2 à 4 mots, 3 bénéfices (titre de 2 à 5 mots + une phrase courte, une icône chacun), un bandeau de 4 à 6 atouts de 2 à 4 mots avec icônes, 3 moments d'usage illustrés (2 à 4 mots chacun), une comparaison honnête avec l'alternative habituelle (catégorie générique, jamais une marque ; lignes de 2 à 6 mots), un appel final court et 2 à 3 messages d'annonce courts.
-- Fiche produit : titre court, sous-titre d'une ligne, description courte (un paragraphe + une liste de 3 à 5 points), prix conseillé en nombre décimal sans devise, prix barré ou chaîne vide, SEO, 3 points forts de 2 à 3 mots avec icônes, 3 rubriques dépliables brèves, une garantie en une phrase, et 1 à 3 offres par quantité (la première = 1 unité à 0 %, remises réalistes de 5 à 25 % pour les lots, cohérentes avec les offres de la stratégie).
-- Une FAQ de 3 questions et une page « À propos » de 2 phrases (usage interne).
-- La direction artistique (visual) : description visuelle précise du produit et univers photo, en anglais, pour générer des photos cohérentes et esthétiques ; chaque imagePrompt décrit une scène réaliste et belle avec le produit.
-Chaque texte découle de la promesse et répond aux objections. N'invente ni avis clients, ni chiffres de vente, ni notes, ni labels, ni études.
+  const user = parts.join("\n\n");
+  const call = <T extends z.ZodType>(schema: T, task: string) =>
+    structured({ schema, effort: "medium", userId: input.userId, maxTokens: 12000, system: `Tu es copywriter et directeur artistique e-commerce. ${STYLE}\n\n${task}\n\n${BASE_RULES}`, user });
 
-${BASE_RULES}`,
-    user: parts.join("\n\n"),
-  });
+  const [core, homeExtras, productExtras] = await Promise.all([
+    call(CoreSchema, `Écris :
+- Accueil : accroche forte (8 mots maximum), sous-titre d'une phrase (15 mots maximum), appel à l'action de 2 à 4 mots, 3 bénéfices (titre de 2 à 5 mots + une phrase courte).
+- Fiche produit : titre court, sous-titre d'une ligne, description courte (un paragraphe + une liste de 3 à 5 points), prix conseillé en nombre décimal sans devise, prix barré ou chaîne vide, 3 à 5 points forts courts, SEO.
+- Une FAQ de 3 questions et une page « À propos » de 2 phrases (usage interne).`),
+    call(HomeExtrasSchema, `Écris les sections visuelles de l'accueil : un bandeau de 4 à 6 atouts de 2 à 4 mots avec icônes, un titre et un sous-titre courts pour ce bandeau, un sur-titre et un titre pour la section bénéfices avec 3 icônes, 3 moments d'usage illustrés (2 à 4 mots chacun, avec une scène photo en anglais), une comparaison honnête avec l'alternative habituelle (catégorie générique, jamais une marque ; lignes de 2 à 6 mots), un appel final court et 2 à 3 messages d'annonce courts.`),
+    call(ProductExtrasSchema, `Écris les compléments de la fiche produit : 3 points forts de 2 à 3 mots avec icônes, 3 rubriques dépliables brèves (matières ou composition, utilisation ou entretien, livraison et retours), une garantie en une phrase, et 1 à 3 offres par quantité (la première = 1 unité à 0 %, remises réalistes de 5 à 25 % pour les lots, cohérentes avec les offres de la stratégie). Puis la direction artistique (visual) : description visuelle précise du produit et univers photo, en anglais, pour des photos cohérentes et esthétiques.`),
+  ]);
+  const pages = {
+    homepage: { ...core.homepage, ...homeExtras.homepage },
+    product: { ...core.product, ...productExtras.product },
+    faq: core.faq,
+    aboutPage: core.aboutPage,
+    visual: productExtras.visual,
+  };
   // Offres par quantité : la première est l'unité, remises bornées, quantités distinctes.
   const seen = new Set<number>();
   const bundles = (pages.product.bundles ?? [])
