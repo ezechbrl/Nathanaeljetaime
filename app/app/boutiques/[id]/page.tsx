@@ -32,7 +32,7 @@ export default function StoreDashboard() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
-  const assets = useApi(() => api.listAssets(store.id), [store.id]);
+  const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
   if (store.status === "generating") return <GenerationProgress store={store} job={activeJob} />;
   if (store.status === "failed" || !store.plan) {

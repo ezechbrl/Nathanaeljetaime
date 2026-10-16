@@ -39,7 +39,7 @@ export default function EditorPage() {
   const lowCredit = !usage.aiBudget.blockedUntil && !usage.aiBudget.session.blockedUntil && (sessionLeft <= usage.aiBudget.session.limitEur * 0.2 || weekLeft <= usage.aiBudget.limitEur * 0.2);
   const toast = useToast();
   const history = useApi(() => api.listMessages(store.id), [store.id]);
-  const assets = useApi(() => api.listAssets(store.id), [store.id]);
+  const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
