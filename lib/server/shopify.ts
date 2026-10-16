@@ -94,7 +94,7 @@ export async function readStoreContent(shop: string, token: string) {
 }
 
 
-export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string; files?: Record<string, { url: string; filename: string }>; bundleOption?: string; themeManual?: boolean };
+export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string; files?: Record<string, { url: string; filename: string }>; bundleOption?: string; themeManual?: boolean; mediaIds?: string[]; mediaSources?: string[] };
 
 // Envoie le contenu de la boutique dans Shopify. Crée les objets la première fois, les met à jour ensuite.
 const rgb = (hex: string) => {
@@ -173,22 +173,38 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
       { product: { id: next.productId, ...productInput } });
     check(d.productUpdate.userErrors);
     next.productHandle = d.productUpdate.product?.handle ?? next.productHandle;
-    // Photos ajoutées après la première publication (le marchand peut aussi en avoir mis lui-même).
-    const m = await graphql<{ product: { media: { nodes: { alt: string | null }[] } } }>(shop, token, `query ($id: ID!) { product(id: $id) { media(first: 50) { nodes { alt } } } }`, { id: next.productId });
-    const have = new Set(m.product.media.nodes.map((n) => n.alt ?? ""));
-    const missing = m.product.media.nodes.length >= 8 ? [] : images.filter((i) => !have.has(i.alt)).slice(0, 8 - m.product.media.nodes.length);
-    if (missing.length) {
-      const u = await graphql<{ productUpdate: { userErrors: UserError[] } }>(shop, token,
-        `mutation ($product: ProductUpdateInput!, $media: [CreateMediaInput!]) { productUpdate(product: $product, media: $media) { product { id } userErrors { field message } } }`,
-        { product: { id: next.productId }, media: missing.map((i) => ({ originalSource: i.url, mediaContentType: "IMAGE", alt: i.alt })) });
-      check(u.productUpdate.userErrors);
+    // Photos : si la sélection a changé (photos refaites…), on remplace celles posées par Vitrio
+    // pour que la fiche Shopify montre exactement les photos du studio. Celles du marchand restent.
+    const wanted = images.slice(0, 8);
+    const same = next.mediaSources?.length === wanted.length && wanted.every((i, k) => next.mediaSources![k] === i.url);
+    if (!same) {
+      const m = await graphql<{ product: { media: { nodes: { id: string }[] } } }>(shop, token, `query ($id: ID!) { product(id: $id) { media(first: 50) { nodes { id } } } }`, { id: next.productId });
+      // Boutiques publiées avant le suivi des photos : toutes les photos venaient de Vitrio.
+      const ours = next.mediaIds ? m.product.media.nodes.filter((n) => next.mediaIds!.includes(n.id)) : m.product.media.nodes;
+      if (ours.length) {
+        const del = await graphql<{ productDeleteMedia: { mediaUserErrors: UserError[] } }>(shop, token,
+          `mutation ($productId: ID!, $mediaIds: [ID!]!) { productDeleteMedia(productId: $productId, mediaIds: $mediaIds) { mediaUserErrors { field message } } }`,
+          { productId: next.productId, mediaIds: ours.map((n) => n.id) });
+        check(del.productDeleteMedia.mediaUserErrors);
+      }
+      if (wanted.length) {
+        const u = await graphql<{ productUpdate: { product: { media: { nodes: { id: string }[] } } | null; userErrors: UserError[] } }>(shop, token,
+          `mutation ($product: ProductUpdateInput!, $media: [CreateMediaInput!]) { productUpdate(product: $product, media: $media) { product { media(first: 50) { nodes { id } } } userErrors { field message } } }`,
+          { product: { id: next.productId }, media: wanted.map((i) => ({ originalSource: i.url, mediaContentType: "IMAGE", alt: i.alt })) });
+        check(u.productUpdate.userErrors);
+        const kept = new Set(m.product.media.nodes.map((n) => n.id));
+        next.mediaIds = (u.productUpdate.product?.media.nodes ?? []).map((n) => n.id).filter((id) => !kept.has(id));
+      } else next.mediaIds = [];
+      next.mediaSources = wanted.map((i) => i.url);
     }
   } else {
-    const d = await graphql<{ productCreate: { product: { id: string; handle: string } | null; userErrors: UserError[] } }>(shop, token,
-      `mutation ($product: ProductCreateInput!, $media: [CreateMediaInput!]) { productCreate(product: $product, media: $media) { product { id handle } userErrors { field message } } }`,
+    const d = await graphql<{ productCreate: { product: { id: string; handle: string; media: { nodes: { id: string }[] } } | null; userErrors: UserError[] } }>(shop, token,
+      `mutation ($product: ProductCreateInput!, $media: [CreateMediaInput!]) { productCreate(product: $product, media: $media) { product { id handle media(first: 50) { nodes { id } } } userErrors { field message } } }`,
       { product: { ...productInput, status: "ACTIVE" }, media: images.slice(0, 8).map((i) => ({ originalSource: i.url, mediaContentType: "IMAGE", alt: i.alt })) });
     check(d.productCreate.userErrors);
     next.productId = d.productCreate.product!.id;
+    next.mediaIds = d.productCreate.product!.media.nodes.map((n) => n.id);
+    next.mediaSources = images.slice(0, 8).map((i) => i.url);
     next.productHandle = d.productCreate.product!.handle;
   }
 
