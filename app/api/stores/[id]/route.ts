@@ -16,7 +16,14 @@ export const GET = route<Ctx>(async (_req, { params }) => {
   const failed = store.status === "failed"
     ? (must(await db().from("jobs").select("error").eq("store_id", store.id).eq("status", "failed").order("created_at", { ascending: false }).limit(1).maybeSingle()) as { error: string | null } | null)
     : null;
-  return json({ store: toStore(store), activeJob: active ? toJob(active as Record<string, any>) : null, lastError: failed?.error ?? null });
+  // Dernière publication en échec (ex. thème refusé) : affichée tant qu'une publication n'a pas réussi depuis.
+  const lastPublish = must(await db().from("jobs").select("status, error, created_at").eq("store_id", store.id).eq("kind", "publish").in("status", ["succeeded", "failed"]).order("created_at", { ascending: false }).limit(1).maybeSingle()) as { status: string; error: string | null } | null;
+  return json({
+    store: toStore(store),
+    activeJob: active ? toJob(active as Record<string, any>) : null,
+    lastError: failed?.error ?? null,
+    lastPublishError: lastPublish?.status === "failed" ? lastPublish.error ?? "La publication a échoué." : null,
+  });
 });
 
 const Patch = z.object({

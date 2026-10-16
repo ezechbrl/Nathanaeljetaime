@@ -10,7 +10,7 @@ import { useApp } from "./AppContext";
 import { LaunchCelebration } from "./LaunchCelebration";
 import { PUBLISH_LIVE_KEY, PublishedCelebration, PublishProgress } from "./PublishShow";
 
-type Ctx = { store: Store; activeJob: Job | null; lastError: string | null; setStore: (s: Store) => void; reload: () => Promise<void>; trackJob: (job: Job) => void };
+type Ctx = { store: Store; activeJob: Job | null; lastError: string | null; lastPublishError: string | null; setStore: (s: Store) => void; reload: () => Promise<void>; trackJob: (job: Job) => void };
 const StoreCtx = createContext<Ctx | null>(null);
 
 export function useStore() {
@@ -26,6 +26,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
   const [activeJob, setActiveJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [lastPublishError, setLastPublishError] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState(false);
   const [published, setPublished] = useState<null | { live: boolean }>(null);
 
@@ -40,6 +41,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
       setStore(res.store);
       setActiveJob(res.activeJob);
       setLastError((res as { lastError?: string | null }).lastError ?? null);
+      setLastPublishError((res as { lastPublishError?: string | null }).lastPublishError ?? null);
       setError(null);
     } catch (e) {
       setError((e as Error).message);
@@ -80,7 +82,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
     );
   }
   return (
-    <StoreCtx.Provider value={{ store, activeJob, lastError, setStore, reload, trackJob: setActiveJob }}>
+    <StoreCtx.Provider value={{ store, activeJob, lastError, lastPublishError, setStore, reload, trackJob: setActiveJob }}>
       {children}
       {celebrate && store.status !== "generating" && <LaunchCelebration store={store} onClose={() => setCelebrate(false)} />}
       {activeJob?.kind === "publish" && <PublishProgress store={store} job={activeJob} />}

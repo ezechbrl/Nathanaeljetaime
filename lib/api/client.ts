@@ -61,7 +61,7 @@ export const disconnectShop = (id: string) =>
 export const listStores = () => (live ? request<{ stores: Store[] }>("/api/stores") : mock.listStores());
 export const createStore = (input: GenerateStoreInput) =>
   live ? request<{ store: Store; job: Job }>("/api/stores", { method: "POST", json: input }) : mock.createStore(input);
-export const getStore = (id: string) => (live ? request<{ store: Store; activeJob: Job | null; lastError?: string | null }>(`/api/stores/${id}`) : mock.getStore(id));
+export const getStore = (id: string) => (live ? request<{ store: Store; activeJob: Job | null; lastError?: string | null; lastPublishError?: string | null }>(`/api/stores/${id}`) : mock.getStore(id));
 export const updateStore = (id: string, input: Partial<Pick<Store, "name" | "theme" | "plan">>) =>
   live ? request<{ store: Store }>(`/api/stores/${id}`, { method: "PATCH", json: input }) : mock.updateStore(id, input);
 export const deleteStore = (id: string) => (live ? request<void>(`/api/stores/${id}`, { method: "DELETE" }) : mock.deleteStore(id));

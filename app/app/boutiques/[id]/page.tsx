@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, History, MessageSquare, RotateCcw, Trash2 } from "lucide-react";
+import { AlertTriangle, ExternalLink, History, MessageSquare, RotateCcw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -26,7 +26,7 @@ const PAGES: { id: PreviewPage; label: string }[] = [
 ];
 
 export default function StoreDashboard() {
-  const { store, activeJob, lastError, setStore, reload } = useStore();
+  const { store, activeJob, lastError, lastPublishError, setStore, reload } = useStore();
   const { setStores } = useApp();
   const router = useRouter();
   const toast = useToast();
@@ -72,6 +72,16 @@ export default function StoreDashboard() {
           <ButtonLink href={`/app/boutiques/${store.id}/editeur`} variant="secondary"><MessageSquare className="h-4 w-4" /> Modifier avec l'IA</ButtonLink><PublishButton />
         </>}
       />
+      {lastPublishError && !activeJob && (
+        <div role="alert" className="mx-5 mt-5 flex items-start gap-3 rounded-card border border-bad/30 bg-bad/10 p-4 text-sm sm:mx-8">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-bad" />
+          <div>
+            <p className="font-medium text-fg">La dernière mise à jour sur Shopify n'est pas allée au bout.</p>
+            <p className="mt-1 text-fg-muted">Raison : {lastPublishError}</p>
+            <p className="mt-1 text-fg-faint">Ton produit est bien dans Shopify. Clique sur « Mettre à jour sur Shopify » pour réessayer.</p>
+          </div>
+        </div>
+      )}
       <div className="grid gap-6 p-5 sm:p-8 xl:grid-cols-[1fr_340px]">
         <div className="min-w-0">
           <div className="flex gap-1 overflow-x-auto">
