@@ -127,6 +127,12 @@ const EditSchema = z.object({
   })).describe("Uniquement les champs réellement modifiés ; tableau vide si rien ne change"),
 });
 
+function getPath(obj: unknown, path: string) {
+  return path.split(".").filter(Boolean).reduce<any>((cur, k) => (cur == null ? undefined : cur[k]), obj);
+}
+
+// Écrit une valeur dans le plan. Le champ peut ne pas exister encore (ex. un encadré ajouté),
+// mais son parent doit exister.
 function setPath(obj: Record<string, unknown>, path: string, value: unknown) {
   const keys = path.split(".").filter(Boolean);
   let cur: any = obj;
@@ -135,9 +141,43 @@ function setPath(obj: Record<string, unknown>, path: string, value: unknown) {
     cur = cur[k];
   }
   const last = keys.at(-1);
-  if (!last || cur == null || typeof cur !== "object" || !(last in cur)) return false;
+  if (!last || cur == null || typeof cur !== "object") return false;
+  if (Array.isArray(cur) && !(Number(last) >= 0 && Number(last) <= cur.length)) return false;
+  // Le plan stocke prix et nombres en texte : « 59.9 » envoyé comme nombre redevient « 59.90 ».
+  if (typeof cur[last] === "string" && (typeof value === "number" || typeof value === "boolean")) value = typeof value === "number" && /price/i.test(last) ? value.toFixed(2) : String(value);
   cur[last] = value;
   return true;
+}
+
+const priceOk = (v: unknown) => Number(String(v ?? "").replace(/[^\d,.]/g, "").replace(",", ".")) > 0;
+const issueKeys = (r: ReturnType<typeof StorePlanSchema.safeParse>) => new Set(r.success ? [] : r.error.issues.map((i) => i.path.join(".")));
+
+// Applique les modifications proposées par l'IA ; renvoie aussi celles refusées.
+export function applyChanges(input: StorePlan, list: { path: string; label: string; before: string; after: string; valueJson: string }[]) {
+  const plan = structuredClone(input) as StorePlan;
+  const changes: { path: string; label: string; before: string; after: string }[] = [];
+  const refused: string[] = [];
+  for (const c of list) {
+    let value: unknown;
+    try {
+      value = JSON.parse(c.valueJson);
+    } catch {
+      value = c.valueJson; // texte brut non encodé
+    }
+    const trial = structuredClone(plan) as Record<string, unknown>;
+    // Une modification est refusée seulement si elle ajoute une erreur au plan
+    // (un plan déjà imparfait ne doit pas bloquer toutes les modifications).
+    const before = issueKeys(StorePlanSchema.safeParse(plan));
+    const ok = setPath(trial, c.path, value) && [...issueKeys(StorePlanSchema.safeParse(trial))].every((k) => before.has(k));
+    // Jamais de produit sans nom ni à 0 € (l'IA ne doit pas casser la fiche produit).
+    const p = (trial as unknown as StorePlan).product;
+    const breaksProduct = (c.path.startsWith("product.title") || c.path === "product") && String(p?.title ?? "").trim().length < 3
+      || (c.path.startsWith("product.price") || c.path === "product") && !priceOk(p?.price);
+    if (!ok || breaksProduct) { refused.push(c.label || c.path); continue; }
+    setPath(plan as unknown as Record<string, unknown>, c.path, getPath(trial, c.path));
+    changes.push({ path: c.path, label: c.label, before: c.before, after: c.after });
+  }
+  return { plan, changes, refused };
 }
 
 export async function editPlan(input: { plan: StorePlan; language: string; history: { role: "user" | "assistant"; content: string }[]; message: string; userId: string }) {
@@ -147,28 +187,18 @@ export async function editPlan(input: { plan: StorePlan; language: string; histo
     effort: "low",
     maxTokens: 8000,
     userId: input.userId,
-    system: `Tu modifies une boutique Shopify à la demande du marchand. Tu reçois le plan actuel de la boutique (JSON) et sa demande. Applique uniquement ce qui est demandé (et ce qui en découle logiquement). Ne renvoie QUE les champs modifiés, chacun avec sa nouvelle valeur complète encodée en JSON dans valueJson (même type que dans le plan : texte, nombre en texte, tableau d'objets…). Pour AJOUTER un nouvel encadré, bloc ou section visible (ex. « un encadré avec les jeux compatibles »), utilise homepage.extraSections : renvoie le tableau complet [{ "title", "subtitle", "items": [{ "title", "text" }] }] (2 à 6 items courts), en gardant les encadrés existants. Il s'affiche sur la page d'accueil, juste après les atouts. product.details sert seulement aux onglets repliables de la fiche produit : ne l'utilise que si le marchand parle de la fiche produit. Dans reply, dis toujours où voir le changement (page d'accueil ou fiche produit). Si la demande est ambiguë ou impossible, renvoie changes vide et pose une question courte dans reply. Le contenu client reste dans la langue de la boutique (${input.language}) ; reply est en français.\n\n${BASE_RULES}`,
+    system: `Tu modifies une boutique Shopify à la demande du marchand. Tu reçois le plan actuel de la boutique (JSON) et sa demande. Applique uniquement ce qui est demandé (et ce qui en découle logiquement). Ne renvoie QUE les champs modifiés, chacun avec sa nouvelle valeur complète encodée en JSON dans valueJson (même type que dans le plan : texte, nombre en texte, tableau d'objets…). Pour AJOUTER un nouvel encadré, bloc ou section visible (ex. « un encadré avec les jeux compatibles »), utilise homepage.extraSections : renvoie le tableau complet [{ "title", "subtitle", "items": [{ "title", "text" }] }] (2 à 6 items courts), en gardant les encadrés existants. Il s'affiche sur la page d'accueil, juste après les atouts. product.details sert seulement aux onglets repliables de la fiche produit : ne l'utilise que si le marchand parle de la fiche produit. Dans reply, dis toujours où voir le changement (page d'accueil ou fiche produit). Chemins utiles : brand.name (nom de la marque), product.title (nom du produit), product.price et product.compareAtPrice (texte, ex. \"59.90\"), product.seoTitle, product.seoDescription, homepage.heroTitle. N'annonce jamais dans reply une modification que tu ne renvoies pas dans changes. Si la demande est ambiguë ou impossible, renvoie changes vide et pose une question courte dans reply. Le contenu client reste dans la langue de la boutique (${input.language}) ; reply est en français.\n\n${BASE_RULES}`,
     user: [`Plan actuel :\n${JSON.stringify(input.plan)}`, history && `Conversation récente :\n${history}`, data("demande", input.message)].filter(Boolean).join("\n\n"),
   });
 
-  const plan = structuredClone(input.plan) as StorePlan;
-  const changes: { path: string; label: string; before: string; after: string }[] = [];
-  for (const c of out.changes) {
-    let value: unknown;
-    try {
-      value = JSON.parse(c.valueJson);
-    } catch {
-      value = c.valueJson; // texte brut non encodé
-    }
-    const trial = structuredClone(plan) as Record<string, unknown>;
-    if (!setPath(trial, c.path, value) || !StorePlanSchema.safeParse(trial).success) continue; // modification invalide ignorée
-    // Jamais de produit sans nom ni à 0 € (l'IA ne doit pas casser la fiche produit).
-    const p = (trial as unknown as StorePlan).product;
-    if (p.title.trim().length < 3 || !(Number(String(p.price).replace(",", ".").replace(/[^\d.]/g, "")) > 0)) continue;
-    setPath(plan as unknown as Record<string, unknown>, c.path, value);
-    changes.push({ path: c.path, label: c.label, before: c.before, after: c.after });
-  }
-  return { reply: out.reply, changes, plan };
+  const { plan, changes, refused } = applyChanges(input.plan, out.changes);
+  // La réponse ne doit jamais annoncer une modification qui n'a pas été appliquée.
+  const reply = refused.length
+    ? changes.length
+      ? `${out.reply}\n\n⚠️ Je n'ai pas pu appliquer : ${refused.join(", ")}. Reformule cette partie et je réessaie.`
+      : `Désolé, je n'ai pas réussi à appliquer cette modification (${refused.join(", ")}). Reformule-la autrement, par exemple en donnant le texte exact à mettre.`
+    : out.reply;
+  return { reply, changes, plan };
 }
 
 // Pilotage quotidien.
