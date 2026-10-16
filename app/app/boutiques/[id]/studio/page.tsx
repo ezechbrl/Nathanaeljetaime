@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, ImagePlus, Trash2, Upload, Wand2 } from "lucide-react";
+import { Download, ImagePlus, RefreshCw, Trash2, Upload, Wand2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { PageHeader } from "@/components/app/PageHeader";
@@ -30,6 +30,7 @@ export default function StudioPage() {
   const [job, setJob] = useState<Job | null>(null);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
   const [uploading, setUploading] = useState(false);
+  const [regen, setRegen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   usePoll(async () => {
@@ -38,7 +39,8 @@ export default function StudioPage() {
     if (j.status === "succeeded" || j.status === "failed") {
       setJob(null);
       if (j.status === "failed") toast(j.error ?? "La génération a échoué.", "error");
-      else toast("Image générée");
+      else toast(regen ? "Nouvelles photos prêtes. Republie la boutique pour les envoyer dans Shopify." : "Image générée");
+      setRegen(false);
       assets.reload();
       refresh();
     } else setJob(j);
@@ -49,6 +51,17 @@ export default function StudioPage() {
     if (prompt.trim().length < 5) return;
     try {
       const res = await api.generateAsset(store.id, { prompt: prompt.trim(), kind, aspectRatio: ratio });
+      setJob(res.job);
+    } catch (err) {
+      toast((err as Error).message, "error");
+    }
+  }
+
+  async function regenerate() {
+    if (!window.confirm("Refaire toutes les photos générées de la boutique ? Tes photos importées sont gardées.")) return;
+    try {
+      const res = await api.regenerateImages(store.id);
+      setRegen(true);
       setJob(res.job);
     } catch (err) {
       toast((err as Error).message, "error");
@@ -88,6 +101,14 @@ export default function StudioPage() {
         </>
       } />
       <div className="space-y-8 p-5 sm:p-8">
+        <section className="surface flex flex-col gap-4 rounded-card p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-medium">Photos de la boutique</p>
+            <p className="mt-1 text-sm text-fg-muted">Le produit seul, toujours le même, sur différents fonds : studio noir, décor, gros plan… Sans personnes.</p>
+          </div>
+          <Button variant="secondary" onClick={regenerate} disabled={!!job}>{job && regen ? <><Spinner /> {job.progress} %</> : <><RefreshCw className="h-4 w-4" /> Refaire les photos</>}</Button>
+        </section>
+
         <form onSubmit={generate} className="surface rounded-card p-5">
           <label htmlFor="prompt" className="text-sm text-fg-muted">Décris l'image</label>
           <div className="mt-2 flex flex-col gap-3 lg:flex-row">

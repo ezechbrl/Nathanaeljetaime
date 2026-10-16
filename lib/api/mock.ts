@@ -462,6 +462,11 @@ export async function generateAsset(storeId: string, _input: { prompt: string })
   const job = newJob(storeId, "image", [{ key: "images", label: "Génération de l'image" }], 5_000);
   return { job: clone(job) as Job };
 }
+export async function regenerateImages(storeId: string) {
+  await wait(300);
+  const job = newJob(storeId, "image", [{ key: "images", label: "Nouvelles photos de la boutique" }], 6_000);
+  return { job: clone(job) as Job };
+}
 export async function uploadAsset(storeId: string, file: File) {
   const url = await new Promise<string>((resolve, reject) => {
     const r = new FileReader();

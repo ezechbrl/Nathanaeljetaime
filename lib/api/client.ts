@@ -86,6 +86,8 @@ export const listAssets = (storeId: string) =>
   live ? request<{ assets: Asset[] }>(`/api/stores/${storeId}/assets`) : mock.listAssets(storeId);
 export const generateAsset = (storeId: string, input: { prompt: string; kind: Asset["kind"]; aspectRatio: "1:1" | "4:5" | "16:9" }) =>
   live ? request<{ job: Job }>(`/api/stores/${storeId}/assets/generate`, { method: "POST", json: input }) : mock.generateAsset(storeId, input);
+export const regenerateImages = (storeId: string) =>
+  live ? request<{ job: Job }>(`/api/stores/${storeId}/assets/regenerate`, { method: "POST" }) : mock.regenerateImages(storeId);
 export const uploadAsset = (storeId: string, file: File) => {
   if (!live) return mock.uploadAsset(storeId, file);
   const form = new FormData();

@@ -18,7 +18,7 @@ export const RichHomeSchema = z.object({
   benefitIcons: z.array(iconField()).describe("Une icône par bénéfice de homepage.benefits, dans le même ordre"),
   moments: z.object({
     title: z.string().describe("Ex. « Pour chaque moment de ta journée »"),
-    items: z.array(z.object({ title: z.string().describe("2 à 4 mots"), imagePrompt: z.string().describe("Scène photo EN ANGLAIS où le produit est utilisé à ce moment, sans texte") })).describe("Exactement 3 moments ou usages"),
+    items: z.array(z.object({ title: z.string().describe("2 à 4 mots"), imagePrompt: z.string().describe("Décor EN ANGLAIS où le produit est posé à ce moment (objets, lieu, lumière), SANS personne ni mains, sans texte") })).describe("Exactement 3 moments ou usages"),
   }),
   comparison: z.object({
     title: z.string().describe("Ex. « Notre produit vs l'option classique »"),
@@ -51,7 +51,7 @@ export const RichProductSchema = z.object({
 
 export const VisualSchema = z.object({
   productLook: z.string().describe("Description visuelle précise du produit EN ANGLAIS (forme, matière, couleurs, emballage) pour des photos cohérentes"),
-  scene: z.string().describe("Univers photo EN ANGLAIS : décor, lumière, ambiance"),
+  scene: z.string().describe("Univers photo EN ANGLAIS : décor, surfaces, lumière, ambiance, sans aucune personne"),
 });
 
 export const HomeBaseSchema = z.object({

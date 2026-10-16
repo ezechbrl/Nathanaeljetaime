@@ -99,23 +99,23 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
   }
 }
 
-// Visuels de la boutique : un packshot, puis des scènes construites à partir de ce packshot
-// pour que le produit garde la même apparence partout. Ce sont des illustrations IA : le marchand
-// peut les remplacer par ses vraies photos. Sans FAL_KEY, la boutique reste utilisable sans visuel.
+// Visuels de la boutique : un packshot, puis des mises en scène construites à partir de ce packshot pour
+// que le produit reste strictement le même partout. Jamais de personnes : seulement le produit, sur
+// différents fonds et décors. Ce sont des illustrations IA : le marchand peut les remplacer par ses vraies photos.
 export async function generateStoreImages(storeId: string, plan: StorePlan) {
   if (!env.falKey()) return;
   const c = plan.brand.colors;
   const look = plan.visual?.productLook || `${plan.product.title}, ${plan.product.subtitle}`;
   const scene = plan.visual?.scene || `${plan.brand.tone}, soft natural light`;
-  const NO_TEXT = "photorealistic, high-end commercial photography, no added text, no watermark";
+  const CLEAN = "photorealistic high-end commercial product photography, the product is the only subject, no people, no hands, no faces, no added text, no logos, no watermark";
   const save = async (slot: Slot, kind: string, img: { bytes: Uint8Array; contentType: string; width: number; height: number }, prompt: string) => {
     const saved = await storeImage(storeId, img.bytes, img.contentType, slot);
     await db().from("assets").insert({ store_id: storeId, kind, storage_path: saved.path, url: saved.url, width: img.width, height: img.height, prompt });
     return saved.url;
   };
 
-  // 1. Packshot de référence.
-  const packPrompt = `Professional e-commerce studio packshot of ${look}. Product centered, full view, on a seamless backdrop in ${c.background}, soft diffused light, subtle shadow, sharp focus, ${NO_TEXT}`;
+  // 1. Packshot de référence, produit sans marque visible.
+  const packPrompt = `Professional e-commerce studio packshot of ${look}. Plain unbranded product without any logo or lettering. Product centered, full view, on a seamless backdrop in ${c.background}, soft diffused light, subtle shadow, sharp focus, ${CLEAN}`;
   let reference: string;
   try {
     reference = await save("packshot", "product", await generateImage(packPrompt, "1:1"), packPrompt);
@@ -124,22 +124,43 @@ export async function generateStoreImages(storeId: string, plan: StorePlan) {
     return;
   }
 
-  // 2. Scènes avec le même produit.
-  const keep = "Keep the exact same product (same shape, colors, materials, packaging and branding) as in the reference image.";
+  // 2. Mises en scène du même produit (aucune personne).
+  const keep = "Keep the exact same product from the reference image: same shape, proportions, colors, materials and details. Do not add any logo or text. Do not add any person or hand.";
+  const momentTitles = (plan.homepage.moments?.items ?? []).slice(0, 3);
   const shots: [Slot, string, AspectRatio, string][] = [
-    ["hero", "banner", "16:9", `Wide editorial hero photograph: the product placed in a beautiful styled scene. ${scene}. Brand palette ${c.background} and ${c.accent}. Product on the right third, generous empty space on the left for a headline, cinematic light. ${keep} ${NO_TEXT}`],
-    ["detail", "product", "1:1", `Macro close-up of the product showing its materials, texture and finish, shallow depth of field. ${scene}. ${keep} ${NO_TEXT}`],
-    ["inuse", "lifestyle", "4:5", `Lifestyle photo of the product being used by the target customer (${plan.strategy.market}) in everyday life, candid, natural light. ${scene}. ${keep} ${NO_TEXT}`],
-    ...(plan.homepage.moments?.items ?? []).slice(0, 3).map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `${m.imagePrompt}. ${scene}. ${keep} ${NO_TEXT}`] as [Slot, string, AspectRatio, string]),
+    ["studio", "product", "1:1", `Place this product on a pure black background, dramatic studio rim lighting, glossy reflections on a black surface, premium mood. ${keep} ${CLEAN}`],
+    ["detail", "product", "1:1", `Macro close-up of this product showing its materials, texture and finish, shallow depth of field. ${keep} ${CLEAN}`],
+    ["inuse", "lifestyle", "4:5", `Place this product in its natural everyday setting where it is used (${scene}), styled like a premium editorial still life, nobody in the scene. ${keep} ${CLEAN}`],
+    ["hero", "banner", "16:9", `Wide cinematic still life: this product placed in a beautiful styled setting (${scene}), brand palette ${c.background} and ${c.accent}, product on the right third, generous empty space on the left, soft dramatic light, nobody in the scene. ${keep} ${CLEAN}`],
+    ...momentTitles.map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `Still life: this product placed in a setting that evokes "${m.title}" (${m.imagePrompt}), only the product and objects, nobody in the scene. ${keep} ${CLEAN}`] as [Slot, string, AspectRatio, string]),
   ];
   await Promise.all(shots.map(async ([slot, kind, ratio, prompt]) => {
     try {
-      const img = await editImage(reference, prompt, ratio, `${prompt.replace(keep, "")} The product: ${look}.`);
-      await save(slot, kind, img, prompt);
+      await save(slot, kind, await editImage(reference, prompt, ratio), prompt);
     } catch (e) {
       console.warn(`Image ${slot} non générée :`, errorMessage(e));
     }
   }));
+}
+
+// Refait toutes les photos générées d'une boutique (les photos importées par le marchand sont gardées).
+export async function runRegenerateImages(job: Record<string, any>, store: StoreRow) {
+  const steps: Step[] = job.steps;
+  const step = tracker(job.id, steps);
+  try {
+    await step("images");
+    const old = must(await db().from("assets").select("id, kind, storage_path").eq("store_id", store.id).neq("kind", "upload").neq("kind", "logo")) as { id: string; kind: string; storage_path: string | null }[];
+    if (old.length) {
+      const paths = old.map((a) => a.storage_path).filter(Boolean) as string[];
+      if (paths.length) await db().storage.from("assets").remove(paths);
+      await db().from("assets").delete().in("id", old.map((a) => a.id));
+    }
+    await generateStoreImages(store.id, store.plan as StorePlan);
+    await db().from("stores").update({ updated_at: new Date().toISOString() }).eq("id", store.id);
+    await finish(job.id, steps);
+  } catch (e) {
+    await finish(job.id, steps, errorMessage(e));
+  }
 }
 
 export async function runPublish(job: Record<string, any>, store: StoreRow) {
@@ -162,7 +183,7 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Les autres visuels (héros, moments, histoire) vont dans les fichiers Shopify et dans le thème.
     let productIndex = 0;
     const tagged = assets.map((a) => ({ ...a, slot: a.kind === "upload" ? null : slotOf(a, a.kind === "product" ? productIndex++ : 0) }));
-    const order: Record<string, number> = { upload: 0, packshot: 1, detail: 2, inuse: 3 };
+    const order: Record<string, number> = { upload: 0, packshot: 1, studio: 2, detail: 3, inuse: 4 };
     const images = tagged
       .filter((a) => a.kind === "upload" || (a.slot && a.slot in order))
       .sort((x, y) => order[x.slot ?? "upload"] - order[y.slot ?? "upload"])
