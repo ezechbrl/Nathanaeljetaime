@@ -30,25 +30,27 @@ export const POST = route<Ctx>(async (req, { params }) => {
   const store = await ownedStore(user.id, (await params).id);
   if (!store.plan) throw new HttpError(409, "conflict", "La boutique est encore en cours de génération.");
   const { content } = await body(req, z.object({ content: z.string().trim().min(1).max(2000) }));
-  await rateLimit(`chat:${user.id}`, 20, 60);
-  await assertAiBudget(user.id, user.plan); // abonnement requis + crédit d'IA
-  await assertQuota(user.id, user.plan, "conversations");
+  // Chaque accès à la base est étiqueté : une erreur dit à quelle étape elle a eu lieu.
+  const step = <T,>(label: string, fn: () => Promise<T>) => fn().catch((e: unknown) => { throw e instanceof Error && e.message.startsWith("Supabase") ? new Error(`${e.message} [${label}]`) : e; });
+  await step("limite", () => rateLimit(`chat:${user.id}`, 20, 60));
+  await step("crédit", () => assertAiBudget(user.id, user.plan)); // abonnement requis + crédit d'IA
+  await step("quota", () => assertQuota(user.id, user.plan, "conversations"));
 
-  const history = (must(await db().from("chat_messages").select("role, content").eq("store_id", store.id).order("created_at", { ascending: false }).limit(10)) as { role: "user" | "assistant"; content: string }[]).reverse();
-  const result = await editPlan({ plan: store.plan as StorePlan, language: store.language, history, message: content, userId: user.id });
-  await consume(user.id, "conversations");
+  const history = (await step("historique", async () => must(await db().from("chat_messages").select("role, content").eq("store_id", store.id).order("created_at", { ascending: false }).limit(10))) as { role: "user" | "assistant"; content: string }[]).reverse();
+  const result = await step("IA", () => editPlan({ plan: store.plan as StorePlan, language: store.language, history, message: content, userId: user.id }));
+  await step("compteur", () => consume(user.id, "conversations"));
 
   const theme = { ...(store.theme as Record<string, unknown>), colors: result.plan.brand.colors };
   const updated = result.changes.length
-    ? must(await db().from("stores").update({ plan: result.plan, theme, name: result.plan.brand.name, updated_at: new Date().toISOString() }).eq("id", store.id).select("*").single())
+    ? await step("boutique", async () => must(await db().from("stores").update({ plan: result.plan, theme, name: result.plan.brand.name, updated_at: new Date().toISOString() }).eq("id", store.id).select("*").single()))
     : store;
   if (result.changes.length) {
     await db().from("store_versions").insert({ store_id: store.id, label: result.changes.map((c) => c.label).join(", ").slice(0, 120), snapshot: { plan: result.plan, theme } });
   }
-  const [userMessage, assistantMessage] = must(await db().from("chat_messages").insert([
+  const [userMessage, assistantMessage] = await step("messages", async () => must(await db().from("chat_messages").insert([
     // Horodatages distincts pour garder l'ordre question → réponse.
     { store_id: store.id, role: "user", content, created_at: new Date(Date.now() - 1).toISOString() },
     { store_id: store.id, role: "assistant", content: result.reply, changes: result.changes, created_at: new Date().toISOString() },
-  ]).select("*")) as Record<string, any>[];
+  ]).select("*"))) as Record<string, any>[];
   return json({ userMessage: toMessage(userMessage), assistantMessage: toMessage(assistantMessage), store: toStore(updated) });
 });

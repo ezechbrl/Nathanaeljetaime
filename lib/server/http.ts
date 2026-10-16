@@ -42,7 +42,8 @@ function errorResponse(e: unknown) {
     return NextResponse.json({ error: { code: "not_configured", message: "Ce service n'est pas encore configuré." } }, { status: 503 });
   }
   console.error(e);
-  const hint = e instanceof Error && e.message.startsWith("Supabase") ? " (base de données)" : "";
+  // Erreur de base de données : on montre sa raison (courte) pour pouvoir la corriger.
+  const hint = e instanceof Error && e.message.startsWith("Supabase") ? ` (base de données : ${e.message.replace(/^Supabase : /, "").slice(0, 160)})` : "";
   return NextResponse.json({ error: { code: "internal", message: `Une erreur est survenue${hint}. Réessaie ; si ça continue, écris-nous.` } }, { status: 500 });
 }
 
