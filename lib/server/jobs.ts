@@ -1,4 +1,5 @@
 import "server-only";
+import Anthropic from "@anthropic-ai/sdk";
 import type { StoreTheme } from "@/lib/api/types";
 import type { JobStepKey } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
@@ -46,7 +47,17 @@ async function finish(jobId: string, steps: Step[], error?: string) {
   await db().from("jobs").update({ status: error ? "failed" : "succeeded", progress: error ? undefined : 100, steps, error: error ?? null, finished_at: new Date().toISOString() }).eq("id", jobId);
 }
 
-const errorMessage = (e: unknown) => (e instanceof Error && e.message ? e.message : "Erreur inattendue.");
+// Message montré au marchand : jamais d'erreur technique brute de l'API Claude (en anglais, JSON).
+// Le détail complet reste dans les journaux du serveur.
+const errorMessage = (e: unknown) => {
+  if (e instanceof Anthropic.APIError) {
+    console.error("API Claude :", e.status, e.message);
+    if (e.status === 400 && /credit balance/i.test(e.message)) return "L'IA de Vitrio est momentanément indisponible. Réessaie dans quelques minutes. (code : crédit IA)";
+    if (e.status === 429 || e.status === 529 || (e.status ?? 0) >= 500) return "L'IA est très demandée en ce moment. Réessaie dans une minute.";
+    return `L'IA n'a pas pu traiter la demande. Réessaie dans un instant. (code : ${e.status ?? "réseau"})`;
+  }
+  return e instanceof Error && e.message ? e.message : "Erreur inattendue.";
+};
 
 const FONTS = { serif: "Instrument Serif", sans: "DM Sans" } as const;
 
