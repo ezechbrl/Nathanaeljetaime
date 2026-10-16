@@ -4,15 +4,18 @@ import { z } from "zod";
 export const ICONS = ["bolt", "leaf", "heart", "check", "shield", "truck", "star", "sparkle", "drop", "sun", "clock", "gift", "recycle", "hand", "award", "feather", "smile", "home", "moon", "flame"] as const;
 export const IconSchema = z.enum(ICONS);
 export type IconName = z.infer<typeof IconSchema>;
+// Champ icône tolérant : l'IA peut proposer un nom hors liste, il est ramené à « check » à l'affichage.
+const iconField = () => z.string().describe(`Nom d'icône, exactement un de : ${ICONS.join(", ")}`);
+export const toIcon = (v: string | undefined): IconName => ((ICONS as readonly string[]).includes(v ?? "") ? (v as IconName) : "check");
 
 // Sections enrichies (facultatives pour les boutiques créées avant leur arrivée).
 export const RichHomeSchema = z.object({
-  features: z.array(z.object({ icon: IconSchema, title: z.string().describe("2 à 4 mots"), text: z.string().describe("Une ligne courte") })).describe("4 à 6 atouts concrets du produit, affichés en bandeau d'icônes"),
+  features: z.array(z.object({ icon: iconField(), title: z.string().describe("2 à 4 mots"), text: z.string().describe("Une ligne courte") })).describe("4 à 6 atouts concrets du produit, affichés en bandeau d'icônes"),
   featuresTitle: z.string().describe("Titre du bandeau d'atouts, ex. « Ta nouvelle routine »"),
   featuresSubtitle: z.string(),
   benefitsEyebrow: z.string().describe("Sur-titre court en majuscules, ex. « UN RITUEL, DE VRAIS EFFETS »"),
   benefitsTitle: z.string().describe("Titre de la section bénéfices, ex. « Ce que ça change pour toi »"),
-  benefitIcons: z.array(IconSchema).describe("Une icône par bénéfice de homepage.benefits, dans le même ordre"),
+  benefitIcons: z.array(iconField()).describe("Une icône par bénéfice de homepage.benefits, dans le même ordre"),
   moments: z.object({
     title: z.string().describe("Ex. « Pour chaque moment de ta journée »"),
     items: z.array(z.object({ title: z.string().describe("2 à 4 mots"), imagePrompt: z.string().describe("Scène photo EN ANGLAIS où le produit est utilisé à ce moment, sans texte") })).describe("Exactement 3 moments ou usages"),
@@ -35,7 +38,7 @@ export const RichHomeSchema = z.object({
 });
 
 export const RichProductSchema = z.object({
-  highlights: z.array(z.object({ icon: IconSchema, title: z.string().describe("2 à 4 mots") })).describe("3 points forts affichés sous la galerie"),
+  highlights: z.array(z.object({ icon: iconField(), title: z.string().describe("2 à 4 mots") })).describe("3 points forts affichés sous la galerie"),
   details: z.array(z.object({ title: z.string(), html: z.string().describe("HTML simple : p, ul, li, strong") })).describe("3 à 4 rubriques dépliables : composition ou matières, utilisation ou entretien, livraison et retours, origine ou qualité"),
   guarantee: z.string().describe("Garantie en une phrase, ex. « 30 jours satisfait ou remboursé »"),
   bundles: z.array(z.object({

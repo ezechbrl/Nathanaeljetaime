@@ -25,7 +25,7 @@ const PAGES: { id: PreviewPage; label: string }[] = [
 ];
 
 export default function StoreDashboard() {
-  const { store, activeJob, setStore, reload } = useStore();
+  const { store, activeJob, lastError, setStore, reload } = useStore();
   const { setStores } = useApp();
   const router = useRouter();
   const toast = useToast();
@@ -41,7 +41,7 @@ export default function StoreDashboard() {
       setStores((list) => list.filter((s) => s.id !== store.id));
       router.push("/app");
     };
-    return <div className="p-8"><ErrorState message="La génération a échoué. Elle n'est pas décomptée de ton offre : relance-la depuis l'accueil." onRetry={restart} /></div>;
+    return <div className="p-8"><ErrorState message={`La génération a échoué. Elle n'est pas décomptée de ton offre : relance-la depuis l'accueil.${lastError ? ` (Détail : ${lastError})` : ""}`} onRetry={restart} /></div>;
   }
 
   const plan = store.plan;

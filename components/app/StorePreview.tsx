@@ -105,7 +105,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
         )}
         {prod.highlights?.length ? (
           <div className="grid grid-cols-3 gap-2 rounded-[18px] p-4" style={{ background: mix(background, accent, 0.18) }}>
-            {prod.highlights.slice(0, 3).map((h) => { const I = ICON[h.icon] ?? Check; return <div key={h.title} className="grid justify-items-center gap-2 text-center text-[12px] font-semibold"><span className="grid h-9 w-9 place-items-center rounded-xl" style={{ background, color: accent }}><I className="h-4 w-4" /></span>{h.title}</div>; })}
+            {prod.highlights.slice(0, 3).map((h) => { const I = ICON[h.icon as IconName] ?? Check; return <div key={h.title} className="grid justify-items-center gap-2 text-center text-[12px] font-semibold"><span className="grid h-9 w-9 place-items-center rounded-xl" style={{ background, color: accent }}><I className="h-4 w-4" /></span>{h.title}</div>; })}
           </div>
         ) : null}
       </div>
@@ -200,7 +200,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             <h3 className={cn("text-[2rem] tracking-tight", H)}>{home.featuresTitle ?? plan.brand.tagline}</h3>
             {home.featuresSubtitle && <p className="mt-2 text-sm opacity-70">{home.featuresSubtitle}</p>}
             <div className={cn("mt-10 grid gap-6", mobile ? "grid-cols-2" : "grid-cols-5")}>
-              {features.slice(0, mobile ? 4 : 5).map((f) => { const I = ICON[f.icon] ?? Check; return <div key={f.title}><I className="mx-auto h-7 w-7" style={{ color: accent }} /><p className="mt-3 text-sm font-semibold">{f.title}</p><p className="mt-1 text-xs opacity-65">{f.text}</p></div>; })}
+              {features.slice(0, mobile ? 4 : 5).map((f) => { const I = ICON[f.icon as IconName] ?? Check; return <div key={f.title}><I className="mx-auto h-7 w-7" style={{ color: accent }} /><p className="mt-3 text-sm font-semibold">{f.title}</p><p className="mt-1 text-xs opacity-65">{f.text}</p></div>; })}
             </div>
           </section>
 
@@ -209,7 +209,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             <div>
               {home.benefitsEyebrow && <Eyebrow>{home.benefitsEyebrow}</Eyebrow>}
               <h3 className={cn("mt-2 text-[2rem] leading-tight tracking-tight", H)}>{home.benefitsTitle ?? plan.strategy.promise}</h3>
-              <ul className="mt-6 space-y-4">{home.benefits.map((b, i) => { const I = ICON[home.benefitIcons?.[i] ?? BENEFIT_ICONS[i % 6]] ?? Check; return <li key={b.title} className="grid grid-cols-[auto_1fr] gap-x-3"><I className="row-span-2 mt-0.5 h-5 w-5" style={{ color: accent }} /><strong className="text-[15px]">{b.title}</strong><span className="text-sm opacity-70">{b.text}</span></li>; })}</ul>
+              <ul className="mt-6 space-y-4">{home.benefits.map((b, i) => { const I = ICON[(home.benefitIcons?.[i] ?? BENEFIT_ICONS[i % 6]) as IconName] ?? Check; return <li key={b.title} className="grid grid-cols-[auto_1fr] gap-x-3"><I className="row-span-2 mt-0.5 h-5 w-5" style={{ color: accent }} /><strong className="text-[15px]">{b.title}</strong><span className="text-sm opacity-70">{b.text}</span></li>; })}</ul>
               <div className="mt-7"><Btn>{home.ctaLabel}</Btn></div>
             </div>
           </section>

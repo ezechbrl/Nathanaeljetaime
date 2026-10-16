@@ -1,5 +1,5 @@
 import { strToU8, zipSync } from "fflate";
-import type { IconName, StorePlan } from "@/lib/store-schema";
+import { toIcon, type IconName, type StorePlan } from "@/lib/store-schema";
 import { staticThemeFiles } from "./files";
 import { labelsFor } from "./labels";
 
@@ -92,12 +92,12 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   const features = home.features?.length
     ? home.features
     : home.benefits.map((b, i) => ({ icon: BENEFIT_ICONS[i % BENEFIT_ICONS.length], title: b.title, text: clip(b.text, 70) }));
-  const featuresSection = { type: "features", settings: { scheme: "tint", title: home.featuresTitle ?? plan.brand.tagline, subtitle: home.featuresSubtitle ?? "" }, ...blocks(features.slice(0, 6).map((f) => ({ type: "feat", settings: { icon: f.icon, title: f.title, text: f.text } }))) };
+  const featuresSection = { type: "features", settings: { scheme: "tint", title: home.featuresTitle ?? plan.brand.tagline, subtitle: home.featuresSubtitle ?? "" }, ...blocks(features.slice(0, 6).map((f) => ({ type: "feat", settings: { icon: toIcon(f.icon), title: f.title, text: f.text } }))) };
 
   const benefitsSection = {
     type: "image-list",
     settings: { scheme: "base", ...(product ? { product } : {}), media_hint: "situation", reverse: false, eyebrow: home.benefitsEyebrow ?? "", title: home.benefitsTitle ?? plan.strategy.promise, text: "", cta: home.ctaLabel, url: shopUrl, cta_style: "button" },
-    ...blocks(home.benefits.slice(0, 5).map((b, i) => ({ type: "item", settings: { icon: home.benefitIcons?.[i] ?? BENEFIT_ICONS[i % BENEFIT_ICONS.length], title: b.title, text: b.text } }))),
+    ...blocks(home.benefits.slice(0, 5).map((b, i) => ({ type: "item", settings: { icon: home.benefitIcons?.[i] ? toIcon(home.benefitIcons[i]) : BENEFIT_ICONS[i % BENEFIT_ICONS.length], title: b.title, text: b.text } }))),
   };
 
   const comparisonSection = home.comparison && {
@@ -120,7 +120,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   };
   const productBlocks = blocks([
     ...prod.bulletPoints.slice(0, 6).map((text) => ({ type: "bullet", settings: { text } })),
-    ...(prod.highlights ?? []).slice(0, 3).map((h) => ({ type: "highlight", settings: { icon: h.icon, title: h.title } })),
+    ...(prod.highlights ?? []).slice(0, 3).map((h) => ({ type: "highlight", settings: { icon: toIcon(h.icon), title: h.title } })),
     ...((prod.bundles?.length ?? 0) > 1 ? prod.bundles! : []).slice(0, 4).map((b) => ({ type: "bundle", settings: { label: bundleLabel(b), quantity: b.quantity, badge: b.badge } })),
     ...(prod.details ?? []).slice(0, 5).map((d) => ({ type: "detail", settings: { title: d.title, content: richtext(d.html) } })),
   ]);
