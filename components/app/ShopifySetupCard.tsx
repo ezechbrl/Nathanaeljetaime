@@ -17,7 +17,7 @@ export function ShopifySetupCard({ store }: { store: Store }) {
 
   const steps = [
     { id: "payments", title: "Active les paiements", text: "Shopify Payments : ton compte bancaire et ta pièce d'identité, pour recevoir l'argent des ventes.", href: links.payments },
-    { id: "shipping", title: "Règle la livraison", text: "Tes tarifs et délais (ex. livraison offerte dès 25 €).", href: links.shipping },
+    { id: "shipping", title: "Règle la livraison", text: "Tes tarifs et délais, par exemple la livraison offerte à partir d'un certain montant.", href: links.shipping },
     { id: "policies", title: "Ajoute tes pages légales", text: "CGV, retours, confidentialité : Shopify te donne des modèles à compléter.", href: links.policies },
     { id: "orders", title: "Prépare l'envoi des commandes", text: "En dropshipping, une app comme DSers commande le produit chez ton fournisseur, qui l'envoie au client.", href: "https://apps.shopify.com/dsers" },
     { id: "password", title: "Ouvre ta boutique au public", text: "Retire le mot de passe : tes clients peuvent acheter.", href: links.password },
