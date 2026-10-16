@@ -38,6 +38,8 @@ export function PhotoShoot({ store }: { store: Store }) {
   const pct = Math.min(95, Math.round(100 * (1 - Math.exp(-elapsed / (EXPECTED_MS / 2.2)))));
   const developed = Math.min(SHOTS.length, Math.floor((pct / 95) * SHOTS.length));
   const current = SHOTS[Math.min(developed, SHOTS.length - 1)];
+  const left = Math.max(0, Math.round((EXPECTED_MS - elapsed) / 1000));
+  const remaining = left > 60 ? `Tes photos arrivent dans environ ${Math.ceil(left / 60)} min` : left > 10 ? `Tes photos arrivent dans environ ${Math.ceil(left / 10) * 10} s` : "Tes photos arrivent dans quelques secondes…";
 
   function onMove(e: React.PointerEvent) {
     if (e.pointerType !== "mouse" || !box.current) return;
@@ -47,12 +49,24 @@ export function PhotoShoot({ store }: { store: Store }) {
 
   return (
     <section className="surface overflow-hidden rounded-card p-5 sm:p-6" aria-live="polite">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-sm text-fg-muted">
-          <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-70" /><span className="relative h-2.5 w-2.5 rounded-full bg-red-500" /></span>
-          Séance photo en cours · <span className="tabular-nums">{Math.floor(elapsed / 1000)} s</span>
-        </p>
-        <p className="text-sm tabular-nums text-fg-muted">{pct} %</p>
+      {/* Bandeau de chargement bien visible, avec le temps restant estimé */}
+      <div className="rounded-[14px] border border-accent/25 bg-accent-deep/30 p-4 sm:p-5">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="flex items-center gap-2 text-sm text-fg-muted">
+              <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-70" /><span className="relative h-2.5 w-2.5 rounded-full bg-red-500" /></span>
+              Séance photo en cours
+            </p>
+            <p className="mt-1 text-xl font-medium tracking-tight sm:text-2xl">{remaining}</p>
+          </div>
+          <p className="text-3xl font-semibold tabular-nums text-accent sm:text-4xl">{pct} %</p>
+        </div>
+        <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progression de la séance photo">
+          <div className="relative h-full overflow-hidden rounded-full bg-accent transition-[width] duration-500" style={{ width: `${Math.max(pct, 3)}%` }}>
+            <span className="absolute inset-0 animate-shimmer bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.55),transparent)] bg-[length:200%_100%]" />
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-fg-faint">{developed} photo{developed > 1 ? "s" : ""} sur {SHOTS.length} · tu peux quitter la page, la séance continue.</p>
       </div>
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-center">
@@ -72,11 +86,6 @@ export function PhotoShoot({ store }: { store: Store }) {
             <span key={flash} className="pointer-events-none absolute inset-0 bg-white opacity-0 [animation:flash_.6s_ease-out]" />
           </div>
           <p key={current.line} className="mt-4 flex items-center gap-2 text-[15px] [animation:fade-in_.4s_ease-out]"><Camera className="h-4 w-4 text-accent" />{current.line}</p>
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-            <div className="relative h-full overflow-hidden rounded-full bg-accent transition-[width] duration-500" style={{ width: `${Math.max(pct, 4)}%` }}>
-              <span className="absolute inset-0 animate-shimmer bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.55),transparent)] bg-[length:200%_100%]" />
-            </div>
-          </div>
         </div>
 
         {/* Les tirages qui se développent */}
