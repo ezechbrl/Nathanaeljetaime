@@ -49,7 +49,7 @@ export const POST = route<Ctx>(async (req, { params }) => {
   }
   const [userMessage, assistantMessage] = await step("messages", async () => must(await db().from("chat_messages").insert([
     // Horodatages distincts pour garder l'ordre question → réponse.
-    { store_id: store.id, role: "user", content, created_at: new Date(Date.now() - 1).toISOString() },
+    { store_id: store.id, role: "user", content, changes: [], created_at: new Date(Date.now() - 1).toISOString() },
     { store_id: store.id, role: "assistant", content: result.reply, changes: result.changes, created_at: new Date().toISOString() },
   ]).select("*"))) as Record<string, any>[];
   return json({ userMessage: toMessage(userMessage), assistantMessage: toMessage(assistantMessage), store: toStore(updated) });
