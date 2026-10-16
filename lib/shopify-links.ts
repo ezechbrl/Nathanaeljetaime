@@ -10,5 +10,9 @@ export function shopifyLinks(liveUrl: string | null | undefined) {
     themes: `${admin}/themes`,
     // Où trouver (ou retirer) le mot de passe d'une boutique protégée.
     password: `${admin}/online_store/preferences`,
+    // Réglages à faire par le marchand dans Shopify avant de vendre.
+    payments: `${admin}/settings/payments`,
+    shipping: `${admin}/settings/shipping`,
+    policies: `${admin}/settings/legal`,
   };
 }
