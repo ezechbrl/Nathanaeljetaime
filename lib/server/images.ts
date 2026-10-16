@@ -17,7 +17,11 @@ export async function generateImage(prompt: string, ratio: AspectRatio) {
     headers: { authorization: `Key ${key}`, "content-type": "application/json" },
     body: JSON.stringify({ prompt, image_size: size, num_images: 1, enable_safety_checker: true }),
   });
-  if (!res.ok) throw new HttpError(502, "upstream_error", "Le service d'images n'a pas répondu.");
+  if (!res.ok) {
+    const detail = (await res.text().catch(() => "")).slice(0, 160);
+    console.error("fal.ai", res.status, detail);
+    throw new HttpError(502, "upstream_error", `Le service d'images a refusé la demande (code ${res.status}${res.status === 401 || res.status === 403 ? " : clé FAL_KEY invalide" : res.status === 402 || /balance|credit/i.test(detail) ? " : crédit fal.ai épuisé" : ""}).`);
+  }
   const out = (await res.json()) as { images?: { url: string; content_type?: string }[] };
   const url = out.images?.[0]?.url;
   if (!url) throw new HttpError(502, "upstream_error", "Aucune image renvoyée.");
