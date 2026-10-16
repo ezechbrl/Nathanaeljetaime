@@ -162,6 +162,9 @@ export async function editPlan(input: { plan: StorePlan; language: string; histo
     }
     const trial = structuredClone(plan) as Record<string, unknown>;
     if (!setPath(trial, c.path, value) || !StorePlanSchema.safeParse(trial).success) continue; // modification invalide ignorée
+    // Jamais de produit sans nom ni à 0 € (l'IA ne doit pas casser la fiche produit).
+    const p = (trial as unknown as StorePlan).product;
+    if (p.title.trim().length < 3 || !(Number(String(p.price).replace(",", ".").replace(/[^\d.]/g, "")) > 0)) continue;
     setPath(plan as unknown as Record<string, unknown>, c.path, value);
     changes.push({ path: c.path, label: c.label, before: c.before, after: c.after });
   }

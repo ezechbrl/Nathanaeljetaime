@@ -167,6 +167,10 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
   };
 
   await onStep("product");
+  // Garde-fous : jamais de produit à 0 € ni sans vrai nom sur une boutique en ligne.
+  const unitPrice = parsePrice(plan.product.price);
+  if (unitPrice <= 0) throw new HttpError(422, "invalid_plan", `Le prix du produit est vide ou à 0 € (« ${plan.product.price} »). Corrige-le dans l'éditeur IA (ex. « Mets le prix à 59,90 € »), puis republie.`);
+  if (plan.product.title.trim().length < 3) throw new HttpError(422, "invalid_plan", `Le nom du produit est trop court (« ${plan.product.title} »). Corrige-le dans l'éditeur IA, puis republie.`);
   if (next.productId) {
     const d = await graphql<{ productUpdate: { product: { id: string; handle: string } | null; userErrors: UserError[] } }>(shop, token,
       `mutation ($product: ProductUpdateInput!) { productUpdate(product: $product) { product { id handle } userErrors { field message } } }`,
@@ -215,7 +219,7 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
   if (variantId) {
     const d = await graphql<{ productVariantsBulkUpdate: { userErrors: UserError[] } }>(shop, token,
       `mutation ($productId: ID!, $variants: [ProductVariantsBulkInput!]!) { productVariantsBulkUpdate(productId: $productId, variants: $variants) { userErrors { field message } } }`,
-      { productId: next.productId, variants: [{ id: variantId, price: plan.product.price, compareAtPrice: plan.product.compareAtPrice || null, inventoryPolicy: "CONTINUE", inventoryItem: { tracked: false } }] });
+      { productId: next.productId, variants: [{ id: variantId, price: unitPrice.toFixed(2), compareAtPrice: parsePrice(plan.product.compareAtPrice) > unitPrice ? parsePrice(plan.product.compareAtPrice).toFixed(2) : null, inventoryPolicy: "CONTINUE", inventoryItem: { tracked: false } }] });
     check(d.productVariantsBulkUpdate.userErrors);
   }
 
@@ -339,9 +343,12 @@ export async function uploadSceneFiles(shop: string, token: string, scenes: Reco
 export const BUNDLE_OPTION = "Offre";
 const money2 = (n: number) => (Math.round(n * 100) / 100).toFixed(2);
 
+// Prix écrit par l'IA ou le marchand (« 59,90 », « 59.90 € ») → nombre ; 0 si illisible.
+export const parsePrice = (v: string | undefined) => Number(String(v ?? "").replace(/[^\d,.]/g, "").replace(",", ".")) || 0;
+
 export function bundlePrices(plan: StorePlan) {
-  const unit = Number(plan.product.price) || 0;
-  const cmp = Number(plan.product.compareAtPrice) || 0;
+  const unit = parsePrice(plan.product.price);
+  const cmp = parsePrice(plan.product.compareAtPrice);
   const ref = cmp > unit ? cmp : unit;
   return (plan.product.bundles ?? []).map((b) => {
     const price = unit * b.quantity * (1 - b.discountPercent / 100);
