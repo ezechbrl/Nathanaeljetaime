@@ -132,10 +132,17 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...blocks(moments.items.slice(0, 3).map((m, i) => ({ type: "moment", settings: { image: file(`moment${i + 1}`), title: m.title } }))),
   };
 
+  const extras = Object.fromEntries((home.extraSections ?? []).slice(0, 4).map((x, i) => [`extra${i + 1}`, {
+    type: "features",
+    settings: { scheme: i % 2 ? "tint" : "base", title: x.title, subtitle: x.subtitle ?? "" },
+    ...blocks(x.items.slice(0, 6).map((it) => ({ type: "feat", settings: { icon: "check", title: it.title, text: it.text } }))),
+  }]));
+
   const sections: Record<string, unknown> = {
     hero: { type: "hero", settings: { image: file("hero"), ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
     features: featuresSection,
     benefits: benefitsSection,
+    ...extras,
     ...(momentsSection ? { moments: momentsSection } : {}),
     ...(comparisonSection ? { comparison: comparisonSection } : {}),
     ...(product ? { buy: { type: "featured-product", settings: { scheme: "tint", product, heading_tag: "h2", eyebrow: "", ...productSettings, sticky: false, bundle_label: "" }, ...productBlocks } } : {}),

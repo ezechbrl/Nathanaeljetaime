@@ -93,7 +93,14 @@ export const StorePlanSchema = z.object({
       .array(z.object({ objection: z.string(), answer: z.string() }))
       .describe("Objections d'achat et réponses"),
   }),
-  homepage: HomeBaseSchema.merge(RichHomeSchema.partial()),
+  homepage: HomeBaseSchema.merge(RichHomeSchema.partial()).extend({
+    // Encadrés ajoutés par le marchand depuis l'éditeur IA, affichés sur l'accueil après les atouts.
+    extraSections: z.array(z.object({
+      title: z.string(),
+      subtitle: z.string().optional(),
+      items: z.array(z.object({ title: z.string(), text: z.string() })),
+    })).optional(),
+  }),
   product: ProductBaseSchema.merge(RichProductSchema.partial()),
   faq: z.array(z.object({ question: z.string(), answer: z.string() })),
   aboutPage: z.object({ title: z.string(), bodyHtml: z.string() }),

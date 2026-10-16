@@ -214,6 +214,21 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             </div>
           </section>
 
+          {home.extraSections?.map((x, n) => (
+            <section key={`${x.title}-${n}`} className={cn(pad, sec, "text-center")} style={n % 2 ? { background: tint } : undefined}>
+              <h3 className={cn("text-[2rem] tracking-tight", H)}>{x.title}</h3>
+              {x.subtitle && <p className="mt-2 text-sm opacity-70">{x.subtitle}</p>}
+              <div className={cn("mt-8 grid gap-4 text-left", mobile ? "grid-cols-1" : x.items.length % 3 === 0 ? "grid-cols-3" : "grid-cols-2")}>
+                {x.items.slice(0, 6).map((it) => (
+                  <div key={it.title} className="rounded-[16px] border p-5" style={{ borderColor: `${primary}1a` }}>
+                    <p className="flex items-center gap-2 font-semibold"><Check className="h-4 w-4 shrink-0" style={{ color: accent }} />{it.title}</p>
+                    <p className="mt-1.5 text-sm opacity-70">{it.text}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+
           {home.moments && (
             <section className={cn(pad, "pb-16")}>
               <h3 className={cn("text-center text-[2rem] tracking-tight", H)}>{home.moments.title}</h3>
