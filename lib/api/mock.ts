@@ -287,17 +287,20 @@ const ACCENTS = ["#c8506a", "#4b62c9", "#5f9e47", "#b9813f", "#8a4fb0", "#d9822b
 const NAMES = ["Nova", "Maison Lune", "Atelier Brume", "Nordé", "Sable & Sel", "Kōra", "Ombre Douce", "Halo"];
 function guessName(_brief: string, url?: string) {
   if (url) {
-    const host = new URL(url).hostname.replace(/^www\./, "").split(".")[0];
-    return host.charAt(0).toUpperCase() + host.slice(1, 14);
+    const host = new URL(url).hostname.replace(/^(www|fr|de|es|it|m)\./, "").split(".")[0];
+    // Lien fournisseur (AliExpress, Amazon…) : la boutique a sa propre marque.
+    if (!/aliexpress|amazon|temu|alibaba|cjdropshipping/i.test(host)) return host.charAt(0).toUpperCase() + host.slice(1, 14);
   }
   return NAMES[load().stores.length % NAMES.length];
 }
 
-// Démo : les sites qui bloquent les robots (AliExpress, Amazon…) sont refusés, les autres donnent un aperçu.
+// Démo : un lien produit donne un aperçu (comme en production avec la clé de lecture) ;
+// une adresse contenant « bloque » simule un site qui refuse la lecture.
 export async function checkLink(url: string) {
   await wait(700);
-  if (/aliexpress|amazon|temu/i.test(url)) return { ok: false as const, reason: "Ce site bloque la lecture automatique de sa page.", protectedSite: true };
-  return { ok: true as const, title: "Produit importé", image: null };
+  if (/bloque/i.test(url)) return { ok: false as const, reason: "Ce site bloque la lecture automatique de sa page.", protectedSite: true };
+  const slug = decodeURIComponent(new URL(url).pathname.split("/").filter(Boolean).pop() ?? "").replace(/\.html?$/, "").replace(/[-_]+/g, " ").replace(/\d{6,}/g, "").trim();
+  return { ok: true as const, title: slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "Produit importé", image: null };
 }
 
 export async function createStore(input: GenerateStoreInput) {

@@ -5,6 +5,8 @@ import {
   ArrowRight, Award, Check, ChevronLeft, ChevronRight, Clock, Droplet, Feather, Flame, Gift, Hand, Heart, Home, Leaf, Lock, Moon,
   RefreshCw, RotateCcw, ShieldCheck, ShoppingBag, Smile, Sparkles, Star, Sun, Truck, X, Zap, type LucideIcon,
 } from "lucide-react";
+import * as api from "@/lib/api/client";
+import { useApi } from "@/lib/api/hooks";
 import type { Asset, Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -293,6 +295,8 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
 // Miniature (aperçu réduit) pour les cartes.
 export function StoreThumb({ store, className }: { store: Store; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  // Les vraies photos de la boutique dans la vignette (pas seulement ses couleurs).
+  const assets = useApi(() => (store.plan ? api.listAssets(store.id) : Promise.resolve({ assets: [] as Asset[] })), [store.id, store.updatedAt, !!store.plan]);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -304,7 +308,7 @@ export function StoreThumb({ store, className }: { store: Store; className?: str
     <div ref={ref} className={cn("relative aspect-[16/10] overflow-hidden rounded-[10px] border border-white/[0.08]", className)} style={{ background: store.theme.colors.background }}>
       {store.plan ? (
         <div className="pointer-events-none absolute left-0 top-0 w-[1000px] origin-top-left" style={{ transform: "scale(var(--thumb-scale, 0.3))" }}>
-          <StorePreview store={store} device="desktop" />
+          <StorePreview store={store} device="desktop" assets={assets.data?.assets} />
         </div>
       ) : (
         <div className="grid h-full place-items-center bg-bg-3">

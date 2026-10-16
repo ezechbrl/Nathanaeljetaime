@@ -13,10 +13,10 @@ import { cn } from "@/lib/cn";
 import { useApp } from "./AppContext";
 import { PaywallDialog, readPendingDraft } from "./Paywall";
 
-const MODES: { id: CreationMode; label: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
-  { id: "link", label: "Coller un lien", icon: Link2, placeholder: "Facultatif : ce que tu veux préciser (cible, prix de vente, ambiance)…", hint: "Le lien du produit que tu vends : AliExpress, Amazon, Temu, CJ, ta propre page… L'IA reprend le produit et ses photos, et écrit une boutique originale." },
-  { id: "start", label: "Décrire", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
-  { id: "recraft", label: "Refaire ma boutique", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
+const MODES: { id: CreationMode; label: string; sub: string; color: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
+  { id: "link", label: "Coller un lien", sub: "AliExpress, Amazon…", color: "#34d399", icon: Link2, placeholder: "Facultatif : ce que tu veux préciser (cible, prix de vente, ambiance)…", hint: "Le lien du produit que tu vends : AliExpress, Amazon, Temu, CJ, ta propre page… L'IA reprend le produit et ses photos, et écrit une boutique originale." },
+  { id: "start", label: "Décrire", sub: "Ton idée en une phrase", color: "#a78bfa", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
+  { id: "recraft", label: "Refaire ma boutique", sub: "Améliorer l'existante", color: "#fbbf24", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
 ];
 
 // Ce qui rend un brief bon : chaque critère détecté s'allume, un clic ajoute une amorce.
@@ -273,12 +273,23 @@ export function CreateStore() {
         </div>
       )}
 
-      <div role="tablist" aria-label="Mode de création" className="surface mx-auto mt-5 flex w-fit gap-1 rounded-ctl p-1">
-        {MODES.map((m) => (
-          <button key={m.id} role="tab" aria-selected={mode === m.id} onClick={() => setMode(m.id)} className={cn("flex items-center gap-2 rounded-[7px] px-3 py-1.5 text-[13px] transition-colors", mode === m.id ? "border border-accent/30 bg-accent-deep/50 text-fg" : "border border-transparent text-fg-muted hover:text-fg")}>
-            <m.icon className="h-3.5 w-3.5" /> {m.label}
-          </button>
-        ))}
+      <div role="tablist" aria-label="Mode de création" className="mx-auto mt-6 grid max-w-[720px] grid-cols-3 gap-2 sm:gap-3">
+        {MODES.map((m) => {
+          const on = mode === m.id;
+          return (
+            <button key={m.id} role="tab" aria-selected={on} onClick={() => setMode(m.id)}
+              className={cn("group flex flex-col items-center gap-2 rounded-[14px] border px-2 py-3 text-center transition-all duration-200 sm:flex-row sm:gap-3 sm:px-4 sm:py-3.5 sm:text-left", on ? "-translate-y-0.5 shadow-[0_14px_30px_-14px_var(--c)]" : "border-white/[0.08] bg-white/[0.02] hover:-translate-y-0.5 hover:border-white/20")}
+              style={{ ["--c" as string]: m.color, ...(on ? { borderColor: `${m.color}99`, background: `${m.color}1f` } : {}) }}>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full transition-transform group-hover:scale-105" style={{ background: `${m.color}${on ? "33" : "1f"}`, color: m.color }}>
+                <m.icon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className={cn("block text-[13px] font-semibold sm:text-[15px]", on ? "text-white" : "text-fg")}>{m.label}</span>
+                <span className="hidden text-xs text-fg-muted sm:block">{m.sub}</span>
+              </span>
+            </button>
+          );
+        })}
       </div>
       <p className="mt-3 text-center text-xs text-fg-faint">{current.hint}</p>
 

@@ -100,6 +100,7 @@
 @keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgb(94 211 140 / .6); } 50% { box-shadow: 0 0 0 6px rgb(94 211 140 / 0); } }
 @keyframes type-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes rise { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes wave { 0%,100% { transform: rotate(0); } 20% { transform: rotate(16deg); } 40% { transform: rotate(-8deg); } 60% { transform: rotate(14deg); } 80% { transform: rotate(-4deg); } }
 
 .anim { animation-play-state: paused; animation-fill-mode: both; }
 [data-reveal="in"] .anim { animation-play-state: running; }
