@@ -108,7 +108,10 @@ export default function SettingsPage() {
             <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} placeholder="ma-boutique.myshopify.com" className="field" />
             <Button type="submit" disabled={connecting || !shop}>{connecting ? <Spinner /> : "Connecter"}</Button>
           </form>
-          <p className="mt-2 text-xs text-fg-faint">Pas encore de boutique ? <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="underline underline-offset-4">Ouvre-en une sur Shopify</a>{site.shopifyReferral && " (lien partenaire)"}, puis reviens ici.</p>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-ctl border border-white/[0.08] bg-white/[0.02] px-3 py-2.5 text-sm">
+            <span className="text-fg-muted">Pas de compte Shopify ?</span>
+            <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="inline-flex items-center gap-1.5 rounded-ctl border border-white/15 px-3 py-1.5 text-[13px] font-medium hover:bg-white/5">Créer un compte Shopify</a>
+          </div>
         </Card>
 
         <Card title="Supprimer le compte" text="Supprime ton compte et toutes tes données. Tes boutiques Shopify ne sont pas touchées.">

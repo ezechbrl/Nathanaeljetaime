@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import { Button, Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
+import { useApi } from "@/lib/api/hooks";
 import { cn } from "@/lib/cn";
+import { ShopifyForm } from "@/components/auth/AuthForms";
 import type { GenerateStoreInput } from "@/lib/api/types";
 import { PLANS, euro } from "@/lib/content/pricing";
 
@@ -38,14 +40,22 @@ export function Paywall({ brief, draft }: { brief?: string; draft?: GenerateStor
   const [yearly, setYearly] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  async function activate() {
-    setBusy(true);
+  const connections = useApi(() => api.listConnections(), []);
+  const needShop = !!connections.data && !connections.data.connections.some((c) => c.status === "active");
+
+  // Le projet en cours est gardé pour reprendre là où on en était au retour.
+  function savePending(autostart = true) {
     try {
-      if (draft) localStorage.setItem(PENDING_BRIEF_KEY, JSON.stringify({ ...draft, autostart: true }));
+      if (draft) localStorage.setItem(PENDING_BRIEF_KEY, JSON.stringify({ ...draft, autostart }));
       else if (brief) localStorage.setItem(PENDING_BRIEF_KEY, JSON.stringify({ mode: "start", brief, language: "français" }));
     } catch {
       // stockage indisponible : le brief sera simplement à retaper
     }
+  }
+
+  async function activate() {
+    setBusy(true);
+    savePending();
     try {
       const { url } = await api.startCheckout("pro", yearly ? "year" : "month");
       window.location.href = url;
@@ -74,9 +84,17 @@ export function Paywall({ brief, draft }: { brief?: string; draft?: GenerateStor
       <ul className="mt-5 grid gap-2 text-[15px] sm:grid-cols-2">
         {pro.features.map((f) => <li key={f} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />{f}</li>)}
       </ul>
-      <Button size="lg" className="mt-7 w-full" onClick={activate} disabled={busy}>
-        {busy ? <Spinner /> : "Activer Vitrio Pro"}
-      </Button>
+      {needShop ? (
+        // L'abonnement est réglé sur la facture Shopify : il faut d'abord relier (ou créer) sa boutique.
+        <div className="mt-7">
+          <p className="mb-3 text-sm text-fg-muted">Pour t'abonner, relie ta boutique Shopify : le paiement passe par ta facture Shopify.</p>
+          <ShopifyForm next="/app" onBeforeRedirect={savePending} />
+        </div>
+      ) : (
+        <Button size="lg" className="mt-7 w-full" onClick={activate} disabled={busy}>
+          {busy ? <Spinner /> : "Activer Vitrio Pro"}
+        </Button>
+      )}
       <p className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-fg-faint">
         <ShieldCheck className="mt-px h-3.5 w-3.5 shrink-0" />
         Paiement sécurisé par Shopify, ajouté à ta facture Shopify. Sans engagement : tu arrêtes en un clic et tu gardes tout ce qui a été créé.

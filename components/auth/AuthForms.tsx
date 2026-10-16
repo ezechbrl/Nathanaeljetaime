@@ -36,7 +36,7 @@ function normalizeShop(input: string) {
   return /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(full) ? full : null;
 }
 
-export function ShopifyForm({ next, cta = "Continuer avec Shopify" }: { next: string; cta?: string }) {
+export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBeforeRedirect }: { next: string; cta?: string; onBeforeRedirect?: (autostart: boolean) => void }) {
   const [shop, setShop] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -47,6 +47,7 @@ export function ShopifyForm({ next, cta = "Continuer avec Shopify" }: { next: st
     if (!domain) return setError("Saisis l'adresse de ta boutique, par exemple ma-boutique.myshopify.com");
     setError("");
     setLoading(true);
+    onBeforeRedirect?.(false);
     await api.loginWithShopify(domain, next).catch((err) => {
       setError((err as Error).message);
       setLoading(false);
@@ -54,19 +55,31 @@ export function ShopifyForm({ next, cta = "Continuer avec Shopify" }: { next: st
   }
 
   return (
-    <form onSubmit={submit} className="space-y-3">
-      <label htmlFor="shop" className="block text-sm text-fg-muted">Adresse de ta boutique Shopify</label>
-      <div className="flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
-        <ShoppingBag className="ml-3 h-4 w-4 shrink-0 text-accent" />
-        <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" className="min-w-0 flex-1 bg-transparent px-2 py-3 text-[15px] focus:outline-none" />
-        <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
+    <div className="space-y-3">
+      {/* 1. Pas encore de boutique : on l'envoie ouvrir son compte Shopify, puis il revient ici. */}
+      <div className="rounded-card border border-line/10 bg-white/[0.02] p-4">
+        <p className="font-medium">Pas de compte Shopify ?</p>
+        <p className="mt-1 text-sm text-fg-muted">Ouvre ta boutique avec l'essai Shopify (quelques euros seulement les premiers mois), puis reviens ici pour la relier.</p>
+        <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-ctl border border-line/15 bg-white/[0.04] text-[15px] font-medium transition-colors hover:border-line/30 hover:bg-white/[0.07]">
+          <ShoppingBag className="h-4 w-4 text-accent" /> Créer un compte Shopify
+        </a>
       </div>
-      {error && <p role="alert" className="text-sm text-bad">{error}</p>}
-      <Button type="submit" size="lg" className="w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
-      <p className="text-xs leading-relaxed text-fg-faint">
-        Pas encore de boutique ? <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="underline underline-offset-4">Ouvre-en une gratuitement sur Shopify</a>{site.shopifyReferral && " (lien partenaire)"}, puis reviens ici.
-      </p>
-    </form>
+
+      {/* 2. Déjà une boutique : on la relie à Vitrio. */}
+      <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-4">
+        <p className="font-medium">J'ai un compte Shopify</p>
+        <p className="mt-1 text-sm text-fg-muted">Associe ta boutique Shopify à Vitrio.</p>
+        <label htmlFor="shop" className="sr-only">Adresse de ta boutique Shopify</label>
+        <div className="mt-3 flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
+          <ShoppingBag className="ml-3 h-4 w-4 shrink-0 text-accent" />
+          <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" className="min-w-0 flex-1 bg-transparent px-2 py-3 text-[15px] focus:outline-none" />
+          <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
+        </div>
+        {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
+        <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
+        <p className="mt-2 text-xs text-fg-faint">L'adresse est dans Shopify, en haut de ton tableau de bord (ex. ma-boutique.myshopify.com).</p>
+      </form>
+    </div>
   );
 }
 
@@ -162,7 +175,7 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
           <p className="mt-1 line-clamp-2 text-fg-muted">« {brief} »</p>
         </div>
       )}
-      <ShopifyForm next={next} cta={mode === "register" ? "Créer ma boutique avec Shopify" : "Continuer avec Shopify"} />
+      <ShopifyForm next={next} />
       <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
       <div className="space-y-2.5">
         <GoogleButton next={next} />
@@ -179,5 +192,5 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
 export function ConnectShopifyPanel() {
   const params = useSearchParams();
   const next = params.get("next")?.startsWith("/") ? params.get("next")! : "/app";
-  return <ShopifyForm next={next} cta="Connecter ma boutique" />;
+  return <ShopifyForm next={next} />;
 }
