@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ExternalLink, History, MessageSquare, RotateCcw, Trash2 } from "lucide-react";
+import { AlertTriangle, ExternalLink, History, RotateCcw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -12,7 +12,7 @@ import { PublishButton } from "@/components/app/PublishButton";
 import { ThemeImportCard } from "@/components/app/ThemeImportCard";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { ErrorState, StatusBadge } from "@/components/ui/Feedback";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
@@ -48,8 +48,6 @@ export default function StoreDashboard() {
     return <div className="p-8"><ErrorState message={`La génération a échoué. Elle n'est pas décomptée de ton offre : relance-la depuis l'accueil.${lastError ? ` (Détail : ${lastError})` : ""}`} onRetry={restart} /></div>;
   }
 
-  const plan = store.plan;
-
   async function restore(versionId: string) {
     const res = await api.restoreVersion(store.id, versionId);
     setStore(res.store);
@@ -66,11 +64,10 @@ export default function StoreDashboard() {
     <>
       <PageHeader
         title={store.name}
-        subtitle={<span className="flex flex-wrap items-center gap-3"><StatusBadge status={store.status} /> <span>{store.language}</span> {links && <a href={links.password} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-fg-faint hover:text-fg">Boutique protégée par mot de passe ? Le voir dans Shopify <ExternalLink className="h-3 w-3" /></a>}</span>}
+        subtitle={<span className="flex flex-wrap items-center gap-3"><StatusBadge status={store.status} /> <span>{store.language}</span></span>}
         actions={<>
           {links && <a href={links.storefront} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-accent/40 bg-accent-deep/40 px-4 text-sm font-medium text-fg transition-colors hover:bg-accent-deep/70"><ExternalLink className="h-4 w-4" /> Voir ma boutique</a>}
-          {links && <a href={links.admin} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-white/10 px-4 text-sm text-fg-muted transition-colors hover:bg-white/[0.05] hover:text-fg">Ouvrir Shopify</a>}
-          <ButtonLink href={`/app/boutiques/${store.id}/editeur`} variant="secondary"><MessageSquare className="h-4 w-4" /> Modifier avec l'IA</ButtonLink><PublishButton />
+          <PublishButton />
         </>}
       />
       {lastPublishError && !activeJob && (
@@ -98,19 +95,6 @@ export default function StoreDashboard() {
         </div>
 
         <aside className="space-y-4">
-          <section className="surface rounded-card p-5">
-            <h2 className="text-sm text-fg-muted">Stratégie</h2>
-            <p className="mt-3 text-[15px] leading-snug">{plan.strategy.promise}</p>
-            <dl className="mt-4 space-y-3 text-sm">
-              <div><dt className="text-fg-faint">Marché</dt><dd className="mt-0.5 text-fg-muted">{plan.strategy.market}</dd></div>
-              <div><dt className="text-fg-faint">Offres</dt><dd className="mt-0.5 text-fg-muted">{plan.strategy.offers.join(" · ")}</dd></div>
-              <div><dt className="text-fg-faint">Ton</dt><dd className="mt-0.5 text-fg-muted">{plan.brand.tone}</dd></div>
-            </dl>
-            <div className="mt-4 flex gap-1.5">
-              {Object.values(store.theme.colors).map((c) => <span key={c} title={c} className="h-6 w-6 rounded-full border border-white/15" style={{ background: c }} />)}
-            </div>
-          </section>
-
           <section className="surface rounded-card p-5">
             <h2 className="flex items-center gap-2 text-sm text-fg-muted"><History className="h-4 w-4" /> Versions</h2>
             <ul className="mt-3 max-h-56 space-y-1 overflow-y-auto">
