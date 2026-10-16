@@ -52,6 +52,8 @@ export default function EditorPage() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [device, setDevice] = useState<"auto" | "mobile">("auto");
   const [flash, setFlash] = useState(false);
+  // Sur téléphone : une seule vue à la fois (discussion ou aperçu), en plein écran.
+  const [view, setView] = useState<"chat" | "preview">("chat");
   const previewRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -106,8 +108,18 @@ export default function EditorPage() {
         </div>
       </div>
 
+      <div className="flex border-b border-white/[0.06] lg:hidden" role="tablist" aria-label="Vue">
+        {([["chat", "Discussion"], ["preview", "Aperçu"]] as const).map(([v, label]) => (
+          <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)} className={cn("relative flex-1 py-2.5 text-sm transition-colors", view === v ? "font-medium text-white" : "text-fg-muted")}>
+            {label}
+            {v === "preview" && flash && <span className="absolute right-[30%] top-2 h-2 w-2 rounded-full bg-accent" />}
+            {view === v && <span className="absolute inset-x-6 bottom-0 h-0.5 rounded-full bg-accent" />}
+          </button>
+        ))}
+      </div>
+
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <section aria-label="Conversation avec l'IA" className="flex max-h-[48dvh] min-h-0 w-full flex-col border-b border-white/[0.06] lg:max-h-none lg:w-[400px] lg:border-b-0 lg:border-r">
+        <section aria-label="Conversation avec l'IA" className={cn("min-h-0 w-full flex-1 flex-col lg:flex lg:w-[400px] lg:flex-none lg:border-r lg:border-white/[0.06]", view === "chat" ? "flex" : "hidden")}>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4" aria-live="polite">
             {messages.map((m) => (
               <div key={m.id} className={cn("flex gap-2.5", m.role === "user" && "justify-end")}>
@@ -126,6 +138,7 @@ export default function EditorPage() {
                           </p>
                         </div>
                       ))}
+                      <button type="button" onClick={() => setView("preview")} className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-accent lg:hidden">Voir dans l'aperçu <ArrowRight className="h-3 w-3" /></button>
                     </div>
                   )}
                 </div>
@@ -177,7 +190,7 @@ export default function EditorPage() {
           </div>
         </section>
 
-        <section aria-label="Aperçu de la boutique" className="flex min-h-0 flex-1 flex-col bg-bg-2">
+        <section aria-label="Aperçu de la boutique" className={cn("min-h-0 flex-1 flex-col bg-bg-2 lg:flex", view === "preview" ? "flex" : "hidden")}>
           <div className="flex gap-1 overflow-x-auto px-4 pt-3">
             {PAGES.map((p) => (
               <button key={p.id} onClick={() => setPage(p.id)} aria-pressed={page === p.id} className={cn("shrink-0 rounded-t-ctl px-4 py-2 text-[13px] transition-colors", page === p.id ? "bg-white/[0.06] text-fg" : "text-fg-faint hover:text-fg")}>{p.label}</button>

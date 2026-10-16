@@ -153,7 +153,7 @@ p{margin:0}
 .hero--split .media{aspect-ratio:4/4.4}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);font-size:13px;margin-bottom:22px;border:1px solid rgba(255,255,255,.22)}
 .hero--split .pill{background:color-mix(in srgb,var(--c-accent) 14%,transparent);border-color:color-mix(in srgb,var(--c-accent) 30%,transparent)}
-@media (max-width:860px){.hero{min-height:auto;padding:150px 0 56px;align-items:flex-end}.hero__bg::after{background:linear-gradient(0deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,.4) 60%,rgba(0,0,0,.15) 100%)}.hero--split .hero__grid{grid-template-columns:1fr;gap:32px}.hero--split{padding:48px 0}}
+@media (max-width:860px){.hero{display:block;min-height:auto;padding:0 0 52px;background:var(--c-primary)}.hero__bg{position:relative;inset:auto;aspect-ratio:4/3.3}.hero__bg img{object-position:74% center;transform:none}.hero__bg::after{background:linear-gradient(0deg,var(--c-primary) 0%,transparent 38%)}.hero .wrap{margin-top:-36px}.hero h1{font-size:clamp(34px,9.5vw,44px)}.hero__sub{font-size:17px;margin-top:14px}.hero .btn{margin-top:24px}.hero__trust{margin-top:22px;font-size:14px}.hero--split .hero__grid{grid-template-columns:1fr;gap:32px}.hero--split{padding:48px 0}}
 .feats{display:grid;grid-template-columns:repeat(var(--n,4),1fr);gap:28px}
 .feat{text-align:center;padding:8px}
 .feat .ico{font-size:34px;color:var(--c-accent);margin:0 auto 14px;display:block;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
