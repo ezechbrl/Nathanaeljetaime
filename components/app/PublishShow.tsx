@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import type { Job, JobStepKey, Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { shopifyLinks } from "@/lib/shopify-links";
+import { useLiveProgress } from "@/lib/use-progress";
 import { Confetti } from "./LaunchCelebration";
+import { ThemeImportCard } from "./ThemeImportCard";
 
 export const PUBLISH_LIVE_KEY = "vitrio-publish-live";
 
@@ -46,6 +48,7 @@ function useFit(width: number) {
 // Écran plein pendant la publication : les éléments de la boutique voyagent de Vitrio vers Shopify.
 export function PublishProgress({ store, job }: { store: Store; job: Job }) {
   const elapsed = useElapsed();
+  const pct = useLiveProgress(job.progress);
   const running = job.steps.find((s) => s.status === "running") ?? job.steps.find((s) => s.status === "pending");
   const done = job.steps.filter((s) => s.status === "done");
   const c = store.theme.colors;
@@ -100,8 +103,8 @@ export function PublishProgress({ store, job }: { store: Store; job: Job }) {
         <p key={running?.key} className="mx-auto mt-2 min-h-[24px] max-w-md text-[15px] [animation:fade-in_.4s_ease-out]" aria-live="polite">{running ? STEP_LINE[running.key] ?? running.label : "Dernières vérifications…"}</p>
 
         <div className="mx-auto mt-5 max-w-md">
-          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-valuenow={job.progress} aria-valuemin={0} aria-valuemax={100}>
-            <div className="relative h-full overflow-hidden rounded-full bg-accent transition-[width] duration-700 ease-out" style={{ width: `${Math.max(job.progress, 5)}%` }}>
+          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+            <div className="relative h-full overflow-hidden rounded-full bg-accent transition-[width] duration-500 ease-out" style={{ width: `${Math.max(pct, 3)}%` }}>
               <span className="absolute inset-0 animate-shimmer bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.55),transparent)] bg-[length:200%_100%]" />
             </div>
           </div>
@@ -131,6 +134,7 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
   const shop = store.liveUrl?.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
   const links = shopifyLinks(store.liveUrl);
   const adminThemes = links?.themes;
+  const manual = store.themeStatus === "manual";
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onKey);
@@ -140,7 +144,7 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
   return (
     <div role="dialog" aria-modal="true" aria-label="Boutique publiée" onClick={onClose} className="fixed inset-0 z-50 grid place-items-center bg-[#061815]/85 p-5 backdrop-blur-md [animation:fade-in_.4s_ease-out]">
       {live && <Confetti colors={[c.accent, c.primary, "#68e6b0", "#ffffff", "#f5c451"]} />}
-      <div onClick={(e) => e.stopPropagation()} className="relative w-full max-w-[480px] text-center [animation:rise_.6s_.1s_cubic-bezier(.2,.8,.2,1)_both]">
+      <div onClick={(e) => e.stopPropagation()} className={cn("relative max-h-[92dvh] w-full overflow-y-auto text-center [animation:rise_.6s_.1s_cubic-bezier(.2,.8,.2,1)_both]", manual ? "max-w-[560px]" : "max-w-[480px]")}>
         <div className="relative mx-auto grid h-24 w-24 place-items-center">
           <span className="absolute inset-0 rounded-full border-2 border-accent [animation:ring-out_1.6s_.3s_ease-out_infinite]" />
           <span className="absolute inset-0 rounded-full border-2 border-accent [animation:ring-out_1.6s_.9s_ease-out_infinite]" />
@@ -151,24 +155,23 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
         <p className="mt-7 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-deep/40 px-3 py-1 text-sm text-accent">
           <span className="h-2 w-2 animate-pulse rounded-full bg-accent" /> {live ? "En ligne" : "Prête en aperçu"}
         </p>
-        <h2 className="mt-4 text-h2">{live ? <>Ta boutique est <span className="serif-accent">en ligne</span></> : <>Tout est dans <span className="serif-accent">Shopify</span></>}</h2>
+        <h2 className="mt-4 text-h2">{manual ? <>Plus qu'<span className="serif-accent">une étape</span></> : live ? <>Ta boutique est <span className="serif-accent">en ligne</span></> : <>Tout est dans <span className="serif-accent">Shopify</span></>}</h2>
         <p className="mx-auto mt-3 max-w-sm text-fg-muted">
           {store.themeStatus === "manual"
-            ? <>Ton produit et tes photos sont dans Shopify. Dernière étape : importer ton thème Vitrio en 3 clics, on te guide.</>
+            ? <>Ton produit, tes prix et tes photos sont dans Shopify. Installe maintenant le design Vitrio de ta boutique :</>
             : live
             ? <>{store.name} est publiée sur Shopify avec son thème, son produit et ses pages.{shop ? <> Adresse : <span className="text-fg">{shop}</span></> : null}</>
             : <>Produit, pages et thème Vitrio sont installés. Ton ancien thème reste affiché tant que tu ne publies pas le nouveau depuis Shopify → Thèmes.</>}
         </p>
+        {manual && <ThemeImportCard store={store} compact />}
         <p className="mx-auto mt-2 max-w-sm text-xs text-fg-faint">Boutique de test ou protégée par mot de passe ? {links ? <a href={links.password} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-fg">Voir le mot de passe dans Shopify</a> : "Le mot de passe est dans Shopify → Boutique en ligne → Préférences."}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          {store.liveUrl && (
+          {store.liveUrl && !manual && (
             <a href={store.liveUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(16_176_127/0.7)]">
               Voir ma boutique <ExternalLink className="h-4 w-4" />
             </a>
           )}
-          {store.themeStatus === "manual" ? (
-            <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">Installer mon thème</button>
-          ) : !live && adminThemes ? (
+          {!manual && !live && adminThemes ? (
             <a href={adminThemes} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">Ouvrir mes thèmes Shopify</a>
           ) : (
             <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">Continuer</button>

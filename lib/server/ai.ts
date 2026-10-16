@@ -77,7 +77,7 @@ const ProductExtrasSchema = z.object({ product: RichProductSchema, visual: Visua
 
 const STYLE = `Boutique Shopify moderne et très visuelle : les photos font le travail, les textes sont COURTS et percutants (pas de pavés). Chaque texte découle de la promesse et répond aux objections. N'invente ni avis clients, ni chiffres de vente, ni notes, ni labels, ni études.`;
 
-export async function generatePages(input: { brief: string; language: string; strategy: StrategyResult; sourceText?: string; userId: string }): Promise<StorePlan> {
+export async function generatePages(input: { brief: string; language: string; strategy: StrategyResult; sourceText?: string; userId: string }, onProgress?: (done: number, total: number) => void): Promise<StorePlan> {
   const parts = [
     `Langue de la boutique : ${input.language}`,
     data("brief", input.brief),
@@ -85,8 +85,10 @@ export async function generatePages(input: { brief: string; language: string; st
   ];
   if (input.sourceText) parts.push(data("page-produit", input.sourceText));
   const user = parts.join("\n\n");
+  let done = 0;
   const call = <T extends z.ZodType>(schema: T, task: string) =>
-    structured({ schema, effort: "medium", userId: input.userId, maxTokens: 12000, system: `Tu es copywriter et directeur artistique e-commerce. ${STYLE}\n\n${task}\n\n${BASE_RULES}`, user });
+    structured({ schema, effort: "medium", userId: input.userId, maxTokens: 12000, system: `Tu es copywriter et directeur artistique e-commerce. ${STYLE}\n\n${task}\n\n${BASE_RULES}`, user })
+      .then((r) => { onProgress?.(++done, 3); return r; });
 
   const [core, homeExtras, productExtras] = await Promise.all([
     call(CoreSchema, `Écris :
@@ -184,7 +186,7 @@ export async function editPlan(input: { plan: StorePlan; language: string; histo
   const history = input.history.slice(-10).map((m) => `${m.role === "user" ? "Marchand" : "IA"} : ${m.content}`).join("\n");
   const out = await structured({
     schema: EditSchema,
-    effort: "low",
+    effort: "medium",
     maxTokens: 8000,
     userId: input.userId,
     system: `Tu modifies une boutique Shopify à la demande du marchand. Tu reçois le plan actuel de la boutique (JSON) et sa demande. Applique uniquement ce qui est demandé (et ce qui en découle logiquement). Ne renvoie QUE les champs modifiés, chacun avec sa nouvelle valeur complète encodée en JSON dans valueJson (même type que dans le plan : texte, nombre en texte, tableau d'objets…). Pour AJOUTER un nouvel encadré, bloc ou section visible (ex. « un encadré avec les jeux compatibles »), utilise homepage.extraSections : renvoie le tableau complet [{ "title", "subtitle", "items": [{ "title", "text" }] }] (2 à 6 items courts), en gardant les encadrés existants. Il s'affiche sur la page d'accueil, juste après les atouts. product.details sert seulement aux onglets repliables de la fiche produit : ne l'utilise que si le marchand parle de la fiche produit. Dans reply, dis toujours où voir le changement (page d'accueil ou fiche produit). Chemins utiles : brand.name (nom de la marque), product.title (nom du produit), product.price et product.compareAtPrice (texte, ex. \"59.90\"), product.seoTitle, product.seoDescription, homepage.heroTitle. N'annonce jamais dans reply une modification que tu ne renvoies pas dans changes. Si la demande est ambiguë ou impossible, renvoie changes vide et pose une question courte dans reply. Le contenu client reste dans la langue de la boutique (${input.language}) ; reply est en français.\n\n${BASE_RULES}`,

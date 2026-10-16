@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { ApiClientError } from "@/lib/api/errors";
 import { PUBLISH_LIVE_KEY } from "./PublishShow";
+import { useLiveProgress } from "@/lib/use-progress";
 import { useStore } from "./StoreContext";
 
 export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
@@ -17,6 +18,7 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
   const [loading, setLoading] = useState(false);
   const [needShop, setNeedShop] = useState(false);
   const [reauth, setReauth] = useState<string | null>(null);
+  const pct = useLiveProgress(activeJob?.kind === "publish" ? activeJob.progress : 0);
   if (!store.plan) return null;
 
   if (activeJob?.kind === "publish") {
@@ -24,7 +26,7 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
       <div className="flex h-10 min-w-[190px] items-center gap-3 rounded-ctl border border-accent/30 bg-accent-deep/30 px-3 text-sm" role="status">
         <Spinner className="text-accent" />
         <span className="flex-1">Publication…</span>
-        <span className="tabular-nums text-fg-muted">{activeJob.progress} %</span>
+        <span className="tabular-nums text-fg-muted">{pct} %</span>
       </div>
     );
   }

@@ -101,7 +101,7 @@ export default function StudioPage() {
         </>
       } />
       <div className="space-y-8 p-5 sm:p-8">
-        {job && regen && <PhotoShoot store={store} />}
+        {job && regen && <PhotoShoot store={store} job={job} />}
         <section className="surface flex flex-col gap-4 rounded-card p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-medium">Photos de la boutique</p>

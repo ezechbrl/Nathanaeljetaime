@@ -17,7 +17,7 @@ function NavLink({ href, icon: Icon, children, exact }: { href: string; icon: Re
   const pathname = usePathname();
   const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
   return (
-    <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex items-center gap-2.5 rounded-ctl px-2.5 py-[7px] text-[13.5px] transition-colors", active ? "bg-white/[0.07] text-fg" : "text-fg-muted hover:bg-white/[0.03] hover:text-fg")}>
+    <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex items-center gap-2.5 rounded-ctl px-2.5 py-[7px] text-[13.5px] transition-colors", active ? "bg-white/[0.09] font-medium text-white" : "text-fg/90 hover:bg-white/[0.04] hover:text-white")}>
       <Icon className={cn("h-4 w-4", active && "text-accent")} /> {children}
     </Link>
   );
@@ -44,7 +44,7 @@ function StoreSwitcher({ currentId }: { currentId?: string }) {
               <span className="truncate">{s.name}</span>
             </button>
           ))}
-          <Link href="/app" onClick={() => setOpen(false)} className="mt-1 flex items-center gap-2.5 border-t border-white/[0.06] px-2.5 py-2 text-[13px] text-fg-muted hover:text-fg"><Plus className="h-4 w-4" /> Nouvelle boutique</Link>
+          <Link href="/app" onClick={() => setOpen(false)} className="mt-1 flex items-center gap-2.5 border-t border-white/[0.06] px-2.5 py-2 text-[13px] text-fg/90 hover:text-white"><Plus className="h-4 w-4" /> Nouvelle boutique</Link>
         </div>
       )}
     </div>
@@ -70,7 +70,7 @@ function SidebarBody() {
 
       {storeId && (
         <>
-          <p className="mt-5 px-2.5 pb-1.5 text-[10.5px] uppercase tracking-[0.14em] text-fg-faint">Ma boutique</p>
+          <p className="mt-5 px-2.5 pb-1.5 text-[10.5px] uppercase tracking-[0.14em] text-fg-muted">Ma boutique</p>
           <StoreSwitcher currentId={params.id} />
           <div className="mt-1 space-y-0.5">
             <NavLink href={`/app/boutiques/${storeId}`} icon={LayoutGrid} exact>Tableau de bord</NavLink>

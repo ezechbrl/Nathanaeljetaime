@@ -9,7 +9,8 @@ import { GenerationProgress } from "@/components/app/GenerationProgress";
 import { FullscreenButton } from "@/components/app/FullscreenButton";
 import { PageHeader } from "@/components/app/PageHeader";
 import { PublishButton } from "@/components/app/PublishButton";
-import { ThemeImportCard } from "@/components/app/ThemeImportCard";
+import { StoreCoach } from "@/components/app/StoreCoach";
+import { ThemeImportCard, useThemeImported } from "@/components/app/ThemeImportCard";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
 import { Button } from "@/components/ui/Button";
@@ -35,6 +36,7 @@ export default function StoreDashboard() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const links = shopifyLinks(store.liveUrl);
+  const [themeImported, markThemeImported] = useThemeImported(store);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
@@ -80,7 +82,7 @@ export default function StoreDashboard() {
           </div>
         </div>
       )}
-      {store.themeStatus === "manual" && !activeJob && <ThemeImportCard store={store} />}
+      {store.themeStatus === "manual" && store.status === "published" && !activeJob && !themeImported && <ThemeImportCard store={store} onDone={markThemeImported} />}
       <div className="grid gap-6 p-5 sm:p-8 xl:grid-cols-[1fr_340px]">
         <div className="min-w-0">
           <div className="flex gap-1 overflow-x-auto">
@@ -95,6 +97,7 @@ export default function StoreDashboard() {
         </div>
 
         <aside className="space-y-4">
+          <StoreCoach store={store} assets={assets.data?.assets} />
           <section className="surface rounded-card p-5">
             <h2 className="flex items-center gap-2 text-sm text-fg-muted"><History className="h-4 w-4" /> Versions</h2>
             <ul className="mt-3 max-h-56 space-y-1 overflow-y-auto">

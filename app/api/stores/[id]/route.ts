@@ -20,9 +20,8 @@ export const GET = route<Ctx>(async (_req, { params }) => {
   const lastPublish = must(await db().from("jobs").select("status, error, created_at").eq("store_id", store.id).eq("kind", "publish").in("status", ["succeeded", "failed"]).order("created_at", { ascending: false }).limit(1).maybeSingle()) as { status: string; error: string | null } | null;
   // Thème refusé faute de dérogation Shopify : ce n'est pas une erreur, le marchand importe le thème à la main.
   const noExemption = lastPublish?.status === "failed" && /access denied|exemption/i.test(lastPublish.error ?? "");
-  const mapped = toStore(store);
   return json({
-    store: noExemption && !mapped.themeStatus ? { ...mapped, themeStatus: "manual" } : mapped,
+    store: toStore(store),
     activeJob: active ? toJob(active as Record<string, any>) : null,
     lastError: failed?.error ?? null,
     lastPublishError: lastPublish?.status === "failed" && !noExemption ? lastPublish.error ?? "La publication a échoué." : null,

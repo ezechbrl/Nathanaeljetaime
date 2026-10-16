@@ -2,7 +2,8 @@
 
 import { Camera } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Store } from "@/lib/api/types";
+import type { Job, Store } from "@/lib/api/types";
+import { useLiveProgress, useRemaining } from "@/lib/use-progress";
 import { cn } from "@/lib/cn";
 
 // Les prises de vue, dans l'ordre où elles « se développent » (purement indicatif : la génération est parallèle).
@@ -17,29 +18,25 @@ const SHOTS: { label: string; line: string; bg: (c: Store["theme"]["colors"]) =>
   { label: "Posé sur le côté", line: "Nouvel angle, vu d'en haut…", bg: (c) => `linear-gradient(200deg, #1b1f24, ${c.primary})` },
   { label: "Grand format", line: "Dernière mise en scène, en grand…", bg: (c) => `linear-gradient(20deg, ${c.accent}55, ${c.background})` },
 ];
-const EXPECTED_MS = 100_000;
 
 // Animation « séance photo » pendant que les visuels de la boutique sont refaits.
-export function PhotoShoot({ store }: { store: Store }) {
+export function PhotoShoot({ store, job }: { store: Store; job: Job | null }) {
   const c = store.theme.colors;
-  const [elapsed, setElapsed] = useState(0);
   const [flash, setFlash] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const t0 = Date.now();
-    const id = setInterval(() => setElapsed(Date.now() - t0), 250);
     const fl = setInterval(() => setFlash((f) => f + 1), 3800);
-    return () => { clearInterval(id); clearInterval(fl); };
+    return () => clearInterval(fl);
   }, []);
 
-  // Progression estimée : ralentit en approchant de la fin, ne dépasse jamais 95 % avant le vrai résultat.
-  const pct = Math.min(95, Math.round(100 * (1 - Math.exp(-elapsed / (EXPECTED_MS / 2.2)))));
-  const developed = Math.min(SHOTS.length, Math.floor((pct / 95) * SHOTS.length));
+  // Progression réelle : chaque photo terminée côté serveur fait avancer la barre.
+  const pct = useLiveProgress(job?.progress ?? 0, job?.status === "succeeded");
+  const developed = Math.min(SHOTS.length, Math.floor((pct / 100) * SHOTS.length));
   const current = SHOTS[Math.min(developed, SHOTS.length - 1)];
-  const left = Math.max(0, Math.round((EXPECTED_MS - elapsed) / 1000));
-  const remaining = left > 60 ? `Tes photos arrivent dans environ ${Math.ceil(left / 60)} min` : left > 10 ? `Tes photos arrivent dans environ ${Math.ceil(left / 10) * 10} s` : "Tes photos arrivent dans quelques secondes…";
+  const left = useRemaining(pct);
+  const remaining = left == null ? "Mise en place du studio…" : left > 60 ? `Tes photos arrivent dans environ ${Math.ceil(left / 60)} min` : left > 10 ? `Tes photos arrivent dans environ ${Math.ceil(left / 10) * 10} s` : "Tes photos arrivent dans quelques secondes…";
 
   function onMove(e: React.PointerEvent) {
     if (e.pointerType !== "mouse" || !box.current) return;

@@ -43,6 +43,11 @@ export default function EditorPage() {
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
+  // Demande préparée depuis le tableau de bord (« Idées pour vendre plus ») : on la pré-remplit.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) setDraft(q);
+  }, []);
   const [sending, setSending] = useState(false);
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [device, setDevice] = useState<"auto" | "mobile">("auto");

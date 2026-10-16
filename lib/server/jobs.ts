@@ -34,12 +34,33 @@ export async function createJob(storeId: string, userId: string, kind: "generate
 }
 
 // Suivi de progression : chaque appel marque l'étape `key` en cours et les précédentes terminées.
-function tracker(jobId: string, steps: Step[]) {
-  return async (key: string) => {
-    const i = steps.findIndex((s) => s.key === key);
-    steps.forEach((s, j) => (s.status = j < i ? "done" : j === i ? "running" : s.status === "done" ? "done" : "pending"));
-    await db().from("jobs").update({ status: "running", steps, progress: Math.round((i / steps.length) * 100) }).eq("id", jobId);
+// Poids de chaque étape (≈ sa durée réelle) : la barre avance au rythme du travail, pas des étapes.
+export const GENERATE_WEIGHTS: Partial<Record<JobStepKey, number>> = { strategy: 14, brand: 2, pages: 34, product: 2, images: 44, theme: 4 };
+export const PUBLISH_WEIGHTS: Partial<Record<JobStepKey, number>> = { product: 45, publish: 25, theme: 30 };
+
+type Tracker = ((key: JobStepKey) => Promise<void>) & { sub: (fraction: number) => Promise<void> };
+
+function tracker(jobId: string, steps: Step[], weights: Partial<Record<JobStepKey, number>> = {}): Tracker {
+  const w = (k: JobStepKey) => weights[k] ?? 1;
+  const total = steps.reduce((n, s) => n + w(s.key), 0);
+  let current = -1;
+  let last = -1;
+  const write = async (fraction: number) => {
+    const before = steps.slice(0, Math.max(0, current)).reduce((n, s) => n + w(s.key), 0);
+    // Jamais 100 % avant la vraie fin (finish).
+    const progress = Math.min(99, Math.round((100 * (before + (current >= 0 ? w(steps[current].key) * fraction : 0))) / total));
+    if (progress === last) return;
+    last = progress;
+    await db().from("jobs").update({ status: "running", steps, progress }).eq("id", jobId);
   };
+  const step = (async (key: JobStepKey) => {
+    current = steps.findIndex((s) => s.key === key);
+    steps.forEach((s, j) => (s.status = j < current ? "done" : j === current ? "running" : s.status === "done" ? "done" : "pending"));
+    last = -1;
+    await write(0);
+  }) as Tracker;
+  step.sub = (fraction) => write(Math.max(0, Math.min(1, fraction))).catch(() => {});
+  return step;
 }
 
 async function finish(jobId: string, steps: Step[], error?: string) {
@@ -64,7 +85,7 @@ const FONTS = { serif: "Instrument Serif", sans: "DM Sans" } as const;
 // Génération complète d'une boutique. Exécutée après la réponse HTTP (voir `after()` dans la route).
 export async function runGeneration(job: Record<string, any>, store: StoreRow) {
   const steps: Step[] = job.steps;
-  const step = tracker(job.id, steps);
+  const step = tracker(job.id, steps, GENERATE_WEIGHTS);
   try {
     await step("strategy");
     let sourceText: string | undefined;
@@ -80,11 +101,11 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     await db().from("stores").update({ name: strategy.brand.name, theme: { colors: strategy.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" } }).eq("id", store.id);
 
     await step("pages");
-    const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText, userId: store.user_id });
+    const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText, userId: store.user_id }, (d, t) => void step.sub(d / t));
     await step("product");
 
     await step("images");
-    await generateStoreImages(store.id, plan);
+    await generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t));
 
     await step("theme");
     const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" };
@@ -102,7 +123,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
 // Visuels de la boutique : un packshot, puis des mises en scène construites à partir de ce packshot pour
 // que le produit reste strictement le même partout. Jamais de personnes : seulement le produit, sur
 // différents fonds et décors. Ce sont des illustrations IA : le marchand peut les remplacer par ses vraies photos.
-export async function generateStoreImages(storeId: string, plan: StorePlan) {
+export async function generateStoreImages(storeId: string, plan: StorePlan, onProgress?: (done: number, total: number) => void) {
   if (!env.falKey()) return;
   const c = plan.brand.colors;
   const look = plan.visual?.productLook || `${plan.product.title}, ${plan.product.subtitle}`;
@@ -141,19 +162,23 @@ export async function generateStoreImages(storeId: string, plan: StorePlan) {
     ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a muted tone close to ${c.background}, gentle window light. ${keep} ${CLEAN}`],
     ["moment3", "lifestyle", "16:9", `Wide atmospheric shot, ${scene}: the product seen from a slightly high front three-quarter angle, placed in an empty, tidy setting that fits the brand, warm evening light with subtle ${c.accent} accent lights, lots of space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
   ];
+  // Le packshot compte pour une photo ; chaque mise en scène terminée fait avancer la barre.
+  let done = 1;
+  onProgress?.(done, shots.length + 1);
   await Promise.all(shots.map(async ([slot, kind, ratio, prompt]) => {
     try {
       await save(slot, kind, await editImage(reference, prompt, ratio), prompt);
     } catch (e) {
       console.warn(`Image ${slot} non générée :`, errorMessage(e));
     }
+    onProgress?.(++done, shots.length + 1);
   }));
 }
 
 // Refait toutes les photos générées d'une boutique (les photos importées par le marchand sont gardées).
 export async function runRegenerateImages(job: Record<string, any>, store: StoreRow) {
   const steps: Step[] = job.steps;
-  const step = tracker(job.id, steps);
+  const step = tracker(job.id, steps, { images: 1 });
   try {
     await step("images");
     const old = must(await db().from("assets").select("id, kind, storage_path").eq("store_id", store.id).neq("kind", "upload").neq("kind", "logo")) as { id: string; kind: string; storage_path: string | null }[];
@@ -162,7 +187,7 @@ export async function runRegenerateImages(job: Record<string, any>, store: Store
       if (paths.length) await db().storage.from("assets").remove(paths);
       await db().from("assets").delete().in("id", old.map((a) => a.id));
     }
-    await generateStoreImages(store.id, store.plan as StorePlan);
+    await generateStoreImages(store.id, store.plan as StorePlan, (d, t) => void step.sub(d / t));
     await db().from("stores").update({ updated_at: new Date().toISOString() }).eq("id", store.id);
     await finish(job.id, steps);
   } catch (e) {
@@ -172,7 +197,7 @@ export async function runRegenerateImages(job: Record<string, any>, store: Store
 
 export async function runPublish(job: Record<string, any>, store: StoreRow) {
   const steps: Step[] = job.steps;
-  const step = tracker(job.id, steps);
+  const step = tracker(job.id, steps, PUBLISH_WEIGHTS);
   const previousStatus = store.shopify && (store.shopify as ShopifyIds).productId ? "published" : "ready";
   try {
     const conn = await connectionFor(store.user_id, store.shop_connection_id);
@@ -181,7 +206,7 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Boutique créée avant l'activation des visuels : on les génère maintenant.
     if (!assets.some((a) => a.kind !== "upload" && a.kind !== "logo") && env.falKey()) {
       await step("product");
-      await generateStoreImages(store.id, store.plan as StorePlan);
+      await generateStoreImages(store.id, store.plan as StorePlan, (d, t) => void step.sub((d / t) * 0.6));
       assets = await listAssets();
     }
     const plan0 = store.plan as StorePlan;
@@ -197,7 +222,8 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
       .map((a) => ({ url: a.url, alt: a.slot === "detail" ? `${title} — détail` : a.slot === "inuse" ? `${title} — en situation` : title }));
     const sceneFiles: Partial<Record<Slot, string>> = {};
     for (const a of tagged) if (a.slot && !(a.slot in order)) sceneFiles[a.slot] = a.url; // le plus récent l'emporte
-    const ids = await publish(conn.shop, conn.token, store.plan as StorePlan, images, store.shopify as ShopifyIds, step, store.theme as StoreTheme | undefined);
+    const ids = await publish(conn.shop, conn.token, store.plan as StorePlan, images, store.shopify as ShopifyIds, (k) => step(k as JobStepKey), store.theme as StoreTheme | undefined);
+    await step.sub(0.4);
     ids.files = await uploadSceneFiles(conn.shop, conn.token, sceneFiles, ids.files ?? {}, plan0.brand.name).catch((e) => {
       console.warn("Visuels du thème non envoyés :", errorMessage(e));
       return ids.files ?? {};

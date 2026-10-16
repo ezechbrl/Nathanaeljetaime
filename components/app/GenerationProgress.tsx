@@ -1,5 +1,6 @@
 "use client";
 
+import { useLiveProgress } from "@/lib/use-progress";
 import { Check, ChevronLeft, ChevronRight, Lightbulb, Monitor, Smartphone, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LightRays } from "@/components/ui/LightRays";
@@ -48,7 +49,7 @@ function useElapsed() {
 
 export function GenerationProgress({ store, job }: { store: Store; job: Job | null }) {
   const steps = job?.steps ?? [];
-  const progress = job?.progress ?? 3;
+  const progress = useLiveProgress(job?.progress ?? 2);
   const running = steps.find((s) => s.status === "running") ?? steps.find((s) => s.status === "pending");
   const thoughts = (running && THOUGHTS[running.key]) ?? ["L'IA travaille…"];
   const t = useTicker(thoughts.length, 2600, running?.key);

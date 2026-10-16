@@ -73,7 +73,7 @@ function Bar({ label, value, limit, hint }: { label: string; value: number; limi
   const pct = Math.min(100, (value / limit) * 100);
   return (
     <div>
-      <div className="flex justify-between text-[11px] text-fg-muted">
+      <div className="flex justify-between text-[11px] text-fg/85">
         <span>{label}</span>
         <span className="tabular-nums">{euros(value)} / {euros(limit)}</span>
       </div>
