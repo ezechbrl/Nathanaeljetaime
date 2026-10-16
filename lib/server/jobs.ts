@@ -129,16 +129,17 @@ export async function generateStoreImages(storeId: string, plan: StorePlan) {
 
   // 2. Mises en scène du même produit (aucune personne).
   const keep = "It must be the exact same product as in the reference image: same design, shape, proportions, colors, materials and details, only the camera angle and the setting change. Do not add any logo or text. Do not add any person or hand.";
-  const momentTitles = (plan.homepage.moments?.items ?? []).slice(0, 3);
-  // Chaque photo a son propre angle et son propre décor, pour une galerie variée (pas tout sur un bureau).
-  const ANGLES = ["front view, slightly turned", "side profile view", "three-quarter view from above", "back three-quarter view, resting on its side"];
+  // Chaque photo montre le produit sous un angle franchement différent (le produit tourne, pas seulement le décor),
+  // et dans un décor différent : pas tout sur un bureau.
   const shots: [Slot, string, AspectRatio, string][] = [
-    ["white", "product", "1:1", `Show this product from a three-quarter front angle, tilted dynamically, on a clean pure white seamless background. Behind it, small blurred glowing LED light dots and sparkles in the brand color ${c.accent}, soft colored glow on the white surface, bright modern premium look. ${keep} ${CLEAN}`],
-    ["studio", "product", "1:1", `Show this product in side profile view, standing upright on a glossy pure black surface, pure black background, dramatic studio rim lighting outlining its silhouette, subtle reflection. ${keep} ${CLEAN}`],
-    ["detail", "product", "1:1", `Extreme macro close-up on one part of this product, showing its materials, texture and finish, shallow depth of field, soft light. ${keep} ${CLEAN}`],
-    ["inuse", "lifestyle", "4:5", `Top-down flat lay view: this product lying flat on a textured surface with a few tasteful related accessories around it, styled editorial composition, soft natural light. ${keep} ${CLEAN}`],
-    ["hero", "banner", "16:9", `Wide cinematic shot: this product seen from a low angle, floating slightly above a minimal pedestal, abstract background with soft gradients in ${c.background} and ${c.accent}, light beams, product on the right third, generous empty space on the left. ${keep} ${CLEAN}`],
-    ...momentTitles.map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `Show this product (${ANGLES[(i + 1) % ANGLES.length]}) placed in an empty setting that evokes "${m.title}"${noPeople(m.imagePrompt) ? ` (${noPeople(m.imagePrompt)})` : ""}. Vary the place and the surface, not a desk unless it fits. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`] as [Slot, string, AspectRatio, string]),
+    ["white", "product", "1:1", `Rotate the product so it faces the camera straight on (front view). Place it on a clean pure white seamless background. Behind it, small blurred glowing LED light dots and sparkles in the brand color ${c.accent}, soft colored glow on the white surface, bright modern premium look. ${keep} ${CLEAN}`],
+    ["studio", "product", "1:1", `Rotate the product to a strict side profile view (90 degrees from the front). It stands upright on a glossy pure black surface, pure black background, dramatic studio rim lighting outlining its silhouette, subtle reflection. ${keep} ${CLEAN}`],
+    ["detail", "product", "1:1", `Extreme macro close-up on one characteristic part of this product, showing its materials, texture and finish, shallow depth of field, soft light. ${keep} ${CLEAN}`],
+    ["inuse", "lifestyle", "4:5", `Top-down flat lay, camera directly above: the product lying flat on a textured surface (linen, slate or light wood) with a few tasteful related accessories around it, styled editorial composition, soft natural light. ${keep} ${CLEAN}`],
+    ["hero", "banner", "16:9", `Wide cinematic shot: the product seen from a low angle, floating slightly above a minimal pedestal, abstract background with soft gradients in ${c.background} and ${c.accent}, light beams, product on the right third, generous empty space on the left. ${keep} ${CLEAN}`],
+    ["moment1", "product", "1:1", `Rotate the product to show it from behind (rear three-quarter view), resting on a rough natural stone block, warm soft side light, neutral beige background. ${keep} ${CLEAN}`],
+    ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a muted tone close to ${c.background}, gentle window light. ${keep} ${CLEAN}`],
+    ["moment3", "lifestyle", "16:9", `Wide atmospheric shot, ${scene}: the product seen from a slightly high front three-quarter angle, placed in an empty, tidy setting that fits the brand, warm evening light with subtle ${c.accent} accent lights, lots of space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
   ];
   await Promise.all(shots.map(async ([slot, kind, ratio, prompt]) => {
     try {
@@ -189,7 +190,7 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Les autres visuels (héros, moments, histoire) vont dans les fichiers Shopify et dans le thème.
     let productIndex = 0;
     const tagged = assets.map((a) => ({ ...a, slot: a.kind === "upload" ? null : slotOf(a, a.kind === "product" ? productIndex++ : 0) }));
-    const order: Record<string, number> = { upload: 0, packshot: 1, white: 2, studio: 3, detail: 4, inuse: 5 };
+    const order: Record<string, number> = { upload: 0, packshot: 1, white: 2, studio: 3, moment1: 4, moment2: 5, detail: 6, inuse: 7 };
     const images = tagged
       .filter((a) => a.kind === "upload" || (a.slot && a.slot in order))
       .sort((x, y) => order[x.slot ?? "upload"] - order[y.slot ?? "upload"])

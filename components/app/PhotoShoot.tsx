@@ -13,9 +13,9 @@ const SHOTS: { label: string; line: string; bg: (c: Store["theme"]["colors"]) =>
   { label: "Gros plan", line: "Mise au point sur la matière…", bg: (c) => `radial-gradient(circle at 40% 60%, ${c.primary}, #111 80%)` },
   { label: "Dans son décor", line: "Installation du décor…", bg: (c) => `linear-gradient(180deg, #2a2f36, ${c.accent}55)` },
   { label: "Photo d'accueil", line: "Cadrage large pour la page d'accueil…", bg: (c) => `linear-gradient(110deg, #0d0f12 40%, ${c.accent}66)` },
-  { label: "Moment 1", line: "Mise en scène du premier moment…", bg: (c) => `linear-gradient(140deg, ${c.background}, ${c.accent}66)` },
-  { label: "Moment 2", line: "Mise en scène du deuxième moment…", bg: (c) => `linear-gradient(200deg, #1b1f24, ${c.primary})` },
-  { label: "Moment 3", line: "Dernière mise en scène…", bg: (c) => `linear-gradient(20deg, ${c.accent}55, ${c.background})` },
+  { label: "De dos", line: "On fait tourner le produit…", bg: (c) => `linear-gradient(140deg, ${c.background}, ${c.accent}66)` },
+  { label: "Posé sur le côté", line: "Nouvel angle, vu d'en haut…", bg: (c) => `linear-gradient(200deg, #1b1f24, ${c.primary})` },
+  { label: "Grand format", line: "Dernière mise en scène, en grand…", bg: (c) => `linear-gradient(20deg, ${c.accent}55, ${c.background})` },
 ];
 const EXPECTED_MS = 100_000;
 

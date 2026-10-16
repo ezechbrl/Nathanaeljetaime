@@ -28,7 +28,8 @@ const mix = (a: string, b: string, t: number) => {
 // Visuels par emplacement (même logique que la publication) : héros, moments, histoire, galerie.
 function pickImages(assets: Asset[]) {
   const by = (s: string) => assets.find((a) => a.slot === s);
-  const products = assets.filter((a) => a.kind === "upload" || a.kind === "product" || a.slot === "inuse");
+  const rank: Record<string, number> = { packshot: 1, white: 2, studio: 3, moment1: 4, moment2: 5, detail: 6, inuse: 7 };
+  const products = assets.filter((a) => a.kind === "upload" || a.kind === "product" || a.slot === "inuse").sort((x, y) => (rank[x.slot ?? ""] ?? 0) - (rank[y.slot ?? ""] ?? 0));
   const lifestyle = assets.filter((a) => a.kind === "lifestyle");
   return {
     hero: by("hero") ?? assets.find((a) => a.kind === "banner"),
@@ -228,15 +229,6 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
               </div>
             </section>
           ))}
-
-          {home.moments && (
-            <section className={cn(pad, "pb-16")}>
-              <h3 className={cn("text-center text-[2rem] tracking-tight", H)}>{home.moments.title}</h3>
-              <div className={cn("mt-8 grid gap-4", mobile ? "grid-flow-col auto-cols-[78%] overflow-x-auto" : "grid-cols-3")}>
-                {home.moments.items.slice(0, 3).map((m, i) => <div key={m.title}><Frame a={imgs.moments[i]} ratio="4/5" /><p className="mt-3 font-semibold">{m.title}</p></div>)}
-              </div>
-            </section>
-          )}
 
           {home.comparison && (
             <section className={cn("grid items-center gap-8", pad, sec, !mobile && "grid-cols-2 gap-14")} style={{ background: primary, color: background }}>

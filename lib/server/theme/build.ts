@@ -125,13 +125,6 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...(prod.details ?? []).slice(0, 5).map((d) => ({ type: "detail", settings: { title: d.title, content: richtext(d.html) } })),
   ]);
 
-  const moments = home.moments;
-  const momentsSection = moments && {
-    type: "moments",
-    settings: { scheme: "base", title: moments.title },
-    ...blocks(moments.items.slice(0, 3).map((m, i) => ({ type: "moment", settings: { image: file(`moment${i + 1}`), title: m.title } }))),
-  };
-
   const extras = Object.fromEntries((home.extraSections ?? []).slice(0, 4).map((x, i) => [`extra${i + 1}`, {
     type: "features",
     settings: { scheme: i % 2 ? "tint" : "base", title: x.title, subtitle: x.subtitle ?? "" },
@@ -143,7 +136,6 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     features: featuresSection,
     benefits: benefitsSection,
     ...extras,
-    ...(momentsSection ? { moments: momentsSection } : {}),
     ...(comparisonSection ? { comparison: comparisonSection } : {}),
     ...(product ? { buy: { type: "featured-product", settings: { scheme: "tint", product, heading_tag: "h2", eyebrow: "", ...productSettings, sticky: false, bundle_label: "" }, ...productBlocks } } : {}),
     reviews: { type: "testimonials", settings: { scheme: "base", title: "" } },
