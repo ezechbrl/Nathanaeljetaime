@@ -4,6 +4,7 @@ import { Check, ExternalLink, FileText, Globe, Package, Palette, ShoppingBag, Ta
 import { useEffect, useRef, useState } from "react";
 import type { Job, JobStepKey, Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { shopifyLinks } from "@/lib/shopify-links";
 import { Confetti } from "./LaunchCelebration";
 
 export const PUBLISH_LIVE_KEY = "vitrio-publish-live";
@@ -128,7 +129,8 @@ export function PublishProgress({ store, job }: { store: Store; job: Job }) {
 export function PublishedCelebration({ store, live, onClose }: { store: Store; live: boolean; onClose: () => void }) {
   const c = store.theme.colors;
   const shop = store.liveUrl?.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-  const adminThemes = shop ? `https://${shop}/admin/themes` : undefined;
+  const links = shopifyLinks(store.liveUrl);
+  const adminThemes = links?.themes;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onKey);
@@ -155,7 +157,7 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
             ? <>{store.name} est publiée sur Shopify avec son thème, son produit et ses pages.{shop ? <> Adresse : <span className="text-fg">{shop}</span></> : null}</>
             : <>Produit, pages et thème Vitrio sont installés. Ton ancien thème reste affiché tant que tu ne publies pas le nouveau depuis Shopify → Thèmes.</>}
         </p>
-        <p className="mx-auto mt-2 max-w-sm text-xs text-fg-faint">Boutique de test ou protégée par mot de passe ? Seules les personnes qui ont le mot de passe la voient.</p>
+        <p className="mx-auto mt-2 max-w-sm text-xs text-fg-faint">Boutique de test ou protégée par mot de passe ? {links ? <a href={links.password} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-fg">Voir le mot de passe dans Shopify</a> : "Le mot de passe est dans Shopify → Boutique en ligne → Préférences."}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           {store.liveUrl && (
             <a href={store.liveUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(16_176_127/0.7)]">

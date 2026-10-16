@@ -128,15 +128,17 @@ export async function generateStoreImages(storeId: string, plan: StorePlan) {
   }
 
   // 2. Mises en scène du même produit (aucune personne).
-  const keep = "Keep the exact same product from the reference image: same shape, proportions, colors, materials and details. Do not add any logo or text. Do not add any person or hand.";
+  const keep = "It must be the exact same product as in the reference image: same design, shape, proportions, colors, materials and details, only the camera angle and the setting change. Do not add any logo or text. Do not add any person or hand.";
   const momentTitles = (plan.homepage.moments?.items ?? []).slice(0, 3);
+  // Chaque photo a son propre angle et son propre décor, pour une galerie variée (pas tout sur un bureau).
+  const ANGLES = ["front view, slightly turned", "side profile view", "three-quarter view from above", "back three-quarter view, resting on its side"];
   const shots: [Slot, string, AspectRatio, string][] = [
-    ["white", "product", "1:1", `Place this product on a clean pure white seamless background, with soft glowing light accents in the brand color ${c.accent} (like subtle LED glow and colored reflections on the white surface), bright modern premium look. ${keep} ${CLEAN}`],
-    ["studio", "product", "1:1", `Place this product on a pure black background, dramatic studio rim lighting, glossy reflections on a black surface, premium mood. ${keep} ${CLEAN}`],
-    ["detail", "product", "1:1", `Macro close-up of this product showing its materials, texture and finish, shallow depth of field. ${keep} ${CLEAN}`],
-    ["inuse", "lifestyle", "4:5", `Place this product in its natural everyday setting where it is used (${scene}), styled like a premium editorial still life, nobody in the scene. ${keep} ${CLEAN}`],
-    ["hero", "banner", "16:9", `Wide cinematic still life: this product placed in a beautiful styled setting (${scene}), brand palette ${c.background} and ${c.accent}, product on the right third, generous empty space on the left, soft dramatic light, nobody in the scene. ${keep} ${CLEAN}`],
-    ...momentTitles.map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `Still life: this product placed in an empty setting that evokes "${m.title}"${noPeople(m.imagePrompt) ? ` (${noPeople(m.imagePrompt)})` : ""}, only the product and objects, an empty room with nobody in the scene. ${keep} ${CLEAN}`] as [Slot, string, AspectRatio, string]),
+    ["white", "product", "1:1", `Show this product from a three-quarter front angle, tilted dynamically, on a clean pure white seamless background. Behind it, small blurred glowing LED light dots and sparkles in the brand color ${c.accent}, soft colored glow on the white surface, bright modern premium look. ${keep} ${CLEAN}`],
+    ["studio", "product", "1:1", `Show this product in side profile view, standing upright on a glossy pure black surface, pure black background, dramatic studio rim lighting outlining its silhouette, subtle reflection. ${keep} ${CLEAN}`],
+    ["detail", "product", "1:1", `Extreme macro close-up on one part of this product, showing its materials, texture and finish, shallow depth of field, soft light. ${keep} ${CLEAN}`],
+    ["inuse", "lifestyle", "4:5", `Top-down flat lay view: this product lying flat on a textured surface with a few tasteful related accessories around it, styled editorial composition, soft natural light. ${keep} ${CLEAN}`],
+    ["hero", "banner", "16:9", `Wide cinematic shot: this product seen from a low angle, floating slightly above a minimal pedestal, abstract background with soft gradients in ${c.background} and ${c.accent}, light beams, product on the right third, generous empty space on the left. ${keep} ${CLEAN}`],
+    ...momentTitles.map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `Show this product (${ANGLES[(i + 1) % ANGLES.length]}) placed in an empty setting that evokes "${m.title}"${noPeople(m.imagePrompt) ? ` (${noPeople(m.imagePrompt)})` : ""}. Vary the place and the surface, not a desk unless it fits. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`] as [Slot, string, AspectRatio, string]),
   ];
   await Promise.all(shots.map(async ([slot, kind, ratio, prompt]) => {
     try {

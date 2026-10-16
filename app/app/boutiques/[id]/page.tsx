@@ -17,6 +17,7 @@ import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
 import { cn } from "@/lib/cn";
+import { shopifyLinks } from "@/lib/shopify-links";
 import { timeAgo } from "@/lib/format";
 
 const PAGES: { id: PreviewPage; label: string }[] = [
@@ -32,6 +33,7 @@ export default function StoreDashboard() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+  const links = shopifyLinks(store.liveUrl);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
@@ -63,8 +65,12 @@ export default function StoreDashboard() {
     <>
       <PageHeader
         title={store.name}
-        subtitle={<span className="flex flex-wrap items-center gap-3"><StatusBadge status={store.status} /> <span>{store.language}</span> {store.liveUrl && <a href={store.liveUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-fg">Voir la boutique <ExternalLink className="h-3 w-3" /></a>}</span>}
-        actions={<><ButtonLink href={`/app/boutiques/${store.id}/editeur`} variant="secondary"><MessageSquare className="h-4 w-4" /> Modifier avec l'IA</ButtonLink><PublishButton /></>}
+        subtitle={<span className="flex flex-wrap items-center gap-3"><StatusBadge status={store.status} /> <span>{store.language}</span> {links && <a href={links.password} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-fg-faint hover:text-fg">Boutique protégée par mot de passe ? Le voir dans Shopify <ExternalLink className="h-3 w-3" /></a>}</span>}
+        actions={<>
+          {links && <a href={links.storefront} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-accent/40 bg-accent-deep/40 px-4 text-sm font-medium text-fg transition-colors hover:bg-accent-deep/70"><ExternalLink className="h-4 w-4" /> Voir ma boutique</a>}
+          {links && <a href={links.admin} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-white/10 px-4 text-sm text-fg-muted transition-colors hover:bg-white/[0.05] hover:text-fg">Ouvrir Shopify</a>}
+          <ButtonLink href={`/app/boutiques/${store.id}/editeur`} variant="secondary"><MessageSquare className="h-4 w-4" /> Modifier avec l'IA</ButtonLink><PublishButton />
+        </>}
       />
       <div className="grid gap-6 p-5 sm:p-8 xl:grid-cols-[1fr_340px]">
         <div className="min-w-0">
