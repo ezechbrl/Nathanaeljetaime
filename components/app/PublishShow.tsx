@@ -153,7 +153,9 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
         </p>
         <h2 className="mt-4 text-h2">{live ? <>Ta boutique est <span className="serif-accent">en ligne</span></> : <>Tout est dans <span className="serif-accent">Shopify</span></>}</h2>
         <p className="mx-auto mt-3 max-w-sm text-fg-muted">
-          {live
+          {store.themeStatus === "manual"
+            ? <>Ton produit et tes photos sont dans Shopify. Dernière étape : importer ton thème Vitrio en 3 clics, on te guide.</>
+            : live
             ? <>{store.name} est publiée sur Shopify avec son thème, son produit et ses pages.{shop ? <> Adresse : <span className="text-fg">{shop}</span></> : null}</>
             : <>Produit, pages et thème Vitrio sont installés. Ton ancien thème reste affiché tant que tu ne publies pas le nouveau depuis Shopify → Thèmes.</>}
         </p>
@@ -164,7 +166,9 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
               Voir ma boutique <ExternalLink className="h-4 w-4" />
             </a>
           )}
-          {!live && adminThemes ? (
+          {store.themeStatus === "manual" ? (
+            <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">Installer mon thème</button>
+          ) : !live && adminThemes ? (
             <a href={adminThemes} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">Ouvrir mes thèmes Shopify</a>
           ) : (
             <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">Continuer</button>

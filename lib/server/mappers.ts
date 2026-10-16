@@ -30,6 +30,7 @@ export const toStore = (s: StoreRow): Store => ({
   plan: (s.plan as StorePlan | null) ?? null,
   previewUrl: s.preview_url,
   liveUrl: s.live_url,
+  themeStatus: (s.shopify as { themeId?: string; themeManual?: boolean } | null)?.themeManual ? "manual" : (s.shopify as { themeId?: string } | null)?.themeId ? "installed" : null,
   createdAt: s.created_at,
   updatedAt: s.updated_at,
 });

@@ -94,7 +94,7 @@ export async function readStoreContent(shop: string, token: string) {
 }
 
 
-export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string; files?: Record<string, { url: string; filename: string }>; bundleOption?: string };
+export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string; files?: Record<string, { url: string; filename: string }>; bundleOption?: string; themeManual?: boolean };
 
 // Envoie le contenu de la boutique dans Shopify. Crée les objets la première fois, les met à jour ensuite.
 const rgb = (hex: string) => {

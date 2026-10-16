@@ -214,12 +214,21 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
       previousThemeId: ids.themeId,
     });
     // Si Shopify refuse le thème à cause d'un visuel, on réessaie sans les visuels de scène.
-    const themeId = await install(true).catch((e) => {
-      if (!Object.keys(ids.files ?? {}).length) throw e;
-      console.warn("Thème refusé avec les visuels, nouvel essai sans :", errorMessage(e));
-      return install(false);
-    });
-    await db().from("stores").update({ shopify: { ...ids, themeId } }).eq("id", store.id);
+    // Sans dérogation « thèmes » accordée par Shopify, l'installation automatique est interdite :
+    // la publication réussit quand même et le marchand importe le thème (fichier .zip) en 3 clics.
+    const noExemption = (e: unknown) => /access denied|exemption/i.test(errorMessage(e));
+    try {
+      const themeId = await install(true).catch((e) => {
+        if (noExemption(e) || !Object.keys(ids.files ?? {}).length) throw e;
+        console.warn("Thème refusé avec les visuels, nouvel essai sans :", errorMessage(e));
+        return install(false);
+      });
+      await db().from("stores").update({ shopify: { ...ids, themeId, themeManual: false } }).eq("id", store.id);
+    } catch (e) {
+      if (!noExemption(e)) throw e;
+      console.warn("Installation de thème non autorisée (dérogation Shopify manquante) : import manuel.");
+      await db().from("stores").update({ shopify: { ...ids, themeManual: true } }).eq("id", store.id);
+    }
     await finish(job.id, steps);
   } catch (e) {
     console.error("Publication échouée", e);

@@ -9,6 +9,7 @@ import { GenerationProgress } from "@/components/app/GenerationProgress";
 import { FullscreenButton } from "@/components/app/FullscreenButton";
 import { PageHeader } from "@/components/app/PageHeader";
 import { PublishButton } from "@/components/app/PublishButton";
+import { ThemeImportCard } from "@/components/app/ThemeImportCard";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -82,6 +83,7 @@ export default function StoreDashboard() {
           </div>
         </div>
       )}
+      {store.themeStatus === "manual" && !activeJob && <ThemeImportCard store={store} />}
       <div className="grid gap-6 p-5 sm:p-8 xl:grid-cols-[1fr_340px]">
         <div className="min-w-0">
           <div className="flex gap-1 overflow-x-auto">
