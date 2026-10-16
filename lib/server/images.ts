@@ -62,7 +62,7 @@ export async function storeImage(storeId: string, bytes: Uint8Array, contentType
 }
 
 // Emplacement d'un visuel dans la boutique, lu dans le nom du fichier (ex. « hero-… »).
-export const SLOTS = ["packshot", "studio", "detail", "inuse", "hero", "moment1", "moment2", "moment3", "story"] as const;
+export const SLOTS = ["packshot", "white", "studio", "detail", "inuse", "hero", "moment1", "moment2", "moment3", "story"] as const;
 export type Slot = (typeof SLOTS)[number];
 export function slotOf(asset: { storage_path?: string | null; kind: string }, productIndex = 0): Slot | null {
   const name = (asset.storage_path ?? "").split("/").pop() ?? "";

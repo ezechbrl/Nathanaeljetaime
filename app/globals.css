@@ -110,3 +110,6 @@
 @keyframes ring-out { from { transform: scale(.6); opacity: .9; } to { transform: scale(2.4); opacity: 0; } }
 @keyframes draw-check { from { stroke-dashoffset: 30; } to { stroke-dashoffset: 0; } }
 @keyframes travel { 0% { offset-distance: 0%; opacity: 0; transform: scale(.6); } 12% { opacity: 1; transform: none; } 88% { opacity: 1; transform: none; } 100% { offset-distance: 100%; opacity: 0; transform: scale(.6); } }
+@keyframes flash { 0% { opacity: .85; } 100% { opacity: 0; } }
+@keyframes focus { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .9; } 50% { transform: translate(-50%, -50%) scale(.82); opacity: 1; } }
+@keyframes develop { from { filter: blur(10px) grayscale(1) brightness(1.6); opacity: .2; } to { filter: none; opacity: 1; } }

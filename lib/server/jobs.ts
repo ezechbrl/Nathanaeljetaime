@@ -106,7 +106,10 @@ export async function generateStoreImages(storeId: string, plan: StorePlan) {
   if (!env.falKey()) return;
   const c = plan.brand.colors;
   const look = plan.visual?.productLook || `${plan.product.title}, ${plan.product.subtitle}`;
-  const scene = plan.visual?.scene || `${plan.brand.tone}, soft natural light`;
+  // Les descriptions de décor écrites par l'IA peuvent mentionner des gens : on retire ces passages.
+  const PEOPLE = /\b(people|person|persons|man|men|woman|women|girl|boy|kid|kids|child|children|friends?|family|couple|gamers?|players?|users?|customers?|hands?|face|faces|someone|teen|teens|student|students|athlete|athletes|crowd|he|she|they)\b/i;
+  const noPeople = (t: string) => t.split(/[.;,]/).map((x) => x.trim()).filter((x) => x && !PEOPLE.test(x)).join(", ");
+  const scene = noPeople(plan.visual?.scene ?? "") || `${plan.brand.tone}, soft natural light`;
   const CLEAN = "photorealistic high-end commercial product photography, the product is the only subject, no people, no hands, no faces, no added text, no logos, no watermark";
   const save = async (slot: Slot, kind: string, img: { bytes: Uint8Array; contentType: string; width: number; height: number }, prompt: string) => {
     const saved = await storeImage(storeId, img.bytes, img.contentType, slot);
@@ -128,11 +131,12 @@ export async function generateStoreImages(storeId: string, plan: StorePlan) {
   const keep = "Keep the exact same product from the reference image: same shape, proportions, colors, materials and details. Do not add any logo or text. Do not add any person or hand.";
   const momentTitles = (plan.homepage.moments?.items ?? []).slice(0, 3);
   const shots: [Slot, string, AspectRatio, string][] = [
+    ["white", "product", "1:1", `Place this product on a clean pure white seamless background, with soft glowing light accents in the brand color ${c.accent} (like subtle LED glow and colored reflections on the white surface), bright modern premium look. ${keep} ${CLEAN}`],
     ["studio", "product", "1:1", `Place this product on a pure black background, dramatic studio rim lighting, glossy reflections on a black surface, premium mood. ${keep} ${CLEAN}`],
     ["detail", "product", "1:1", `Macro close-up of this product showing its materials, texture and finish, shallow depth of field. ${keep} ${CLEAN}`],
     ["inuse", "lifestyle", "4:5", `Place this product in its natural everyday setting where it is used (${scene}), styled like a premium editorial still life, nobody in the scene. ${keep} ${CLEAN}`],
     ["hero", "banner", "16:9", `Wide cinematic still life: this product placed in a beautiful styled setting (${scene}), brand palette ${c.background} and ${c.accent}, product on the right third, generous empty space on the left, soft dramatic light, nobody in the scene. ${keep} ${CLEAN}`],
-    ...momentTitles.map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `Still life: this product placed in a setting that evokes "${m.title}" (${m.imagePrompt}), only the product and objects, nobody in the scene. ${keep} ${CLEAN}`] as [Slot, string, AspectRatio, string]),
+    ...momentTitles.map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `Still life: this product placed in an empty setting that evokes "${m.title}"${noPeople(m.imagePrompt) ? ` (${noPeople(m.imagePrompt)})` : ""}, only the product and objects, an empty room with nobody in the scene. ${keep} ${CLEAN}`] as [Slot, string, AspectRatio, string]),
   ];
   await Promise.all(shots.map(async ([slot, kind, ratio, prompt]) => {
     try {
@@ -183,7 +187,7 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Les autres visuels (héros, moments, histoire) vont dans les fichiers Shopify et dans le thème.
     let productIndex = 0;
     const tagged = assets.map((a) => ({ ...a, slot: a.kind === "upload" ? null : slotOf(a, a.kind === "product" ? productIndex++ : 0) }));
-    const order: Record<string, number> = { upload: 0, packshot: 1, studio: 2, detail: 3, inuse: 4 };
+    const order: Record<string, number> = { upload: 0, packshot: 1, white: 2, studio: 3, detail: 4, inuse: 5 };
     const images = tagged
       .filter((a) => a.kind === "upload" || (a.slot && a.slot in order))
       .sort((x, y) => order[x.slot ?? "upload"] - order[y.slot ?? "upload"])

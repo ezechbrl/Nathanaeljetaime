@@ -4,6 +4,7 @@ import { Download, ImagePlus, RefreshCw, Trash2, Upload, Wand2 } from "lucide-re
 import { useRef, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { PageHeader } from "@/components/app/PageHeader";
+import { PhotoShoot } from "@/components/app/PhotoShoot";
 import { useStore } from "@/components/app/StoreContext";
 import { Button, Spinner } from "@/components/ui/Button";
 import { EmptyState, ErrorState, Skeleton } from "@/components/ui/Feedback";
@@ -101,6 +102,7 @@ export default function StudioPage() {
         </>
       } />
       <div className="space-y-8 p-5 sm:p-8">
+        {job && regen && <PhotoShoot store={store} />}
         <section className="surface flex flex-col gap-4 rounded-card p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-medium">Photos de la boutique</p>

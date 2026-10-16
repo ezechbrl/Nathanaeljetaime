@@ -9,7 +9,6 @@ import { GenerationProgress } from "@/components/app/GenerationProgress";
 import { PageHeader } from "@/components/app/PageHeader";
 import { PublishButton } from "@/components/app/PublishButton";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
-import { ThemeColorsCard } from "@/components/app/ThemeColorsCard";
 import { useStore } from "@/components/app/StoreContext";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ErrorState, StatusBadge } from "@/components/ui/Feedback";
@@ -78,7 +77,6 @@ export default function StoreDashboard() {
         </div>
 
         <aside className="space-y-4">
-          <ThemeColorsCard store={store} />
           <section className="surface rounded-card p-5">
             <h2 className="text-sm text-fg-muted">Stratégie</h2>
             <p className="mt-3 text-[15px] leading-snug">{plan.strategy.promise}</p>
