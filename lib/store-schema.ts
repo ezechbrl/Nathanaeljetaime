@@ -105,6 +105,8 @@ export const StorePlanSchema = z.object({
   faq: z.array(z.object({ question: z.string(), answer: z.string() })),
   aboutPage: z.object({ title: z.string(), bodyHtml: z.string() }),
   visual: VisualSchema.optional(),
+  // Photos du produit chez le fournisseur (lien importé) : base des photos de la boutique.
+  sourceImages: z.array(z.string()).optional(),
 });
 
 export type StorePlan = z.infer<typeof StorePlanSchema>;

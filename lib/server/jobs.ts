@@ -4,7 +4,7 @@ import type { StoreTheme } from "@/lib/api/types";
 import type { JobStepKey } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
 import { generatePages, generateStrategy } from "./ai";
-import { fetchProductPageText } from "@/lib/fetch-product-page";
+import { fetchProductPage, UnreadablePageError } from "@/lib/fetch-product-page";
 import { editImage, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
 import { connectionFor, installTheme, publish, readStoreContent, uploadSceneFiles, type ShopifyIds } from "./shopify";
 import { themeZipUrl } from "./theme/link";
@@ -89,23 +89,39 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
   try {
     await step("strategy");
     let sourceText: string | undefined;
+    let sourceImages: string[] = [];
     let existingStore: string | undefined;
-    if (store.mode === "link" && store.source_url) sourceText = await fetchProductPageText(store.source_url);
+    const screenshots = ((job.input as { screenshots?: string[] } | null)?.screenshots ?? []).slice(0, 3);
+    if (store.mode === "link" && store.source_url) {
+      try {
+        const page = await fetchProductPage(store.source_url);
+        sourceText = page.text;
+        sourceImages = page.images;
+      } catch (e) {
+        // Lien illisible (AliExpress bloque parfois) : on continue avec les captures ou la description.
+        const hasBrief = store.brief.trim().length >= 25 && store.brief !== "Boutique à partir du lien produit";
+        if (!screenshots.length && !hasBrief) {
+          throw new Error(`On n'a pas pu lire ce lien${e instanceof UnreadablePageError ? ` (${e.message.replace(/\.$/, "")})` : ""}. Recommence en ajoutant 1 à 3 captures d'écran de la page produit, ou décris le produit en une phrase.`);
+        }
+        console.warn("Lien produit illisible, génération à partir des captures ou de la description :", (e as Error).message);
+      }
+    }
     if (store.mode === "recraft") {
       const conn = await connectionFor(store.user_id, store.shop_connection_id);
       existingStore = await readStoreContent(conn.shop, conn.token);
     }
-    const strategy = await generateStrategy({ brief: store.brief, language: store.language, sourceText, existingStore, userId: store.user_id });
+    const strategy = await generateStrategy({ brief: store.brief, language: store.language, sourceText, screenshots, existingStore, userId: store.user_id });
 
     await step("brand");
     await db().from("stores").update({ name: strategy.brand.name, theme: { colors: strategy.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" } }).eq("id", store.id);
 
     await step("pages");
-    const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText, userId: store.user_id }, (d, t) => void step.sub(d / t));
+    const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText, screenshots, userId: store.user_id }, (d, t) => void step.sub(d / t));
+    if (sourceImages.length) plan.sourceImages = sourceImages;
     await step("product");
 
     await step("images");
-    await generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t));
+    await generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t), screenshots[0]);
 
     await step("theme");
     const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" };
@@ -123,7 +139,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
 // Visuels de la boutique : un packshot, puis des mises en scène construites à partir de ce packshot pour
 // que le produit reste strictement le même partout. Jamais de personnes : seulement le produit, sur
 // différents fonds et décors. Ce sont des illustrations IA : le marchand peut les remplacer par ses vraies photos.
-export async function generateStoreImages(storeId: string, plan: StorePlan, onProgress?: (done: number, total: number) => void) {
+export async function generateStoreImages(storeId: string, plan: StorePlan, onProgress?: (done: number, total: number) => void, screenshot?: string) {
   if (!env.falKey()) return;
   const c = plan.brand.colors;
   const look = plan.visual?.productLook || `${plan.product.title}, ${plan.product.subtitle}`;
@@ -140,9 +156,20 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
 
   // 1. Packshot de référence, produit sans marque visible.
   const packPrompt = `Professional e-commerce studio packshot of ${look}. Plain unbranded product without any logo or lettering. Product centered, full view, on a seamless backdrop in ${c.background}, soft diffused light, subtle shadow, sharp focus, ${CLEAN}`;
-  let reference: string;
+  // Lien importé : le packshot part de la vraie photo du fournisseur (ou d'une capture de sa page),
+  // nettoyée de ses textes et logos. Ainsi toutes les photos montrent le produit que le client recevra.
+  const supplier = plan.sourceImages?.[0] ?? screenshot;
+  const fromPhoto = `Isolate the main product shown in this image and turn it into a professional e-commerce studio packshot: the product alone, centered, full view, on a seamless backdrop in ${c.background}, soft diffused light, subtle shadow. Remove every text, price, badge, watermark, logo, sticker, hand, person and other object. Keep the product exactly as it is: same shape, colors, materials and details. ${CLEAN}`;
+  let reference: string | undefined;
+  if (supplier) {
+    try {
+      reference = await save("packshot", "product", await editImage(supplier, fromPhoto, "1:1"), fromPhoto);
+    } catch (e) {
+      console.warn("Packshot depuis la photo fournisseur impossible, génération à partir du texte :", errorMessage(e));
+    }
+  }
   try {
-    reference = await save("packshot", "product", await generateImage(packPrompt, "1:1"), packPrompt);
+    reference ??= await save("packshot", "product", await generateImage(packPrompt, "1:1"), packPrompt);
   } catch (e) {
     console.warn("Packshot non généré :", errorMessage(e));
     return;

@@ -4,6 +4,7 @@ import { requireUser, type StoreRow } from "@/lib/server/auth";
 import { badRequest, body, json, route } from "@/lib/server/http";
 import { createJob, GENERATE_STEPS, runGeneration } from "@/lib/server/jobs";
 import { toJob, toStore } from "@/lib/server/mappers";
+import { storeImage } from "@/lib/server/images";
 import { assertQuota, rateLimit } from "@/lib/server/quota";
 import { assertAiBudget } from "@/lib/server/budget";
 import { connectionFor } from "@/lib/server/shopify";
@@ -21,6 +22,8 @@ const Input = z.object({
   mode: z.enum(["start", "link", "recraft"]),
   brief: z.string().trim().min(3, "Décris ton projet en une ou deux phrases.").max(4000),
   productUrl: z.string().trim().url("Lien invalide.").optional(),
+  // Captures de la page produit (data URL JPEG/PNG/WebP compressées côté navigateur).
+  screenshots: z.array(z.string().regex(/^data:image\/(jpeg|png|webp);base64,/, "Image invalide.").max(3_000_000, "Image trop lourde.")).max(3).optional(),
   language: z.string().trim().min(2).max(40),
   shopConnectionId: z.string().uuid().optional(),
 });
@@ -45,7 +48,13 @@ export const POST = route(async (req) => {
     source_url: input.productUrl ?? null,
     status: "generating",
   }).select("*").single()) as StoreRow;
-  const job = await createJob(store.id, user.id, input.mode === "recraft" ? "recraft" : "generate", GENERATE_STEPS);
+  const screenshots: string[] = [];
+  for (const shot of input.screenshots ?? []) {
+    const [head, b64] = shot.split(",");
+    const type = head.match(/^data:(image\/[a-z]+);/)![1];
+    screenshots.push((await storeImage(store.id, Buffer.from(b64, "base64"), type, "source")).url);
+  }
+  const job = await createJob(store.id, user.id, input.mode === "recraft" ? "recraft" : "generate", GENERATE_STEPS, { screenshots });
   after(() => runGeneration(job, store));
   return json({ store: toStore(store), job: toJob(job) }, 201);
 });

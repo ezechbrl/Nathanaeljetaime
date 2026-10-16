@@ -23,7 +23,7 @@ const BASE_RULES = `Règles :
 
 // Appel structuré : la réponse est validée par le schéma Zod.
 // Si `userId` est fourni, le coût réel de l'appel est débité de son budget hebdomadaire.
-async function structured<T extends z.ZodType>(opts: { schema: T; system: string; user: string; effort: "low" | "medium" | "high"; maxTokens?: number; userId?: string }): Promise<z.infer<T>> {
+async function structured<T extends z.ZodType>(opts: { schema: T; system: string; user: string; images?: string[]; effort: "low" | "medium" | "high"; maxTokens?: number; userId?: string }): Promise<z.infer<T>> {
   const res = await ai().beta.messages.parse({
     model: MODEL,
     max_tokens: opts.maxTokens ?? 16000,
@@ -31,7 +31,10 @@ async function structured<T extends z.ZodType>(opts: { schema: T; system: string
     fallbacks: "default",
     output_config: { effort: opts.effort, format: betaZodOutputFormat(opts.schema) },
     system: opts.system,
-    messages: [{ role: "user", content: opts.user }],
+    // Captures d'écran de la page produit : Claude les lit comme le texte.
+    messages: [{ role: "user", content: opts.images?.length
+      ? [...opts.images.map((url) => ({ type: "image" as const, source: { type: "url" as const, url } })), { type: "text" as const, text: opts.user }]
+      : opts.user }],
   });
   // Facturé même si la réponse est refusée ou incomplète.
   if (opts.userId) await chargeAi(opts.userId, costMicros(res.usage));
@@ -39,6 +42,8 @@ async function structured<T extends z.ZodType>(opts: { schema: T; system: string
   if (res.stop_reason === "max_tokens" || !res.parsed_output) throw new HttpError(422, "generation_failed", "La réponse de l'IA est incomplète. Réessaie.");
   return res.parsed_output as z.infer<T>;
 }
+
+const SCREENSHOTS_NOTE = "Les images jointes sont des captures d'écran de la page produit du fournisseur : relève-y le produit, ses caractéristiques et son prix. N'en recopie ni les phrases ni la marque.";
 
 const data = (label: string, text: string) => `<donnees type="${label}">\n${text}\n</donnees>`;
 
@@ -50,9 +55,10 @@ const StrategySchema = z.object({
 });
 export type StrategyResult = z.infer<typeof StrategySchema>;
 
-export async function generateStrategy(input: { brief: string; language: string; sourceText?: string; existingStore?: string; userId: string }) {
+export async function generateStrategy(input: { brief: string; language: string; sourceText?: string; screenshots?: string[]; existingStore?: string; userId: string }) {
   const parts = [`Langue de la boutique : ${input.language}`, data("brief", input.brief)];
   if (input.sourceText) parts.push(data("page-produit", input.sourceText));
+  if (input.screenshots?.length) parts.push(SCREENSHOTS_NOTE);
   if (input.existingStore) parts.push("Boutique existante à refondre (garde ce qui fonctionne, corrige ce qui freine la vente) :\n" + data("boutique-existante", input.existingStore));
   return structured({
     schema: StrategySchema,
@@ -60,6 +66,7 @@ export async function generateStrategy(input: { brief: string; language: string;
     userId: input.userId,
     system: `Tu es un expert e-commerce Shopify. À partir du brief d'un marchand, tu poses la stratégie d'une boutique pensée pour vendre : marché et persona précis, promesse en une phrase, 3 offres concrètes (seuil de livraison, lot, garantie…), 4 à 6 objections d'achat avec leurs réponses, puis l'identité de marque (nom court et mémorable si le marchand n'en donne pas, slogan, ton, palette).\n\n${BASE_RULES}`,
     user: parts.join("\n\n"),
+    images: input.screenshots,
   });
 }
 
@@ -77,17 +84,18 @@ const ProductExtrasSchema = z.object({ product: RichProductSchema, visual: Visua
 
 const STYLE = `Boutique Shopify moderne et très visuelle : les photos font le travail, les textes sont COURTS et percutants (pas de pavés). Chaque texte découle de la promesse et répond aux objections. N'invente ni avis clients, ni chiffres de vente, ni notes, ni labels, ni études.`;
 
-export async function generatePages(input: { brief: string; language: string; strategy: StrategyResult; sourceText?: string; userId: string }, onProgress?: (done: number, total: number) => void): Promise<StorePlan> {
+export async function generatePages(input: { brief: string; language: string; strategy: StrategyResult; sourceText?: string; screenshots?: string[]; userId: string }, onProgress?: (done: number, total: number) => void): Promise<StorePlan> {
   const parts = [
     `Langue de la boutique : ${input.language}`,
     data("brief", input.brief),
     `Stratégie validée (JSON) :\n${JSON.stringify({ brand: input.strategy.brand, strategy: input.strategy.strategy })}`,
   ];
   if (input.sourceText) parts.push(data("page-produit", input.sourceText));
+  if (input.screenshots?.length) parts.push(SCREENSHOTS_NOTE);
   const user = parts.join("\n\n");
   let done = 0;
   const call = <T extends z.ZodType>(schema: T, task: string) =>
-    structured({ schema, effort: "medium", userId: input.userId, maxTokens: 12000, system: `Tu es copywriter et directeur artistique e-commerce. ${STYLE}\n\n${task}\n\n${BASE_RULES}`, user })
+    structured({ schema, effort: "medium", userId: input.userId, maxTokens: 12000, system: `Tu es copywriter et directeur artistique e-commerce. ${STYLE}\n\n${task}\n\n${BASE_RULES}`, user, images: input.screenshots })
       .then((r) => { onProgress?.(++done, 3); return r; });
 
   const [core, homeExtras, productExtras] = await Promise.all([

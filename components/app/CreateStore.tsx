@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Check, Link2, PenLine, Plus, RefreshCw, Sparkles } from "lucide-react";
+import { AlertCircle, Check, ImagePlus, Link2, PenLine, Plus, RefreshCw, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -14,8 +14,8 @@ import { useApp } from "./AppContext";
 import { PaywallDialog, readPendingDraft } from "./Paywall";
 
 const MODES: { id: CreationMode; label: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
+  { id: "link", label: "Coller un lien", icon: Link2, placeholder: "Facultatif : ce que tu veux préciser (cible, prix de vente, ambiance)…", hint: "Le lien du produit que tu vends : AliExpress, Amazon, Temu, CJ, ta propre page… L'IA reprend le produit et ses photos, et écrit une boutique originale." },
   { id: "start", label: "Décrire", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
-  { id: "link", label: "Importer un lien", icon: Link2, placeholder: "Ajoute ce que tu veux changer par rapport à la page d'origine (ton, cible, prix)…", hint: "Uniquement un produit que tu vends : ta propre page ou celle de ton fournisseur. L'IA en tire les caractéristiques et écrit une fiche originale." },
   { id: "recraft", label: "Refaire ma boutique", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
 ];
 
@@ -33,6 +33,24 @@ const EXAMPLES = [
   "Bijoux minimalistes en acier doré, pour les femmes de 25-35 ans, prix entre 20 et 50 €, ton chic et accessible.",
 ];
 
+// Capture d'écran réduite dans le navigateur (1600 px, JPEG) avant l'envoi.
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * k);
+      canvas.height = Math.round(img.height * k);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(img.src);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => reject(new Error("Image illisible."));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 export const LANGUAGES = ["français", "anglais", "espagnol", "allemand", "italien", "néerlandais", "portugais", "polonais", "suédois", "danois", "tchèque", "roumain"];
 
 export function CreateStore() {
@@ -40,7 +58,8 @@ export function CreateStore() {
   const params = useSearchParams();
   const { user, setStores, refresh } = useApp();
   const connections = useApi(() => api.listConnections(), []);
-  const [mode, setMode] = useState<CreationMode>((params.get("mode") as CreationMode) || "start");
+  const [mode, setMode] = useState<CreationMode>((params.get("mode") as CreationMode) || (params.get("brief") ? "start" : "link"));
+  const [shots, setShots] = useState<string[]>([]);
   const [brief, setBrief] = useState(params.get("brief") ?? "");
   const [url, setUrl] = useState(params.get("url") ?? "");
   const [language, setLanguage] = useState("français");
@@ -65,6 +84,7 @@ export function CreateStore() {
     setMode(pending.mode);
     setBrief(pending.brief);
     if (pending.productUrl) setUrl(pending.productUrl);
+    if (pending.screenshots) setShots(pending.screenshots);
     setLanguage(pending.language);
     if (pending.shopConnectionId) setShop(pending.shopConnectionId);
     if (pending.autostart) setAutostart(pending);
@@ -105,13 +125,35 @@ export function CreateStore() {
   async function submit(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
-    if (mode === "link" && !/^https?:\/\//.test(url)) return setError(new ApiClientError(400, "invalid_input", "Colle un lien qui commence par https://", "url"));
+    if (mode === "link" && !/^https?:\/\//.test(url.trim())) return setError(new ApiClientError(400, "invalid_input", "Colle le lien du produit (il commence par https://).", "url"));
     if (mode === "recraft" && !shop) return setError(new ApiClientError(400, "no_shop", "Connecte d'abord ta boutique Shopify pour la refondre."));
     if (mode !== "link" && brief.trim().length < 10) return setError(new ApiClientError(400, "invalid_input", "Décris ton projet en une ou deux phrases.", "brief"));
-    const input: GenerateStoreInput = { mode, brief: brief.trim() || "Boutique à partir du lien produit", productUrl: mode === "link" ? url : undefined, language, shopConnectionId: shop || undefined };
+    const input: GenerateStoreInput = { mode, brief: brief.trim() || "Boutique à partir du lien produit", productUrl: mode === "link" ? url.trim() : undefined, screenshots: mode === "link" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
     // Sans abonnement, rien n'est envoyé à l'IA : on propose Pro au moment où le projet est prêt.
     if (user.plan === "free") return setPaywall(input);
     generate(input);
+  }
+
+  async function addShots(files: FileList | null) {
+    if (!files) return;
+    try {
+      const list = await Promise.all([...files].filter((f) => f.type.startsWith("image/")).slice(0, 3 - shots.length).map(compressImage));
+      setShots((s) => [...s, ...list].slice(0, 3));
+    } catch (e) {
+      setError(new ApiClientError(400, "invalid_input", (e as Error).message));
+    }
+  }
+
+  // Un lien collé dans la description bascule tout seul sur l'import par lien.
+  function onBriefChange(value: string) {
+    const link = value.trim().match(/^https?:\/\/\S+$/);
+    if (link && mode !== "recraft") {
+      setMode("link");
+      setUrl(link[0]);
+      setBrief("");
+      return;
+    }
+    setBrief(value);
   }
 
   const met = CRITERIA.map((c) => c.test.test(brief));
@@ -122,19 +164,36 @@ export function CreateStore() {
       <form onSubmit={submit} className="rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
         <div className="rounded-[13px] bg-[linear-gradient(180deg,#123d35,#0c2b26)]">
           {mode === "link" && (
-            <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
-              <Link2 className="h-4 w-4 shrink-0 text-accent" />
-              <label htmlFor="url" className="sr-only">Lien de la page produit</label>
-              <input id="url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://… ta page produit ou celle de ton fournisseur" className="w-full bg-transparent text-[15px] placeholder:text-fg-faint focus:outline-none" />
+            <div className="border-b border-white/[0.06]">
+              <div className="flex items-center gap-2 px-4 py-3.5">
+                <Link2 className="h-5 w-5 shrink-0 text-accent" />
+                <label htmlFor="url" className="sr-only">Lien du produit</label>
+                <input id="url" type="url" inputMode="url" autoFocus value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Colle le lien de ton produit (AliExpress, Amazon…)" className="w-full bg-transparent text-base placeholder:text-fg-faint focus:outline-none" />
+                {url && <button type="button" onClick={() => setUrl("")} aria-label="Effacer le lien" className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-fg-faint hover:bg-white/5 hover:text-fg"><X className="h-4 w-4" /></button>}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
+                {shots.map((src, i) => (
+                  <span key={i} className="relative h-12 w-12 overflow-hidden rounded-[8px] border border-white/15">
+                    <img src={src} alt={`Capture ${i + 1}`} className="h-full w-full object-cover" />
+                    <button type="button" onClick={() => setShots((s) => s.filter((_, j) => j !== i))} aria-label="Retirer la capture" className="absolute right-0.5 top-0.5 grid h-4 w-4 place-items-center rounded-full bg-black/70 text-white"><X className="h-3 w-3" /></button>
+                  </span>
+                ))}
+                {shots.length < 3 && (
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-white/15 px-2.5 py-1 text-xs text-fg-muted transition-colors hover:border-white/30 hover:text-fg">
+                    <ImagePlus className="h-3.5 w-3.5" /> {shots.length ? "Ajouter une capture" : "Facultatif : ajoute des captures de la page produit"}
+                    <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addShots(e.target.files); e.target.value = ""; }} />
+                  </label>
+                )}
+              </div>
             </div>
           )}
           <label htmlFor="brief" className="sr-only">Ton brief</label>
           <textarea
             ref={textarea}
             id="brief"
-            rows={4}
+            rows={mode === "link" ? 2 : 4}
             value={brief}
-            onChange={(e) => setBrief(e.target.value)}
+            onChange={(e) => onBriefChange(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(); }}
             placeholder={current.placeholder}
             className="block w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[15px] leading-relaxed placeholder:text-fg-faint focus:outline-none"

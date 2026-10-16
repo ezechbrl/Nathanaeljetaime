@@ -149,6 +149,8 @@ export type GenerateStoreInput = {
   mode: CreationMode;
   brief: string;
   productUrl?: string;
+  // Captures d'écran de la page produit (images en data URL, 3 maximum), si le lien ne se lit pas.
+  screenshots?: string[];
   language: string;
   shopConnectionId?: string;
 };

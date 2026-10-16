@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 
 export const MODES = [
   { id: "start", label: "Décrire", icon: PenLine, placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…" },
-  { id: "link", label: "Importer un lien", icon: Link2, placeholder: "Colle le lien de ton produit chez ton fournisseur, ou de ta propre page produit…" },
+  { id: "link", label: "Coller un lien", icon: Link2, placeholder: "Colle le lien de ton produit : AliExpress, Amazon, Temu, ta propre page…" },
   { id: "recraft", label: "Refaire ma boutique", icon: RefreshCw, placeholder: "Ma boutique ne convertit pas : rends-la plus rassurante et plus haut de gamme…" },
 ] as const;
 
@@ -42,8 +42,11 @@ export function PromptBox({ target = "/inscription", className, align = "center"
 
   function submit(e?: React.FormEvent) {
     e?.preventDefault();
-    const params = new URLSearchParams({ mode });
-    if (value.trim()) params.set(mode === "link" ? "url" : "brief", value.trim());
+    // Un lien collé passe en import par lien, quel que soit l'onglet choisi.
+    const isLink = /^https?:\/\/\S+$/.test(value.trim());
+    const m = isLink && mode !== "recraft" ? "link" : mode;
+    const params = new URLSearchParams({ mode: m });
+    if (value.trim()) params.set(m === "link" ? "url" : "brief", value.trim());
     router.push(`${target}?${params}`);
   }
 

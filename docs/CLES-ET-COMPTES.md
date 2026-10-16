@@ -156,6 +156,18 @@ Elle fonctionne avec Dawn et les thèmes qui en dérivent.
 
 ---
 
+## 6. Lecture des liens AliExpress (ScraperAPI) — facultatif
+
+AliExpress, Amazon et Temu bloquent la lecture de leurs pages par les serveurs (captcha). Sans cette clé, Vitrio
+lit les sites qui l'acceptent ; pour les autres, le client ajoute 1 à 3 captures d'écran de la page produit
+(l'IA les lit) ou décrit le produit. Avec cette clé, les liens AliExpress se lisent directement.
+
+1. Crée un compte sur https://www.scraperapi.com (offre gratuite : 1 000 crédits par mois).
+2. Dans le tableau de bord, copie ta **API Key**.
+3. Dans Vercel → ton projet → Settings → Environment Variables, ajoute `SCRAPER_API_KEY` avec cette clé, puis redéploie.
+
+Ne m'envoie jamais la clé : elle va uniquement dans Vercel.
+
 ## Pour plus tard
 
 ### Resend (e-mails : formulaire de contact, notifications)
