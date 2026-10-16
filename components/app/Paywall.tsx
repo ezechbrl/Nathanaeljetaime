@@ -6,6 +6,7 @@ import { Button, Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
+import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { ShopifyForm } from "@/components/auth/AuthForms";
 import type { GenerateStoreInput } from "@/lib/api/types";
@@ -81,13 +82,16 @@ export function Paywall({ brief, draft }: { brief?: string; draft?: GenerateStor
         <span className="text-5xl tracking-[-0.04em] tabular-nums">{euro(yearly ? Math.round(pro.yearly / 12) : pro.monthly)}</span>
         <span className="text-sm text-fg-muted">/ mois{yearly ? ` · facturé ${euro(pro.yearly)} par an` : ""}</span>
       </p>
+      {connections.data && !needShop && (
+        <p className="mt-4 rounded-ctl border border-accent/20 bg-accent-deep/25 px-3 py-2.5 text-sm text-fg-muted">Tu as déjà ta boutique Shopify : Vitrio te fait gagner des semaines. Design pro, photos du produit, textes et offres pensés pour vendre, prêts en quelques minutes.</p>
+      )}
       <ul className="mt-5 grid gap-2 text-[15px] sm:grid-cols-2">
         {pro.features.map((f) => <li key={f} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />{f}</li>)}
       </ul>
       {needShop ? (
         // L'abonnement est réglé sur la facture Shopify : il faut d'abord relier (ou créer) sa boutique.
         <div className="mt-7">
-          <p className="mb-3 text-sm text-fg-muted">Pour t'abonner, relie ta boutique Shopify : le paiement passe par ta facture Shopify.</p>
+          <p className="mb-3 text-sm text-fg-muted">Pour t'abonner, relie ta boutique Shopify : le paiement passe par ta facture Shopify. Pas encore de compte ? Shopify coûte en ce moment <strong className="text-fg">{site.shopifyOffer}</strong> : ton premier mois de boutique complète te revient à environ {euro(pro.monthly + 1)}.</p>
           <ShopifyForm next="/app" onBeforeRedirect={savePending} />
         </div>
       ) : (

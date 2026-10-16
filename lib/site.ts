@@ -8,4 +8,6 @@ export const site = {
   // Lien pour ouvrir une boutique Shopify. Mets ton lien d'affilié Shopify dans NEXT_PUBLIC_SHOPIFY_REFERRAL_URL pour toucher une commission.
   shopifySignupUrl: process.env.NEXT_PUBLIC_SHOPIFY_REFERRAL_URL || "https://www.shopify.com/fr/essai-gratuit",
   shopifyReferral: Boolean(process.env.NEXT_PUBLIC_SHOPIFY_REFERRAL_URL),
+  // Offre de lancement Shopify en cours (à mettre à jour si Shopify la change).
+  shopifyOffer: "1 €/mois pendant 3 mois",
 };

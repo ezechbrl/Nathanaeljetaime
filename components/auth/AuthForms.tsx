@@ -59,7 +59,7 @@ export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBefor
       {/* 1. Pas encore de boutique : on l'envoie ouvrir son compte Shopify, puis il revient ici. */}
       <div className="rounded-card border border-line/10 bg-white/[0.02] p-4">
         <p className="font-medium">Pas de compte Shopify ?</p>
-        <p className="mt-1 text-sm text-fg-muted">Ouvre ta boutique avec l'essai Shopify (quelques euros seulement les premiers mois), puis reviens ici pour la relier.</p>
+        <p className="mt-1 text-sm text-fg-muted">Bonne nouvelle : en ce moment, Shopify coûte <strong className="text-fg">{site.shopifyOffer}</strong>. Lancer ton business ne te coûte presque rien : crée ton compte, puis reviens ici pour le relier.</p>
         <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-ctl border border-line/15 bg-white/[0.04] text-[15px] font-medium transition-colors hover:border-line/30 hover:bg-white/[0.07]">
           <ShoppingBag className="h-4 w-4 text-accent" /> Créer un compte Shopify
         </a>
@@ -68,7 +68,7 @@ export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBefor
       {/* 2. Déjà une boutique : on la relie à Vitrio. */}
       <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-4">
         <p className="font-medium">J'ai un compte Shopify</p>
-        <p className="mt-1 text-sm text-fg-muted">Associe ta boutique Shopify à Vitrio.</p>
+        <p className="mt-1 text-sm text-fg-muted">Tu vends déjà : relie ta boutique et Vitrio lui donne un design pro, des photos et des textes pensés pour vendre, en quelques minutes.</p>
         <label htmlFor="shop" className="sr-only">Adresse de ta boutique Shopify</label>
         <div className="mt-3 flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
           <ShoppingBag className="ml-3 h-4 w-4 shrink-0 text-accent" />
