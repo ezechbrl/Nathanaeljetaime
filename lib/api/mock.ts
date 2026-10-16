@@ -293,6 +293,13 @@ function guessName(_brief: string, url?: string) {
   return NAMES[load().stores.length % NAMES.length];
 }
 
+// Démo : les sites qui bloquent les robots (AliExpress, Amazon…) sont refusés, les autres donnent un aperçu.
+export async function checkLink(url: string) {
+  await wait(700);
+  if (/aliexpress|amazon|temu/i.test(url)) return { ok: false as const, reason: "Ce site bloque la lecture automatique de sa page.", protectedSite: true };
+  return { ok: true as const, title: "Produit importé", image: null };
+}
+
 export async function createStore(input: GenerateStoreInput) {
   await wait(500);
   requireUser();

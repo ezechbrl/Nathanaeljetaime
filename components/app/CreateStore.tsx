@@ -60,6 +60,8 @@ export function CreateStore() {
   const connections = useApi(() => api.listConnections(), []);
   const [mode, setMode] = useState<CreationMode>((params.get("mode") as CreationMode) || (params.get("brief") ? "start" : "link"));
   const [shots, setShots] = useState<string[]>([]);
+  // Vérification du lien dès qu'il est collé (aperçu, ou demande de captures si le site bloque).
+  const [link, setLink] = useState<{ state: "idle" | "checking" } | { state: "ok"; title: string; image: string | null } | { state: "blocked"; reason: string; protectedSite: boolean }>({ state: "idle" });
   const [brief, setBrief] = useState(params.get("brief") ?? "");
   const [url, setUrl] = useState(params.get("url") ?? "");
   const [language, setLanguage] = useState("français");
@@ -97,6 +99,19 @@ export function CreateStore() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autostart, user.plan]);
 
+  useEffect(() => {
+    const u = url.trim();
+    if (mode !== "link" || !/^https?:\/\/[^\s/]+\.[^\s]+$/.test(u)) { setLink({ state: "idle" }); return; }
+    let live = true;
+    setLink({ state: "checking" });
+    const t = setTimeout(() => {
+      api.checkLink(u)
+        .then((r) => { if (live) setLink(r.ok ? { state: "ok", title: r.title, image: r.image } : { state: "blocked", reason: r.reason, protectedSite: r.protectedSite }); })
+        .catch(() => { if (live) setLink({ state: "idle" }); });
+    }, 600);
+    return () => { live = false; clearTimeout(t); };
+  }, [url, mode]);
+
   function addHint(text: string) {
     setBrief((b) => (b.trim() ? `${b.trim().replace(/[.,;]?$/, ".")} ${text}` : text));
     requestAnimationFrame(() => {
@@ -126,6 +141,9 @@ export function CreateStore() {
     e?.preventDefault();
     setError(null);
     if (mode === "link" && !/^https?:\/\//.test(url.trim())) return setError(new ApiClientError(400, "invalid_input", "Colle le lien du produit (il commence par https://).", "url"));
+    if (mode === "link" && link.state === "blocked" && !shots.length && brief.trim().length < 25) {
+      return setError(new ApiClientError(400, "invalid_input", "Ce site ne laisse pas lire sa page. Ajoute 1 à 3 captures d'écran de la page produit (ou décris le produit en une phrase), puis clique sur Générer.", "url"));
+    }
     if (mode === "recraft" && !shop) return setError(new ApiClientError(400, "no_shop", "Connecte d'abord ta boutique Shopify pour la refondre."));
     if (mode !== "link" && brief.trim().length < 10) return setError(new ApiClientError(400, "invalid_input", "Décris ton projet en une ou deux phrases.", "brief"));
     const input: GenerateStoreInput = { mode, brief: brief.trim() || "Boutique à partir du lien produit", productUrl: mode === "link" ? url.trim() : undefined, screenshots: mode === "link" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
@@ -161,7 +179,7 @@ export function CreateStore() {
 
   return (
     <div className="mx-auto w-full max-w-[720px]">
-      <form onSubmit={submit} className="rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
+      <form onSubmit={submit} onPaste={(e) => { if (mode === "link" && e.clipboardData.files.length) { e.preventDefault(); addShots(e.clipboardData.files); } }} className="rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
         <div className="rounded-[13px] bg-[linear-gradient(180deg,#123d35,#0c2b26)]">
           {mode === "link" && (
             <div className="border-b border-white/[0.06]">
@@ -171,6 +189,19 @@ export function CreateStore() {
                 <input id="url" type="url" inputMode="url" autoFocus value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Colle le lien de ton produit (AliExpress, Amazon…)" className="w-full bg-transparent text-base placeholder:text-fg-faint focus:outline-none" />
                 {url && <button type="button" onClick={() => setUrl("")} aria-label="Effacer le lien" className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-fg-faint hover:bg-white/5 hover:text-fg"><X className="h-4 w-4" /></button>}
               </div>
+              {link.state === "checking" && <p className="flex items-center gap-2 px-4 pb-2 text-xs text-fg-muted"><Spinner /> Lecture du lien…</p>}
+              {link.state === "ok" && (
+                <p className="mx-4 mb-2 flex items-center gap-2.5 rounded-ctl border border-accent/25 bg-accent-deep/25 px-2.5 py-2 text-sm [animation:fade-in_.3s_ease-out]">
+                  {link.image ? <img src={link.image} alt="" className="h-9 w-9 shrink-0 rounded-[6px] object-cover" /> : <Check className="h-4 w-4 shrink-0 text-accent" />}
+                  <span className="min-w-0 flex-1 truncate">{link.title || "Produit trouvé"}</span>
+                  <span className="shrink-0 text-xs text-accent">Produit trouvé ✓</span>
+                </p>
+              )}
+              {link.state === "blocked" && !shots.length && (
+                <p role="status" className="mx-4 mb-2 rounded-ctl border border-warn/30 bg-warn/5 px-3 py-2 text-sm text-fg-muted [animation:fade-in_.3s_ease-out]">
+                  {link.protectedSite ? "Ce site bloque la lecture automatique." : "Cette page n'a pas pu être lue."} <strong className="text-fg">Ajoute 1 à 3 captures d'écran de la page produit</strong> (photo, titre, caractéristiques), ou colle-les ici avec Ctrl+V : l'IA les lit et crée ta boutique pareil.
+                </p>
+              )}
               <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
                 {shots.map((src, i) => (
                   <span key={i} className="relative h-12 w-12 overflow-hidden rounded-[8px] border border-white/15">
@@ -179,8 +210,8 @@ export function CreateStore() {
                   </span>
                 ))}
                 {shots.length < 3 && (
-                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-white/15 px-2.5 py-1 text-xs text-fg-muted transition-colors hover:border-white/30 hover:text-fg">
-                    <ImagePlus className="h-3.5 w-3.5" /> {shots.length ? "Ajouter une capture" : "Facultatif : ajoute des captures de la page produit"}
+                  <label className={cn("inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed px-2.5 py-1 text-xs transition-colors", link.state === "blocked" && !shots.length ? "border-accent/60 bg-accent-deep/40 text-fg" : "border-white/15 text-fg-muted hover:border-white/30 hover:text-fg")}>
+                    <ImagePlus className="h-3.5 w-3.5" /> {shots.length ? "Ajouter une capture" : link.state === "blocked" ? "Ajouter des captures d'écran" : "Facultatif : ajoute des captures de la page produit"}
                     <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addShots(e.target.files); e.target.value = ""; }} />
                   </label>
                 )}
