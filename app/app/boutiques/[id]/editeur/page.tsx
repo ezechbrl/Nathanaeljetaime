@@ -4,6 +4,7 @@ import { ArrowRight, ArrowUp, Monitor, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
+import { FullscreenButton } from "@/components/app/FullscreenButton";
 import { GenerationProgress } from "@/components/app/GenerationProgress";
 import { PublishButton } from "@/components/app/PublishButton";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
@@ -46,6 +47,7 @@ export default function EditorPage() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [device, setDevice] = useState<"auto" | "mobile">("auto");
   const [flash, setFlash] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { if (history.data) setMessages(history.data.messages); }, [history.data]);
@@ -175,9 +177,10 @@ export default function EditorPage() {
             {PAGES.map((p) => (
               <button key={p.id} onClick={() => setPage(p.id)} aria-pressed={page === p.id} className={cn("shrink-0 rounded-t-ctl px-4 py-2 text-[13px] transition-colors", page === p.id ? "bg-white/[0.06] text-fg" : "text-fg-faint hover:text-fg")}>{p.label}</button>
             ))}
+            <FullscreenButton target={previewRef} />
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-            <div className={cn("overflow-hidden rounded-b-card rounded-tr-card ring-1 ring-white/10 transition-shadow duration-700", flash && "shadow-[0_0_0_3px_rgb(0_166_118/0.5)]")}>
+            <div ref={previewRef} className={cn("preview-fs overflow-hidden rounded-b-card rounded-tr-card ring-1 ring-white/10 transition-shadow duration-700", flash && "shadow-[0_0_0_3px_rgb(0_166_118/0.5)]")}>
               <StorePreview store={store} page={page} device={device} assets={assets.data?.assets} />
             </div>
           </div>

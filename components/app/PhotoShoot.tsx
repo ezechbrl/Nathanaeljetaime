@@ -50,18 +50,18 @@ export function PhotoShoot({ store }: { store: Store }) {
   return (
     <section className="surface overflow-hidden rounded-card p-5 sm:p-6" aria-live="polite">
       {/* Bandeau de chargement bien visible, avec le temps restant estimé */}
-      <div className="rounded-[14px] border border-accent/25 bg-accent-deep/30 p-4 sm:p-5">
+      <div className="rounded-[14px] border border-accent/25 bg-accent-deep/30 p-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="flex items-center gap-2 text-sm text-fg-muted">
               <span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-70" /><span className="relative h-2.5 w-2.5 rounded-full bg-red-500" /></span>
               Séance photo en cours
             </p>
-            <p className="mt-1 text-xl font-medium tracking-tight sm:text-2xl">{remaining}</p>
+            <p className="mt-1 text-lg font-medium tracking-tight">{remaining}</p>
           </div>
-          <p className="text-3xl font-semibold tabular-nums text-accent sm:text-4xl">{pct} %</p>
+          <p className="text-2xl font-semibold tabular-nums text-accent">{pct} %</p>
         </div>
-        <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progression de la séance photo">
+        <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progression de la séance photo">
           <div className="relative h-full overflow-hidden rounded-full bg-accent transition-[width] duration-500" style={{ width: `${Math.max(pct, 3)}%` }}>
             <span className="absolute inset-0 animate-shimmer bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.55),transparent)] bg-[length:200%_100%]" />
           </div>

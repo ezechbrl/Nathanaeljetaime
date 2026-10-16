@@ -3,9 +3,10 @@
 import { ExternalLink, History, MessageSquare, RotateCcw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { GenerationProgress } from "@/components/app/GenerationProgress";
+import { FullscreenButton } from "@/components/app/FullscreenButton";
 import { PageHeader } from "@/components/app/PageHeader";
 import { PublishButton } from "@/components/app/PublishButton";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
@@ -30,6 +31,7 @@ export default function StoreDashboard() {
   const toast = useToast();
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
@@ -70,8 +72,9 @@ export default function StoreDashboard() {
             {PAGES.map((p) => (
               <button key={p.id} onClick={() => setPage(p.id)} aria-pressed={page === p.id} className={cn("shrink-0 rounded-t-ctl border-x border-t px-4 py-2 text-[13px] transition-colors", page === p.id ? "border-white/10 bg-white/[0.04] text-fg" : "border-transparent text-fg-muted hover:text-fg")}>{p.label}</button>
             ))}
+            <FullscreenButton target={previewRef} />
           </div>
-          <div className="max-h-[720px] overflow-y-auto rounded-b-card rounded-tr-card border border-white/10">
+          <div ref={previewRef} className="preview-fs max-h-[720px] overflow-y-auto rounded-b-card rounded-tr-card border border-white/10">
             <StorePreview store={store} page={page} assets={assets.data?.assets} />
           </div>
         </div>

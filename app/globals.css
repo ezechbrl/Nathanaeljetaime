@@ -113,3 +113,5 @@
 @keyframes flash { 0% { opacity: .85; } 100% { opacity: 0; } }
 @keyframes focus { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .9; } 50% { transform: translate(-50%, -50%) scale(.82); opacity: 1; } }
 @keyframes develop { from { filter: blur(10px) grayscale(1) brightness(1.6); opacity: .2; } to { filter: none; opacity: 1; } }
+/* Aperçu de boutique en plein écran : défilement libre, sans cadre. */
+.preview-fs:fullscreen { max-height: none; overflow-y: auto; border: 0; border-radius: 0; background: #fff; scroll-behavior: smooth; }
