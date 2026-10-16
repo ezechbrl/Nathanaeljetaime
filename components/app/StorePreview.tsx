@@ -166,7 +166,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
       </div>
       <div className={cn("grid grid-cols-[1fr_auto_1fr] items-center border-b py-4", pad)} style={{ borderColor: `${primary}1a` }}>
         <span className={cn("text-xl tracking-tight", H)}>{plan.brand.name}</span>
-        {!mobile ? <nav className="flex gap-7 text-[13px] opacity-80"><span>Boutique</span><span>Notre histoire</span><span>FAQ</span></nav> : <span />}
+        {!mobile ? <nav className="flex gap-7 text-[13px] opacity-80"><span>Boutique</span></nav> : <span />}
         <span className="relative justify-self-end"><ShoppingBag className="h-5 w-5" /><span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] font-bold text-white" style={{ background: accent }}>0</span></span>
       </div>
 
@@ -242,26 +242,6 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
           )}
 
           <section className={cn(pad, sec)} style={{ background: tint }}>{productBlock}</section>
-
-          <section className={cn("grid items-center gap-10", pad, sec, !mobile && "grid-cols-2 gap-14")}>
-            <div className={cn(!mobile && "order-2")}><Frame a={imgs.story} ratio="4/4.6" /></div>
-            <div>
-              <Eyebrow>{home.story?.eyebrow ?? "Notre histoire"}</Eyebrow>
-              <h3 className={cn("mt-2 text-[2rem] leading-tight tracking-tight", H)}>{home.story?.title ?? plan.aboutPage.title}</h3>
-              <div className="mt-4 space-y-3 text-[15px] opacity-75">{(home.story?.paragraphs ?? [plan.aboutPage.bodyHtml.replace(/<[^>]+>/g, " ")]).map((p) => <p key={p}>{p}</p>)}</div>
-            </div>
-          </section>
-
-          <section className={cn(pad, sec)} style={{ background: tint }}>
-            <Eyebrow>FAQ</Eyebrow>
-            <h3 className={cn("mt-2 text-[2rem] tracking-tight", H)}>Questions fréquentes</h3>
-            <div className="mt-6">{faq.slice(0, 6).map((f, i) => (
-              <div key={f.question} className="border-b" style={{ borderColor: `${primary}24` }}>
-                <button type="button" onClick={() => setOpen(open === 100 + i ? -1 : 100 + i)} className="flex w-full items-center justify-between py-4 text-left font-semibold">{f.question}<span className={cn("text-xl font-light transition-transform", open === 100 + i && "rotate-45")}>+</span></button>
-                {open === 100 + i && <p className="pb-4 text-sm opacity-70">{f.answer}</p>}
-              </div>
-            ))}</div>
-          </section>
 
           <section className="relative grid min-h-[340px] place-items-center overflow-hidden px-6 py-16 text-center text-white" style={{ background: primary }}>
             {(imgs.moments[2] ?? imgs.hero) && <><img src={(imgs.moments[2] ?? imgs.hero)!.url} alt="" className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-black/45" /></>}

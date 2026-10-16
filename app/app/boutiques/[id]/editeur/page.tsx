@@ -19,13 +19,13 @@ import { cn } from "@/lib/cn";
 
 const SUGGESTIONS = ["Rends le ton plus premium", "Change la couleur principale", "Ajoute un lot de 3 à −20 %", "Raccourcis le titre produit", "Ajoute une question à la FAQ"];
 const PAGES: { id: PreviewPage; label: string }[] = [
-  { id: "accueil", label: "Accueil" }, { id: "produit", label: "Produit" }, { id: "faq", label: "FAQ" }, { id: "a-propos", label: "À propos" },
+  { id: "accueil", label: "Accueil" }, { id: "produit", label: "Produit" },
 ];
 
 function pageFor(path: string): PreviewPage | null {
   if (path.startsWith("product") || path.startsWith("strategy.offers")) return "produit";
-  if (path.startsWith("faq")) return "faq";
-  if (path.startsWith("aboutPage")) return "a-propos";
+  if (path.startsWith("faq")) return "accueil";
+  if (path.startsWith("aboutPage")) return "accueil";
   if (path.startsWith("homepage") || path.startsWith("theme")) return "accueil";
   return null;
 }

@@ -358,7 +358,6 @@ export async function publishStore(id: string) {
   const job = newJob(id, "publish", [
     { key: "product", label: "Produit, prix et images" },
     { key: "publish", label: "Mise en vente" },
-    { key: "pages", label: "Pages À propos et FAQ" },
     { key: "theme", label: "Installation du thème Vitrio" },
   ], 9_000);
   save();

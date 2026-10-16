@@ -93,12 +93,6 @@ export async function readStoreContent(shop: string, token: string) {
   ].join("\n").slice(0, 15000);
 }
 
-const faqHtml = (plan: StorePlan) =>
-  [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))]
-    .map((f) => `<h3>${escapeHtml(f.question)}</h3><p>${escapeHtml(f.answer)}</p>`)
-    .join("");
-
-const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
 export type ShopifyIds = { productId?: string; productHandle?: string; aboutPageId?: string; faqPageId?: string; aboutPageHandle?: string; faqPageHandle?: string; themeId?: string; files?: Record<string, { url: string; filename: string }>; bundleOption?: string };
 
@@ -217,30 +211,6 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
   // Mise en vente sur la boutique en ligne.
   await onStep("publish");
   await publishToOnlineStore(shop, token, next.productId!);
-
-  // Pages À propos et FAQ.
-  await onStep("pages");
-  const pages: { id: "aboutPageId" | "faqPageId"; handle: "aboutPageHandle" | "faqPageHandle"; title: string; html: string; templateSuffix: string }[] = [
-    { id: "aboutPageId", handle: "aboutPageHandle", title: plan.aboutPage.title, html: plan.aboutPage.bodyHtml, templateSuffix: "" },
-    { id: "faqPageId", handle: "faqPageHandle", title: "FAQ", html: faqHtml(plan), templateSuffix: "faq" },
-  ];
-  for (const pg of pages) {
-    const page = { title: pg.title, body: pg.html, isPublished: true, templateSuffix: pg.templateSuffix };
-    if (next[pg.id]) {
-      const d = await graphql<{ pageUpdate: { page: { handle: string } | null; userErrors: UserError[] } }>(shop, token,
-        `mutation ($id: ID!, $page: PageUpdateInput!) { pageUpdate(id: $id, page: $page) { page { handle } userErrors { field message } } }`,
-        { id: next[pg.id], page });
-      check(d.pageUpdate.userErrors);
-      next[pg.handle] = d.pageUpdate.page?.handle ?? next[pg.handle];
-    } else {
-      const d = await graphql<{ pageCreate: { page: { id: string; handle: string } | null; userErrors: UserError[] } }>(shop, token,
-        `mutation ($page: PageCreateInput!) { pageCreate(page: $page) { page { id handle } userErrors { field message } } }`,
-        { page });
-      check(d.pageCreate.userErrors);
-      next[pg.id] = d.pageCreate.page!.id;
-      next[pg.handle] = d.pageCreate.page!.handle;
-    }
-  }
 
   // Couleurs et polices pour l'extension de thème (sans effet tant qu'elle n'est pas activée).
   if (theme) await saveBrandForTheme(shop, token, theme).catch((e) => console.error("Couleurs de marque", e));

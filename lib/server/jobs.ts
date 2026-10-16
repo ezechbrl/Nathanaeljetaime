@@ -25,7 +25,6 @@ export const GENERATE_STEPS: Omit<Step, "status">[] = [
 export const PUBLISH_STEPS: Omit<Step, "status">[] = [
   { key: "product", label: "Produit, prix et images" },
   { key: "publish", label: "Mise en vente" },
-  { key: "pages", label: "Pages À propos et FAQ" },
   { key: "theme", label: "Installation du thème Vitrio" },
 ];
 
@@ -121,7 +120,6 @@ export async function generateStoreImages(storeId: string, plan: StorePlan) {
     ["detail", "product", "1:1", `Macro close-up of the product showing its materials, texture and finish, shallow depth of field. ${scene}. ${keep} ${NO_TEXT}`],
     ["inuse", "lifestyle", "4:5", `Lifestyle photo of the product being used by the target customer (${plan.strategy.market}) in everyday life, candid, natural light. ${scene}. ${keep} ${NO_TEXT}`],
     ...(plan.homepage.moments?.items ?? []).slice(0, 3).map((m, i) => [`moment${i + 1}` as Slot, "lifestyle", "4:5" as AspectRatio, `${m.imagePrompt}. ${scene}. ${keep} ${NO_TEXT}`] as [Slot, string, AspectRatio, string]),
-    ...(plan.homepage.story ? [["story", "lifestyle", "4:5", `${plan.homepage.story.imagePrompt}. ${scene}. ${keep} ${NO_TEXT}`] as [Slot, string, AspectRatio, string]] : []),
   ];
   await Promise.all(shots.map(async ([slot, kind, ratio, prompt]) => {
     try {

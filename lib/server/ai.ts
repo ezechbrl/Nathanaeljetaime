@@ -66,7 +66,7 @@ export async function generateStrategy(input: { brief: string; language: string;
 // Étape 2 : pages et fiche produit à partir de la stratégie.
 // La génération remplit toutes les sections enrichies (facultatives seulement pour les anciennes boutiques).
 const PagesSchema = z.object({
-  homepage: HomeBaseSchema.merge(RichHomeSchema),
+  homepage: HomeBaseSchema.merge(RichHomeSchema.omit({ story: true })),
   product: ProductBaseSchema.merge(RichProductSchema),
   faq: StorePlanSchema.shape.faq,
   aboutPage: StorePlanSchema.shape.aboutPage,
@@ -85,11 +85,11 @@ export async function generatePages(input: { brief: string; language: string; st
     effort: "medium",
     userId: input.userId,
     maxTokens: 24000,
-    system: `Tu es copywriter et directeur artistique e-commerce. À partir d'une stratégie validée, tu écris tout le contenu d'une boutique Shopify premium pensée pour vendre, section par section :
-- Accueil : accroche forte, sous-titre, appel à l'action, 3 bénéfices (avec une icône chacun), un bandeau de 4 à 6 atouts courts avec icônes, 3 moments d'usage illustrés, une comparaison honnête avec l'alternative habituelle (catégorie générique, jamais une marque), une section « histoire » (origine, fabrication ou sélection), un appel final et 2 à 3 messages d'annonce.
-- Fiche produit : titre court, sous-titre, bénéfices avant caractéristiques, réponses aux objections dans la description, prix conseillé en nombre décimal sans devise, prix barré ou chaîne vide, SEO, 3 points forts avec icônes, 3 à 4 rubriques dépliables, une garantie, et 1 à 3 offres par quantité (la première = 1 unité à 0 %, remises réalistes de 5 à 25 % pour les lots, cohérentes avec les offres de la stratégie).
-- Une FAQ de 5 à 7 questions et la page « À propos ».
-- La direction artistique (visual) : description visuelle précise du produit et univers photo, en anglais, pour générer des photos cohérentes ; chaque imagePrompt décrit une scène réaliste avec le produit.
+    system: `Tu es copywriter et directeur artistique e-commerce. À partir d'une stratégie validée, tu écris le contenu d'une boutique Shopify moderne et très visuelle : les photos font le travail, les textes sont COURTS et percutants (pas de pavés).
+- Accueil : accroche forte (8 mots maximum), sous-titre d'une phrase (15 mots maximum), appel à l'action de 2 à 4 mots, 3 bénéfices (titre de 2 à 5 mots + une phrase courte, une icône chacun), un bandeau de 4 à 6 atouts de 2 à 4 mots avec icônes, 3 moments d'usage illustrés (2 à 4 mots chacun), une comparaison honnête avec l'alternative habituelle (catégorie générique, jamais une marque ; lignes de 2 à 6 mots), un appel final court et 2 à 3 messages d'annonce courts.
+- Fiche produit : titre court, sous-titre d'une ligne, description courte (un paragraphe + une liste de 3 à 5 points), prix conseillé en nombre décimal sans devise, prix barré ou chaîne vide, SEO, 3 points forts de 2 à 3 mots avec icônes, 3 rubriques dépliables brèves, une garantie en une phrase, et 1 à 3 offres par quantité (la première = 1 unité à 0 %, remises réalistes de 5 à 25 % pour les lots, cohérentes avec les offres de la stratégie).
+- Une FAQ de 3 questions et une page « À propos » de 2 phrases (usage interne).
+- La direction artistique (visual) : description visuelle précise du produit et univers photo, en anglais, pour générer des photos cohérentes et esthétiques ; chaque imagePrompt décrit une scène réaliste et belle avec le produit.
 Chaque texte découle de la promesse et répond aux objections. N'invente ni avis clients, ni chiffres de vente, ni notes, ni labels, ni études.
 
 ${BASE_RULES}`,

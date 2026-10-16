@@ -55,8 +55,6 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   const prod = plan.product;
   const L = labelsFor(ctx.language ?? "français");
   const product = ctx.productHandle;
-  const aboutUrl = ctx.aboutHandle ? `/pages/${ctx.aboutHandle}` : "";
-  const faqUrl = ctx.faqHandle ? `/pages/${ctx.faqHandle}` : "";
   const shopUrl = product ? `/products/${product}` : "/collections/all";
   const file = (slot: string) => (ctx.files?.[slot] ? `shopify://shop_images/${ctx.files[slot].filename}` : undefined);
   const offers = plan.strategy.offers;
@@ -83,8 +81,8 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
       ...labels,
       sections: {
         announcement: { type: "announcement", ...blocks((home.announcements?.length ? home.announcements : [shipOffer, returnOffer, plan.brand.tagline].filter(Boolean)).slice(0, 3).map((text, i) => ({ type: "msg", settings: { icon: (["truck", "return", "gift"] as const)[i] ?? "sparkle", text: clip(text, 110) } }))) },
-        header: { type: "header", settings: { scheme: "base", shop_url: shopUrl, about_url: aboutUrl, faq_url: faqUrl } },
-        footer: { type: "footer", settings: { scheme: "dark", tagline: plan.brand.tagline, about_url: aboutUrl, faq_url: faqUrl } },
+        header: { type: "header", settings: { scheme: "base", shop_url: shopUrl } },
+        footer: { type: "footer", settings: { scheme: "dark", tagline: plan.brand.tagline } },
       },
     },
   };
@@ -127,17 +125,6 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...(prod.details ?? []).slice(0, 5).map((d) => ({ type: "detail", settings: { title: d.title, content: richtext(d.html) } })),
   ]);
 
-  const story = home.story;
-  const storySection = {
-    type: "image-list",
-    settings: {
-      scheme: "base", image: file("story"), reverse: true,
-      eyebrow: story?.eyebrow ?? L.about, title: story?.title ?? plan.aboutPage.title,
-      text: story ? story.paragraphs.map((p) => `<p>${p}</p>`).join("") : `<p>${clip(plain(plan.aboutPage.bodyHtml), 420)}</p>`,
-      cta: aboutUrl ? L.about : "", url: aboutUrl, cta_style: "link",
-    },
-  };
-
   const moments = home.moments;
   const momentsSection = moments && {
     type: "moments",
@@ -152,11 +139,8 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...(momentsSection ? { moments: momentsSection } : {}),
     ...(comparisonSection ? { comparison: comparisonSection } : {}),
     ...(product ? { buy: { type: "featured-product", settings: { scheme: "tint", product, heading_tag: "h2", eyebrow: "", ...productSettings, sticky: false, bundle_label: "" }, ...productBlocks } } : {}),
-    story: storySection,
     reviews: { type: "testimonials", settings: { scheme: "base", title: "" } },
-    faq: faqSection(L.faq === "FAQ" ? "FAQ" : L.faq),
     banner: { type: "image-banner", settings: { image: file("moment3") || file("hero"), title: home.finalCta?.title ?? plan.strategy.promise, text: home.finalCta?.text ?? "", cta: home.ctaLabel, url: shopUrl } },
-    news: { type: "newsletter", settings: { scheme: "base", eyebrow: plan.brand.name, title: plan.brand.tagline, text: "" } },
   };
   const index = { sections, order: Object.keys(sections) };
 
@@ -166,9 +150,8 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
       features: { ...featuresSection, settings: { ...featuresSection.settings, title: "" } },
       benefits: { ...benefitsSection, settings: { ...benefitsSection.settings, cta: "" } },
       ...(comparisonSection ? { comparison: comparisonSection } : {}),
-      faq: faqSection(L.faq),
     },
-    order: ["main", "features", "benefits", ...(comparisonSection ? ["comparison"] : []), "faq"],
+    order: ["main", "features", "benefits", ...(comparisonSection ? ["comparison"] : [])],
   };
 
   // Réglages vides (liens, images) retirés : Shopify refuse une valeur vide pour ces types.

@@ -22,8 +22,6 @@ import { timeAgo } from "@/lib/format";
 const PAGES: { id: PreviewPage; label: string }[] = [
   { id: "accueil", label: "Accueil" },
   { id: "produit", label: "Fiche produit" },
-  { id: "faq", label: "FAQ" },
-  { id: "a-propos", label: "À propos" },
 ];
 
 export default function StoreDashboard() {
