@@ -5,6 +5,7 @@ import type { JobStepKey } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
 import { generatePages, generateStrategy } from "./ai";
 import { fetchProductPage, UnreadablePageError } from "@/lib/fetch-product-page";
+import { supplierReviews } from "./reviews";
 import { editImage, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
 import { connectionFor, installTheme, publish, readStoreContent, uploadSceneFiles, type ShopifyIds } from "./shopify";
 import { themeZipUrl } from "./theme/link";
@@ -90,11 +91,12 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     await step("strategy");
     let sourceText: string | undefined;
     let sourceImages: string[] = [];
+    let page: Awaited<ReturnType<typeof fetchProductPage>> | undefined;
     let existingStore: string | undefined;
     const screenshots = ((job.input as { screenshots?: string[] } | null)?.screenshots ?? []).slice(0, 3);
     if (store.mode === "link" && store.source_url) {
       try {
-        const page = await fetchProductPage(store.source_url);
+        page = await fetchProductPage(store.source_url);
         sourceText = page.text;
         sourceImages = page.images;
       } catch (e) {
@@ -121,7 +123,15 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     await step("product");
 
     await step("images");
-    await generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t), screenshots[0]);
+    // Avis réels des acheteurs chez le fournisseur, lus pendant que les photos se font.
+    const [reviews] = await Promise.all([
+      page ? supplierReviews({ url: page.url, fromPage: page.reviews, storeId: store.id, language: store.language, userId: store.user_id }).catch((e) => {
+        console.warn("Avis du fournisseur non récupérés :", errorMessage(e));
+        return undefined;
+      }) : undefined,
+      generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t), screenshots[0]),
+    ]);
+    if (reviews) plan.reviews = reviews;
 
     await step("theme");
     const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" };
@@ -137,8 +147,9 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
 }
 
 // Visuels de la boutique : un packshot, puis des mises en scène construites à partir de ce packshot pour
-// que le produit reste strictement le même partout. Jamais de personnes : seulement le produit, sur
-// différents fonds et décors. Ce sont des illustrations IA : le marchand peut les remplacer par ses vraies photos.
+// que le produit reste strictement le même partout : le produit seul sous plusieurs angles et décors,
+// puis 3 scènes de vie où une personne de la cible l'utilise. Ce sont des illustrations IA : le marchand
+// peut les remplacer par ses vraies photos.
 export async function generateStoreImages(storeId: string, plan: StorePlan, onProgress?: (done: number, total: number) => void, screenshot?: string) {
   if (!env.falKey()) return;
   const c = plan.brand.colors;
@@ -189,6 +200,11 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
     ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a muted tone close to ${c.background}, gentle window light. ${keep} ${CLEAN}`],
     ["moment3", "lifestyle", "16:9", `Wide atmospheric shot, ${scene}: the product seen from a slightly high front three-quarter angle, placed in an empty, tidy setting that fits the brand, warm evening light with subtle ${c.accent} accent lights, lots of space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
   ];
+  // Scènes de vie : une personne de la clientèle cible utilise le produit, une scène par moment d'usage.
+  const life = "Candid, natural lifestyle photo as if shot by a professional photographer on a 35mm camera: realistic people with natural skin texture and correct anatomy, natural hands, authentic everyday setting, soft natural light, shallow depth of field. The product is clearly visible and is the exact same product as in the reference image: same design, shape, proportions, colors, materials and details. No added logo, text, watermark or brand name.";
+  (plan.homepage.moments?.items ?? []).slice(0, 3).forEach((m, i) => {
+    shots.push([`life${i + 1}` as Slot, "lifestyle", "4:5", `${m.imagePrompt}. ${life}`]);
+  });
   // Le packshot compte pour une photo ; chaque mise en scène terminée fait avancer la barre.
   let done = 1;
   onProgress?.(done, shots.length + 1);
@@ -242,13 +258,14 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Les autres visuels (héros, moments, histoire) vont dans les fichiers Shopify et dans le thème.
     let productIndex = 0;
     const tagged = assets.map((a) => ({ ...a, slot: a.kind === "upload" ? null : slotOf(a, a.kind === "product" ? productIndex++ : 0) }));
-    const order: Record<string, number> = { upload: 0, packshot: 1, white: 2, studio: 3, moment1: 4, moment2: 5, detail: 6, inuse: 7 };
+    const order: Record<string, number> = { upload: 0, packshot: 1, white: 2, life1: 3, studio: 4, moment1: 5, life2: 6, moment2: 7, detail: 8, inuse: 9 };
     const images = tagged
       .filter((a) => a.kind === "upload" || (a.slot && a.slot in order))
       .sort((x, y) => order[x.slot ?? "upload"] - order[y.slot ?? "upload"])
-      .map((a) => ({ url: a.url, alt: a.slot === "detail" ? `${title} — détail` : a.slot === "inuse" ? `${title} — en situation` : title }));
+      .map((a) => ({ url: a.url, alt: a.slot === "detail" ? `${title} — détail` : a.slot === "inuse" || a.slot?.startsWith("life") ? `${title} — en situation` : title }));
+    // Visuels du thème : héros, décors, et les scènes de vie (aussi dans la galerie) pour la section « moments ».
     const sceneFiles: Partial<Record<Slot, string>> = {};
-    for (const a of tagged) if (a.slot && !(a.slot in order)) sceneFiles[a.slot] = a.url; // le plus récent l'emporte
+    for (const a of tagged) if (a.slot && (!(a.slot in order) || a.slot.startsWith("life"))) sceneFiles[a.slot] = a.url; // le plus récent l'emporte
     const ids = await publish(conn.shop, conn.token, store.plan as StorePlan, images, store.shopify as ShopifyIds, (k) => step(k as JobStepKey), store.theme as StoreTheme | undefined);
     await step.sub(0.4);
     ids.files = await uploadSceneFiles(conn.shop, conn.token, sceneFiles, ids.files ?? {}, plan0.brand.name).catch((e) => {

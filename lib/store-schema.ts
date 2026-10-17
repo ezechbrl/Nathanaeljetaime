@@ -18,7 +18,11 @@ export const RichHomeSchema = z.object({
   benefitIcons: z.array(iconField()).describe("Une icône par bénéfice de homepage.benefits, dans le même ordre"),
   moments: z.object({
     title: z.string().describe("Ex. « Pour chaque moment de ta journée »"),
-    items: z.array(z.object({ title: z.string().describe("2 à 4 mots"), imagePrompt: z.string().describe("Décor EN ANGLAIS où le produit est posé à ce moment (objets, lieu, lumière), SANS personne ni mains, sans texte") })).describe("Exactement 3 moments ou usages"),
+    items: z.array(z.object({
+      title: z.string().describe("2 à 4 mots"),
+      text: z.string().optional().describe("Une phrase courte (12 mots maximum) sur ce moment d'usage"),
+      imagePrompt: z.string().describe("Scène photo EN ANGLAIS : une personne typique de la clientèle cible utilise le produit à ce moment (qui, lieu, geste précis, lumière), photo naturelle et réaliste, sans texte"),
+    })).describe("Exactement 3 moments d'usage concrets, propres à la niche"),
   }),
   comparison: z.object({
     title: z.string().describe("Ex. « Notre produit vs l'option classique »"),
@@ -74,6 +78,14 @@ export const ProductBaseSchema = z.object({
     tags: z.array(z.string()),
   });
 
+export const ReviewsSchema = z.object({
+  average: z.number(),
+  total: z.number(),
+  source: z.string(),
+  items: z.array(z.object({ author: z.string(), country: z.string().optional(), rating: z.number(), text: z.string(), photo: z.string().optional() })),
+});
+export type Reviews = z.infer<typeof ReviewsSchema>;
+
 export const StorePlanSchema = z.object({
   brand: z.object({
     name: z.string(),
@@ -105,6 +117,8 @@ export const StorePlanSchema = z.object({
   faq: z.array(z.object({ question: z.string(), answer: z.string() })),
   aboutPage: z.object({ title: z.string(), bodyHtml: z.string() }),
   visual: VisualSchema.optional(),
+  // Avis réels d'acheteurs du produit, relevés sur la page du fournisseur (jamais inventés) et traduits.
+  reviews: ReviewsSchema.optional(),
   // Photos du produit chez le fournisseur (lien importé) : base des photos de la boutique.
   sourceImages: z.array(z.string()).optional(),
 });

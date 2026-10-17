@@ -44,6 +44,15 @@ function rich(name: string, short: string): { home: Partial<StorePlan["homepage"
   };
 }
 
+// Visuels de remplacement générés localement (pas de dépendance réseau).
+const PALETTES = [["#f4d6d9", "#c8506a"], ["#efe4d6", "#b9813f"], ["#dfeee0", "#5f9e47"], ["#e2e6f5", "#4b62c9"], ["#f6e7d2", "#d9822b"], ["#ece0f2", "#8a4fb0"]];
+const img = (seed: string, w = 800, h = 800) => {
+  const n = [...seed].reduce((a, c) => a + c.charCodeAt(0), 0);
+  const [a, b] = PALETTES[n % PALETTES.length];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><circle cx="${w * 0.62}" cy="${h * 0.45}" r="${Math.min(w, h) * 0.22}" fill="#fff" fill-opacity=".35"/><rect x="${w * 0.3}" y="${h * 0.3}" width="${w * 0.16}" height="${h * 0.42}" rx="${w * 0.03}" fill="#fff" fill-opacity=".7"/></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+};
+
 export function samplePlan(name: string, niche: string): StorePlan {
   if (!/baume|lèvre/i.test(niche)) return genericPlan(name, niche);
   return {
@@ -87,6 +96,16 @@ export function samplePlan(name: string, niche: string): StorePlan {
       seoDescription: "Baume à lèvres en 6 ingrédients naturels, fabriqué en France. Livraison offerte dès 39 €.",
       tags: ["baume", "lèvres", "naturel"],
       ...rich(name, niche).product,
+    },
+    // Exemple de démo (mode maquette) : en vrai, ces avis viennent des acheteurs du produit chez le fournisseur.
+    reviews: {
+      average: 4.7, total: 1284, source: "aliexpress",
+      items: [
+        { author: "C***e", country: "FR", rating: 5, text: "Très doux, ne colle pas et l'odeur est légère. Mes lèvres ne pèlent plus depuis une semaine.", photo: img("rv1", 600, 600) },
+        { author: "M***n", country: "BE", rating: 5, text: "Reçu en 9 jours, bien emballé. Le format tient dans la poche, je l'emporte partout." },
+        { author: "S***a", country: "FR", rating: 4, text: "Bon produit, texture agréable. Un peu petit pour le prix mais il dure longtemps.", photo: img("rv3", 600, 600) },
+        { author: "J***s", country: "CH", rating: 5, text: "J'en ai commandé un deuxième pour ma sœur. Parfait l'hiver." },
+      ],
     },
     faq: [
       { question: "Quels sont les délais de livraison ?", answer: "48 à 72 h en France métropolitaine." },
@@ -271,17 +290,10 @@ export const seedRecommendations = (storeId: string): Recommendation[] => [
   },
 ];
 
-// Visuels de remplacement générés localement (pas de dépendance réseau).
-const PALETTES = [["#f4d6d9", "#c8506a"], ["#efe4d6", "#b9813f"], ["#dfeee0", "#5f9e47"], ["#e2e6f5", "#4b62c9"], ["#f6e7d2", "#d9822b"], ["#ece0f2", "#8a4fb0"]];
-const img = (seed: string, w = 800, h = 800) => {
-  const n = [...seed].reduce((a, c) => a + c.charCodeAt(0), 0);
-  const [a, b] = PALETTES[n % PALETTES.length];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><circle cx="${w * 0.62}" cy="${h * 0.45}" r="${Math.min(w, h) * 0.22}" fill="#fff" fill-opacity=".35"/><rect x="${w * 0.3}" y="${h * 0.3}" width="${w * 0.16}" height="${h * 0.42}" rx="${w * 0.03}" fill="#fff" fill-opacity=".7"/></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-};
+
 
 export const seedAssets = (storeId: string): Asset[] =>
-  ["packshot", "texture", "lifestyle", "banner", "flatlay", "detail"].map((k, i) => ({
+  (["packshot", "texture", "lifestyle", "banner", "flatlay", "detail"].map((k, i) => ({
     id: `${storeId}_a${i}`,
     storeId,
     kind: k === "banner" ? "banner" : k === "lifestyle" ? "lifestyle" : "product",
@@ -290,4 +302,4 @@ export const seedAssets = (storeId: string): Asset[] =>
     height: k === "banner" ? 900 : 800,
     prompt: k === "banner" ? "Bannière lumière du matin, tons rosés" : null,
     createdAt: ago(i),
-  }));
+  })) as Asset[]).concat([1, 2, 3].map((n) => ({ id: `${storeId}_life${n}`, storeId, kind: "lifestyle" as const, slot: `life${n}`, url: img(`${storeId}-life${n}`, 800, 1000), width: 800, height: 1000, prompt: null, createdAt: ago(7 + n) })));

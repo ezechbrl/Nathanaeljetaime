@@ -30,8 +30,8 @@ const mix = (a: string, b: string, t: number) => {
 // Visuels par emplacement (même logique que la publication) : héros, moments, histoire, galerie.
 function pickImages(assets: Asset[]) {
   const by = (s: string) => assets.find((a) => a.slot === s);
-  const rank: Record<string, number> = { packshot: 1, white: 2, studio: 3, moment1: 4, moment2: 5, detail: 6, inuse: 7 };
-  const products = assets.filter((a) => a.kind === "upload" || a.kind === "product" || a.slot === "inuse").sort((x, y) => (rank[x.slot ?? ""] ?? 0) - (rank[y.slot ?? ""] ?? 0));
+  const rank: Record<string, number> = { packshot: 1, white: 2, life1: 3, studio: 4, moment1: 5, life2: 6, moment2: 7, detail: 8, inuse: 9 };
+  const products = assets.filter((a) => a.kind === "upload" || a.kind === "product" || a.slot === "inuse" || a.slot === "life1" || a.slot === "life2").sort((x, y) => (rank[x.slot ?? ""] ?? 0) - (rank[y.slot ?? ""] ?? 0));
   const lifestyle = assets.filter((a) => a.kind === "lifestyle");
   return {
     hero: by("hero") ?? assets.find((a) => a.kind === "banner"),
@@ -39,6 +39,7 @@ function pickImages(assets: Asset[]) {
     inuse: by("inuse") ?? lifestyle[0],
     moments: [1, 2, 3].map((i) => by(`moment${i}`) ?? lifestyle[i] ?? products[i]),
     story: by("story") ?? lifestyle.at(-1),
+    life: [1, 2, 3].map((i) => by(`life${i}`)),
   };
 }
 
@@ -90,6 +91,40 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
     <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: dark ? `${background}b3` : accent }}>{children}</p>
   );
 
+  const reviews = plan.reviews;
+  const Stars = ({ rating, size = 15 }: { rating: number; size?: number }) => (
+    <span className="inline-flex gap-px" aria-label={`${rating}/5`}>{[1, 2, 3, 4, 5].map((i) => <Star key={i} style={{ width: size, height: size }} className={rating >= i - 0.5 ? "fill-[#f5b301] text-[#f5b301]" : "fill-current opacity-20"} />)}</span>
+  );
+  const flag = (c?: string) => (c && /^[A-Za-z]{2}$/.test(c) ? String.fromCodePoint(...[...c.toUpperCase().replace("UK", "GB")].map((x) => 0x1f1a5 + x.charCodeAt(0))) : "");
+  const reviewsSection = reviews?.items.length ? (
+    <section className={cn(pad, sec)}>
+      <div className="text-center">
+        <h3 className={cn("text-[2rem] tracking-tight", H)}>Ce qu&apos;en disent les acheteurs</h3>
+        <p className="mt-3 flex items-center justify-center gap-2 text-[15px]"><Stars rating={reviews.average} size={17} /><strong>{reviews.average.toFixed(1).replace(".", ",")}/5</strong><span className="opacity-60">· {reviews.total.toLocaleString("fr-FR")} avis</span></p>
+      </div>
+      <div className={cn("mt-8 gap-4", mobile ? "columns-1" : "columns-3")}>
+        {reviews.items.slice(0, mobile ? 4 : 9).map((r, i) => (
+          <figure key={i} className="mb-4 grid break-inside-avoid gap-3 rounded-[18px] border p-5" style={{ borderColor: `${primary}1f` }}>
+            {r.photo && <img src={r.photo} alt="" className="aspect-square w-full rounded-xl object-cover" />}
+            <Stars rating={r.rating} />
+            <p className="text-sm leading-relaxed">{r.text}</p>
+            <figcaption className="text-[13px]"><strong>{r.author || "—"}</strong> {flag(r.country)}</figcaption>
+          </figure>
+        ))}
+      </div>
+      <p className="mt-2 text-center text-[12px] opacity-55">Avis d&apos;acheteurs de ce produit, traduits automatiquement.</p>
+    </section>
+  ) : null;
+  const moments = (home.moments?.items ?? []).slice(0, 3).map((m, i) => ({ ...m, img: imgs.life[i] })).filter((m) => m.img);
+  const momentsSection = moments.length ? (
+    <section className={cn(pad, sec)}>
+      <h3 className={cn("text-center text-[2rem] tracking-tight", H)}>{home.moments!.title}</h3>
+      <div className={cn("mt-8 grid gap-5", mobile ? "grid-cols-1" : moments.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
+        {moments.map((m) => <div key={m.title}><Frame a={m.img} ratio="4/5" /><p className="mt-3 text-[17px] font-semibold">{m.title}</p>{m.text && <p className="mt-1 text-sm opacity-70">{m.text}</p>}</div>)}
+      </div>
+    </section>
+  ) : null;
+
   const productBlock = (
     <div className={cn("grid gap-8", !mobile && "grid-cols-[1.08fr_1fr] gap-12")}>
       <div className="space-y-3">
@@ -114,6 +149,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
       </div>
       <div>
         <h2 className={cn("text-[2rem] leading-[1.05] tracking-[-0.02em]", H, mobile && "text-[1.7rem]")}>{prod.title}</h2>
+        {reviews && reviews.average >= 1 && <p className="mt-2 flex items-center gap-2 text-sm"><Stars rating={reviews.average} /><strong>{reviews.average.toFixed(1).replace(".", ",")}</strong>{reviews.total > 0 && <span className="underline underline-offset-2 opacity-70">({reviews.total.toLocaleString("fr-FR")} avis)</span>}</p>}
         <p className="mt-2 text-[15px] opacity-70">{prod.subtitle}</p>
         <p className="mt-4 flex items-center gap-3 text-2xl font-bold">
           {eur(bundles.length ? price * bundles[bundle].quantity * (1 - bundles[bundle].discountPercent / 100) : price)}
@@ -217,6 +253,8 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             </div>
           </section>
 
+          {momentsSection}
+
           {home.extraSections?.map((x, n) => (
             <section key={`${x.title}-${n}`} className={cn(pad, sec, "text-center")} style={n % 2 ? { background: tint } : undefined}>
               <h3 className={cn("text-[2rem] tracking-tight", H)}>{x.title}</h3>
@@ -250,6 +288,8 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             </section>
           )}
 
+          {reviewsSection}
+
           <section className={cn(pad, sec)} style={{ background: tint }}>{productBlock}</section>
 
           <section className="relative grid min-h-[340px] place-items-center overflow-hidden px-6 py-16 text-center text-white" style={{ background: primary }}>
@@ -263,7 +303,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
         </>
       )}
 
-      {page === "produit" && <section className={cn(pad, "py-10")}>{productBlock}</section>}
+      {page === "produit" && <><section className={cn(pad, "py-10")}>{productBlock}</section>{reviewsSection}{momentsSection}</>}
 
       {page === "faq" && (
         <section className={cn(pad, sec)}>

@@ -49,7 +49,7 @@ async function fetchHtml(raw: string): Promise<{ html: string; url: string }> {
 }
 
 // Service de lecture optionnel (ScraperAPI) pour les sites qui bloquent les serveurs, comme AliExpress.
-async function fetchViaScraper(url: string): Promise<string | null> {
+export async function fetchViaScraper(url: string): Promise<string | null> {
   const key = process.env.SCRAPER_API_KEY;
   if (!key) return null;
   const api = new URL("https://api.scraperapi.com/");
@@ -98,7 +98,10 @@ function jsonLdProducts(html: string) {
   return out;
 }
 
-export type ProductPage = { text: string; images: string[]; title: string };
+// Avis tels que lus sur la page (langue d'origine), avant traduction.
+export type RawReview = { author: string; country?: string; rating: number; text: string; photo?: string };
+export type RawReviews = { average: number; total: number; items: RawReview[] };
+export type ProductPage = { text: string; images: string[]; title: string; url: string; reviews?: RawReviews };
 
 // Lit une page produit (la sienne ou celle d'un fournisseur : AliExpress, Amazon, CJ, boutique Shopify…)
 // et en tire le titre, une description et les photos du produit, pour nourrir la génération.
@@ -162,8 +165,33 @@ export function parseProductHtml(html: string, url: string): ProductPage {
     .trim();
   const text = `${facts}\n\nTexte de la page :\n${decode(body)}`.slice(0, MAX_CHARS);
   if (!title && body.length < 200) throw new UnreadablePageError("La page ne contient pas d'informations sur le produit.");
-  return { text, images: [...images].slice(0, 6), title };
+  return { text, images: [...images].slice(0, 6), title, url, reviews: pageReviews(html, ld) };
 }
+
+// Note et avis présents dans la page elle-même : données structurées (boutiques Shopify, Amazon…)
+// ou statistiques AliExpress. Les avis détaillés AliExpress sont lus à part (lib/server/reviews.ts).
+function pageReviews(html: string, ld: Record<string, any>[]): RawReviews | undefined {
+  const p = ld.find((x) => x.aggregateRating || x.review);
+  const items: RawReview[] = [];
+  for (const r of [p?.review ?? []].flat().slice(0, 30)) {
+    const text = decode(String(r?.reviewBody ?? r?.description ?? "")).trim();
+    const rating = Number(r?.reviewRating?.ratingValue);
+    const author = typeof r?.author === "string" ? r.author : r?.author?.name;
+    if (text.length >= 10 && rating >= 1 && rating <= 5) items.push({ author: String(author ?? "").trim() || "Client", rating, text });
+  }
+  const agg = p?.aggregateRating;
+  let average = Number(agg?.ratingValue);
+  let total = Number(agg?.reviewCount ?? agg?.ratingCount);
+  if (!(average > 0)) {
+    // AliExpress : « averageStar » / « totalValidNum » dans les données de la page.
+    average = Number(html.match(/"(?:averageStar|evarageStar)"\s*:\s*"?([\d.]+)/)?.[1]);
+    total = Number(html.match(/"(?:totalValidNum|totalNum)"\s*:\s*"?(\d+)/)?.[1]);
+  }
+  if (!(average >= 1 && average <= 5)) return items.length ? { average: avg(items), total: items.length, items } : undefined;
+  return { average, total: total > 0 ? total : items.length, items };
+}
+
+export const avg = (items: { rating: number }[]) => Math.round((items.reduce((s, r) => s + r.rating, 0) / items.length) * 10) / 10;
 
 // Compatibilité : seulement le texte.
 export async function fetchProductPageText(rawUrl: string): Promise<string> {

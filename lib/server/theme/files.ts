@@ -260,10 +260,17 @@ p{margin:0}
 .acc .rte{padding:0 0 20px}
 .rte p{margin:0 0 12px}.rte ul{padding-left:20px;margin:0 0 12px}.rte li{margin:6px 0}.rte h3{font-size:20px;margin:20px 0 8px}
 @media (max-width:900px){.product{grid-template-columns:1fr;gap:28px}.gallery{position:static}.gallery__thumbs button{flex-basis:22%}}
-.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.quote{border:1px solid color-mix(in srgb,var(--fgc) 14%,transparent);border-radius:22px;padding:26px;display:grid;gap:14px;align-content:start}
-.quote__stars{color:#f5b301;letter-spacing:2px}
-@media (max-width:900px){.quotes{grid-template-columns:1fr}}
+.quotes{columns:3;column-gap:20px}
+.quote{break-inside:avoid;margin:0 0 20px;border:1px solid color-mix(in srgb,var(--fgc) 14%,transparent);border-radius:22px;padding:22px;display:grid;gap:12px;align-content:start;background:color-mix(in srgb,var(--bgc,#fff) 92%,var(--fgc))}
+.quote p{margin:0;line-height:1.55}
+.quote__img{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:14px}
+.stars{display:inline-flex;gap:1px;color:#f5b301;font-size:17px;letter-spacing:0;line-height:1}
+.stars .off{color:color-mix(in srgb,var(--fgc,#000) 22%,transparent)}
+.rv-sum{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;font-size:17px}
+.rv-note{text-align:center;font-size:13px;margin-top:8px}
+.p-rating{display:inline-flex;align-items:center;gap:8px;margin-top:10px;font-size:15px;color:inherit;text-decoration:none}
+.p-rating span{opacity:.7;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:900px){.quotes{columns:1}}
 .banner{position:relative;min-height:560px;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;overflow:hidden;padding:80px 0}
 .banner__bg{position:absolute;inset:0}
 .banner__bg img{width:100%;height:100%;object-fit:cover}
@@ -458,6 +465,7 @@ const PRODUCT_CORE = `{%- assign current = product.selected_or_first_available_v
   <div class="reveal">
     {% if section.settings.eyebrow != blank %}<p class="eyebrow" style="margin-bottom:10px">{{ section.settings.eyebrow }}</p>{% endif %}
     {% if section.settings.heading_tag == 'h1' %}<h1 class="p-title">{{ product.title }}</h1>{% else %}<h2 class="p-title">{{ product.title }}</h2>{% endif %}
+    {% if settings.rating != blank %}<a class="p-rating" href="#avis">{% render 'stars', rating: settings.rating %}<strong>{{ settings.rating }}</strong>{% if settings.rating_count > 0 %}<span>({{ settings.rating_count }} {{ settings.label_reviews }})</span>{% endif %}</a>{% endif %}
     {% if section.settings.subtitle != blank %}<p class="p-sub muted">{{ section.settings.subtitle }}</p>{% endif %}
     <p class="price"><span data-btn-price>{{ current.price | money }}</span>{% if current.compare_at_price > current.price %}<s>{{ current.compare_at_price | money }}</s><span class="badge">-{{ current.compare_at_price | minus: current.price | times: 100.0 | divided_by: current.compare_at_price | round }} %</span>{% endif %}</p>
     <hr class="p-sep">
@@ -651,11 +659,11 @@ ${schema({ name: "Image et texte", settings: [SCHEME, { type: "image_picker", id
   <div class="wrap">
     <div class="head center reveal"><h2 class="title">{{ section.settings.title }}</h2></div>
     <div class="moments">
-      {%- for block in section.blocks -%}<div class="moment reveal" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}><div class="frame"><div class="media">{% if block.settings.image != blank %}${img("block.settings.image", 900, 1125)}{% else %}<div class="ph"></div>{% endif %}</div></div><h3>{{ block.settings.title }}</h3></div>{%- endfor -%}
+      {%- for block in section.blocks -%}<div class="moment reveal" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}><div class="frame"><div class="media">{% if block.settings.image != blank %}${img("block.settings.image", 900, 1125)}{% else %}<div class="ph"></div>{% endif %}</div></div><h3>{{ block.settings.title }}</h3>{% if block.settings.text != blank %}<p class="muted" style="margin-top:6px">{{ block.settings.text }}</p>{% endif %}</div>{%- endfor -%}
     </div>
   </div>
 </section>
-${schema({ name: "Moments", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "moment", name: "Moment", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "title", label: "Titre" }] }], max_blocks: 4, presets: [{ name: "Moments" }] })}`,
+${schema({ name: "Moments", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "moment", name: "Moment", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Moments" }] })}`,
 
   comparison: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap vs">
@@ -681,14 +689,23 @@ ${STICKY}
 ${schema({ name: "Fiche produit", settings: [SCHEME, { type: "select", id: "heading_tag", label: "Niveau de titre", options: [{ value: "h1", label: "H1" }, { value: "h2", label: "H2" }], default: "h1" }, ...PRODUCT_SETTINGS], blocks: PRODUCT_BLOCKS })}`,
 
   testimonials: `{%- if section.blocks.size > 0 -%}
-<section class="sec s-{{ section.settings.scheme }}">
+<section class="sec s-{{ section.settings.scheme }}" id="avis">
   <div class="wrap">
-    <div class="head center reveal"><h2 class="title">{{ section.settings.title }}</h2></div>
-    <div class="quotes">{%- for block in section.blocks -%}<div class="quote reveal" {{ block.shopify_attributes }}><span class="quote__stars">{% for i in (1..block.settings.stars) %}★{% endfor %}</span><p>« {{ block.settings.quote }} »</p><strong>{{ block.settings.author }}</strong></div>{%- endfor -%}</div>
+    <div class="head center reveal">
+      <h2 class="title">{{ section.settings.title | default: settings.label_reviews_title }}</h2>
+      {%- if settings.rating != blank -%}<p class="rv-sum">{% render 'stars', rating: settings.rating %}<strong>{{ settings.rating }}/5</strong>{% if settings.rating_count > 0 %}<span class="muted">· {{ settings.rating_count }} {{ settings.label_reviews }}</span>{% endif %}</p>{%- endif -%}
+    </div>
+    <div class="quotes">{%- for block in section.blocks -%}<figure class="quote reveal" {{ block.shopify_attributes }}>
+      {%- if block.settings.photo != blank -%}<img class="quote__img" src="{{ block.settings.photo }}" alt="" width="600" height="600" loading="lazy">{%- endif -%}
+      {% render 'stars', rating: block.settings.stars %}
+      <p>{{ block.settings.quote }}</p>
+      <figcaption><strong>{{ block.settings.author }}</strong>{% if block.settings.country != blank %} <span class="muted">{{ block.settings.country }}</span>{% endif %}</figcaption>
+    </figure>{%- endfor -%}</div>
+    {%- if section.settings.note != blank -%}<p class="rv-note muted">{{ section.settings.note }}</p>{%- endif -%}
   </div>
 </section>
 {%- endif -%}
-${schema({ name: "Avis clients", settings: [SCHEME, { type: "paragraph", content: "Ajoute uniquement de vrais avis de tes clients. La section reste invisible tant qu'elle est vide." }, { type: "text", id: "title", label: "Titre", default: "Ce qu'en disent nos clients" }], blocks: [{ type: "review", name: "Avis", settings: [{ type: "textarea", id: "quote", label: "Avis" }, { type: "text", id: "author", label: "Prénom et initiale" }, { type: "range", id: "stars", label: "Note", min: 1, max: 5, step: 1, default: 5 }] }], max_blocks: 6, presets: [{ name: "Avis clients" }] })}`,
+${schema({ name: "Avis clients", settings: [SCHEME, { type: "paragraph", content: "Uniquement de vrais avis (les tiens ou ceux des acheteurs du produit chez ton fournisseur). La section reste invisible tant qu'elle est vide." }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "note", label: "Mention sous les avis (origine des avis)" }], blocks: [{ type: "review", name: "Avis", settings: [{ type: "textarea", id: "quote", label: "Avis" }, { type: "text", id: "author", label: "Prénom et initiale" }, { type: "text", id: "country", label: "Pays (drapeau ou nom)" }, { type: "range", id: "stars", label: "Note", min: 1, max: 5, step: 1, default: 5 }, { type: "text", id: "photo", label: "Adresse de la photo du client (facultatif)" }] }], max_blocks: 12, presets: [{ name: "Avis clients" }] })}`,
 
   "image-banner": `{%- assign pic = section.settings.image -%}
 <section class="banner{% if pic == blank %} banner--plain{% endif %}">
@@ -813,6 +830,8 @@ export const SETTINGS_SCHEMA = [
   ] },
   { name: "Panier", settings: [
     { type: "number", id: "free_shipping_threshold", label: "Livraison offerte à partir de (0 = pas de barre)", default: 0 },
+    { type: "text", id: "rating", label: "Note moyenne des avis (ex. 4.8, vide = masquée)" },
+    { type: "number", id: "rating_count", label: "Nombre d'avis", default: 0 },
   ] },
   { name: "Textes", settings: LABEL_KEYS.map((k) => ({ type: "text", id: `label_${k}`, label: k, default: DEFAULT_LABELS[k] })) },
 ];
@@ -825,6 +844,8 @@ export function staticThemeFiles(): Record<string, string> {
     "assets/vitrio.css": CSS,
     "assets/vitrio.js": JS,
     "snippets/icon.liquid": ICON_SNIPPET,
+    // Étoiles pleines, demi-étoile arrondie et vides, d'après une note sur 5 (ex. 4.6).
+    "snippets/stars.liquid": `{%- assign r = rating | times: 1.0 -%}<span class="stars" aria-label="{{ r }}/5">{%- for i in (1..5) -%}{%- assign t = i | minus: 0.5 -%}<span{% if r < t %} class="off"{% endif %}>★</span>{%- endfor -%}</span>`,
     "config/settings_schema.json": JSON.stringify(SETTINGS_SCHEMA, null, 2),
     "locales/fr.default.json": JSON.stringify({ general: { brand: "Vitrio" } }, null, 2),
     "locales/en.json": JSON.stringify({ general: { brand: "Vitrio" } }, null, 2),

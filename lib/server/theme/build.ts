@@ -46,6 +46,9 @@ const blocks = (list: Block[]) => {
   return { blocks: out, block_order: Object.keys(out) };
 };
 
+// Drapeau d'un pays à partir de son code (FR → 🇫🇷).
+const flag = (code?: string) => (code && /^[A-Za-z]{2}$/.test(code) ? String.fromCodePoint(...[...code.toUpperCase().replace("UK", "GB")].map((c) => 0x1f1a5 + c.charCodeAt(0))) : "");
+
 const BENEFIT_ICONS: IconName[] = ["sparkle", "heart", "leaf", "shield", "clock", "star"];
 
 // Contenu propre à la boutique : réglages globaux et modèles de page.
@@ -65,6 +68,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   const freeShippingThreshold = freeShip ? Math.round(Number(freeShip[1].replace(",", "."))) : 0;
   const faqItems = [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))].slice(0, 10);
 
+  const reviews = plan.reviews;
   const labels = Object.fromEntries(Object.entries(L).map(([k, v]) => [`label_${k}`, v]));
   const settingsData = {
     current: {
@@ -78,6 +82,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
       heading_style: SERIF.test(theme.headingFont) ? "serif" : "sans",
       body_font: theme.bodyFont,
       free_shipping_threshold: freeShippingThreshold,
+      ...(reviews && reviews.average >= 1 ? { rating: reviews.average.toFixed(1), rating_count: reviews.total } : {}),
       ...labels,
       sections: {
         announcement: { type: "announcement", ...blocks((home.announcements?.length ? home.announcements : [shipOffer, returnOffer, plan.brand.tagline].filter(Boolean)).slice(0, 3).map((text, i) => ({ type: "msg", settings: { icon: (["truck", "return", "gift"] as const)[i] ?? "sparkle", text: clip(text, 110) } }))) },
@@ -131,14 +136,29 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...blocks(x.items.slice(0, 6).map((it) => ({ type: "feat", settings: { icon: "check", title: it.title, text: it.text } }))),
   }]));
 
+  // Avis réels (acheteurs du produit chez le fournisseur), avec leur origine indiquée sous la section.
+  const reviewsSection = {
+    type: "testimonials",
+    settings: { scheme: "base", title: "", note: reviews?.items.length ? L.reviews_note : "" },
+    ...blocks((reviews?.items ?? []).slice(0, 9).map((r) => ({ type: "review", settings: { quote: r.text, author: r.author || "—", country: flag(r.country), stars: Math.min(5, Math.max(1, Math.round(r.rating))), ...(r.photo ? { photo: r.photo } : {}) } }))),
+  };
+  // Moments d'usage : une scène de vie par moment (personne de la cible qui utilise le produit).
+  const moments = home.moments?.items.slice(0, 3).map((m, i) => ({ ...m, image: file(`life${i + 1}`) })) ?? [];
+  const momentsSection = moments.some((m) => m.image) && {
+    type: "moments",
+    settings: { scheme: "base", title: home.moments!.title },
+    ...blocks(moments.filter((m) => m.image).map((m) => ({ type: "moment", settings: { image: m.image, title: m.title, text: m.text ?? "" } }))),
+  };
+
   const sections: Record<string, unknown> = {
     hero: { type: "hero", settings: { image: file("hero"), ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
     features: featuresSection,
     benefits: benefitsSection,
+    ...(momentsSection ? { moments: momentsSection } : {}),
     ...extras,
     ...(comparisonSection ? { comparison: comparisonSection } : {}),
+    reviews: reviewsSection,
     ...(product ? { buy: { type: "featured-product", settings: { scheme: "tint", product, heading_tag: "h2", eyebrow: "", ...productSettings, sticky: false, bundle_label: "" }, ...productBlocks } } : {}),
-    reviews: { type: "testimonials", settings: { scheme: "base", title: "" } },
     banner: { type: "image-banner", settings: { image: file("moment3") || file("hero"), title: home.finalCta?.title ?? plan.strategy.promise, text: home.finalCta?.text ?? "", cta: home.ctaLabel, url: shopUrl } },
   };
   const index = { sections, order: Object.keys(sections) };
@@ -147,10 +167,12 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     sections: {
       main: { type: "main-product", settings: { scheme: "base", heading_tag: "h1", eyebrow: "", ...productSettings }, ...productBlocks },
       features: { ...featuresSection, settings: { ...featuresSection.settings, title: "" } },
+      reviews: { ...reviewsSection, settings: { ...reviewsSection.settings, scheme: "tint" } },
       benefits: { ...benefitsSection, settings: { ...benefitsSection.settings, cta: "" } },
+      ...(momentsSection ? { moments: momentsSection } : {}),
       ...(comparisonSection ? { comparison: comparisonSection } : {}),
     },
-    order: ["main", "features", "benefits", ...(comparisonSection ? ["comparison"] : [])],
+    order: ["main", "features", "reviews", "benefits", ...(momentsSection ? ["moments"] : []), ...(comparisonSection ? ["comparison"] : [])],
   };
 
   // Réglages vides (liens, images) retirés : Shopify refuse une valeur vide pour ces types.
