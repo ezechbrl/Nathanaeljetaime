@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { PageHeader } from "@/components/app/PageHeader";
-import { Paywall, ProFaq } from "@/components/app/Paywall";
+import { Paywall } from "@/components/app/Paywall";
 import { Button, Spinner } from "@/components/ui/Button";
 import { AiBudgetMeter, Meter, Skeleton } from "@/components/ui/Feedback";
 import { useToast } from "@/components/ui/Toast";
@@ -54,7 +54,7 @@ function Billing() {
     return (
       <>
         <PageHeader title="Abonnement" />
-        <div className="p-5 sm:p-8"><Paywall /><ProFaq /></div>
+        <div className="p-5 sm:p-8"><Paywall /></div>
       </>
     );
   }
