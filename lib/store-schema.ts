@@ -17,12 +17,12 @@ export const RichHomeSchema = z.object({
   benefitsTitle: z.string().describe("Titre de la section bénéfices, ex. « Ce que ça change pour toi »"),
   benefitIcons: z.array(iconField()).describe("Une icône par bénéfice de homepage.benefits, dans le même ordre"),
   moments: z.object({
-    title: z.string().describe("Ex. « Pour chaque moment de ta journée »"),
+    title: z.string().describe("Titre de la section qui montre le produit utilisé par des profils différents, ex. « Pour tous les sportifs » ou « Il suit toutes tes envies ». Jamais « moments de la journée »"),
     items: z.array(z.object({
-      title: z.string().describe("2 à 4 mots"),
-      text: z.string().optional().describe("Une phrase courte (12 mots maximum) sur ce moment d'usage"),
-      imagePrompt: z.string().describe("Scène photo EN ANGLAIS : une personne typique de la clientèle cible utilise le produit à ce moment (qui, lieu, geste précis, lumière), photo naturelle et réaliste, sans texte"),
-    })).describe("Exactement 3 moments d'usage concrets, propres à la niche"),
+      title: z.string().describe("Contexte d'usage en 2 à 4 mots, ex. « En salle de sport », « Sur le court »"),
+      text: z.string().optional().describe("Une phrase courte (12 mots maximum) sur ce que le produit apporte dans ce contexte"),
+      imagePrompt: z.string().describe("Photo EN ANGLAIS : une personne précise (âge, genre, style) utilise le produit dans ce contexte (lieu, activité, geste précis, lumière). Chacune des 3 photos montre une personne différente dans un contexte différent. Photo naturelle et réaliste, sans texte"),
+    })).describe("Exactement 3 contextes d'usage différents (ex. 3 sports, 3 métiers, 3 profils), propres à la niche, chacun avec une personne différente"),
   }),
   comparison: z.object({
     title: z.string().describe("Ex. « Notre produit vs l'option classique »"),

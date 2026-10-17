@@ -663,7 +663,7 @@ ${schema({ name: "Image et texte", settings: [SCHEME, { type: "image_picker", id
     </div>
   </div>
 </section>
-${schema({ name: "Moments", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "moment", name: "Moment", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Moments" }] })}`,
+${schema({ name: "Le produit en situation", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "moment", name: "Situation", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Le produit en situation" }] })}`,
 
   comparison: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap vs">

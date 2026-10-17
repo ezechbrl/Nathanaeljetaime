@@ -200,10 +200,16 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
     ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a muted tone close to ${c.background}, gentle window light. ${keep} ${CLEAN}`],
     ["moment3", "lifestyle", "16:9", `Wide atmospheric shot, ${scene}: the product seen from a slightly high front three-quarter angle, placed in an empty, tidy setting that fits the brand, warm evening light with subtle ${c.accent} accent lights, lots of space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
   ];
-  // Scènes de vie : une personne de la clientèle cible utilise le produit, une scène par moment d'usage.
+  // Scènes de vie : 3 personnes différentes utilisent le produit, chacune dans un contexte différent.
+  // Profils variés d'une photo à l'autre, même si la scène décrite par l'IA ne le précise pas.
+  const PERSONAS = [
+    "If the scene does not specify the person, show a young adult in their twenties.",
+    "If the scene does not specify the person, show a person in their thirties or forties, of a different gender than a typical first photo.",
+    "If the scene does not specify the person, show a person in their fifties, with a different style and background.",
+  ];
   const life = "Candid, natural lifestyle photo as if shot by a professional photographer on a 35mm camera: realistic people with natural skin texture and correct anatomy, natural hands, authentic everyday setting, soft natural light, shallow depth of field. The product is clearly visible and is the exact same product as in the reference image: same design, shape, proportions, colors, materials and details. No added logo, text, watermark or brand name.";
   (plan.homepage.moments?.items ?? []).slice(0, 3).forEach((m, i) => {
-    shots.push([`life${i + 1}` as Slot, "lifestyle", "4:5", `${m.imagePrompt}. ${life}`]);
+    shots.push([`life${i + 1}` as Slot, "lifestyle", "4:5", `${m.imagePrompt}. ${PERSONAS[i]} ${life}`]);
   });
   // Le packshot compte pour une photo ; chaque mise en scène terminée fait avancer la barre.
   let done = 1;

@@ -19,7 +19,7 @@ function rich(name: string, short: string): { home: Partial<StorePlan["homepage"
       benefitsEyebrow: "Au quotidien",
       benefitsTitle: "Ce que ça change pour toi",
       benefitIcons: ["sparkle", "clock", "heart"],
-      moments: { title: "Pour chaque moment de ta journée", items: [{ title: "Le matin", imagePrompt: "" }, { title: "En journée", imagePrompt: "" }, { title: "Le soir", imagePrompt: "" }] },
+      moments: { title: "Il suit toutes tes envies", items: [{ title: "Sur les pistes", text: "Protège du froid et du vent toute la journée.", imagePrompt: "" }, { title: "En ville", text: "Glisse dans la poche, s'applique en 2 secondes.", imagePrompt: "" }, { title: "Après le sport", text: "Réhydrate après l'effort, sans effet gras.", imagePrompt: "" }] },
       comparison: {
         title: `${name} vs l'option classique`,
         text: "On a gardé l'essentiel et retiré le superflu. Voilà ce que ça change concrètement.",
