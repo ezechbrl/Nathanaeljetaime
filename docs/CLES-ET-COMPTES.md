@@ -168,6 +168,23 @@ lit les sites qui l'acceptent ; pour les autres, le client ajoute 1 à 3 capture
 
 Ne m'envoie jamais la clé : elle va uniquement dans Vercel.
 
+## 7. Notification « Nouvelle vente » sur ton téléphone — facultatif
+
+À chaque nouvel abonné Pro (et à chaque départ), Vitrio t'envoie une notification.
+
+**Option A — Pushover (son « caisse enregistreuse », iPhone et Android, 5 $ une fois après 30 jours d'essai)**
+1. Installe l'app **Pushover** sur ton téléphone et crée un compte.
+2. Sur **https://pushover.net** : copie ta **User Key** (en haut de la page).
+3. **Create an Application/API Token** → nom « Vitrio » → copie l'**API Token**.
+4. Dans Vercel : `PUSHOVER_USER_KEY` = la User Key, `PUSHOVER_APP_TOKEN` = l'API Token.
+
+**Option B — ntfy (gratuit)**
+1. Installe l'app **ntfy** et abonne-toi à un sujet secret (ex. `vitrio-ventes-8f3k2q`).
+2. Dans Vercel : `NTFY_TOPIC` = ce sujet. Le son se choisit dans les réglages du sujet de l'app (Android).
+
+**Tester** : ajoute `OWNER_EMAIL` = l'e-mail de ton compte Vitrio dans Vercel, redéploie, connecte-toi à Vitrio
+puis ouvre `https://nathanaeljetaime.vercel.app/api/owner/test-notification`.
+
 ## Pour plus tard
 
 ### Resend (e-mails : formulaire de contact, notifications)

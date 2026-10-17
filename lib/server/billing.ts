@@ -3,6 +3,7 @@ import type { Invoice, PlanId, Subscription } from "@/lib/api/types";
 import type { UserRow } from "./auth";
 import { env } from "./env";
 import { HttpError } from "./http";
+import { notifyOwner, saleMessage } from "./notify";
 import { connectionFor, graphql } from "./shopify";
 import { db, must } from "./supabase";
 
@@ -76,6 +77,7 @@ export async function syncShopifySubscription(userId: string) {
     return; // pas de boutique active : rien à synchroniser
   }
   const sub = await activeSubscription(conn.shop, conn.token);
+  const before = must(await db().from("users").select("plan").eq("id", userId).maybeSingle()) as { plan: PlanId } | null;
   const item = sub?.items.find((i) => planFromHandle(i.handle) !== "free") ?? sub?.items[0];
   const plan = planFromHandle(item?.handle);
   await db().from("subscriptions").upsert({
@@ -89,6 +91,12 @@ export async function syncShopifySubscription(userId: string) {
     updated_at: new Date().toISOString(),
   });
   await db().from("users").update({ plan }).eq("id", userId);
+
+  // Notification sur le téléphone du fondateur : nouvelle vente ou départ d'un abonné.
+  const was = before?.plan ?? "free";
+  const interval = sub ? (sub.billingPeriod === "ANNUAL" ? "year" : "month") : null;
+  if (was === "free" && plan !== "free") await notifyOwner("💰 Nouvelle vente Vitrio", saleMessage(conn.shop, interval));
+  else if (was !== "free" && plan === "free") await notifyOwner("Abonné parti", `${conn.shop.replace(/\.myshopify\.com$/, "")} a arrêté Vitrio Pro.`);
 
   // Commission d'affiliation : une fois par période payée, pendant 12 mois.
   const amount = Number(item?.price.amount ?? 0);
@@ -120,8 +128,9 @@ export async function billingFor(user: UserRow): Promise<{ subscription: Subscri
 
 // Désinstallation de l'app : Shopify arrête la facturation, l'utilisateur repasse sans abonnement.
 export async function endSubscriptionForShop(shop: string) {
-  const rows = must(await db().from("subscriptions").select("user_id").eq("shop_domain", shop)) as { user_id: string }[];
+  const rows = must(await db().from("subscriptions").select("user_id, plan").eq("shop_domain", shop)) as { user_id: string; plan: PlanId }[];
   for (const r of rows) {
+    if (r.plan !== "free") await notifyOwner("Abonné parti", `${shop.replace(/\.myshopify\.com$/, "")} a désinstallé Vitrio.`);
     await db().from("subscriptions").update({ plan: "free", status: "canceled", updated_at: new Date().toISOString() }).eq("user_id", r.user_id);
     await db().from("users").update({ plan: "free" }).eq("id", r.user_id);
   }
