@@ -4,8 +4,9 @@ import type { StoreTheme } from "@/lib/api/types";
 import type { JobStepKey } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
 import { generatePages, generateStrategy } from "./ai";
-import { fetchProductPage, UnreadablePageError } from "@/lib/fetch-product-page";
+import { UnreadablePageError, type ProductPage } from "@/lib/fetch-product-page";
 import { supplierReviews } from "./reviews";
+import { cachedProductPage } from "./link-cache";
 import { editImage, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
 import { connectionFor, installTheme, publish, readStoreContent, uploadSceneFiles, type ShopifyIds } from "./shopify";
 import { themeZipUrl } from "./theme/link";
@@ -91,12 +92,12 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     await step("strategy");
     let sourceText: string | undefined;
     let sourceImages: string[] = [];
-    let page: Awaited<ReturnType<typeof fetchProductPage>> | undefined;
+    let page: ProductPage | undefined;
     let existingStore: string | undefined;
     const screenshots = ((job.input as { screenshots?: string[] } | null)?.screenshots ?? []).slice(0, 3);
     if (store.mode === "link" && store.source_url) {
       try {
-        page = await fetchProductPage(store.source_url);
+        page = await cachedProductPage(store.source_url);
         sourceText = page.text;
         sourceImages = page.images;
       } catch (e) {

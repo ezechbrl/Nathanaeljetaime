@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { fetchProductPage, UnreadablePageError } from "@/lib/fetch-product-page";
+import { UnreadablePageError } from "@/lib/fetch-product-page";
+import { cachedProductPage } from "@/lib/server/link-cache";
 import { requireUser } from "@/lib/server/auth";
 import { body, json, route } from "@/lib/server/http";
 import { rateLimit } from "@/lib/server/quota";
@@ -13,7 +14,7 @@ export const POST = route(async (req) => {
   const { url } = await body(req, z.object({ url: z.string().trim().url() }));
   await rateLimit(`link-check:${user.id}`, 20, 600);
   try {
-    const page = await fetchProductPage(url);
+    const page = await cachedProductPage(url);
     return json({ ok: true, title: page.title, image: page.images[0] ?? null });
   } catch (e) {
     const reason = e instanceof UnreadablePageError ? e.message : "La page n'a pas pu être lue.";
