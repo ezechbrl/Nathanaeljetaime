@@ -4,7 +4,7 @@ import { encrypt, safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { route } from "@/lib/server/http";
 import { LIMITS } from "@/lib/server/quota";
-import { exchangeCode, SHOP_RE, shopInfo, verifyQueryHmac } from "@/lib/server/shopify";
+import { exchangeCode, registerUninstallWebhook, SHOP_RE, shopInfo, verifyQueryHmac } from "@/lib/server/shopify";
 import { authClient, db, must } from "@/lib/server/supabase";
 
 // Ouvre une session Supabase pour un utilisateur donné, côté serveur (lien magique à usage unique).
@@ -62,6 +62,7 @@ export const GET = route(async (req) => {
     { user_id: userId, shop_domain: shop, shop_name: info.name, access_token_encrypted: encrypt(access_token), scopes: scope, status: "active", updated_at: new Date().toISOString() },
     { onConflict: "user_id,shop_domain" },
   );
+  await registerUninstallWebhook(shop, access_token).catch((e) => console.warn("Webhook de désinstallation non enregistré :", (e as Error).message));
   const res = NextResponse.redirect(`${app}${next}`);
   res.cookies.delete("shopify_state");
   res.cookies.delete("shopify_next");

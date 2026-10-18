@@ -39,6 +39,14 @@ export async function exchangeCode(shop: string, code: string) {
   return (await res.json()) as { access_token: string; scope: string };
 }
 
+// Webhook de désinstallation, enregistré boutique par boutique (le flux d'installation hérité ne permet
+// pas de le déclarer dans shopify.app.toml). Une boutique déjà abonnée renvoie une erreur sans gravité.
+export async function registerUninstallWebhook(shop: string, token: string) {
+  await graphql(shop, token,
+    `mutation ($uri: String!) { webhookSubscriptionCreate(topic: APP_UNINSTALLED, webhookSubscription: { uri: $uri, format: JSON }) { userErrors { message } } }`,
+    { uri: `${env.appUrl()}/api/webhooks/shopify` });
+}
+
 type Gql<T> = { data?: T; errors?: { message: string }[] | string };
 
 export async function graphql<T>(shop: string, token: string, query: string, variables: Record<string, unknown> = {}): Promise<T> {

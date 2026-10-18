@@ -7,7 +7,6 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = false
-include_config_on_deploy = true
 
 [access_scopes]
 # read_themes et write_themes seront ajoutés quand Shopify aura accordé la dérogation.
@@ -20,10 +19,7 @@ redirect_urls = ["https://nathanaeljetaime.vercel.app/api/shopify/callback"]
 [webhooks]
 api_version = "2026-10"
 
-  # Désinstallation de l'app : Vitrio coupe l'accès et l'abonnement.
-  [[webhooks.subscriptions]]
-  topics = ["app/uninstalled"]
-  uri = "https://nathanaeljetaime.vercel.app/api/webhooks/shopify"
+  # « app/uninstalled » est enregistré boutique par boutique à la connexion (flux d'installation hérité).
 
   # Webhooks de conformité (RGPD) obligatoires pour l'App Store.
   [[webhooks.subscriptions]]
