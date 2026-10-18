@@ -2,3 +2,4 @@
 # Déployée avec `npx shopify app deploy` (voir docs/CLES-ET-COMPTES.md).
 name = "vitrio-brand"
 type = "theme"
+uid = "21452845-02cd-8934-f4ee-225ce2bd8f2c252985f2"
