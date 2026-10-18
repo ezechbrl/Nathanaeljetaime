@@ -1,10 +1,31 @@
-# Configuration de l'app pour Shopify CLI (sert uniquement à déployer l'extension de thème).
-# Remplace client_id par le « Client ID » de ton app (même valeur que SHOPIFY_API_KEY).
-client_id = "REMPLACE_PAR_TON_CLIENT_ID"
+# Configuration de l'app Vitrio, déployée avec `npx @shopify/cli app deploy` (crée une nouvelle version).
+# Doit rester identique aux réglages du tableau de bord Shopify (dev.shopify.com) : ce fichier les remplace.
+client_id = "da05327de5caa0989a67970304b18f71"
 name = "Vitrio"
 application_url = "https://nathanaeljetaime.vercel.app"
 embedded = false
 
 [build]
 automatically_update_urls_on_dev = false
-include_config_on_deploy = false
+include_config_on_deploy = true
+
+[access_scopes]
+# read_themes et write_themes seront ajoutés quand Shopify aura accordé la dérogation.
+scopes = "read_products,write_products,read_content,write_content,read_online_store_pages,write_online_store_pages,read_files,write_files,read_publications,write_publications,read_orders,read_reports"
+use_legacy_install_flow = true
+
+[auth]
+redirect_urls = ["https://nathanaeljetaime.vercel.app/api/shopify/callback"]
+
+[webhooks]
+api_version = "2026-10"
+
+  # Désinstallation de l'app : Vitrio coupe l'accès et l'abonnement.
+  [[webhooks.subscriptions]]
+  topics = ["app/uninstalled"]
+  uri = "https://nathanaeljetaime.vercel.app/api/webhooks/shopify"
+
+  # Webhooks de conformité (RGPD) obligatoires pour l'App Store.
+  [[webhooks.subscriptions]]
+  compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+  uri = "https://nathanaeljetaime.vercel.app/api/webhooks/shopify"
