@@ -81,7 +81,7 @@ export function Paywall({ brief, draft }: { brief?: string; draft?: GenerateStor
         <p className="w-fit bg-[linear-gradient(90deg,#34d399,#a3e635,#fcd34d)] bg-clip-text text-xs font-bold uppercase tracking-[0.2em] text-transparent">Vitrio Pro</p>
         <h2 className="mt-2 text-[1.65rem] font-semibold leading-tight tracking-[-0.02em]">{draft ? "Ta boutique t'attend 🚀" : "Une boutique qui vend. En 5 minutes."}</h2>
         {draft?.brief || brief ? <Recap text={draft?.brief || brief!} /> : connections.data && (
-          <p className="mt-2 text-sm text-fg-muted">{needShop ? "Ta marque en ligne ce soir, sans freelance ni designer." : "Tu as déjà Shopify : Vitrio te fait gagner des semaines."}</p>
+          <p className="mt-2 text-sm text-fg-muted">{needShop ? "Ta marque en ligne en 10 minutes, sans freelance ni designer." : "Tu as déjà Shopify : Vitrio te fait gagner des semaines."}</p>
         )}
 
         <div className="mt-5 flex flex-wrap items-end justify-between gap-3">

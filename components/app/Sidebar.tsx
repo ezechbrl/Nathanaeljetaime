@@ -2,7 +2,7 @@
 
 import {
   BarChart3, ChevronsUpDown, CreditCard, Gift, HelpCircle, Home, Image as ImageIcon, LayoutGrid, LogOut,
-  Menu, MessageSquare, Plus, Settings, Store as StoreIcon, X,
+  Menu, MessageSquare, Plus, Settings, Store as StoreIcon, Wand2, X,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -77,6 +77,7 @@ function SidebarBody() {
             <NavLink href={`/app/boutiques/${storeId}/editeur`} icon={MessageSquare}>Éditeur IA</NavLink>
             <NavLink href={`/app/boutiques/${storeId}/studio`} icon={ImageIcon}>Studio et bibliothèque</NavLink>
             <NavLink href={`/app/boutiques/${storeId}/pilotage`} icon={BarChart3}>Pilotage</NavLink>
+            <NavLink href="/app/outils" icon={Wand2}>Outils IA (nom, slogan…)</NavLink>
           </div>
         </>
       )}

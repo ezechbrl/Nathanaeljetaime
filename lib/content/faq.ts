@@ -2,28 +2,32 @@ import { site } from "@/lib/site";
 
 export const HOME_FAQ = [
   {
-    q: `Concrètement, ${site.name} fait quoi ?`,
-    a: `Tu écris une phrase sur ton produit (ou tu colles un lien, ou tu relies ta boutique actuelle). ${site.name} commence par la stratégie : à qui tu vends, quelle promesse, quelles offres, quelles hésitations lever. Ensuite seulement, il écrit les pages, crée les visuels et installe le tout dans ta boutique Shopify.`,
+    q: "Je colle un lien AliExpress : qu'est-ce que j'obtiens exactement ?",
+    a: `Une boutique Shopify complète autour de ce produit : un nom de marque, une page d'accueil, une fiche produit avec photos studio et mises en situation, des offres par lot (1, 2 ou 3 unités), les vrais avis des acheteurs avec étoiles, une FAQ et un design aux couleurs de ta marque. Tu vois tout avant de publier.`,
   },
   {
-    q: "Combien ça coûte ?",
-    a: "31 € par mois, ou 310 € par an (2 mois offerts), sans engagement. Boutiques illimitées, éditeur IA, visuels et suivi quotidien inclus. Le paiement s'ajoute à ta facture Shopify, et tu arrêtes en un clic.",
+    q: "Ça prend combien de temps ?",
+    a: "Environ 5 à 10 minutes pour la création. Ensuite tu relis, tu ajustes en discutant avec l'IA si tu veux, et tu publies dans Shopify en un clic.",
+  },
+  {
+    q: "Combien ça me coûte, au total ?",
+    a: `Vitrio : 31 € par mois, ou 310 € par an (2 mois offerts), sans engagement. Shopify : ${site.shopifyOffer} en ce moment, puis son prix normal. Pas de designer, pas de photographe, pas de thème payant à acheter.`,
+  },
+  {
+    q: "Les photos et les avis, ils viennent d'où ?",
+    a: "Les photos sont créées par l'IA à partir de la vraie photo de ton produit : le produit reste identique, seuls le décor et l'angle changent. Les avis sont ceux des vrais acheteurs du produit chez le fournisseur, traduits ; on n'invente jamais d'avis.",
+  },
+  {
+    q: "Et si quelque chose ne me plaît pas ?",
+    a: "Tu l'écris simplement à l'éditeur IA : « change la couleur en bleu », « moins de texte », « ajoute un lot de 3 ». Il modifie la boutique, et chaque version reste disponible si tu veux revenir en arrière.",
   },
   {
     q: "Il faut déjà avoir une boutique Shopify ?",
-    a: "Il faut un compte Shopify, oui : c'est là que ta boutique vit. Si tu n'en as pas, tu en ouvres un gratuitement pendant l'inscription, puis tu le relies en deux clics.",
+    a: "Il faut un compte Shopify, oui : c'est là que ta boutique vit. Si tu n'en as pas, tu le crées en quelques minutes, puis tu le relies à Vitrio en un clic.",
   },
   {
-    q: "Qu'est-ce qui est créé dans ma boutique ?",
-    a: "La fiche produit (textes, prix conseillé, SEO, visuels), la page d'accueil, la FAQ, les pages À propos, Livraison et Contact, et les menus. Côté stratégie, tu reçois aussi ton marché cible, ta promesse, tes offres et la liste des objections traitées.",
-  },
-  {
-    q: "Et si le résultat ne me plaît pas ?",
-    a: "Tu le dis simplement : « plus haut de gamme », « moins de texte », « ajoute un lot de 3 ». L'IA modifie, te montre l'avant/après, et chaque version reste disponible si tu veux revenir en arrière.",
-  },
-  {
-    q: "Ma boutique peut être en anglais ou en espagnol ?",
-    a: "Oui. Tu choisis la langue de ton marché (une douzaine disponibles) et les textes sont écrits directement dans cette langue, pas traduits mot à mot depuis le français.",
+    q: "Je dois savoir coder ou faire du design ?",
+    a: "Non. Tout se fait en français, avec des boutons et des phrases. Si tu sais coller un lien, tu sais utiliser Vitrio.",
   },
   {
     q: "Si j'arrête, je perds tout ?",

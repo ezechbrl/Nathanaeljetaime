@@ -56,8 +56,13 @@ export function PublishProgress({ store, job }: { store: Store; job: Job }) {
   const [fitRef, k] = useFit(560);
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Publication en cours" className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#061815]/85 p-5 backdrop-blur-md [animation:fade-in_.3s_ease-out]">
-      <div className="w-full max-w-[600px] text-center [animation:rise_.5s_cubic-bezier(.2,.8,.2,1)_both]">
+    <div role="dialog" aria-modal="true" aria-label="Publication en cours" className="fixed inset-0 z-[60] grid place-items-center overflow-y-auto bg-[#040d0b] p-5 [animation:fade-in_.3s_ease-out]">
+      {/* Même fond animé que l'écran de création */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-[20%] -top-[30%] h-[80vh] w-[70vw] rounded-full bg-[radial-gradient(closest-side,rgb(16_176_127/0.28),transparent)] [animation:aurora_14s_ease-in-out_infinite]" />
+        <div className="absolute -bottom-[30%] right-[-10%] h-[70vh] w-[60vw] rounded-full bg-[radial-gradient(closest-side,rgb(104_230_176/0.16),transparent)] [animation:aurora_18s_ease-in-out_infinite_reverse]" />
+      </div>
+      <div className="relative w-full max-w-[600px] text-center [animation:rise_.5s_cubic-bezier(.2,.8,.2,1)_both]">
         <p className="inline-flex items-center gap-2 text-sm text-fg-muted">
           <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" /><span className="relative h-2 w-2 rounded-full bg-accent" /></span>
           Publication en cours · <span className="tabular-nums">{elapsed}</span>

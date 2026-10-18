@@ -18,7 +18,7 @@ export default function HomePage() {
           <p className="text-sm font-medium text-accent">Regarde plutôt</p>
           <h2 className="mt-2 text-h2">Du lien AliExpress à la boutique <span className="serif-accent">en ligne</span></h2>
         </Reveal>
-        <Reveal delay={120}><TutorialVideo name="tuto-boutique" title="vitrio.app · Coller un lien, générer, publier" speed="×3" className="mt-8" /></Reveal>
+        <Reveal delay={120}><TutorialVideo name="tuto-boutique" title="vitrio.app · Du lien à la boutique en ligne, étape par étape" speed="×1,8" className="mt-8" /></Reveal>
       </section>
       <Playground />
       <Steps />

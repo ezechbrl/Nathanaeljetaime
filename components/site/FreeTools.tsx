@@ -30,7 +30,7 @@ const TOOLS: { id: ToolId; label: string; description: string; fields: { name: s
 
 type Result = { names?: string[]; slogans?: string[]; html?: string; items?: { question: string; answer: string }[] };
 
-export function FreeTools() {
+export function FreeTools({ inApp = false }: { inApp?: boolean }) {
   const [toolId, setToolId] = useState<ToolId>("store-name");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
@@ -91,9 +91,13 @@ export function FreeTools() {
             {result.items?.map((x) => (
               <div key={x.question} className="border-b border-white/[0.05] py-3"><p>{x.question}</p><p className="mt-1 text-sm text-fg-muted">{x.answer}</p></div>
             ))}
-            <div className="mt-6 rounded-ctl border border-accent/20 bg-accent-deep/20 p-4 text-sm text-fg-muted">
-              Envie de la boutique entière, pas seulement d'un texte ? <ButtonLink href="/inscription" variant="ghost" size="sm" className="ml-1 text-accent">Créer ma boutique →</ButtonLink>
-            </div>
+            {inApp ? (
+              <p className="mt-6 rounded-ctl border border-accent/20 bg-accent-deep/20 p-4 text-sm text-fg-muted">Copie ce qui te plaît, puis demande à l'éditeur IA de l'utiliser dans ta boutique (ex. « renomme la boutique en … »).</p>
+            ) : (
+              <div className="mt-6 rounded-ctl border border-accent/20 bg-accent-deep/20 p-4 text-sm text-fg-muted">
+                Envie de la boutique entière, pas seulement d'un texte ? <ButtonLink href="/inscription" variant="ghost" size="sm" className="ml-1 text-accent">Créer ma boutique →</ButtonLink>
+              </div>
+            )}
           </div>
         )}
       </div>

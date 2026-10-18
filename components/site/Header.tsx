@@ -18,7 +18,6 @@ const NAV = [
 
 const RESOURCES = [
   { href: "/blog", label: "Blog", text: "Guides pour vendre sur Shopify" },
-  { href: "/outils", label: "Outils gratuits", text: "Noms, slogans, descriptions" },
   { href: "/nouveautes", label: "Feuille de route", text: "Ce qui sort et ce qui arrive" },
   { href: "/fondateurs", label: "Notre histoire", text: "Pourquoi on construit ça" },
   { href: "/affiliation", label: "Devenir partenaire", text: "30 % de commission récurrente" },

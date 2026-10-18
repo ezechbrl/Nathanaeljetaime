@@ -1,7 +1,7 @@
 "use client";
 
 import { site } from "@/lib/site";
-import { ArrowRight, Mail, ShoppingBag } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -40,6 +40,7 @@ export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBefor
   const [shop, setShop] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,30 +57,43 @@ export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBefor
 
   return (
     <div className="space-y-3">
-      {/* 1. Pas encore de boutique : on l'envoie ouvrir son compte Shopify, puis il revient ici. */}
-      <div className="rounded-card border border-line/10 bg-white/[0.02] p-4">
-        <p className="font-medium">Pas de compte Shopify ?</p>
-        <p className="mt-1 text-sm text-fg-muted">Bonne nouvelle : en ce moment, Shopify coûte <strong className="text-fg">{site.shopifyOffer}</strong>. Lancer ton business ne te coûte presque rien : crée ton compte, puis reviens ici pour le relier.</p>
-        <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-ctl border border-line/15 bg-white/[0.04] text-[15px] font-medium transition-colors hover:border-line/30 hover:bg-white/[0.07]">
-          <ShoppingBag className="h-4 w-4 text-accent" /> Créer un compte Shopify
-        </a>
+      {/* Logo Shopify et deux actions courtes : relier sa boutique, ou en créer une. */}
+      <div className="flex items-center gap-3 pb-1">
+        <ShopifyBag className="h-11 w-11 shrink-0" />
+        <p className="text-sm leading-snug text-fg-muted">Vitrio crée ta boutique directement dans <strong className="text-fg">Shopify</strong>.</p>
       </div>
 
-      {/* 2. Déjà une boutique : on la relie à Vitrio. */}
-      <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-4">
-        <p className="font-medium">J'ai un compte Shopify</p>
-        <p className="mt-1 text-sm text-fg-muted">Tu vends déjà : relie ta boutique et Vitrio lui donne un design pro, des photos et des textes pensés pour vendre, en quelques minutes.</p>
-        <label htmlFor="shop" className="sr-only">Adresse de ta boutique Shopify</label>
-        <div className="mt-3 flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
-          <ShoppingBag className="ml-3 h-4 w-4 shrink-0 text-accent" />
-          <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" className="min-w-0 flex-1 bg-transparent px-2 py-3 text-[15px] focus:outline-none" />
-          <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
-        </div>
-        {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
-        <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
-        <p className="mt-2 text-xs text-fg-faint">L'adresse est dans Shopify, en haut de ton tableau de bord (ex. ma-boutique.myshopify.com).</p>
-      </form>
+      {open ? (
+        <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-3">
+          <label htmlFor="shop" className="text-sm font-medium">Adresse de ta boutique</label>
+          <div className="mt-2 flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
+            <input id="shop" autoFocus value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" className="min-w-0 flex-1 bg-transparent px-3 py-3 text-[15px] focus:outline-none" />
+            <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
+          </div>
+          {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
+          <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
+          <p className="mt-2 text-xs text-fg-faint">Visible en haut de ton admin Shopify.</p>
+        </form>
+      ) : (
+        <Button type="button" size="lg" className="w-full" onClick={() => setOpen(true)}>Connecter mon compte Shopify <ArrowRight className="h-4 w-4" /></Button>
+      )}
+
+      <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="flex h-12 w-full items-center justify-center gap-2 rounded-ctl border border-line/15 bg-white/[0.04] text-[15px] font-medium transition-colors hover:border-line/30 hover:bg-white/[0.07]">
+        Créer un compte Shopify <ArrowUpRight className="h-4 w-4 text-fg-muted" />
+      </a>
+      <p className="text-center text-xs text-fg-faint">Shopify : {site.shopifyOffer} en ce moment</p>
     </div>
+  );
+}
+
+// Sac Shopify simplifié (couleurs de la marque), pour signaler l'intégration.
+function ShopifyBag({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 44 50" className={className} aria-label="Shopify" role="img">
+      <path d="M31.3 9.6c0-.2-.2-.4-.4-.4l-3.4-.3-2.5-2.5c-.3-.3-.8-.2-1-.1l-1.3.4C21.9 4.2 20.6 2.4 18.4 2.4h-.2C17.6 1.6 16.8 1.2 16.1 1.2c-5.2 0-7.7 6.5-8.5 9.8l-3.6 1.1c-1.1.4-1.2.4-1.3 1.4L0 37.6 22.8 42 35.2 39.3 31.3 9.6Z" fill="#95BF47" />
+      <path d="M30.9 9.2l-3.4-.3-2.5-2.5c-.1-.1-.2-.1-.3-.2L22.8 42l12.4-2.7L31.3 9.6c0-.2-.2-.4-.4-.4Z" fill="#5E8E3E" />
+      <path d="M18.3 16.7l-1.5 4.4s-1.3-.7-2.9-.7c-2.3 0-2.4 1.5-2.4 1.8 0 2 5.2 2.8 5.2 7.5 0 3.7-2.3 6-5.5 6-3.8 0-5.7-2.4-5.7-2.4l1-3.4s2 1.7 3.7 1.7c1.1 0 1.6-.9 1.6-1.5 0-2.6-4.3-2.7-4.3-7 0-3.6 2.6-7.1 7.8-7.1 2 0 3 .6 3 .6Z" fill="#fff" />
+    </svg>
   );
 }
 

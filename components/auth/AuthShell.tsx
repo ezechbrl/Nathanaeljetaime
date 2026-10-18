@@ -17,7 +17,7 @@ export function AuthShell({ title, subtitle, children }: { title: React.ReactNod
       <div className="relative hidden overflow-hidden border-l border-white/[0.06] bg-bg-2 lg:block">
         <LightRays />
         <div className="absolute inset-0 flex flex-col justify-center px-16">
-          <p className="max-w-md text-h2">Ta vitrine Shopify, <span className="serif-accent">prête ce soir</span>.</p>
+          <p className="max-w-md text-h2">Ta vitrine Shopify, prête en <span className="serif-accent">10 minutes</span>.</p>
           <div className="relative mt-14 h-[320px]">
             <div className="absolute left-0 top-10 w-[58%] -rotate-3 opacity-80"><StoreFrame s={SHOWCASE[2]} phone={false} /></div>
             <div className="absolute right-0 top-0 w-[62%] rotate-2"><StoreFrame s={SHOWCASE[1]} /></div>
