@@ -25,22 +25,24 @@ export const PLANS: Plan[] = [
     features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
-    id: "pro", name: "Starter", tagline: "Pour lancer ta marque.", monthly: 40, yearly: yearly(40),
+    id: "pro", name: "Starter", tagline: "Pour lancer ta marque.", monthly: 50, yearly: yearly(50),
     features: ["1 boutique Shopify connectée", "Change de produit à volonté", "Photos produit et mises en situation par l'IA", "Vrais avis clients importés", "Modifications par l'IA", "Thème Shopify à ta marque"],
     limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
     cta: "Commencer",
   },
   {
-    id: "agency", name: "Pro", tagline: "Pour tester plusieurs produits et grandir.", monthly: 80, yearly: yearly(80),
+    id: "agency", name: "Pro", tagline: "Pour tester plusieurs produits et grandir.", monthly: 90, yearly: yearly(90),
     features: ["3 boutiques Shopify connectées", "Teste plusieurs produits à la fois", "2× plus de crédit IA", "Optimisation quotidienne de la boutique", "Images et modifications en plus", "Support prioritaire"],
     limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "3", ai: "2 € toutes les 5 h, 7 € / semaine" },
     cta: "Commencer", featured: true,
   },
 ];
 
-// Offre de lancement : −25 % à vie si on s'abonne dans les 48 h après l'inscription (coupon Stripe « forever »).
-export const LAUNCH_OFFER = { percent: 25, hours: 48 };
-export const withOffer = (price: number) => Math.round(price * (1 - LAUNCH_OFFER.percent / 100));
+// Offre de lancement : −10 € par mois à vie (−84 € par an) si on s'abonne dans les 48 h après l'inscription.
+// Remise réelle : deux coupons Stripe « pour toujours » (STRIPE_LAUNCH_COUPON_MONTH et _YEAR).
+// Starter 50 → 40 €/mois (420 → 336 €/an), Pro 90 → 80 €/mois (756 → 672 €/an).
+export const LAUNCH_OFFER = { hours: 48, off: { month: 10, year: 84 } };
+export const withOffer = (price: number, interval: "month" | "year") => price - LAUNCH_OFFER.off[interval];
 
 export const PAID_PLANS = PLANS.filter((p) => !p.hidden);
 

@@ -65,7 +65,7 @@ export async function aiBlock(userId: string, plan?: PlanId): Promise<{ until: s
 export async function assertAiBudget(userId: string, plan?: PlanId) {
   const p = plan ?? (await planOf(userId));
   // Pas d'offre gratuite : l'IA est réservée aux abonnés.
-  if (p === "free") throw new HttpError(402, "subscription_required", "Choisis ton offre pour utiliser l'IA : dès 40 € par mois, sans engagement.");
+  if (p === "free") throw new HttpError(402, "subscription_required", "Choisis ton offre pour utiliser l'IA : dès 50 € par mois, sans engagement.");
   const b = await aiBlock(userId, p);
   if (b) throw blockedError(b.until, b.reason, p);
 }

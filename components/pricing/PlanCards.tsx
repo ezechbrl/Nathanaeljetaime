@@ -3,7 +3,7 @@
 import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Timer } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { LAUNCH_OFFER, PAID_PLANS, YEARLY_DISCOUNT, euro, withOffer, type Plan } from "@/lib/content/pricing";
+import { PAID_PLANS, YEARLY_DISCOUNT, euro, withOffer, type Plan } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -37,7 +37,9 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
 export function planPrice(plan: Plan, interval: Interval, offer = false) {
   const billed = interval === "year" ? plan.yearly : plan.monthly;
   const perMonth = interval === "year" ? Math.round(plan.yearly / 12) : plan.monthly;
-  return offer ? { perMonth: withOffer(perMonth), billed: withOffer(billed), was: perMonth } : { perMonth, billed, was: null };
+  if (!offer) return { perMonth, billed, was: null };
+  const paid = withOffer(billed, interval);
+  return { perMonth: interval === "year" ? Math.round(paid / 12) : paid, billed: paid, was: perMonth };
 }
 
 // Temps restant avant `endsAt`, mis à jour chaque seconde (null une fois écoulé).
@@ -63,7 +65,7 @@ export function OfferBanner({ left }: { left: Left }) {
   return (
     <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(16_176_127/0.25),rgb(163_230_53/0.12))] px-5 py-3 shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
       <div>
-        <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
+        <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de lancement : jusqu'à −20 % à vie</p>
         <p className="text-[12.5px] text-fg-muted">Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
       </div>
       <div className="flex items-end gap-1.5 font-semibold tabular-nums" aria-label={`Il reste ${left.h} heures ${left.m} minutes`}>

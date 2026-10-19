@@ -86,7 +86,7 @@ function SidebarBody() {
         {user.plan === "free" ? (
           <div className="rounded-card border border-accent/25 bg-accent-deep/30 p-3">
             <p className="text-xs leading-relaxed text-fg-muted">Abonne-toi pour créer et modifier tes boutiques avec l'IA.</p>
-            <Link href="/app" className="mt-2.5 block rounded-ctl bg-accent-strong py-1.5 text-center text-xs font-medium text-white transition hover:brightness-110">Choisir mon offre · dès 40 €</Link>
+            <Link href="/app" className="mt-2.5 block rounded-ctl bg-accent-strong py-1.5 text-center text-xs font-medium text-white transition hover:brightness-110">Choisir mon offre</Link>
           </div>
         ) : (
           <div className="space-y-2.5 rounded-card border border-white/[0.07] p-3">
