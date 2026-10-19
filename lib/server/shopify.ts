@@ -36,7 +36,9 @@ export async function exchangeCode(shop: string, code: string) {
     body: JSON.stringify({ client_id: env.shopifyKey(), client_secret: env.shopifySecret(), code }),
   });
   if (!res.ok) throw new HttpError(502, "upstream_error", "Shopify a refusé la connexion.");
-  return (await res.json()) as { access_token: string; scope: string };
+  const out = (await res.json()) as { access_token: string; scope: string };
+  console.info(`Connexion Shopify ${shop} : jeton reçu (${out.access_token?.slice(0, 6) ?? "aucun"}…), portées « ${out.scope} »`);
+  return out;
 }
 
 // Webhook de désinstallation, enregistré boutique par boutique (le flux d'installation hérité ne permet
@@ -56,8 +58,10 @@ export async function graphql<T>(shop: string, token: string, query: string, var
     body: JSON.stringify({ query, variables }),
   });
   if (res.status === 401 || res.status === 403) {
+    const detail = (await res.text().catch(() => "")).slice(0, 300);
+    console.error(`Shopify ${res.status} sur ${shop} :`, detail);
     await db().from("shop_connections").update({ status: "error" }).eq("shop_domain", shop);
-    throw new HttpError(502, "upstream_error", "L'accès à ta boutique Shopify a expiré. Reconnecte-la dans les paramètres.");
+    throw new HttpError(502, "upstream_error", `L'accès à ta boutique Shopify a expiré. Reconnecte-la dans les paramètres. (Shopify ${res.status}${detail ? ` : ${detail.replace(/[{}"]/g, "").slice(0, 160)}` : ""})`);
   }
   if (!res.ok) throw new HttpError(502, "upstream_error", `Shopify a répondu ${res.status}.`);
   const json = (await res.json()) as Gql<T>;
