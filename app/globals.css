@@ -75,18 +75,24 @@
 }
 
 /* Apparition au défilement (voir components/ui/Reveal.tsx). */
-[data-reveal] {
+/* « auto » : visible dès le premier affichage, petite apparition en CSS (aucune attente du JavaScript). */
+@keyframes reveal-in { from { opacity: 0; transform: translate3d(0, 10px, 0); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+[data-reveal="auto"] { animation: reveal-in .4s cubic-bezier(.22,1,.36,1) both; animation-delay: var(--reveal-delay, 0ms); }
+/* "" : bloc sous l'écran, masqué jusqu'à ce qu'on y arrive ; "in" : révélé. */
+[data-reveal=""] {
   opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  filter: blur(6px);
-  transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1), filter .9s cubic-bezier(.22,1,.36,1);
+  transform: translate3d(0, 12px, 0);
+  filter: blur(3px);
+}
+[data-reveal="in"] {
+  opacity: 1; transform: none; filter: none;
+  transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .45s cubic-bezier(.22,1,.36,1), filter .45s cubic-bezier(.22,1,.36,1);
   transition-delay: var(--reveal-delay, 0ms);
 }
-[data-reveal="in"] { opacity: 1; transform: none; filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; }
+  [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; animation: none; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
 }
 
@@ -103,7 +109,7 @@
 @keyframes wave { 0%,100% { transform: rotate(0); } 20% { transform: rotate(16deg); } 40% { transform: rotate(-8deg); } 60% { transform: rotate(14deg); } 80% { transform: rotate(-4deg); } }
 
 .anim { animation-play-state: paused; animation-fill-mode: both; }
-[data-reveal="in"] .anim { animation-play-state: running; }
+[data-reveal="in"] .anim, [data-reveal="auto"] .anim { animation-play-state: running; }
 @keyframes chip-in { from { opacity: 0; transform: translateY(14px) scale(.6); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes scan { 0% { top: -4rem; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
@@ -134,3 +140,7 @@
 @media (prefers-reduced-motion: reduce) {
   .glow-frame { animation: none; }
 }
+
+/* Chargement des photos (components/app/PhotoLoading.tsx) */
+@keyframes photo-sweep { from { transform: translateX(0) skewX(-12deg); } to { transform: translateX(400%) skewX(-12deg); } }
+@keyframes photo-bar { from { transform: translateX(-120%); } to { transform: translateX(320%); } }

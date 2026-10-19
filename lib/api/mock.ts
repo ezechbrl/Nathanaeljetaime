@@ -540,7 +540,7 @@ export async function getBilling() {
 export async function checkout(plan: "pro" | "agency") {
   await wait(700);
   const s = load();
-  s.subscription = { plan, status: "active", interval: "month", renewsAt: new Date(Date.now() + 30 * 86_400_000).toISOString(), cancelAtPeriodEnd: false };
+  s.subscription = { plan, status: "active", interval: "month", renewsAt: new Date(Date.now() + 30 * 86_400_000).toISOString(), cancelAtPeriodEnd: false, amount: plan === "pro" ? 4000 : 8000 };
   if (s.user) s.user.plan = plan;
   save();
   return { url: "/app?checkout=success" };
@@ -582,6 +582,16 @@ export async function runTool<T>(tool: string, input: Record<string, string>): P
         { question: "Quels sont les délais de livraison ?", answer: "48 à 72 h en France métropolitaine." },
         { question: "Puis-je le retourner ?", answer: "Oui, pendant 30 jours." },
       ],
+    },
+    "tiktok-ideas": {
+      ideas: [
+        { hook: `Je ne pensais pas qu'un ${name} changerait autant mes soirées`, scene: "Plan serré sur le produit, puis toi qui l'utilises dans ton salon", caption: "Le petit détail qui change tout ✨ #routine #cosy" },
+        { hook: "Avant / après en 5 secondes", scene: "Même pièce filmée sans puis avec le produit", caption: "La différence se voit tout de suite #avantapres" },
+        { hook: "3 raisons de l'adopter", scene: "Trois plans courts, un texte à l'écran par raison", caption: "Tu en penses quoi ? #astuce" },
+      ],
+    },
+    "instagram-caption": {
+      captions: [`Nouveau : ${name} 🌿\nPensé pour ton quotidien, fait pour durer.\n\n#nouveauté #faitmain #lifestyle`, `Ton moment à toi commence ici ✨\nDécouvre ${name} en lien dans la bio.\n\n#cosy #selfcare #shopping`],
     },
   };
   if (!(tool in results)) throw new ApiClientError(404, "not_found", "Outil inconnu.");

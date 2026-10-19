@@ -31,8 +31,8 @@ export async function customerFor(user: UserRow) {
 }
 
 // Fin de l'offre de lancement pour ce compte (48 h après l'inscription, premier abonnement seulement), ou null.
+// Le paiement n'est ouvert que si le coupon existe (voir billingConfigured) : le prix affiché est toujours celui payé.
 export async function launchOfferEndsAt(user: UserRow) {
-  if (!process.env.STRIPE_LAUNCH_COUPON) return null;
   const ends = new Date(user.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000;
   if (ends <= Date.now()) return null;
   const sub = must(await db().from("subscriptions").select("stripe_subscription_id").eq("user_id", user.id).maybeSingle()) as { stripe_subscription_id: string | null } | null;
@@ -126,6 +126,8 @@ export async function billingFor(user: UserRow): Promise<{ subscription: Subscri
       console.error("Factures Stripe", e);
     }
   }
+  // Prix réellement payé : dernière facture payée (inclut la remise de lancement).
+  subscription.amount = invoices.find((i) => i.status === "paid" && i.amount > 0)?.amount ?? null;
   return { subscription, invoices };
 }
 

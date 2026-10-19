@@ -78,11 +78,11 @@ export function OfferBanner({ left }: { left: Left }) {
 }
 
 // Les deux offres côte à côte. `action` rend le bouton (paiement dans l'app, inscription sur le site).
-export function PlanCards({ interval, action, left }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null }) {
+export function PlanCards({ interval, action, left, offer = false }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null; offer?: boolean }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {PAID_PLANS.map((plan) => {
-        const { billed, was } = planPrice(plan, interval, !!left);
+        const { billed, was } = planPrice(plan, interval, offer || !!left);
         const featured = plan.featured;
         return (
           <div key={plan.id} className={cn("relative rounded-[22px] p-px", featured ? "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_60px_-18px_rgb(46_230_166/0.55)]" : "bg-[linear-gradient(160deg,rgb(52_211_153/0.45),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))]")}>
@@ -93,7 +93,7 @@ export function PlanCards({ interval, action, left }: { interval: Interval; acti
               </div>
               <p className="mt-1 text-[13.5px] text-fg-muted">{plan.tagline}</p>
               <p className="mt-4 flex items-baseline gap-1">
-                {was !== null && <span className="mr-1.5 text-xl font-semibold text-fg-faint line-through decoration-[#f87171] decoration-2">{euro(was)}</span>}
+                {was !== null && <span className="mr-1.5 text-xl font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(was)}</span>}
                 <span className="text-[2.8rem] font-semibold leading-none tracking-[-0.04em] tabular-nums">{euro(billed)}</span>
                 <span className="text-sm text-fg-muted">{interval === "year" ? "/ an" : "/ mois"}</span>
                 {was !== null && <span className="ml-2 self-center rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{LAUNCH_OFFER.percent} %</span>}

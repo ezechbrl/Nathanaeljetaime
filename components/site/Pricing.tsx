@@ -13,11 +13,15 @@ export function PricingCards() {
   return (
     <div className="relative isolate mx-auto max-w-[940px] overflow-hidden rounded-[28px] border border-white/10 px-4 py-10 sm:px-10">
       <AuroraBackground className="-z-10" />
-      <p className="mb-5 text-center text-[14px] font-semibold text-[#bef264]">🎁 Offre de lancement : −{LAUNCH_OFFER.percent} % à vie (40 € au lieu de 80 €, 80 € au lieu de 160 €) si tu t'abonnes dans les {LAUNCH_OFFER.hours} h après ton inscription</p>
+      <div className="mx-auto mb-6 max-w-[760px] rounded-[18px] border border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(16_176_127/0.25),rgb(163_230_53/0.12))] px-5 py-3 text-center shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
+        <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
+        <p className="text-[12.5px] text-fg-muted">Valable {LAUNCH_OFFER.hours} h après ton inscription, avec un compte à rebours dans ton espace. Ce prix reste le tien tant que tu restes abonné.</p>
+      </div>
       <IntervalToggle value={interval} onChange={setPeriod} />
       <div className="mx-auto mt-8 max-w-[780px]">
         <PlanCards
           interval={interval}
+          offer
           action={(plan, iv) => (
             <Link href={`/inscription?plan=${plan.id}&interval=${iv}`} className={planButtonClass(plan.featured)}>
               {CTA.short} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

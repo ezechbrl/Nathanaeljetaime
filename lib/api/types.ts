@@ -133,6 +133,7 @@ export type Subscription = {
   interval: "month" | "year" | null;
   renewsAt: string | null;
   cancelAtPeriodEnd: boolean;
+  amount?: number | null; // montant réellement payé par période, en centimes (offre de lancement comprise)
 };
 
 export type Invoice = { id: string; number: string; amount: number; currency: string; status: "paid" | "open" | "void"; pdfUrl: string; createdAt: string };

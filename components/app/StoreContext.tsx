@@ -69,7 +69,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
       if (job.kind === "generate" && job.status === "succeeded") setCelebrate(true);
       reload();
     }
-  }, 1500, !!activeJob);
+  }, 1000, !!activeJob);
 
   if (error) return <div className="p-8"><ErrorState message={error} onRetry={reload} /></div>;
   if (!store) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ArrowUp, Monitor, Smartphone } from "lucide-react";
+import { ArrowRight, ArrowUp, Gift, HelpCircle, Monitor, Palette, Smartphone, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
@@ -19,6 +19,13 @@ import type { ChatMessage } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
 const SUGGESTIONS = ["Rends le ton plus premium", "Change la couleur principale", "Ajoute un lot de 3 à −20 %", "Raccourcis le titre produit", "Ajoute une question à la FAQ"];
+// Grandes cartes de départ, quand la discussion ne fait que commencer.
+const STARTERS = [
+  { icon: Sparkles, text: "Rends le ton plus premium" },
+  { icon: Palette, text: "Change la couleur principale" },
+  { icon: Gift, text: "Ajoute une offre 2 achetés = 1 offert" },
+  { icon: HelpCircle, text: "Réécris la FAQ" },
+];
 const PAGES: { id: PreviewPage; label: string }[] = [
   { id: "accueil", label: "Accueil" }, { id: "produit", label: "Produit" },
 ];
@@ -55,10 +62,18 @@ export default function EditorPage() {
   // Sur téléphone : une seule vue à la fois (discussion ou aperçu), en plein écran.
   const [view, setView] = useState<"chat" | "preview">("chat");
   const previewRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { if (history.data) setMessages(history.data.messages); }, [history.data]);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [messages, sending]);
+  // Le champ s'agrandit avec le texte (2 à 8 lignes).
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 216)}px`;
+  }, [draft]);
 
   if (store.status === "generating") return <GenerationProgress store={store} job={activeJob} />;
 
@@ -119,74 +134,117 @@ export default function EditorPage() {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <section aria-label="Conversation avec l'IA" className={cn("min-h-0 w-full flex-1 flex-col lg:flex lg:w-[480px] lg:flex-none xl:w-[540px] lg:border-r lg:border-white/[0.06]", view === "chat" ? "flex" : "hidden")}>
-          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-5" aria-live="polite">
-            {messages.map((m) => (
-              <div key={m.id} className={cn("flex gap-2.5", m.role === "user" && "justify-end")}>
-                {m.role === "assistant" && <LogoMark className="mt-0.5 h-8 w-8 shrink-0" />}
-                <div className={cn("max-w-[88%] text-[15.5px] leading-relaxed", m.role === "user" ? "rounded-[16px] rounded-br-[5px] bg-white/[0.09] px-4 py-3" : "text-fg-muted")}>
-                  {m.content}
-                  {m.changes.length > 0 && (
-                    <div className="mt-3 space-y-2 rounded-card border border-accent/20 bg-accent-deep/20 p-3">
-                      {m.changes.map((c) => (
-                        <div key={c.path} className="text-xs">
-                          <p className="text-accent">{c.label}</p>
-                          <p className="mt-1 flex flex-wrap items-center gap-1.5">
-                            <span className="text-fg-faint line-through">{c.before.startsWith("#") ? <Swatch c={c.before} /> : c.before}</span>
-                            <ArrowRight className="h-3 w-3 text-fg-faint" />
-                            <span className="text-fg">{c.after.startsWith("#") ? <Swatch c={c.after} /> : c.after}</span>
-                          </p>
-                        </div>
-                      ))}
-                      <button type="button" onClick={() => setView("preview")} className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-accent lg:hidden">Voir dans l'aperçu <ArrowRight className="h-3 w-3" /></button>
-                    </div>
+        <section aria-label="Conversation avec l'IA" className={cn("min-h-0 w-full flex-1 flex-col lg:flex lg:w-[52%] lg:min-w-[560px] lg:flex-none lg:border-r lg:border-white/[0.06]", view === "chat" ? "flex" : "hidden")}>
+          <div className="flex items-center gap-3 border-b border-white/[0.06] bg-black/15 px-5 py-3.5">
+            <LogoMark className="h-10 w-10 shrink-0" />
+            <div className="leading-tight">
+              <p className="text-[15.5px] font-semibold">Assistant IA Vitrio</p>
+              <p className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-fg-muted">
+                <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" /><span className="relative h-2 w-2 rounded-full bg-accent" /></span>
+                En ligne · modifie ta boutique en direct
+              </p>
+            </div>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6" aria-live="polite">
+            <div className="mx-auto max-w-[760px] space-y-6">
+              {messages.map((m) => (
+                <div key={m.id} className={cn("flex items-end gap-3", m.role === "user" && "flex-row-reverse")}>
+                  {m.role === "assistant"
+                    ? <LogoMark className="mb-1 h-9 w-9 shrink-0" />
+                    : <span className="mb-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-deep text-[14px] font-semibold text-accent">{user.firstName.charAt(0).toUpperCase() || "M"}</span>}
+                  <div className={cn(
+                    "max-w-[82%] px-4 py-3 text-[16px] leading-relaxed",
+                    m.role === "user"
+                      ? "rounded-[20px] rounded-br-[6px] bg-[linear-gradient(180deg,#1fd197,#0fa877)] text-[#03140d] shadow-[0_8px_24px_-12px_rgb(46_230_166/0.7)]"
+                      : "rounded-[20px] rounded-bl-[6px] border border-accent/20 bg-white/[0.04] text-fg/90 backdrop-blur",
+                  )}>
+                    {m.content}
+                    {m.changes.length > 0 && (
+                      <div className="mt-3 space-y-2.5 rounded-[14px] border border-accent/25 bg-accent-deep/25 p-3.5">
+                        {m.changes.map((c) => (
+                          <div key={c.path} className="text-[13px]">
+                            <p className="font-medium text-accent">{c.label}</p>
+                            <p className="mt-1 flex flex-wrap items-center gap-1.5">
+                              <span className="text-fg-faint line-through">{c.before.startsWith("#") ? <Swatch c={c.before} /> : c.before}</span>
+                              <ArrowRight className="h-3.5 w-3.5 text-fg-faint" />
+                              <span className="text-fg">{c.after.startsWith("#") ? <Swatch c={c.after} /> : c.after}</span>
+                            </p>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => setView("preview")} className="mt-1 inline-flex items-center gap-1 text-[13px] font-medium text-accent lg:hidden">Voir dans l'aperçu <ArrowRight className="h-3.5 w-3.5" /></button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {!messages.some((m) => m.role === "user") && !sending && (
+                <div className="grid gap-3 pt-2 sm:grid-cols-2">
+                  {STARTERS.map(({ icon: I, text }) => (
+                    <button key={text} type="button" onClick={() => send(text)} className="group flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/[0.03] p-4 text-left text-[15px] transition-all hover:-translate-y-0.5 hover:border-accent/50 hover:bg-accent/[0.06]">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] border border-accent/30 bg-accent/10 text-accent transition-transform group-hover:scale-105"><I className="h-5 w-5" /></span>
+                      {text}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {sending && (
+                <div className="flex items-end gap-3" role="status">
+                  <LogoMark className="mb-1 h-9 w-9 shrink-0 animate-pulse" />
+                  <div className="flex items-center gap-2 rounded-[20px] rounded-bl-[6px] border border-accent/20 bg-white/[0.04] px-4 py-3.5 text-[14px] text-fg-muted">
+                    <span className="flex gap-1" aria-hidden>
+                      {[0, 1, 2].map((i) => <span key={i} className="h-2 w-2 animate-bounce rounded-full bg-accent" style={{ animationDelay: `${i * 0.15}s` }} />)}
+                    </span>
+                    L'IA écrit…
+                  </div>
+                </div>
+              )}
+              <div ref={endRef} />
+            </div>
+          </div>
+
+          <div className="border-t border-white/[0.06] bg-black/15 px-4 pb-4 pt-3 sm:px-6">
+            <div className="mx-auto max-w-[760px]">
+              {upsell && (
+                <div role="status" className="mb-3 rounded-[14px] border border-accent/30 bg-accent-deep/30 px-4 py-3 text-[13px] leading-relaxed text-fg-muted">
+                  <p>{upsell}</p>
+                  {user.plan === "free" && (
+                    <Link href="/app/abonnement?plan=pro" className="mt-2 inline-flex items-center gap-1 rounded-ctl bg-accent-strong px-3 py-1.5 text-[13px] font-medium text-white hover:brightness-110">
+                      Choisir mon offre <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
                   )}
                 </div>
+              )}
+              {lowCredit && !upsell && (
+                <p role="status" className="mb-3 rounded-[14px] border border-warn/30 bg-warn/5 px-4 py-2.5 text-[13px] text-fg-muted">
+                  Ton crédit d'IA est presque épuisé (environ {Math.max(1, Math.floor(Math.min(weekLeft, sessionLeft) / 0.07))} messages restants).
+                  {sessionLeft <= weekLeft && usage.aiBudget.session.resetsAt ? " Il se recharge bientôt." : ""}
+                  {user.plan === "pro" && <> <Link href="/app/abonnement" className="text-accent underline underline-offset-2">Passe à l'offre Pro</Link> pour 2× plus de crédit.</>}
+                </p>
+              )}
+              <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+                {SUGGESTIONS.map((s) => (
+                  <button key={s} onClick={() => send(s)} disabled={sending} className="shrink-0 rounded-full border border-white/[0.1] bg-white/[0.02] px-3.5 py-1.5 text-[13.5px] text-fg-muted transition-colors hover:border-accent/40 hover:text-fg disabled:opacity-50">{s}</button>
+                ))}
               </div>
-            ))}
-            {sending && (
-              <div className="flex items-center gap-2.5 text-sm text-fg-faint">
-                <LogoMark className="h-6 w-6 animate-pulse" /> L'IA modifie ta boutique…
-              </div>
-            )}
-            <div ref={endRef} />
-          </div>
-          <div className="border-t border-white/[0.06] p-4">
-            {upsell && (
-              <div role="status" className="mb-2 rounded-ctl border border-accent/30 bg-accent-deep/30 px-3 py-2.5 text-xs leading-relaxed text-fg-muted">
-                <p>{upsell}</p>
-                {user.plan === "free" && (
-                  <Link href="/app/abonnement?plan=pro" className="mt-2 inline-flex items-center gap-1 rounded-ctl bg-accent-strong px-3 py-1.5 text-[13px] font-medium text-white hover:brightness-110">
-                    Choisir mon offre <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                )}
-              </div>
-            )}
-            {lowCredit && !upsell && (
-              <p role="status" className="mb-2 rounded-ctl border border-warn/30 bg-warn/5 px-3 py-2 text-xs text-fg-muted">
-                Ton crédit d'IA est presque épuisé (environ {Math.max(1, Math.floor(Math.min(weekLeft, sessionLeft) / 0.07))} messages restants).
-                {sessionLeft <= weekLeft && usage.aiBudget.session.resetsAt ? " Il se recharge bientôt." : ""}
-                {user.plan === "pro" && <> <Link href="/app/abonnement" className="text-accent underline underline-offset-2">Passe à l'offre Pro</Link> pour 2× plus de crédit.</>}
-              </p>
-            )}
-            <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1">
-              {SUGGESTIONS.map((s) => (
-                <button key={s} onClick={() => send(s)} disabled={sending} className="shrink-0 rounded-full border border-white/[0.1] px-3 py-1.5 text-[13px] text-fg-muted transition-colors hover:border-accent/40 hover:text-fg disabled:opacity-50">{s}</button>
-              ))}
+              <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-[22px] border border-white/15 bg-black/30 p-2.5 shadow-[0_0_30px_-10px_rgb(46_230_166/0.4)] transition-colors focus-within:border-accent/60">
+                <label htmlFor="msg" className="sr-only">Ta demande</label>
+                <textarea
+                  ref={inputRef}
+                  id="msg"
+                  rows={2}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(draft); } }}
+                  placeholder="Demande une modification à l'IA… (ex. « mets un ton plus premium »)"
+                  className="max-h-[216px] min-h-[60px] flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-6 placeholder:text-fg-faint focus:outline-none"
+                />
+                <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_20px_rgb(46_230_166/0.55)] transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"><ArrowUp className="h-5 w-5" /></button>
+              </form>
+              <p className="mt-2 hidden text-center text-[12px] text-fg-faint sm:block">Entrée pour envoyer · Maj+Entrée pour aller à la ligne</p>
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-[16px] border border-white/15 bg-black/25 p-2 shadow-[0_0_24px_-8px_rgb(46_230_166/0.35)] focus-within:border-accent/60">
-              <label htmlFor="msg" className="sr-only">Ta demande</label>
-              <textarea
-                id="msg"
-                rows={2}
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(draft); } }}
-                placeholder="Demande une modification à l'IA… (ex. « mets un ton plus premium »)"
-                className="max-h-48 min-h-[56px] flex-1 resize-none bg-transparent px-2.5 py-2 text-[15px] placeholder:text-fg-faint focus:outline-none"
-              />
-              <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_16px_rgb(46_230_166/0.5)] transition-opacity disabled:opacity-40"><ArrowUp className="h-4 w-4" /></button>
-            </form>
           </div>
         </section>
 

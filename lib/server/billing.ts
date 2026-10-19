@@ -5,7 +5,7 @@ import { HttpError } from "./http";
 export { billingFor } from "./stripe";
 
 export function billingConfigured() {
-  return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_STARTER_MONTH);
+  return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_STARTER_MONTH && process.env.STRIPE_LAUNCH_COUPON);
 }
 
 export function assertBillingConfigured() {

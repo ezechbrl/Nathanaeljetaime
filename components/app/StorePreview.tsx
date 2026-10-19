@@ -78,7 +78,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
 
   const Img = ({ a, className: c, ratio }: { a?: Asset; className?: string; ratio?: string }) => (
     <div className={cn("relative overflow-hidden rounded-[18px]", c)} style={{ aspectRatio: ratio, background: `linear-gradient(150deg, ${tint}, ${mix(background, accent, 0.35)})` }}>
-      {a ? <img src={a.url} alt="" className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute left-1/2 top-1/2 h-[55%] w-[34%] -translate-x-1/2 -translate-y-1/2 rounded-[22%] shadow-xl" style={{ background: `linear-gradient(160deg, ${accent}, ${primary})` }} />}
+      {a ? <img loading="lazy" decoding="async" src={a.url} alt="" className="absolute inset-0 h-full w-full object-cover" /> : <div className="absolute left-1/2 top-1/2 h-[55%] w-[34%] -translate-x-1/2 -translate-y-1/2 rounded-[22%] shadow-xl" style={{ background: `linear-gradient(160deg, ${accent}, ${primary})` }} />}
     </div>
   );
   const Frame = ({ a, ratio, light = false }: { a?: Asset; ratio: string; light?: boolean }) => (
@@ -105,7 +105,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
       <div className={cn("mt-8 gap-4", mobile ? "columns-1" : "columns-3")}>
         {reviews.items.slice(0, mobile ? 4 : 9).map((r, i) => (
           <figure key={i} className="mb-4 grid break-inside-avoid gap-3 rounded-[18px] border p-5" style={{ borderColor: `${primary}1f` }}>
-            {r.photo && <img src={r.photo} alt="" className="aspect-square w-full rounded-xl object-cover" />}
+            {r.photo && <img loading="lazy" decoding="async" src={r.photo} alt="" className="aspect-square w-full rounded-xl object-cover" />}
             <Stars rating={r.rating} />
             <p className="text-sm leading-relaxed">{r.text}</p>
             <figcaption className="text-[13px]"><strong>{r.author || "—"}</strong> {flag(r.country)}</figcaption>
@@ -139,7 +139,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
           )}
         </div>
         {imgs.gallery.length > 1 && (
-          <div className="flex gap-2">{imgs.gallery.slice(0, 5).map((a, i) => <button type="button" key={a.id} onClick={() => setShot(i)} className="w-1/5 overflow-hidden rounded-xl border-2 transition-opacity" style={{ borderColor: i === shot % imgs.gallery.length ? accent : "transparent", opacity: i === shot % imgs.gallery.length ? 1 : 0.7 }}><img src={a.url} alt="" className="aspect-square w-full object-cover" /></button>)}</div>
+          <div className="flex gap-2">{imgs.gallery.slice(0, 5).map((a, i) => <button type="button" key={a.id} onClick={() => setShot(i)} className="w-1/5 overflow-hidden rounded-xl border-2 transition-opacity" style={{ borderColor: i === shot % imgs.gallery.length ? accent : "transparent", opacity: i === shot % imgs.gallery.length ? 1 : 0.7 }}><img loading="lazy" decoding="async" src={a.url} alt="" className="aspect-square w-full object-cover" /></button>)}</div>
         )}
         {prod.highlights?.length ? (
           <div className="grid grid-cols-3 gap-2 rounded-[18px] p-4" style={{ background: mix(background, accent, 0.18) }}>
@@ -213,7 +213,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
         <>
           {imgs.hero ? (
             <section className="relative flex min-h-[460px] items-end overflow-hidden text-white sm:items-center" style={{ minHeight: mobile ? 520 : 520 }}>
-              <img src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <img decoding="async" src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : "linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)" }} />
               <div className={cn("relative max-w-[560px] pb-10 pt-24", pad)}>
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs backdrop-blur"><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
@@ -293,7 +293,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
           <section className={cn(pad, sec)} style={{ background: tint }}>{productBlock}</section>
 
           <section className="relative grid min-h-[340px] place-items-center overflow-hidden px-6 py-16 text-center text-white" style={{ background: primary }}>
-            {(imgs.moments[2] ?? imgs.hero) && <><img src={(imgs.moments[2] ?? imgs.hero)!.url} alt="" className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-black/45" /></>}
+            {(imgs.moments[2] ?? imgs.hero) && <><img loading="lazy" decoding="async" src={(imgs.moments[2] ?? imgs.hero)!.url} alt="" className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-black/45" /></>}
             <div className="relative max-w-lg">
               <h3 className={cn("text-[2.2rem] leading-tight", H)}>{home.finalCta?.title ?? plan.strategy.promise}</h3>
               {home.finalCta?.text && <p className="mt-3 opacity-90">{home.finalCta.text}</p>}

@@ -54,13 +54,6 @@ export const SHOWCASE: ShowcaseStore[] = [
     highlights: ["Profil aromatique pour chaque café", "Quiz « quel café pour toi ? »", "Abonnement sans engagement"],
   },
   {
-    slug: "nomade", name: "Nómada", category: "Voyage", language: "espagnol",
-    brief: "Sac à dos cabine extensible pour voyageurs, marché espagnol.",
-    headline: "Todo cabe. Hasta tu próximo viaje.", sub: "40 L en cabina, se expande a 48 L.", product: "Mochila Nómada 40", price: "119,00 €",
-    palette: { bg: "#13201b", ink: "#e9f1ec", accent: "#e0a43a", soft: "#22352d" }, font: "sans", layout: "split",
-    highlights: ["Textes écrits en espagnol", "Comparatif avec une valise cabine", "Garantie à vie mise en avant"],
-  },
-  {
     slug: "lumen", name: "Lumen", category: "Maison", language: "français",
     brief: "Lampe de bureau LED qui imite la lumière du jour, pour télétravailleurs.",
     headline: "La lumière du jour, à 22 h.", sub: "Lampe LED à spectre complet, sans scintillement.", product: "Lumen Desk", price: "89,00 €",
@@ -75,31 +68,10 @@ export const SHOWCASE: ShowcaseStore[] = [
     highlights: ["Storytelling « verre de la mer »", "Emballage cadeau en option", "Livraison offerte dès 2 bijoux"],
   },
   {
-    slug: "petit-pas", name: "Petit Pas", category: "Bébé", language: "français",
-    brief: "Chaussons bébé en laine mérinos, semelle souple, pour les premiers pas.",
-    headline: "Pour les tout premiers pas.", sub: "Laine mérinos, semelle cuir souple, cousus main.", product: "Chaussons Flocon", price: "29,00 €",
-    palette: { bg: "#fdf6ee", ink: "#2b2330", accent: "#8a6fb3", soft: "#ebe0f3" }, font: "serif", layout: "split",
-    highlights: ["Guide des pointures par âge", "FAQ « ça tient au pied ? »", "Coffret naissance"],
-  },
-  {
-    slug: "brume", name: "Brume", category: "Bien-être", language: "français",
-    brief: "Diffuseur d'huiles essentielles en céramique, silencieux, pour la chambre.",
-    headline: "Respire. La nuit commence ici.", sub: "Diffuseur céramique ultra-silencieux, 8 h de brume.", product: "Diffuseur Brume", price: "49,00 €",
-    palette: { bg: "#f1eef6", ink: "#2a2438", accent: "#7c6bb0", soft: "#ddd6ee" }, font: "serif", layout: "center",
-    highlights: ["Rituel du soir en 3 étapes", "Coffret huiles offert dès 2 achats", "FAQ « est-ce bruyant ? »"],
-  },
-  {
     slug: "atlas", name: "Atlas", category: "Montres", language: "anglais",
     brief: "Montre minimaliste en acier, cadran noir, pour hommes actifs, marché UK.",
     headline: "Time, without the noise.", sub: "Steel case. Sapphire glass. 5 ATM.", product: "Atlas 40", price: "£129",
     palette: { bg: "#111214", ink: "#f2f2f0", accent: "#c9a96e", soft: "#24262a" }, font: "sans", layout: "split",
     highlights: ["Boutique 100 % en anglais", "Comparatif avec une montre de luxe", "Gravure offerte"],
-  },
-  {
-    slug: "sillage", name: "Sillage", category: "Parfum", language: "français",
-    brief: "Parfums de niche en format voyage, notes boisées, pour offrir.",
-    headline: "Un sillage qui reste.", sub: "Parfums de niche, flacons 10 ml rechargeables.", product: "Coffret Découverte", price: "39,00 €",
-    palette: { bg: "#f7efe9", ink: "#2d1b14", accent: "#a2463a", soft: "#efd9cf" }, font: "serif", layout: "grid",
-    highlights: ["Guide « quel parfum lui offrir ? »", "Coffret de 3 flacons", "Échantillon offert"],
   },
 ];

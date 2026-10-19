@@ -252,6 +252,12 @@ const TOOL_SCHEMAS = {
   slogan: z.object({ slogans: z.array(z.string()).describe("6 slogans de moins de 8 mots") }),
   "product-description": z.object({ html: z.string().describe("Description produit en HTML simple : un paragraphe d'accroche, un h3, une liste de 3 à 5 bénéfices") }),
   faq: z.object({ items: z.array(z.object({ question: z.string(), answer: z.string() })).describe("6 questions-réponses") }),
+  "tiktok-ideas": z.object({ ideas: z.array(z.object({
+    hook: z.string().describe("Phrase dite ou affichée dans les 2 premières secondes"),
+    scene: z.string().describe("Ce qu'on filme, faisable seul avec un téléphone"),
+    caption: z.string().describe("Légende courte avec 2 ou 3 hashtags"),
+  })).describe("5 idées de vidéos courtes, variées (démonstration, avant/après, réaction, astuce, coulisses)") }),
+  "instagram-caption": z.object({ captions: z.array(z.string()).describe("4 légendes Instagram de 2 à 4 lignes, avec quelques emojis et 3 à 5 hashtags à la fin") }),
 };
 export type ToolId = keyof typeof TOOL_SCHEMAS;
 export const isTool = (t: string): t is ToolId => t in TOOL_SCHEMAS;

@@ -80,3 +80,75 @@ export function StoreFrame({ s, phone = true, className }: { s: ShowcaseStore; p
     </div>
   );
 }
+
+// Page complète d'une boutique, en long (vitrine de l'accueil) : accueil, fiche produit, atouts, avis, pied de page.
+export function StoreLongFrame({ s }: { s: ShowcaseStore }) {
+  const { bg, ink, accent, soft } = s.palette;
+  const f = fontClass[s.font];
+  return (
+    <div className="relative">
+      <div className="overflow-hidden rounded-[10px] border border-black/10 text-[8px] shadow-[0_30px_60px_-30px_rgba(0,0,0,.6)]" style={{ background: bg, color: ink }}>
+        <div className="py-1 text-center text-[6.5px] tracking-wide" style={{ background: ink, color: bg }}>Livraison offerte dès 39 € · Retours 30 jours</div>
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className={cn("text-[11px]", f, s.font === "serif" && "italic")}>{s.name}</span>
+          <span className="flex gap-2.5 opacity-60"><span>Boutique</span><span>Avis</span><span>Panier</span></span>
+        </div>
+        {/* Accueil */}
+        <div className="grid grid-cols-[1.15fr_1fr] items-center gap-2.5 px-3 pb-3">
+          <div>
+            <p className={cn("text-[15px] leading-[1.05] tracking-tight", f)}>{s.headline}</p>
+            <p className="mt-1 text-[7px] opacity-60">{s.sub}</p>
+            <span className="mt-2 inline-block rounded-full px-2.5 py-1 text-[6.5px] font-medium" style={{ background: accent, color: bg }}>Découvrir</span>
+          </div>
+          <ProductVisual s={s} className="aspect-[4/3] rounded-md" />
+        </div>
+        {/* Fiche produit */}
+        <div className="grid grid-cols-[1fr_1.1fr] gap-2.5 px-3 py-3" style={{ background: soft }}>
+          <ProductVisual s={s} className="aspect-square rounded-md" />
+          <div>
+            <p className="text-[9px] font-semibold leading-tight">{s.product}</p>
+            <p className="mt-0.5 text-[7px] opacity-70">★★★★★ 4,8 · 126 avis</p>
+            <p className="mt-1 text-[10px] font-bold">{s.price}</p>
+            <div className="mt-1.5 space-y-1">
+              {["1 unité", "Lot de 2 · −15 %"].map((o, i) => (
+                <div key={o} className="rounded-[4px] border px-1.5 py-1 text-[6.5px]" style={{ borderColor: i === 0 ? accent : `${ink}22`, background: i === 0 ? `${accent}14` : "transparent" }}>{o}</div>
+              ))}
+            </div>
+            <span className="mt-1.5 block rounded-full py-1 text-center text-[6.5px] font-semibold" style={{ background: accent, color: bg }}>Ajouter au panier</span>
+          </div>
+        </div>
+        {/* Atouts */}
+        <div className="grid grid-cols-3 gap-1.5 px-3 py-3 text-center">
+          {s.highlights.slice(0, 3).map((h) => (
+            <div key={h}><span className="mx-auto mb-1 block h-3.5 w-3.5 rounded-full" style={{ background: `${accent}33`, border: `1px solid ${accent}` }} /><p className="text-[6px] leading-tight opacity-70">{h}</p></div>
+          ))}
+        </div>
+        {/* Avis */}
+        <div className="px-3 pb-3">
+          <p className={cn("mb-1.5 text-center text-[10px]", f)}>Ils l'ont adopté</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {[0, 1].map((i) => (
+              <div key={i} className="rounded-[5px] p-1.5" style={{ background: `${ink}0d` }}>
+                <p className="text-[6px] text-[#f5b301]">★★★★★</p>
+                <div className="mt-1 h-[3px] w-full rounded bg-current opacity-20" /><div className="mt-0.5 h-[3px] w-2/3 rounded bg-current opacity-20" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center justify-between px-3 py-2 text-[6px] opacity-80" style={{ background: ink, color: bg }}>
+          <span className={f}>{s.name}</span><span>Visa · Mastercard · PayPal · Apple Pay</span>
+        </div>
+      </div>
+      {/* Téléphone */}
+      <div className="absolute -bottom-3 -right-2 w-[30%] overflow-hidden rounded-[12px] border-[3px] border-[#0b0f12] shadow-[0_20px_40px_-12px_rgba(0,0,0,.7)]" style={{ background: bg, color: ink }}>
+        <div className="flex items-center justify-between px-2 py-1 text-[6px]"><span className={cn("text-[7.5px]", f, s.font === "serif" && "italic")}>{s.name}</span><span>☰</span></div>
+        <ProductVisual s={s} className="aspect-square" />
+        <div className="p-1.5">
+          <p className="text-[6.5px] font-medium leading-tight">{s.product}</p>
+          <p className="text-[6.5px] opacity-60">{s.price}</p>
+          <span className="mt-1 block rounded-full py-0.5 text-center text-[5.5px]" style={{ background: accent, color: bg }}>Ajouter au panier</span>
+        </div>
+      </div>
+    </div>
+  );
+}

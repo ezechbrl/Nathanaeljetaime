@@ -4,6 +4,7 @@ import { Download, ImagePlus, RefreshCw, Trash2, Upload, Wand2 } from "lucide-re
 import { useRef, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { PageHeader } from "@/components/app/PageHeader";
+import { FadeImage, PhotoLoadingTile } from "@/components/app/PhotoLoading";
 import { PhotoShoot } from "@/components/app/PhotoShoot";
 import { useStore } from "@/components/app/StoreContext";
 import { Button, Spinner } from "@/components/ui/Button";
@@ -44,8 +45,11 @@ export default function StudioPage() {
       setRegen(false);
       assets.reload();
       refresh();
-    } else setJob(j);
-  }, 1500, !!job);
+    } else {
+      setJob(j);
+      if (regen) assets.reload(); // les photos s'affichent au fur et à mesure
+    }
+  }, 1000, !!job);
 
   async function generate(e: React.FormEvent) {
     e.preventDefault();
@@ -101,7 +105,7 @@ export default function StudioPage() {
         </>
       } />
       <div className="space-y-8 p-5 sm:p-8">
-        {job && regen && <PhotoShoot store={store} job={job} />}
+        {job && regen && <PhotoShoot store={store} job={job} photos={(assets.data?.assets ?? []).filter((a) => a.kind !== "upload" && a.kind !== "logo" && a.createdAt >= job.createdAt).sort((x, y) => x.createdAt.localeCompare(y.createdAt))} />}
         <section className="surface flex flex-col gap-4 rounded-card p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-medium">Photos de la boutique</p>
@@ -145,10 +149,10 @@ export default function StudioPage() {
               <EmptyState icon={ImagePlus} title="Aucune image ici" text="Génère une image ou importe tes photos produit." />
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-                {job && <div className="grid aspect-square place-items-center rounded-card border border-accent/30 bg-accent-deep/20"><Spinner className="text-accent" /></div>}
+                {job && !regen && <PhotoLoadingTile className="aspect-square" progress={job.progress} />}
                 {list.map((a) => (
-                  <figure key={a.id} className="group relative aspect-square overflow-hidden rounded-card border border-white/[0.07]">
-                    <img src={a.url} alt={a.prompt ?? "Visuel de la boutique"} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                  <figure key={a.id} className="group relative aspect-square overflow-hidden rounded-card border border-white/[0.07] bg-[linear-gradient(160deg,rgb(10_45_35/0.6),rgb(3_16_12/0.8))]">
+                    <FadeImage src={a.url} alt={a.prompt ?? "Visuel de la boutique"} className="h-full w-full object-cover group-hover:scale-[1.03]" />
                     <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-2.5 pt-8 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <span className="truncate text-[11px] text-white/80">{a.prompt ?? KINDS.find((k) => k.id === a.kind)?.label ?? "Importée"}</span>
                       <span className="flex gap-1">

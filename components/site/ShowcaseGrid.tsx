@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 import { SHOWCASE } from "@/lib/content/showcase";
-import { StoreFrame } from "./StoreFrame";
+import { StoreLongFrame } from "./StoreFrame";
 
 // Vitrine : une grille de boutiques créées avec Vitrio, chacune sur un fond à ses couleurs.
 export function ShowcaseGrid() {
@@ -10,7 +10,7 @@ export function ShowcaseGrid() {
     <section className="py-16">
       <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
         <div className="text-center">
-          <Reveal as="h2" className="text-h2">{SHOWCASE.length} produits, {SHOWCASE.length} boutiques. <span className="serif-accent">Aucun</span> modèle.</Reveal>
+          <Reveal as="h2" className="text-h2">Un produit, une boutique. <span className="serif-accent">Aucun</span> modèle.</Reveal>
           <Reveal delay={80} as="p" className="mx-auto mt-4 max-w-xl text-fg-muted">Chaque boutique part d'un lien ou d'une phrase. Clique pour voir ce que l'IA en a fait.</Reveal>
         </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -22,7 +22,7 @@ export function ShowcaseGrid() {
                 style={{ background: `linear-gradient(160deg, ${s.palette.accent}, ${s.palette.ink})` }}
               >
                 <div className="pointer-events-none transition-transform duration-700 ease-out group-hover:scale-[1.04]">
-                  <StoreFrame s={s} />
+                  <StoreLongFrame s={s} />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/60 to-transparent px-5 pb-4 pt-10">
                   <div>

@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 // Fait apparaître son contenu (fondu + légère montée + net) quand il entre dans l'écran.
 // Le style est dans app/globals.css ([data-reveal]).
+// Sans latence : tout est rendu visible (« auto », animation CSS jouée dès le premier affichage, sans attendre
+// le JavaScript). Seuls les blocs encore sous l'écran sont masqués, puis révélés quand on y arrive.
+const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+const MAX_DELAY = 150; // ms : un délai plus long donne une impression de lenteur
 export function Reveal({
   children,
   delay = 0,
@@ -17,9 +21,11 @@ export function Reveal({
 }) {
   const ref = useRef<HTMLElement>(null);
 
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.92) return; // déjà à l'écran : rien à attendre
+    el.dataset.reveal = "";
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -27,7 +33,7 @@ export function Reveal({
           io.disconnect();
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+      { rootMargin: "0px 0px -4% 0px", threshold: 0.05 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -37,9 +43,9 @@ export function Reveal({
     <Tag
       // @ts-expect-error ref générique selon la balise
       ref={ref}
-      data-reveal=""
+      data-reveal="auto"
       className={className}
-      style={{ "--reveal-delay": `${delay}ms` } as React.CSSProperties}
+      style={{ "--reveal-delay": `${Math.min(delay, MAX_DELAY)}ms` } as React.CSSProperties}
     >
       {children}
     </Tag>
