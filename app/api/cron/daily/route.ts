@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { recommend } from "@/lib/server/ai";
 import { aiBlock } from "@/lib/server/budget";
 import { safeEqual } from "@/lib/server/crypto";
+import { sendEmail } from "@/lib/server/email";
 import { env } from "@/lib/server/env";
 import { accessToken, dailyOrders, dailySessions } from "@/lib/server/shopify";
 import { db, must } from "@/lib/server/supabase";
@@ -45,5 +46,21 @@ export async function GET(req: Request) {
       console.error("Pilotage", s.id, e);
     }
   }
-  return NextResponse.json({ processed: Object.keys(report).length, report });
+  // Rappel de l'offre de lancement : un e-mail quand il reste moins de 24 h et que la personne n'est pas abonnée.
+  // La tâche passe une fois par jour : chaque compte traverse la fenêtre « 24 h à 48 h » une seule fois.
+  const now = Date.now();
+  const late = must(await db().from("users").select("id, email, first_name, created_at").eq("plan", "free")
+    .lte("created_at", new Date(now - 24 * 3_600_000).toISOString()).gt("created_at", new Date(now - 48 * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string }[];
+  let reminders = 0;
+  for (const u of late) {
+    const { error: dup } = await db().from("webhook_events").insert({ id: `offer-reminder:${u.id}` });
+    if (dup || !u.email) continue;
+    const hours = Math.max(1, Math.round((new Date(u.created_at).getTime() + 48 * 3_600_000 - now) / 3_600_000));
+    const ok = await sendEmail(u.email, `Plus que ${hours} h pour ton prix de lancement (−50 % à vie)`,
+      `Salut${u.first_name ? ` ${u.first_name}` : ""},\n\nTon offre de lancement Vitrio se termine dans ${hours} h : −50 % à vie sur ton abonnement (40 € par mois au lieu de 80 € pour Starter).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${env.appUrl()}/app/abonnement\n\nÀ tout de suite,\nL'équipe Vitrio`);
+    if (ok) reminders++;
+    else await db().from("webhook_events").delete().eq("id", `offer-reminder:${u.id}`); // réessai demain si encore dans la fenêtre
+  }
+
+  return NextResponse.json({ processed: Object.keys(report).length, report, reminders });
 }

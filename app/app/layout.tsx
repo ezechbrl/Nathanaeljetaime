@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppProvider } from "@/components/app/AppContext";
+import { OfferBanner } from "@/components/app/OfferBanner";
 import { Sidebar } from "@/components/app/Sidebar";
 import { LogoMark } from "@/components/ui/Logo";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -20,7 +21,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <AppProvider fallback={<Loading />}>
         <div className="min-h-dvh lg:flex">
           <Sidebar />
-          <main id="main" className="min-w-0 flex-1">{children}</main>
+          <main id="main" className="min-w-0 flex-1"><OfferBanner />{children}</main>
         </div>
       </AppProvider>
     </ToastProvider>

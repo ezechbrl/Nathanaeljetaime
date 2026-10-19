@@ -4,6 +4,7 @@ import { Check, ImageIcon, Type } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Job, JobStepKey, Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { PhotoStudio } from "./PhotoStudio";
 
 type Colors = Store["theme"]["colors"];
 
@@ -158,10 +159,8 @@ export function BuildStage({ store, job, mobile }: { store: Store; job: Job | nu
                   </div>
                 </div>
               </Layer>
-              <Layer built={done("images")} depth={170} label="Visuel" delay={80}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-md" style={{ background: `linear-gradient(150deg, ${colors.background}, ${accent}66)` }}>
-                  <div className="absolute left-1/2 top-1/2 h-[60%] w-[30%] -translate-x-1/2 -translate-y-1/2 rounded-[18%] shadow-xl" style={{ background: `linear-gradient(160deg, ${accent}, ${primary})` }} />
-                </div>
+              <Layer built={done("images") || running === "images"} depth={170} label="Visuel" delay={80}>
+                <PhotoStudio storeId={store.id} running={running === "images"} done={done("images")} accent={accent} primary={primary} background={colors.background} />
               </Layer>
             </div>
             <div className={cn("grid gap-2 [transform-style:preserve-3d]", mobile ? "grid-cols-1" : "grid-cols-3")}>

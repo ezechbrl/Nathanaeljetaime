@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
 
-// « Instantané. » : ce que fait Vitrio, à essayer directement (textes, photos, avis, publication).
+// « Nouvelle ère. » : ce que fait Vitrio, à essayer directement (textes, photos, avis, publication).
 const TABS = [
   { id: "text", icon: MessageSquareText, title: "Des textes qui vendent", text: "Accueil, fiche produit, FAQ, offres par lot." },
   { id: "photo", icon: Camera, title: "Des photos de pro", text: "Ton produit en studio et en situation." },
@@ -136,10 +136,10 @@ export function Instant() {
       <div className="relative mx-auto max-w-[1200px] px-4 sm:px-6">
         <div className="text-center">
           <Reveal as="h2" className="bg-[linear-gradient(180deg,#ffffff_20%,#a7f3d0_60%,rgb(110_231_183/0.35))] bg-clip-text pb-2 font-display text-[clamp(3.4rem,1.5rem+8vw,9rem)] font-medium leading-[0.95] tracking-[-0.06em] text-transparent">
-            Instantané.
+            Nouvelle ère.
           </Reveal>
           <Reveal delay={100} as="p" className="mx-auto mt-6 max-w-2xl text-[clamp(1.05rem,0.9rem+0.5vw,1.3rem)] leading-relaxed text-fg-muted">
-            Ce qui prenait 3 semaines se fait pendant que tu bois ton café. <span className="text-fg">Essaie, c'est en direct :</span>
+            Créer une boutique ne prend plus 3 semaines : ça se fait pendant que tu bois ton café. <span className="text-fg">Essaie, c'est en direct :</span>
           </Reveal>
         </div>
         <Reveal delay={150} className="mt-12 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)]">

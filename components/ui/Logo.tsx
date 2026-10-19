@@ -3,18 +3,21 @@ import { useId } from "react";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
-// Vitrio : un V en forme de coche (la vente réussie), dégradé émeraude → citron vert, avec l'étincelle de l'IA.
+// Vitrio : un sac de boutique (notre forme, pas celle de Shopify) avec le V au milieu,
+// et une pastille « commande validée ».
 export function LogoMark({ className }: { className?: string }) {
   const id = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 32 32" aria-hidden className={cn("h-7 w-7", className)}>
       <defs>
-        <linearGradient id={`${id}v`} x1="0" y1="1" x2="1" y2="0"><stop offset="0" stopColor="#059669" /><stop offset=".6" stopColor="#2ee6a6" /><stop offset="1" stopColor="#d9f99d" /></linearGradient>
+        <linearGradient id={`${id}g`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#6ee7b7" /><stop offset=".55" stopColor="#10b07f" /><stop offset="1" stopColor="#047857" /></linearGradient>
       </defs>
       <rect width="32" height="32" rx="9" fill="#04211a" />
-      <rect x=".5" y=".5" width="31" height="31" rx="8.5" fill="none" stroke="#2ee6a6" strokeOpacity=".25" />
-      <path d="M8.5 12.5l6.2 11.2c.5.9 1.8.9 2.3 0L24.5 9" fill="none" stroke={`url(#${id}v)`} strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="24.8" cy="5.6" r="1.6" fill="#d9f99d" />
+      <path d="M11.2 11.5V9.8a3.8 3.8 0 0 1 7.6 0v1.7" fill="none" stroke="#a7f3d0" strokeWidth="2" strokeLinecap="round" />
+      <path d="M6.4 13c.1-.9.8-1.5 1.7-1.5h13.8c.9 0 1.6.6 1.7 1.5l.8 11.3A2.5 2.5 0 0 1 21.9 27H8.1a2.5 2.5 0 0 1-2.5-2.7z" fill={`url(#${id}g)`} />
+      <path d="M10.6 15.6l4.4 7.6 4.4-7.6" fill="none" stroke="#04211a" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="24.5" cy="8.5" r="4.3" fill="#d9f99d" stroke="#04211a" strokeWidth="1.5" />
+      <path d="M22.6 8.6l1.3 1.3 2.4-2.6" fill="none" stroke="#04211a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

@@ -144,3 +144,6 @@
 /* Chargement des photos (components/app/PhotoLoading.tsx) */
 @keyframes photo-sweep { from { transform: translateX(0) skewX(-12deg); } to { transform: translateX(400%) skewX(-12deg); } }
 @keyframes photo-bar { from { transform: translateX(-120%); } to { transform: translateX(320%); } }
+
+/* Mini studio photo de la création : projecteur qui balaie le produit. */
+@keyframes studio-spot { 0%, 100% { transform: translateX(-18%); } 50% { transform: translateX(18%); } }
