@@ -3,12 +3,14 @@ import { CTA } from "@/lib/launch";
 import { Reveal } from "@/components/ui/Reveal";
 import { TutorialVideo } from "@/components/ui/TutorialVideo";
 import { HeroBeams } from "./HeroBeams";
+import { HeroCircuits } from "./HeroCircuits";
 import { PromptBox } from "./PromptBox";
 
 export function Hero() {
   return (
     <section className="relative pb-16 pt-28 sm:pt-36">
       <HeroBeams />
+      <HeroCircuits />
       <div className="relative mx-auto max-w-[1100px] px-4 text-center sm:px-6">
         <Reveal>
           <span className="eyebrow mx-auto">

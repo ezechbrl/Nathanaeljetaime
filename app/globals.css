@@ -119,3 +119,23 @@
 @keyframes aurora { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(6%, -4%) scale(1.15); } }
 @keyframes caret { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 @keyframes beams { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-4%); } }
+
+/* Cadre lumineux du champ de l'accueil : un reflet fait le tour du bord, lentement. */
+@property --frame-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes frame-spin { to { --frame-angle: 360deg; } }
+.glow-frame {
+  background: conic-gradient(from var(--frame-angle), rgb(46 230 166 / 0.35), rgb(167 243 208) 8%, rgb(46 230 166 / 0.35) 18%, rgb(46 230 166 / 0.35) 50%, rgb(110 231 183 / 0.9) 58%, rgb(46 230 166 / 0.35) 68%);
+  animation: frame-spin 7s linear infinite;
+  box-shadow: 0 0 22px rgb(46 230 166 / 0.35), 0 0 70px -10px rgb(46 230 166 / 0.45);
+  transition: box-shadow .3s;
+}
+.glow-frame:focus-within { box-shadow: 0 0 28px rgb(46 230 166 / 0.55), 0 0 90px -10px rgb(46 230 166 / 0.6); }
+
+/* Lignes « circuit » sur les côtés de l'accueil : une lueur parcourt chaque ligne. */
+@keyframes circuit-run { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -1000; } }
+.circuit-pulse { stroke-dasharray: 70 930; animation: circuit-run 6s linear infinite; }
+@keyframes node-glow { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-frame, .circuit-pulse { animation: none; }
+}

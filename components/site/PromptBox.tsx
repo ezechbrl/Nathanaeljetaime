@@ -52,8 +52,8 @@ export function PromptBox({ target = "/inscription", className, align = "center"
 
   return (
     <div className={cn("w-full max-w-2xl", align === "center" && "mx-auto", className)}>
-      <form onSubmit={submit} className="group relative rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
-        <div className="rounded-[13px] bg-[linear-gradient(180deg,#123d35,#0c2b26)] shadow-[0_30px_80px_-30px_rgb(0_128_96/0.55)]">
+      <form onSubmit={submit} className="glow-frame group relative rounded-[16px] p-[1.5px]">
+        <div className="rounded-[14.5px] bg-[linear-gradient(180deg,#123d35,#0b2823)] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
           <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
           <textarea
             id={inputId}
@@ -68,21 +68,21 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             <button type="button" aria-label="Ajouter une image" className="grid h-8 w-8 place-items-center rounded-ctl text-fg-faint transition-colors hover:bg-white/5 hover:text-fg">
               <Plus className="h-4 w-4" />
             </button>
-            <button type="submit" className="inline-flex h-9 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_6px_20px_-6px_rgb(0_166_118/0.6)] transition-shadow hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_28px_-6px_rgb(0_166_118/0.8)]">
+            <button type="submit" className="inline-flex h-9 items-center gap-2 rounded-full border border-[#6ee7b7]/50 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_0_18px_rgb(46_230_166/0.55)] transition-all hover:-translate-y-px hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_0_28px_rgb(46_230_166/0.8)]">
               <Sparkles className="h-4 w-4" /> Générer
             </button>
           </div>
         </div>
       </form>
 
-      <div role="tablist" aria-label="Mode de création" className={cn("surface mt-5 flex w-fit max-w-full gap-1 overflow-x-auto rounded-ctl p-1", align === "center" && "mx-auto")}>
+      <div role="tablist" aria-label="Mode de création" className={cn("mt-5 flex w-fit max-w-full gap-1 overflow-x-auto rounded-full border border-white/10 bg-black/25 p-1 backdrop-blur", align === "center" && "mx-auto")}>
         {MODES.map((m) => (
           <button
             key={m.id}
             role="tab"
             aria-selected={mode === m.id}
             onClick={() => setMode(m.id)}
-            className={cn("flex items-center gap-2 shrink-0 rounded-[7px] px-2.5 py-1.5 text-[13px] transition-colors sm:px-3.5 sm:text-sm", mode === m.id ? "border border-accent/30 bg-accent-deep/50 text-fg" : "border border-transparent text-fg-muted hover:text-fg")}
+            className={cn("flex items-center gap-2 shrink-0 rounded-full px-3 py-1.5 text-[13px] transition-all sm:px-4 sm:text-sm", mode === m.id ? "border border-[#6ee7b7]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_rgb(46_230_166/0.45),inset_0_0_10px_rgb(46_230_166/0.15)]" : "border border-transparent text-fg-muted hover:text-fg")}
           >
             <m.icon className="hidden h-3.5 w-3.5 sm:block" /> {m.label}
           </button>
