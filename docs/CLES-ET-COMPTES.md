@@ -112,8 +112,8 @@ Tant que les variables sont vides, les boutons de paiement affichent « Le paiem
 
 1. **dashboard.stripe.com** → créer le compte (au nom du parent) et l'activer.
 2. **Catalogue de produits → Ajouter un produit** :
-   - « Vitrio Starter » : prix récurrent **50 €/mois**, puis un 2e prix **420 €/an** ;
-   - « Vitrio Pro » : prix récurrent **90 €/mois**, puis un 2e prix **756 €/an**.
+   - « Vitrio Starter » : prix récurrent **50 €/mois**, puis un 2e prix **360 €/an** ;
+   - « Vitrio Pro » : prix récurrent **90 €/mois**, puis un 2e prix **648 €/an**.
    Copie l'identifiant de chaque prix (`price_…`).
 3. **Développeurs → Clés API** : copie la **clé secrète** (`sk_live_…`).
 4. **Développeurs → Webhooks → Ajouter une destination** :
@@ -125,19 +125,19 @@ Tant que les variables sont vides, les boutons de paiement affichent « Le paiem
 
 6. **Catalogue de produits → Coupons → Créer** deux coupons, durée **Pour toujours** :
    - « Lancement mensuel » : **montant fixe 10 €** (50 → 40 €, 90 → 80 €) ;
-   - « Lancement annuel » : **montant fixe 84 €** (420 → 336 €, 756 → 672 €).
+   - « Lancement annuel » : **montant fixe 72 €** (360 → 288 €, 648 → 576 €).
    C'est l'offre du compte à rebours (48 h après l'inscription). Sans ces variables, le compte à rebours ne s'affiche pas.
 
 | Variable Vercel | Valeur |
 |---|---|
 | `STRIPE_LAUNCH_COUPON_MONTH` | coupon 10 € (étape 6) |
-| `STRIPE_LAUNCH_COUPON_YEAR` | coupon 84 € (étape 6) |
+| `STRIPE_LAUNCH_COUPON_YEAR` | coupon 72 € (étape 6) |
 | `STRIPE_SECRET_KEY` | la clé secrète (étape 3) |
 | `STRIPE_WEBHOOK_SECRET` | le secret de signature (étape 4) |
 | `STRIPE_PRICE_STARTER_MONTH` | prix 50 €/mois |
-| `STRIPE_PRICE_STARTER_YEAR` | prix 420 €/an |
+| `STRIPE_PRICE_STARTER_YEAR` | prix 360 €/an |
 | `STRIPE_PRICE_PRO_MONTH` | prix 90 €/mois |
-| `STRIPE_PRICE_PRO_YEAR` | prix 756 €/an |
+| `STRIPE_PRICE_PRO_YEAR` | prix 648 €/an |
 
 Pour tester sans payer : fais tout en **mode test** (clés `sk_test_…`, carte `4242 4242 4242 4242`), ou dans
 Supabase → Table Editor → `users`, mets ta ligne à `plan = pro` (Starter) ou `plan = agency` (Pro).

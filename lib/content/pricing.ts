@@ -14,7 +14,7 @@ export type Plan = {
 };
 
 // Réduction de l'abonnement annuel.
-export const YEARLY_DISCOUNT = 0.3;
+export const YEARLY_DISCOUNT = 0.4;
 const yearly = (monthly: number) => Math.round(monthly * 12 * (1 - YEARLY_DISCOUNT));
 
 // Identifiants internes gardés tels quels (contrainte de la base) : « pro » = offre Starter, « agency » = offre Pro.
@@ -38,10 +38,10 @@ export const PLANS: Plan[] = [
   },
 ];
 
-// Offre de lancement : −10 € par mois à vie (−84 € par an) si on s'abonne dans les 48 h après l'inscription.
+// Offre de lancement : −10 € par mois à vie (−72 € par an) si on s'abonne dans les 48 h après l'inscription.
 // Remise réelle : deux coupons Stripe « pour toujours » (STRIPE_LAUNCH_COUPON_MONTH et _YEAR).
-// Starter 50 → 40 €/mois (420 → 336 €/an), Pro 90 → 80 €/mois (756 → 672 €/an).
-export const LAUNCH_OFFER = { hours: 48, off: { month: 10, year: 84 } };
+// Starter 50 → 40 €/mois (360 → 288 €/an), Pro 90 → 80 €/mois (648 → 576 €/an).
+export const LAUNCH_OFFER = { hours: 48, off: { month: 10, year: 72 } };
 export const withOffer = (price: number, interval: "month" | "year") => price - LAUNCH_OFFER.off[interval];
 
 export const PAID_PLANS = PLANS.filter((p) => !p.hidden);

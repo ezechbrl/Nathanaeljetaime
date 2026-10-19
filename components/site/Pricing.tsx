@@ -7,7 +7,7 @@ import { AuroraBackground, IntervalToggle, PlanCards, TrustRow, planButtonClass,
 import { CTA } from "@/lib/launch";
 import { AI_FAIR_USE, LAUNCH_OFFER, PAID_PLANS } from "@/lib/content/pricing";
 
-// Les deux offres (Starter et Pro), au mois ou à l'année (−30 %).
+// Les deux offres (Starter et Pro), au mois ou à l'année (−40 %).
 export function PricingCards() {
   const [interval, setPeriod] = useState<Interval>("month");
   return (
