@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { syncShopifySubscription } from "@/lib/server/billing";
 import { safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { route } from "@/lib/server/http";
@@ -64,8 +63,6 @@ export const GET = route(async (req) => {
     { user_id: userId, shop_domain: shop, shop_name: info.name, access_token_encrypted: sealTokens(tokens), scopes: scope, status: "active", updated_at: new Date().toISOString() },
     { onConflict: "user_id,shop_domain" },
   );
-  // Abonnement déjà choisi chez Shopify (ex. réinstallation) : on le relit tout de suite.
-  await syncShopifySubscription(userId).catch((e) => console.warn("Abonnement Shopify non relu :", (e as Error).message));
   await registerUninstallWebhook(shop, access_token).catch((e) => console.warn("Webhook de désinstallation non enregistré :", (e as Error).message));
   const res = NextResponse.redirect(`${app}${next}`);
   res.cookies.delete("shopify_state");

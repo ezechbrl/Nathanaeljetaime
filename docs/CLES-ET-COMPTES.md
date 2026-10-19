@@ -1,7 +1,7 @@
 # Les clés à récupérer (et où les trouver)
 
 C'est moi qui code le back-end. Toi, tu crées les comptes et tu copies les clés dans Vercel.
-Obligatoires pour lancer : **Supabase, Claude, Shopify, les clés générées**. Le paiement passe par **Shopify** (pas besoin de Stripe).
+Obligatoires pour lancer : **Supabase, Claude, Shopify, les clés générées**. Le paiement des abonnements passe par **Stripe** (section 4).
 Resend et les images peuvent attendre.
 
 ### Ordre pour passer en production
@@ -103,28 +103,40 @@ automatiquement avec l'e-mail de la boutique.
 
 ---
 
-## 4. Paiement par Shopify (abonnement Pro)
+## 4. Paiement par Stripe (abonnements Starter et Pro)
 
-Le client paie depuis Shopify : l'abonnement s'ajoute à sa facture Shopify, et Shopify te reverse l'argent
-(0 % de commission sur ton premier million de dollars, 2,9 % de frais de paiement, inscription unique de 19 $).
-Il n'y a pas d'offre gratuite : sans abonnement actif, le client voit la page « Active Vitrio Pro » et l'IA reste bloquée. Tant que ces variables sont vides, le bouton d'activation affiche « Le paiement arrive très bientôt ».
-Pour tester sans payer : sur ta boutique de développement, les offres payantes sont gratuites. Ou, dans Supabase → Table Editor → `users`, mets ta ligne à `plan = pro`.
+Le client paie par carte (ou Apple Pay / Google Pay) sur une page Stripe. Stripe garde ~1,5 % + 0,25 € par paiement
+(cartes européennes) et verse l'argent sur le compte bancaire du titulaire du compte Stripe.
+**Le titulaire doit être majeur** : c'est le parent qui ouvre le compte Stripe, avec sa pièce d'identité et son IBAN.
+Tant que les variables sont vides, les boutons de paiement affichent « Le paiement en ligne arrive très bientôt ».
 
-1. **Partner Dashboard → Settings → App Store registration** : inscris-toi (19 $, une fois).
-2. **Apps → Vitrio → Distribution → Manage listing → Pricing content → Settings** : choisis **Shopify App Pricing**.
-3. Crée les offres (le **handle** de l'offre payante doit contenir `pro`) :
-   - `pro` : 31 €/mois et 310 €/an ;
-   Dans chaque offre, **Welcome link** : `https://ton-domaine.vercel.app/api/billing/shopify/return`
-4. **Settings → Partner API clients → Create** : coche **Manage apps** et **View financials**, copie le jeton.
+1. **dashboard.stripe.com** → créer le compte (au nom du parent) et l'activer.
+2. **Catalogue de produits → Ajouter un produit** :
+   - « Vitrio Starter » : prix récurrent **40 €/mois**, puis un 2e prix **336 €/an** ;
+   - « Vitrio Pro » : prix récurrent **80 €/mois**, puis un 2e prix **672 €/an**.
+   Copie l'identifiant de chaque prix (`price_…`).
+3. **Développeurs → Clés API** : copie la **clé secrète** (`sk_live_…`).
+4. **Développeurs → Webhooks → Ajouter une destination** :
+   URL `https://nathanaeljetaime.vercel.app/api/webhooks/stripe`, événements
+   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`,
+   `customer.subscription.deleted`, `invoice.paid`. Copie le **secret de signature** (`whsec_…`).
+5. **Paramètres → Facturation → Portail client** : active-le, autorise « Annuler », « Changer de carte »
+   et « Changer d'offre » (ajoute les 4 prix).
 
-| Variable Vercel | Où la trouver |
+| Variable Vercel | Valeur |
 |---|---|
-| `SHOPIFY_APP_HANDLE` | le « handle » de l'app (dans l'URL de la page d'offres ou le fichier `shopify.app.toml`), ex. `vitrio` |
-| `SHOPIFY_APP_ID` | le nombre dans l'URL de l'app : `partners.shopify.com/<ORG_ID>/apps/<APP_ID>/…` |
-| `SHOPIFY_PARTNER_ORG_ID` | le premier nombre de cette même URL |
-| `SHOPIFY_PARTNER_TOKEN` | le jeton du Partner API client (étape 4) |
+| `STRIPE_SECRET_KEY` | la clé secrète (étape 3) |
+| `STRIPE_WEBHOOK_SECRET` | le secret de signature (étape 4) |
+| `STRIPE_PRICE_STARTER_MONTH` | prix 40 €/mois |
+| `STRIPE_PRICE_STARTER_YEAR` | prix 336 €/an |
+| `STRIPE_PRICE_PRO_MONTH` | prix 80 €/mois |
+| `STRIPE_PRICE_PRO_YEAR` | prix 672 €/an |
 
-Sur une boutique de développement, les offres payantes sont gratuites : tu peux tout tester sans payer.
+Pour tester sans payer : fais tout en **mode test** (clés `sk_test_…`, carte `4242 4242 4242 4242`), ou dans
+Supabase → Table Editor → `users`, mets ta ligne à `plan = pro` (Starter) ou `plan = agency` (Pro).
+
+Les anciennes variables Shopify (`SHOPIFY_APP_HANDLE`, `SHOPIFY_APP_ID`, `SHOPIFY_PARTNER_ORG_ID`,
+`SHOPIFY_PARTNER_TOKEN`) ne servent plus.
 
 ## 4 bis. Couleurs de la marque dans le thème Shopify
 
@@ -219,7 +231,7 @@ Modèles modifiables avec `FAL_MODEL` (défaut `fal-ai/flux/dev`) et `FAL_EDIT_M
 - [ ] `ANTHROPIC_API_KEY`
 - [ ] `SHOPIFY_API_KEY`
 - [ ] `SHOPIFY_API_SECRET`
-- [ ] Offres Shopify + `SHOPIFY_APP_HANDLE`, `SHOPIFY_APP_ID`, `SHOPIFY_PARTNER_ORG_ID`, `SHOPIFY_PARTNER_TOKEN`
+- [ ] Stripe : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` et les 4 `STRIPE_PRICE_…`
 - [ ] Extension de thème déployée + `NEXT_PUBLIC_SHOPIFY_API_KEY`
 - [ ] `NEXT_PUBLIC_LAUNCH_MODE` (`waitlist` puis `open`)
 - [ ] `ENCRYPTION_KEY`

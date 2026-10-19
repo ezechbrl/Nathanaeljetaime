@@ -7,8 +7,8 @@ import { db, must } from "./supabase";
 // Quotas par offre (doivent correspondre à lib/content/pricing.ts).
 export const LIMITS: Record<PlanId, { stores: number; conversations: number; images: number; shops: number }> = {
   free: { stores: 0, conversations: 0, images: 0, shops: 1 }, // sans abonnement
-  pro: { stores: 999, conversations: 200, images: 200, shops: 3 },
-  agency: { stores: 999, conversations: 800, images: 1000, shops: 10 },
+  pro: { stores: 999, conversations: 150, images: 100, shops: 1 }, // offre Starter
+  agency: { stores: 999, conversations: 400, images: 300, shops: 3 }, // offre Pro
 };
 
 export const period = () => new Date().toISOString().slice(0, 7);

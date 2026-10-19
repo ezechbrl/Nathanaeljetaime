@@ -13,7 +13,7 @@ export const POST = route<{ params: Promise<{ id: string }> }>(async (_req, { pa
   const user = await requireUser();
   const store = await ownedStore(user.id, (await params).id);
   if (!env.falKey()) throw new HttpError(503, "not_configured", "La génération d'images n'est pas encore activée.");
-  if (user.plan === "free") throw new HttpError(402, "subscription_required", "Active Vitrio Pro pour générer des images.");
+  if (user.plan === "free") throw new HttpError(402, "subscription_required", "Choisis ton offre pour générer des images.");
   if (!store.plan) throw new HttpError(409, "conflict", "La boutique est encore en cours de génération.");
   await rateLimit(`regen:${user.id}`, 3, 3600);
   const job = await createJob(store.id, user.id, "image", [{ key: "images", label: "Nouvelles photos de la boutique" }]);

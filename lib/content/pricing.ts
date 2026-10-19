@@ -13,6 +13,11 @@ export type Plan = {
   hidden?: boolean;
 };
 
+// Réduction de l'abonnement annuel.
+export const YEARLY_DISCOUNT = 0.3;
+const yearly = (monthly: number) => Math.round(monthly * 12 * (1 - YEARLY_DISCOUNT));
+
+// Identifiants internes gardés tels quels (contrainte de la base) : « pro » = offre Starter, « agency » = offre Pro.
 export const PLANS: Plan[] = [
   {
     // Compte sans abonnement (pas affiché sur la page Tarifs : il n'y a pas d'offre gratuite).
@@ -20,16 +25,23 @@ export const PLANS: Plan[] = [
     features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
-    id: "pro", name: "Pro", tagline: "Pour lancer et faire grandir ta marque.", monthly: 31, yearly: 310,
-    features: ["Boutiques illimitées", "Jusqu'à 200 messages à l'IA / mois", "Studio d'images (200 / mois)", "Optimisation quotidienne", "Import depuis un lien et refonte", "Support prioritaire"],
-    limits: { stores: "Illimitées", conversations: "Jusqu'à 200 / mois", images: "200 / mois", shops: "3", ai: "1 € toutes les 5 h, 3 € / semaine" },
+    id: "pro", name: "Starter", tagline: "Pour lancer ta marque.", monthly: 40, yearly: yearly(40),
+    features: ["1 boutique Shopify connectée", "Change de produit à volonté", "Photos produit et mises en situation par l'IA", "Vrais avis clients importés", "Modifications par l'IA", "Thème Shopify à ta marque"],
+    limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
+    cta: "Commencer",
+  },
+  {
+    id: "agency", name: "Pro", tagline: "Pour tester plusieurs produits et grandir.", monthly: 80, yearly: yearly(80),
+    features: ["3 boutiques Shopify connectées", "Teste plusieurs produits à la fois", "2× plus de crédit IA", "Optimisation quotidienne de la boutique", "Images et modifications en plus", "Support prioritaire"],
+    limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "3", ai: "2 € toutes les 5 h, 7 € / semaine" },
     cta: "Commencer", featured: true,
   },
 ];
+
+export const PAID_PLANS = PLANS.filter((p) => !p.hidden);
 
 // Explication affichée sous les offres (doit correspondre à lib/server/budget.ts).
 export const AI_FAIR_USE =
   "L'IA fonctionne avec un crédit qui se recharge toutes les 5 heures, comme les assistants IA du marché, et une limite par semaine. Un usage normal (création de boutiques, retouches quotidiennes) ne l'atteint pas.";
 
 export const euro = (n: number) => `${n.toLocaleString("fr-FR")} €`;
-

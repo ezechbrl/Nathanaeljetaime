@@ -28,5 +28,5 @@ export async function notifyOwner(title: string, message: string) {
   for (const r of results) if (r.status === "rejected") console.warn("Notification non envoyée :", r.reason);
 }
 
-const PRICE: Record<string, string> = { month: "31 €/mois", year: "310 €/an" };
-export const saleMessage = (shop: string, interval: string | null) => `${shop.replace(/\.myshopify\.com$/, "")} vient de s'abonner à Vitrio Pro${interval ? ` (${PRICE[interval] ?? interval})` : ""}.`;
+// Ex. « marie@gmail.com vient de s'abonner à Starter (40 €/mois). »
+export const saleMessage = (who: string, planName: string, price: string) => `${who} vient de s'abonner à ${planName} (${price}).`;

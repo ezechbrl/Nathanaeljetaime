@@ -1,7 +1,9 @@
 import "server-only";
 import Stripe from "stripe";
 import type { Invoice, PlanId, Subscription } from "@/lib/api/types";
+import { PLANS, euro } from "@/lib/content/pricing";
 import { env } from "./env";
+import { notifyOwner, saleMessage } from "./notify";
 import { db, must } from "./supabase";
 import type { UserRow } from "./auth";
 
@@ -36,8 +38,10 @@ export async function checkoutUrl(user: UserRow, plan: "pro" | "agency", interva
     client_reference_id: user.id,
     subscription_data: { metadata: { user_id: user.id } },
     allow_promotion_codes: true,
-    success_url: `${env.appUrl()}/app/abonnement?checkout=success`,
-    cancel_url: `${env.appUrl()}/app/abonnement`,
+    locale: "fr",
+    // Retour sur l'accueil : le projet mis de côté avant le paiement se relance tout seul.
+    success_url: `${env.appUrl()}/app?checkout=success`,
+    cancel_url: `${env.appUrl()}/app`,
   });
   return session.url!;
 }
@@ -51,6 +55,7 @@ export async function portalUrl(user: UserRow) {
 export async function syncSubscription(sub: Stripe.Subscription) {
   const userId = sub.metadata.user_id ?? (must(await db().from("users").select("id").eq("stripe_customer_id", String(sub.customer)).maybeSingle()) as { id: string } | null)?.id;
   if (!userId) return;
+  const before = must(await db().from("users").select("plan, email").eq("id", userId).maybeSingle()) as { plan: PlanId; email: string } | null;
   const item = sub.items.data[0];
   const mapped = item ? planForPrice(item.price.id) : null;
   const active = ["active", "trialing", "past_due"].includes(sub.status);
@@ -66,6 +71,15 @@ export async function syncSubscription(sub: Stripe.Subscription) {
     updated_at: new Date().toISOString(),
   });
   await db().from("users").update({ plan }).eq("id", userId);
+
+  // Notification sur le téléphone du fondateur : nouvelle vente ou départ d'un abonné.
+  const was = before?.plan ?? "free";
+  const info = PLANS.find((p) => p.id === plan);
+  if (was === "free" && plan !== "free" && info && mapped) {
+    await notifyOwner("💰 Nouvelle vente Vitrio", saleMessage(before?.email ?? "Un client", info.name, mapped.interval === "year" ? `${euro(info.yearly)}/an` : `${euro(info.monthly)}/mois`));
+  } else if (was !== "free" && plan === "free") {
+    await notifyOwner("Abonné parti", `${before?.email ?? "Un client"} a arrêté son abonnement Vitrio.`);
+  }
 }
 
 // Crédite la commission d'affiliation sur une facture payée.

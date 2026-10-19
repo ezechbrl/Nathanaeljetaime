@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { hmacBase64, safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
-import { endSubscriptionForShop } from "@/lib/server/billing";
 import { db, must } from "@/lib/server/supabase";
 
 // Webhooks Shopify : app/uninstalled et les trois webhooks RGPD obligatoires.
@@ -30,7 +29,6 @@ export async function POST(req: Request) {
     case "shop/redact":
       // L'app est retirée (ou Shopify demande l'effacement 48 h après) : on supprime l'accès.
       await db().from("shop_connections").update({ status: "uninstalled", access_token_encrypted: null, updated_at: new Date().toISOString() }).eq("shop_domain", shop);
-      await endSubscriptionForShop(shop); // Shopify arrête aussi la facturation de l'app
       if (topic === "shop/redact") {
         // Effacement demandé par Shopify : statistiques de vente agrégées des boutiques reliées à ce domaine.
         const conns = must(await db().from("shop_connections").select("id").eq("shop_domain", shop)) as { id: string }[];

@@ -29,7 +29,7 @@ function nextUrl(params: URLSearchParams) {
   return carry.size ? `/app?${carry}` : "/app";
 }
 
-function normalizeShop(input: string) {
+export function normalizeShop(input: string) {
   const d = input.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
   if (!d) return null;
   const full = d.endsWith(".myshopify.com") ? d : `${d.replace(/\.myshopify$/, "")}.myshopify.com`;
@@ -87,7 +87,7 @@ export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBefor
 }
 
 // Sac Shopify simplifié (couleurs de la marque), pour signaler l'intégration.
-function ShopifyBag({ className }: { className?: string }) {
+export function ShopifyBag({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 44 50" className={className} aria-label="Shopify" role="img">
       <path d="M31.3 9.6c0-.2-.2-.4-.4-.4l-3.4-.3-2.5-2.5c-.3-.3-.8-.2-1-.1l-1.3.4C21.9 4.2 20.6 2.4 18.4 2.4h-.2C17.6 1.6 16.8 1.2 16.1 1.2c-5.2 0-7.7 6.5-8.5 9.8l-3.6 1.1c-1.1.4-1.2.4-1.3 1.4L0 37.6 22.8 42 35.2 39.3 31.3 9.6Z" fill="#95BF47" />

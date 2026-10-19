@@ -7,6 +7,6 @@ export const GET = route(async () => {
   const user = await requireUser();
   const owner = process.env.OWNER_EMAIL?.trim().toLowerCase();
   if (!owner || user.email.toLowerCase() !== owner) throw new HttpError(403, "forbidden", "Réservé au fondateur de Vitrio.");
-  await notifyOwner("💰 Nouvelle vente Vitrio (test)", saleMessage("boutique-de-test.myshopify.com", "month"));
+  await notifyOwner("💰 Nouvelle vente Vitrio (test)", saleMessage("client-test@gmail.com", "Starter", "40 €/mois"));
   return json({ ok: true, sent: Boolean(process.env.NTFY_TOPIC || process.env.PUSHOVER_USER_KEY) });
 });

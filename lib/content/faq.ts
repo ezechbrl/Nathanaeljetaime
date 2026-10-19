@@ -11,7 +11,7 @@ export const HOME_FAQ = [
   },
   {
     q: "Combien ça me coûte, au total ?",
-    a: `Vitrio : 31 € par mois, ou 310 € par an (2 mois offerts), sans engagement. Shopify : ${site.shopifyOffer} en ce moment, puis son prix normal. Pas de designer, pas de photographe, pas de thème payant à acheter.`,
+    a: `Vitrio : 40 € par mois (Starter) ou 80 € par mois (Pro), −30 % à l'année, sans engagement. Shopify : ${site.shopifyOffer} en ce moment, puis son prix normal. Pas de designer, pas de photographe, pas de thème payant à acheter.`,
   },
   {
     q: "Les photos et les avis, ils viennent d'où ?",

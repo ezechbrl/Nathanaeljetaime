@@ -21,7 +21,7 @@ export const POST = route<{ params: Promise<{ id: string }> }>(async (req, { par
   if (!env.falKey()) throw new HttpError(503, "not_configured", "La génération d'images n'est pas encore activée.");
   const input = await body(req, Input);
   await rateLimit(`image:${user.id}`, 10, 60);
-  if (user.plan === "free") throw new HttpError(402, "subscription_required", "Active Vitrio Pro pour générer des images.");
+  if (user.plan === "free") throw new HttpError(402, "subscription_required", "Choisis ton offre pour générer des images.");
   await assertQuota(user.id, user.plan, "images");
   await consume(user.id, "images");
   const job = await createJob(store.id, user.id, "image", [{ key: "images", label: "Génération de l'image" }], input);

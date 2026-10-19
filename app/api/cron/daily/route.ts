@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { recommend } from "@/lib/server/ai";
 import { aiBlock } from "@/lib/server/budget";
-import { syncShopifySubscription } from "@/lib/server/billing";
 import { safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { accessToken, dailyOrders, dailySessions } from "@/lib/server/shopify";
@@ -46,11 +45,5 @@ export async function GET(req: Request) {
       console.error("Pilotage", s.id, e);
     }
   }
-  // Abonnements Shopify : renouvellements, changements d'offre et résiliations faits hors de Vitrio.
-  const owners = must(await db().from("shop_connections").select("user_id").eq("status", "active")) as { user_id: string }[];
-  for (const userId of new Set(owners.map((o) => o.user_id))) {
-    await syncShopifySubscription(userId).catch((e) => console.error("Abonnement Shopify", userId, e));
-  }
-
   return NextResponse.json({ processed: Object.keys(report).length, report });
 }

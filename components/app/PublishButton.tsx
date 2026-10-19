@@ -1,13 +1,13 @@
 "use client";
 
 import { Upload } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { Button, Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { ApiClientError } from "@/lib/api/errors";
 import { PUBLISH_LIVE_KEY } from "./PublishShow";
+import { ShopifyChoiceDialog } from "./ShopifyChoice";
 import { useLiveProgress } from "@/lib/use-progress";
 import { useStore } from "./StoreContext";
 
@@ -40,7 +40,7 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
       trackJob(job);
       setConfirm(false);
     } catch (e) {
-      if (e instanceof ApiClientError && e.code === "no_shop") { setNeedShop(true); setConfirm(true); }
+      if (e instanceof ApiClientError && e.code === "no_shop") setNeedShop(true);
       else if (e instanceof ApiClientError && e.code === "reauth_required" && e.field) { setReauth(e.field); setConfirm(true); }
       else toast((e as Error).message, "error");
     } finally {
@@ -53,20 +53,12 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
       <Button size={size} onClick={() => publish(true)} disabled={!!activeJob || loading}>
         {loading ? <Spinner /> : <Upload className="h-4 w-4" />} {store.status === "published" ? "Mettre à jour sur Shopify" : "Publier sur Shopify"}
       </Button>
-      {confirm && (
+      {needShop && <ShopifyChoiceDialog next={`/app/boutiques/${store.id}`} onClose={() => setNeedShop(false)} />}
+      {confirm && reauth && (
         <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-card border border-white/10 bg-bg-2 p-4 text-sm shadow-2xl">
-          {reauth ? (
-            <>
-              <p className="text-fg">Une autorisation à donner</p>
+          <p className="text-fg">Une autorisation à donner</p>
               <p className="mt-1 text-fg-muted">Vitrio installe maintenant un vrai thème à tes couleurs dans Shopify. Shopify te demande de l'autoriser une fois, puis tu reviens ici.</p>
               <a href={api.shopifyLoginUrl(reauth, `/app/boutiques/${store.id}`)} className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-ctl bg-accent px-3 text-sm font-medium text-white">Autoriser dans Shopify</a>
-            </>
-          ) : (
-            <>
-              <p>Aucune boutique Shopify connectée.</p>
-              <Link href="/app/parametres#shopify" className="mt-3 inline-block text-accent underline underline-offset-4">Connecter ma boutique</Link>
-            </>
-          )}
         </div>
       )}
     </div>

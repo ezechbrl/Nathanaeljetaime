@@ -157,7 +157,7 @@ export default function EditorPage() {
                 <p>{upsell}</p>
                 {user.plan === "free" && (
                   <Link href="/app/abonnement?plan=pro" className="mt-2 inline-flex items-center gap-1 rounded-ctl bg-accent-strong px-3 py-1.5 text-[13px] font-medium text-white hover:brightness-110">
-                    Activer Vitrio Pro · 31 €/mois <ArrowRight className="h-3.5 w-3.5" />
+                    Choisir mon offre · dès 40 €/mois <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}
               </div>
@@ -166,7 +166,7 @@ export default function EditorPage() {
               <p role="status" className="mb-2 rounded-ctl border border-warn/30 bg-warn/5 px-3 py-2 text-xs text-fg-muted">
                 Ton crédit d'IA est presque épuisé (environ {Math.max(1, Math.floor(Math.min(weekLeft, sessionLeft) / 0.07))} messages restants).
                 {sessionLeft <= weekLeft && usage.aiBudget.session.resetsAt ? " Il se recharge bientôt." : ""}
-                {user.plan === "free" && <> <Link href="/app/abonnement?plan=pro" className="text-accent underline underline-offset-2">Passe à Pro</Link> pour 2× plus de crédit.</>}
+                {user.plan === "pro" && <> <Link href="/app/abonnement" className="text-accent underline underline-offset-2">Passe à l'offre Pro</Link> pour 2× plus de crédit.</>}
               </p>
             )}
             <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1">

@@ -24,7 +24,7 @@ function Welcome() {
   useEffect(() => {
     if (params.get("checkout") !== "success") return;
     refresh();
-    toast("Vitrio Pro est activé. À toi de jouer !");
+    toast("Ton abonnement est activé. À toi de jouer !");
     router.replace("/app");
   }, [params, refresh, router, toast]);
   return null;

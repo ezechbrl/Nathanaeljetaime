@@ -1,9 +1,11 @@
 import { requireUser } from "@/lib/server/auth";
-import { planSelectionUrl } from "@/lib/server/billing";
+import { assertBillingConfigured } from "@/lib/server/billing";
 import { json, route } from "@/lib/server/http";
+import { portalUrl } from "@/lib/server/stripe";
 
-// Changer de période ou arrêter l'abonnement se fait sur la page d'offres Shopify.
+// Portail Stripe : changer d'offre ou de carte, télécharger les factures, arrêter l'abonnement.
 export const POST = route(async () => {
   const user = await requireUser();
-  return json({ url: await planSelectionUrl(user) });
+  assertBillingConfigured();
+  return json({ url: await portalUrl(user) });
 });

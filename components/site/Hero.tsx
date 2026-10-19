@@ -28,7 +28,7 @@ export function Hero() {
             <PromptBox align="left" />
           </Reveal>
           <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-fg-muted">
-            {["31 €/mois, sans engagement", "Annulable en un clic", "Publiée directement dans Shopify"].map((t) => (
+            {["Dès 40 €/mois, sans engagement", "Annulable en un clic", "Publiée directement dans Shopify"].map((t) => (
               <li key={t} className="flex items-center gap-1.5"><Check className="h-4 w-4 text-accent" /> {t}</li>
             ))}</ul>
           </Reveal>

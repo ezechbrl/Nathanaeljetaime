@@ -29,8 +29,9 @@ export const env = {
   partnerToken: () => process.env.SHOPIFY_PARTNER_TOKEN ?? null,
   stripeKey: () => required("STRIPE_SECRET_KEY"),
   stripeWebhookSecret: () => required("STRIPE_WEBHOOK_SECRET"),
+  // 4 prix Stripe : offre Starter (id « pro ») et offre Pro (id « agency »), au mois et à l'année.
   stripePrice: (plan: "pro" | "agency", interval: "month" | "year") =>
-    required(`STRIPE_PRICE_${plan === "pro" ? "PRO" : "AGENCY"}_${interval === "month" ? "MONTH" : "YEAR"}`),
+    required(`STRIPE_PRICE_${plan === "pro" ? "STARTER" : "PRO"}_${interval === "month" ? "MONTH" : "YEAR"}`),
   resendKey: () => process.env.RESEND_API_KEY ?? null,
   contactEmail: () => process.env.CONTACT_EMAIL ?? null,
   falKey: () => process.env.FAL_KEY ?? null,

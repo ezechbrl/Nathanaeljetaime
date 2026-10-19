@@ -122,7 +122,7 @@ export async function logout() {
   save();
 }
 // Mêmes règles que le serveur (lib/server/budget.ts) : crédit toutes les 5 h et limite par semaine, selon l'offre.
-const AI_LIMITS = { free: { session: 0, week: 0 }, pro: { session: 1, week: 3 }, agency: { session: 3, week: 12 } } as const;
+const AI_LIMITS = { free: { session: 0, week: 0 }, pro: { session: 1, week: 3 }, agency: { session: 2, week: 7 } } as const;
 const limits = () => AI_LIMITS[load().subscription.plan];
 const SESSION_MS = 5 * 3_600_000;
 function aiStatus() {
@@ -138,7 +138,7 @@ const waitText = (until: number) => {
   return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h${min % 60 ? ` ${String(min % 60).padStart(2, "0")}` : ""}`;
 };
 function assertAi() {
-  if (load().subscription.plan === "free") throw new ApiClientError(402, "subscription_required", "Active Vitrio Pro pour utiliser l'IA : 31 € par mois, sans engagement.");
+  if (load().subscription.plan === "free") throw new ApiClientError(402, "subscription_required", "Choisis ton offre pour utiliser l'IA : dès 40 € par mois, sans engagement.");
   const a = aiStatus();
   const l = limits();
   const upsell = load().subscription.plan === "agency" ? "" : " Passe à l'offre supérieure pour plus d'IA.";
@@ -159,7 +159,7 @@ function chargeAi(eur: number) {
 
 export function usage(): Usage {
   const s = load();
-  const quota = { free: [20, 10, 1], pro: [200, 200, 999], agency: [800, 1000, 999] }[s.subscription.plan];
+  const quota = { free: [20, 10, 1], pro: [150, 100, 999], agency: [400, 300, 999] }[s.subscription.plan];
   return {
     conversations: { used: s.messages.filter((m) => m.role === "user").length + 4, limit: quota[0] },
     images: { used: s.assets.filter((a) => a.prompt).length, limit: quota[1] },
@@ -532,7 +532,7 @@ export async function getBilling() {
   await wait(250);
   const s = load();
   const invoices: Invoice[] = s.subscription.plan === "free" ? [] : [
-    { id: "inv_1", number: "SHP-0001", amount: s.subscription.plan === "pro" ? 3100 : 14900, currency: "EUR", status: "paid", pdfUrl: "#", createdAt: iso() },
+    { id: "inv_1", number: "SHP-0001", amount: s.subscription.plan === "pro" ? 4000 : 8000, currency: "EUR", status: "paid", pdfUrl: "#", createdAt: iso() },
   ];
   return { subscription: clone(s.subscription), usage: usage(), invoices };
 }

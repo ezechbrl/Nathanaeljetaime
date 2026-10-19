@@ -10,8 +10,8 @@ import { db, must } from "./supabase";
 // Montants en euros. À garder cohérents avec la page Tarifs (lib/content/pricing.ts).
 export const AI_LIMITS: Record<PlanId, { session: number; week: number }> = {
   free: { session: 0, week: 0 }, // sans abonnement : pas d'IA
-  pro: { session: 1, week: 3 },
-  agency: { session: 3, week: 12 },
+  pro: { session: 1, week: 3 }, // offre Starter
+  agency: { session: 2, week: 7 }, // offre Pro
 };
 export const SESSION_HOURS = 5;
 const USD_TO_EUR = 0.92; // à ajuster si le taux de change bouge beaucoup
@@ -47,7 +47,7 @@ const eurText = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits
 
 function blockedError(until: string, reason: "week" | "session", plan: PlanId) {
   const l = AI_LIMITS[plan];
-  const upsell = plan === "free" ? " Tu aimes Vitrio ? Passe à Pro : 1 € de crédit toutes les 5 h, 3 € par semaine, et des boutiques illimitées." : plan === "pro" ? " Besoin de plus ? Écris-nous." : "";
+  const upsell = plan === "free" ? " Active un abonnement Vitrio pour utiliser l'IA." : plan === "pro" ? " Passe à l'offre Pro pour 2× plus de crédit." : "";
   return reason === "session"
     ? new HttpError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA (${eurText(l.session)} €) pour ces ${SESSION_HOURS} heures. Il se recharge dans ${wait(until)}.${upsell}`)
     : new HttpError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de la semaine (${eurText(l.week)} €). Elle se débloque dans ${wait(until)}.${upsell}`);
@@ -65,7 +65,7 @@ export async function aiBlock(userId: string, plan?: PlanId): Promise<{ until: s
 export async function assertAiBudget(userId: string, plan?: PlanId) {
   const p = plan ?? (await planOf(userId));
   // Pas d'offre gratuite : l'IA est réservée aux abonnés.
-  if (p === "free") throw new HttpError(402, "subscription_required", "Active Vitrio Pro pour utiliser l'IA : 31 € par mois, sans engagement.");
+  if (p === "free") throw new HttpError(402, "subscription_required", "Choisis ton offre pour utiliser l'IA : dès 40 € par mois, sans engagement.");
   const b = await aiBlock(userId, p);
   if (b) throw blockedError(b.until, b.reason, p);
 }
