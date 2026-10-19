@@ -119,12 +119,12 @@ export default function EditorPage() {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <section aria-label="Conversation avec l'IA" className={cn("min-h-0 w-full flex-1 flex-col lg:flex lg:w-[400px] lg:flex-none lg:border-r lg:border-white/[0.06]", view === "chat" ? "flex" : "hidden")}>
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4" aria-live="polite">
+        <section aria-label="Conversation avec l'IA" className={cn("min-h-0 w-full flex-1 flex-col lg:flex lg:w-[480px] lg:flex-none xl:w-[540px] lg:border-r lg:border-white/[0.06]", view === "chat" ? "flex" : "hidden")}>
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-5" aria-live="polite">
             {messages.map((m) => (
               <div key={m.id} className={cn("flex gap-2.5", m.role === "user" && "justify-end")}>
-                {m.role === "assistant" && <LogoMark className="mt-0.5 h-6 w-6 shrink-0" />}
-                <div className={cn("max-w-[85%] text-[14px] leading-relaxed", m.role === "user" ? "rounded-[12px] rounded-br-[4px] bg-white/[0.08] px-3.5 py-2.5" : "text-fg-muted")}>
+                {m.role === "assistant" && <LogoMark className="mt-0.5 h-8 w-8 shrink-0" />}
+                <div className={cn("max-w-[88%] text-[15.5px] leading-relaxed", m.role === "user" ? "rounded-[16px] rounded-br-[5px] bg-white/[0.09] px-4 py-3" : "text-fg-muted")}>
                   {m.content}
                   {m.changes.length > 0 && (
                     <div className="mt-3 space-y-2 rounded-card border border-accent/20 bg-accent-deep/20 p-3">
@@ -151,7 +151,7 @@ export default function EditorPage() {
             )}
             <div ref={endRef} />
           </div>
-          <div className="border-t border-white/[0.06] p-3">
+          <div className="border-t border-white/[0.06] p-4">
             {upsell && (
               <div role="status" className="mb-2 rounded-ctl border border-accent/30 bg-accent-deep/30 px-3 py-2.5 text-xs leading-relaxed text-fg-muted">
                 <p>{upsell}</p>
@@ -171,21 +171,21 @@ export default function EditorPage() {
             )}
             <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1">
               {SUGGESTIONS.map((s) => (
-                <button key={s} onClick={() => send(s)} disabled={sending} className="shrink-0 rounded-full border border-white/[0.08] px-2.5 py-1 text-xs text-fg-muted transition-colors hover:border-accent/40 hover:text-fg disabled:opacity-50">{s}</button>
+                <button key={s} onClick={() => send(s)} disabled={sending} className="shrink-0 rounded-full border border-white/[0.1] px-3 py-1.5 text-[13px] text-fg-muted transition-colors hover:border-accent/40 hover:text-fg disabled:opacity-50">{s}</button>
               ))}
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-card border border-white/10 bg-white/[0.03] p-1.5 focus-within:border-accent/50">
+            <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-[16px] border border-white/15 bg-black/25 p-2 shadow-[0_0_24px_-8px_rgb(46_230_166/0.35)] focus-within:border-accent/60">
               <label htmlFor="msg" className="sr-only">Ta demande</label>
               <textarea
                 id="msg"
-                rows={1}
+                rows={2}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(draft); } }}
-                placeholder="Demande une modification…"
-                className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-2 text-sm placeholder:text-fg-faint focus:outline-none"
+                placeholder="Demande une modification à l'IA… (ex. « mets un ton plus premium »)"
+                className="max-h-48 min-h-[56px] flex-1 resize-none bg-transparent px-2.5 py-2 text-[15px] placeholder:text-fg-faint focus:outline-none"
               />
-              <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-9 w-9 shrink-0 place-items-center rounded-ctl bg-accent-strong text-white transition-opacity disabled:opacity-40"><ArrowUp className="h-4 w-4" /></button>
+              <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_16px_rgb(46_230_166/0.5)] transition-opacity disabled:opacity-40"><ArrowUp className="h-4 w-4" /></button>
             </form>
           </div>
         </section>

@@ -7,7 +7,7 @@ import {
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AiBudgetMeter, Meter } from "@/components/ui/Feedback";
+import { UsagePercent } from "@/components/ui/Feedback";
 import { Logo } from "@/components/ui/Logo";
 import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
@@ -89,11 +89,9 @@ function SidebarBody() {
             <Link href="/app" className="mt-2.5 block rounded-ctl bg-accent-strong py-1.5 text-center text-xs font-medium text-white transition hover:brightness-110">Choisir mon offre</Link>
           </div>
         ) : (
-          <div className="space-y-2.5 rounded-card border border-white/[0.07] p-3">
-            <AiBudgetMeter budget={usage.aiBudget} />
-            <Meter label="Messages IA" used={usage.conversations.used} limit={usage.conversations.limit} />
-            <Meter label="Images" used={usage.images.used} limit={usage.images.limit} />
-          </div>
+          <Link href="/app/abonnement" className="block rounded-card border border-white/[0.08] bg-black/20 p-3 transition-colors hover:border-accent/30">
+            <UsagePercent usage={usage} />
+          </Link>
         )}
         <div className="space-y-0.5">
           <NavLink href="/app/abonnement" icon={CreditCard}>Abonnement</NavLink>

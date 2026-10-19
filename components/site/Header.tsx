@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -9,11 +9,12 @@ import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
 import { CTA } from "@/lib/launch";
 
+// Seulement les pages utiles, en pilules bien visibles. Les autres pages sont dans le pied de page.
 const NAV = [
-  { href: "/produit", label: "Fonctionnalités" },
   { href: "/exemples", label: "Exemples" },
-  { href: "/tarifs", label: "Tarifs" },
   { href: "/demo", label: "Comment ça marche" },
+  { href: "/tarifs", label: "Tarifs" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const RESOURCES = [
@@ -49,45 +50,29 @@ export function Header() {
         <div className="flex items-center gap-8">
         <Logo />
 
-        <nav aria-label="Navigation principale" className="hidden items-center gap-0.5 text-sm md:flex">
+        <nav aria-label="Navigation principale" className="hidden items-center gap-2 lg:flex">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className={cn("rounded-full px-3.5 py-1.5 transition-colors", active(n.href) ? "bg-white/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>
+            <Link key={n.href} href={n.href} className={cn("rounded-full border px-4 py-2 text-[14.5px] font-medium backdrop-blur transition-all", active(n.href) ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_-2px_rgb(46_230_166/0.45)]" : "border-white/12 bg-white/[0.04] text-fg/85 hover:border-[#2ee6a6]/40 hover:text-white")}>
               {n.label}
             </Link>
           ))}
-          <div className="group relative">
-            <button className="flex items-center gap-1 rounded-full px-3.5 py-1.5 text-fg-muted transition-colors hover:text-fg group-focus-within:text-fg" aria-haspopup="true">
-              Ressources <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180" />
-            </button>
-            <div className="invisible absolute left-0 top-full w-72 pt-3 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-              <div className="rounded-card border border-white/10 bg-bg-2/95 p-1.5 shadow-2xl backdrop-blur-xl">
-                {RESOURCES.map((r) => (
-                  <Link key={r.href} href={r.href} className="block rounded-ctl px-3 py-2.5 hover:bg-white/[0.05]">
-                    <span className="block text-sm text-fg">{r.label}</span>
-                    <span className="block text-xs text-fg-faint">{r.text}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-          <Link href="/contact" className={cn("rounded-full px-3.5 py-1.5 transition-colors", active("/contact") ? "bg-white/[0.08] text-fg" : "text-fg-muted hover:text-fg")}>Contact</Link>
         </nav>
         </div>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <ButtonLink href="/connexion" variant="ghost" size="sm">Connexion</ButtonLink>
           <ButtonLink href="/inscription" size="sm">{CTA.main}</ButtonLink>
         </div>
 
-        <button className="grid h-10 w-10 place-items-center rounded-ctl text-fg md:hidden" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <button className="grid h-10 w-10 place-items-center rounded-ctl text-fg lg:hidden" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       {open && (
-        <div className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-white/[0.06] px-4 pb-10 pt-4 md:hidden">
+        <div className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-white/[0.06] px-4 pb-10 pt-4 lg:hidden">
           <nav aria-label="Navigation mobile" className="flex flex-col">
-            {[...NAV, { href: "/contact", label: "Contact" }].map((n) => (
+            {NAV.map((n) => (
               <Link key={n.href} href={n.href} className="border-b border-white/[0.06] py-4 text-2xl tracking-tight">{n.label}</Link>
             ))}
             <p className="mt-8 text-xs uppercase tracking-[0.14em] text-fg-faint">Ressources</p>

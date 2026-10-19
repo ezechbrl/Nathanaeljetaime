@@ -4,6 +4,10 @@ import { cn } from "@/lib/cn";
 const fontClass = { serif: "font-serif", sans: "font-sans", mono: "font-mono" } as const;
 
 function ProductVisual({ s, className }: { s: ShowcaseStore; className?: string }) {
+  if (s.image) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <div className={cn("relative overflow-hidden", className)}><img src={s.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" /></div>;
+  }
   return (
     <div className={cn("relative overflow-hidden", className)} style={{ background: `linear-gradient(150deg, ${s.palette.soft}, ${s.palette.accent}55)` }}>
       <div className="absolute left-1/2 top-1/2 h-[58%] w-[34%] -translate-x-1/2 -translate-y-1/2 rounded-[18%] shadow-[0_18px_30px_-12px_rgba(0,0,0,.35)]" style={{ background: `linear-gradient(160deg, ${s.palette.accent}, ${s.palette.ink})` }} />

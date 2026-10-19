@@ -13,9 +13,18 @@ export type ShowcaseStore = {
   font: "serif" | "sans" | "mono";
   layout: "split" | "center" | "grid";
   highlights: string[];
+  image?: string; // vraie photo générée par Vitrio (sinon visuel dessiné aux couleurs de la marque)
 };
 
 export const SHOWCASE: ShowcaseStore[] = [
+  {
+    slug: "norde", name: "Nordé", category: "Gaming", language: "français",
+    brief: "Casque gaming sans fil avec micro, pour les joueurs en équipe, prix 59 €.",
+    headline: "Entends tout. Avant les autres.", sub: "Son spatial, micro antibruit, 40 h d'autonomie.", product: "Casque Nordé One", price: "59,00 €",
+    palette: { bg: "#0b0f0e", ink: "#e8fff6", accent: "#2ee6a6", soft: "#16302a" }, font: "sans", layout: "split",
+    highlights: ["Photos produit créées par l'IA à partir du lien AliExpress", "Offres par lot (×2, ×3)", "Vrais avis acheteurs importés"],
+    image: "/showcase/norde.jpg",
+  },
   {
     slug: "seve", name: "Sève", category: "Soin du visage", language: "français",
     brief: "Sérum visage à la sève de bouleau, peaux sensibles, fabriqué dans le Jura.",
@@ -71,5 +80,26 @@ export const SHOWCASE: ShowcaseStore[] = [
     headline: "Pour les tout premiers pas.", sub: "Laine mérinos, semelle cuir souple, cousus main.", product: "Chaussons Flocon", price: "29,00 €",
     palette: { bg: "#fdf6ee", ink: "#2b2330", accent: "#8a6fb3", soft: "#ebe0f3" }, font: "serif", layout: "split",
     highlights: ["Guide des pointures par âge", "FAQ « ça tient au pied ? »", "Coffret naissance"],
+  },
+  {
+    slug: "brume", name: "Brume", category: "Bien-être", language: "français",
+    brief: "Diffuseur d'huiles essentielles en céramique, silencieux, pour la chambre.",
+    headline: "Respire. La nuit commence ici.", sub: "Diffuseur céramique ultra-silencieux, 8 h de brume.", product: "Diffuseur Brume", price: "49,00 €",
+    palette: { bg: "#f1eef6", ink: "#2a2438", accent: "#7c6bb0", soft: "#ddd6ee" }, font: "serif", layout: "center",
+    highlights: ["Rituel du soir en 3 étapes", "Coffret huiles offert dès 2 achats", "FAQ « est-ce bruyant ? »"],
+  },
+  {
+    slug: "atlas", name: "Atlas", category: "Montres", language: "anglais",
+    brief: "Montre minimaliste en acier, cadran noir, pour hommes actifs, marché UK.",
+    headline: "Time, without the noise.", sub: "Steel case. Sapphire glass. 5 ATM.", product: "Atlas 40", price: "£129",
+    palette: { bg: "#111214", ink: "#f2f2f0", accent: "#c9a96e", soft: "#24262a" }, font: "sans", layout: "split",
+    highlights: ["Boutique 100 % en anglais", "Comparatif avec une montre de luxe", "Gravure offerte"],
+  },
+  {
+    slug: "sillage", name: "Sillage", category: "Parfum", language: "français",
+    brief: "Parfums de niche en format voyage, notes boisées, pour offrir.",
+    headline: "Un sillage qui reste.", sub: "Parfums de niche, flacons 10 ml rechargeables.", product: "Coffret Découverte", price: "39,00 €",
+    palette: { bg: "#f7efe9", ink: "#2d1b14", accent: "#a2463a", soft: "#efd9cf" }, font: "serif", layout: "grid",
+    highlights: ["Guide « quel parfum lui offrir ? »", "Coffret de 3 flacons", "Échantillon offert"],
   },
 ];

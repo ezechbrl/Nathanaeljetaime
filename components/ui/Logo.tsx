@@ -1,14 +1,24 @@
 import Link from "next/link";
+import { useId } from "react";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
-// Vitrio : une vitrine (store) stylisée en V.
+// Vitrio : un V taillé comme un prisme de verre (la vitrine), avec l'étincelle de l'IA.
 export function LogoMark({ className }: { className?: string }) {
+  const id = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 32 32" aria-hidden className={cn("h-7 w-7", className)}>
-      <rect width="32" height="32" rx="8" fill="#008060" />
-      <path d="M7 10.5h18l-1.4-3.2a1.5 1.5 0 0 0-1.37-.9H9.77a1.5 1.5 0 0 0-1.37.9L7 10.5Z" fill="#95bf47" />
-      <path d="m10.5 13.5 5.5 11 5.5-11" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      <defs>
+        <linearGradient id={`${id}bg`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0d5c44" /><stop offset="1" stopColor="#04241b" /></linearGradient>
+        <linearGradient id={`${id}l`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#d9fbe9" /><stop offset="1" stopColor="#6ee7b7" /></linearGradient>
+        <linearGradient id={`${id}r`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#34d399" /><stop offset="1" stopColor="#059669" /></linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill={`url(#${id}bg)`} />
+      <rect x=".5" y=".5" width="31" height="31" rx="8.5" fill="none" stroke="#6ee7b7" strokeOpacity=".35" />
+      <path d="M6.5 9h5.2L16 20.6V26z" fill={`url(#${id}l)`} />
+      <path d="M25.5 9h-5.2L16 20.6V26z" fill={`url(#${id}r)`} />
+      <path d="M11.7 9h8.6L16 20.6z" fill="#a7f3d0" fillOpacity=".22" />
+      <path d="M24.6 3.2l.75 1.9 1.9.75-1.9.75-.75 1.9-.75-1.9-1.9-.75 1.9-.75z" fill="#d9f99d" />
     </svg>
   );
 }

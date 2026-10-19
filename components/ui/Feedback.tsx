@@ -1,5 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/cn";
+import type { Usage } from "@/lib/api/types";
 
 export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-shimmer rounded-ctl bg-[linear-gradient(90deg,rgb(255_255_255/0.03),rgb(255_255_255/0.07),rgb(255_255_255/0.03))] bg-[length:200%_100%]", className)} />;
@@ -81,6 +82,34 @@ function Bar({ label, value, limit, hint }: { label: string; value: number; limi
         <div className={cn("h-full rounded transition-[width] duration-500", pct > 80 ? "bg-warn" : "bg-accent/80")} style={{ width: `${pct}%` }} />
       </div>
       {hint && <p className="mt-1 text-[10.5px] text-fg-faint">{hint}</p>}
+    </div>
+  );
+}
+
+// Résumé simple de l'utilisation (barre latérale) : crédit IA et images, en pourcentage.
+export function UsagePercent({ usage }: { usage: Usage }) {
+  const b = usage.aiBudget;
+  const paused = b.blockedUntil ?? b.session.blockedUntil;
+  const ai = paused ? 100 : Math.max(b.session.spentEur / Math.max(b.session.limitEur, 0.01), b.spentEur / Math.max(b.limitEur, 0.01)) * 100;
+  const img = (usage.images.used / Math.max(usage.images.limit, 1)) * 100;
+  const rows = [{ label: "Crédit IA", pct: ai }, { label: "Images", pct: img }];
+  return (
+    <div className="space-y-3">
+      {rows.map((r) => {
+        const pct = Math.min(100, Math.round(r.pct));
+        return (
+          <div key={r.label}>
+            <div className="flex justify-between text-[12px] font-medium">
+              <span className="text-fg/90">{r.label}</span>
+              <span className={cn("tabular-nums", pct > 85 ? "text-warn" : "text-accent")}>{pct} %</span>
+            </div>
+            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
+              <div className={cn("h-full rounded-full transition-[width] duration-500", pct > 85 ? "bg-warn" : "bg-[linear-gradient(90deg,#10b07f,#6ee7b7)]")} style={{ width: `${Math.max(pct, 2)}%` }} />
+            </div>
+          </div>
+        );
+      })}
+      {paused && <p className="text-[10.5px] leading-snug text-fg-faint">IA en pause · reprend dans {inText(paused)}</p>}
     </div>
   );
 }
