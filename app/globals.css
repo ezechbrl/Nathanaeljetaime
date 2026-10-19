@@ -131,11 +131,6 @@
 }
 .glow-frame:focus-within { box-shadow: 0 0 28px rgb(46 230 166 / 0.55), 0 0 90px -10px rgb(46 230 166 / 0.6); }
 
-/* Lignes « circuit » sur les côtés de l'accueil : une lueur parcourt chaque ligne. */
-@keyframes circuit-run { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -1000; } }
-.circuit-pulse { stroke-dasharray: 70 930; animation: circuit-run 6s linear infinite; }
-@keyframes node-glow { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
-
 @media (prefers-reduced-motion: reduce) {
-  .glow-frame, .circuit-pulse { animation: none; }
+  .glow-frame { animation: none; }
 }
