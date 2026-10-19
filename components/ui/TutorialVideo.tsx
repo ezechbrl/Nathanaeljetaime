@@ -37,7 +37,7 @@ export function TutorialVideo({ name, title, speed, className }: { name: string;
             poster={`/videos/${name}.jpg`}
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
-            className="block aspect-[16/10] w-full bg-black object-cover"
+            className="block aspect-video w-full bg-black object-cover"
             aria-label={title}
           >
             <source src={`/videos/${name}.mp4`} type="video/mp4" />
