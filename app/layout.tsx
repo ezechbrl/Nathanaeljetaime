@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Bricolage_Grotesque, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { PageBackdrop } from "@/components/ui/PageBackdrop";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -27,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;filter:none!important}`}</style>
         </noscript>
       </head>
-      <body>{children}</body>
+      <body><PageBackdrop />{children}</body>
     </html>
   );
 }

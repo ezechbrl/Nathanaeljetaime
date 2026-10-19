@@ -256,7 +256,7 @@ function tick(job: State["jobs"][number]): Job {
     }
     if (store && job.kind === "publish") {
       store.status = "published";
-      store.liveUrl = store.liveUrl ?? `https://${store.id}.example`;
+      store.liveUrl = store.liveUrl ?? `https://${store.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "ma-boutique"}.myshopify.com`;
       store.updatedAt = iso();
     }
     if (job.kind === "image") {
