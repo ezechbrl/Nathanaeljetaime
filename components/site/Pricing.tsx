@@ -13,7 +13,7 @@ export function PricingCards() {
   return (
     <div className="relative isolate mx-auto max-w-[940px] overflow-hidden rounded-[28px] border border-white/10 px-4 py-10 sm:px-10">
       <AuroraBackground className="-z-10" />
-      <p className="mb-5 text-center text-[14px] font-semibold text-[#bef264]">🎁 Offre de lancement : 40 € au lieu de 50 € (et 80 € au lieu de 90 €), à vie, si tu t'abonnes dans les {LAUNCH_OFFER.hours} h après ton inscription</p>
+      <p className="mb-5 text-center text-[14px] font-semibold text-[#bef264]">🎁 Offre de lancement : −{LAUNCH_OFFER.percent} % à vie (40 € au lieu de 80 €, 80 € au lieu de 160 €) si tu t'abonnes dans les {LAUNCH_OFFER.hours} h après ton inscription</p>
       <IntervalToggle value={interval} onChange={setPeriod} />
       <div className="mx-auto mt-8 max-w-[780px]">
         <PlanCards

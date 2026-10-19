@@ -157,7 +157,7 @@ export default function EditorPage() {
                 <p>{upsell}</p>
                 {user.plan === "free" && (
                   <Link href="/app/abonnement?plan=pro" className="mt-2 inline-flex items-center gap-1 rounded-ctl bg-accent-strong px-3 py-1.5 text-[13px] font-medium text-white hover:brightness-110">
-                    Choisir mon offre · dès 50 €/mois <ArrowRight className="h-3.5 w-3.5" />
+                    Choisir mon offre <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}
               </div>

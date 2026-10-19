@@ -138,7 +138,7 @@ const waitText = (until: number) => {
   return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h${min % 60 ? ` ${String(min % 60).padStart(2, "0")}` : ""}`;
 };
 function assertAi() {
-  if (load().subscription.plan === "free") throw new ApiClientError(402, "subscription_required", "Choisis ton offre pour utiliser l'IA : dès 50 € par mois, sans engagement.");
+  if (load().subscription.plan === "free") throw new ApiClientError(402, "subscription_required", "Choisis ton offre pour utiliser l'IA (sans engagement).");
   const a = aiStatus();
   const l = limits();
   const upsell = load().subscription.plan === "agency" ? "" : " Passe à l'offre supérieure pour plus d'IA.";

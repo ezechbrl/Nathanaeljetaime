@@ -32,7 +32,7 @@ export async function customerFor(user: UserRow) {
 
 // Fin de l'offre de lancement pour ce compte (48 h après l'inscription, premier abonnement seulement), ou null.
 export async function launchOfferEndsAt(user: UserRow) {
-  if (!process.env.STRIPE_LAUNCH_COUPON_MONTH || !process.env.STRIPE_LAUNCH_COUPON_YEAR) return null;
+  if (!process.env.STRIPE_LAUNCH_COUPON) return null;
   const ends = new Date(user.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000;
   if (ends <= Date.now()) return null;
   const sub = must(await db().from("subscriptions").select("stripe_subscription_id").eq("user_id", user.id).maybeSingle()) as { stripe_subscription_id: string | null } | null;
@@ -48,7 +48,7 @@ export async function checkoutUrl(user: UserRow, plan: "pro" | "agency", interva
     client_reference_id: user.id,
     subscription_data: { metadata: { user_id: user.id } },
     // Stripe refuse les deux ensemble : coupon de lancement, sinon codes promo.
-    ...(offer ? { discounts: [{ coupon: interval === "year" ? process.env.STRIPE_LAUNCH_COUPON_YEAR! : process.env.STRIPE_LAUNCH_COUPON_MONTH! }] } : { allow_promotion_codes: true }),
+    ...(offer ? { discounts: [{ coupon: process.env.STRIPE_LAUNCH_COUPON! }] } : { allow_promotion_codes: true }),
     locale: "fr",
     // Retour sur l'accueil : le projet mis de côté avant le paiement se relance tout seul.
     success_url: `${env.appUrl()}/app?checkout=success`,

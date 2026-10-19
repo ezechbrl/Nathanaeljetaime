@@ -5,7 +5,7 @@ import { FinalCta } from "@/components/site/FinalCta";
 import { PageHero } from "@/components/site/PageHero";
 import { PricingCards } from "@/components/site/Pricing";
 
-export const metadata: Metadata = { title: "Tarifs", description: "Vitrio Starter à 50 € par mois, Pro à 90 € par mois, −40 % à l'année, et −10 € par mois à vie avec l'offre de lancement. Sans engagement." };
+export const metadata: Metadata = { title: "Tarifs", description: "Vitrio Starter à 80 € par mois, Pro à 160 € par mois, −40 % à l'année, et −50 % à vie avec l'offre de lancement : 40 € et 80 € par mois. Sans engagement." };
 
 const PRICING_FAQ = [
   { q: "Comment je paie ?", a: "Par carte bancaire, Apple Pay ou Google Pay, sur une page de paiement sécurisée par Stripe. Tu reçois une facture à chaque paiement." },
