@@ -2,6 +2,8 @@
 # Doit rester identique aux réglages du tableau de bord Shopify (dev.shopify.com) : ce fichier les remplace.
 client_id = "da05327de5caa0989a67970304b18f71"
 name = "Vitrio"
+# Nom court de l'app (adresse de la page des forfaits Shopify) : doit être égal à SHOPIFY_APP_HANDLE dans Vercel.
+handle = "vitrio"
 application_url = "https://nathanaeljetaime.vercel.app"
 embedded = false
 
