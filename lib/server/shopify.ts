@@ -2,7 +2,7 @@ import "server-only";
 import type { StoreTheme } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
 import { bundleLabel } from "./theme/build";
-import { decrypt, hmacHex, safeEqual } from "./crypto";
+import { decrypt, encrypt, hmacHex, safeEqual } from "./crypto";
 import { env } from "./env";
 import { HttpError } from "./http";
 import { db, must } from "./supabase";
@@ -29,16 +29,45 @@ export function authorizeUrl(shop: string, state: string) {
   return u.toString();
 }
 
-export async function exchangeCode(shop: string, code: string) {
+// Jetons hors ligne « expirants » (obligatoires pour les nouvelles apps) : un jeton d'accès valable 1 h
+// et un jeton de renouvellement valable 90 jours, renouvelés automatiquement avant expiration.
+type TokenResponse = { access_token: string; scope: string; expires_in?: number; refresh_token?: string; refresh_token_expires_in?: number };
+type StoredTokens = { a: string; r?: string; e?: number };
+
+async function tokenRequest(shop: string, params: Record<string, string>): Promise<TokenResponse> {
   const res = await fetch(`https://${shop}/admin/oauth/access_token`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ client_id: env.shopifyKey(), client_secret: env.shopifySecret(), code }),
+    headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" },
+    body: new URLSearchParams({ client_id: env.shopifyKey(), client_secret: env.shopifySecret(), ...params }),
   });
-  if (!res.ok) throw new HttpError(502, "upstream_error", "Shopify a refusé la connexion.");
-  const out = (await res.json()) as { access_token: string; scope: string };
-  console.info(`Connexion Shopify ${shop} : jeton reçu (${out.access_token?.slice(0, 6) ?? "aucun"}…), portées « ${out.scope} »`);
-  return out;
+  if (!res.ok) {
+    console.error(`Jeton Shopify refusé pour ${shop} :`, res.status, (await res.text().catch(() => "")).slice(0, 300));
+    throw new HttpError(502, "upstream_error", "Shopify a refusé la connexion. Reconnecte ta boutique dans les paramètres.");
+  }
+  return (await res.json()) as TokenResponse;
+}
+
+export async function exchangeCode(shop: string, code: string) {
+  return tokenRequest(shop, { code, expiring: "1" });
+}
+
+// Valeur chiffrée stockée en base : le jeton d'accès, le jeton de renouvellement et l'échéance.
+export const sealTokens = (t: TokenResponse) => encrypt(JSON.stringify({ a: t.access_token, r: t.refresh_token, e: t.expires_in ? Date.now() + t.expires_in * 1000 : undefined } satisfies StoredTokens));
+
+function openTokens(sealed: string): StoredTokens {
+  const raw = decrypt(sealed);
+  if (!raw.startsWith("{")) return { a: raw }; // ancien jeton permanent
+  return JSON.parse(raw) as StoredTokens;
+}
+
+// Jeton d'accès valide pour une connexion : renouvelé (et enregistré) s'il expire dans moins de 5 minutes.
+export async function accessToken(row: { id?: string; shop_domain: string; access_token_encrypted: string }) {
+  const t = openTokens(row.access_token_encrypted);
+  if (!t.r || !t.e || t.e - Date.now() > 5 * 60_000) return t.a;
+  const fresh = await tokenRequest(row.shop_domain, { grant_type: "refresh_token", refresh_token: t.r });
+  const q = db().from("shop_connections").update({ access_token_encrypted: sealTokens(fresh), updated_at: new Date().toISOString() });
+  await (row.id ? q.eq("id", row.id) : q.eq("shop_domain", row.shop_domain));
+  return fresh.access_token;
 }
 
 // Webhook de désinstallation, enregistré boutique par boutique (le flux d'installation hérité ne permet
@@ -78,7 +107,7 @@ export async function connectionFor(userId: string, connectionId: string | null)
   const q = db().from("shop_connections").select("*").eq("user_id", userId).eq("status", "active");
   const row = must(await (connectionId ? q.eq("id", connectionId) : q.order("created_at")).limit(1).maybeSingle()) as Record<string, any> | null;
   if (!row?.access_token_encrypted) throw new HttpError(409, "no_shop", "Connecte d'abord une boutique Shopify dans les paramètres.");
-  return { id: row.id as string, shop: row.shop_domain as string, token: decrypt(row.access_token_encrypted), scopes: String(row.scopes ?? "") };
+  return { id: row.id as string, shop: row.shop_domain as string, token: await accessToken(row as { id: string; shop_domain: string; access_token_encrypted: string }), scopes: String(row.scopes ?? "") };
 }
 
 export async function shopInfo(shop: string, token: string) {

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { encrypt, safeEqual } from "@/lib/server/crypto";
+import { safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { route } from "@/lib/server/http";
 import { LIMITS } from "@/lib/server/quota";
-import { exchangeCode, registerUninstallWebhook, SHOP_RE, shopInfo, verifyQueryHmac } from "@/lib/server/shopify";
+import { exchangeCode, registerUninstallWebhook, sealTokens, SHOP_RE, shopInfo, verifyQueryHmac } from "@/lib/server/shopify";
 import { authClient, db, must } from "@/lib/server/supabase";
 
 // Ouvre une session Supabase pour un utilisateur donné, côté serveur (lien magique à usage unique).
@@ -27,7 +27,8 @@ export const GET = route(async (req) => {
   if (!SHOP_RE.test(shop) || !verifyQueryHmac(params)) return fail("signature");
   if (!state || !safeEqual(state, params.get("state") ?? "")) return fail("session");
 
-  const { access_token, scope } = await exchangeCode(shop, params.get("code") ?? "");
+  const tokens = await exchangeCode(shop, params.get("code") ?? "");
+  const { access_token, scope } = tokens;
   const info = await shopInfo(shop, access_token);
 
   // 1. Déjà connecté (ex. via Google) : on relie la boutique à ce compte.
@@ -59,7 +60,7 @@ export const GET = route(async (req) => {
   if ((count ?? 0) >= LIMITS[user?.plan ?? "free"].shops) return NextResponse.redirect(`${app}/app/abonnement?raison=boutiques`);
 
   await db().from("shop_connections").upsert(
-    { user_id: userId, shop_domain: shop, shop_name: info.name, access_token_encrypted: encrypt(access_token), scopes: scope, status: "active", updated_at: new Date().toISOString() },
+    { user_id: userId, shop_domain: shop, shop_name: info.name, access_token_encrypted: sealTokens(tokens), scopes: scope, status: "active", updated_at: new Date().toISOString() },
     { onConflict: "user_id,shop_domain" },
   );
   await registerUninstallWebhook(shop, access_token).catch((e) => console.warn("Webhook de désinstallation non enregistré :", (e as Error).message));

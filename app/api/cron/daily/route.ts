@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { recommend } from "@/lib/server/ai";
 import { aiBlock } from "@/lib/server/budget";
 import { syncShopifySubscription } from "@/lib/server/billing";
-import { decrypt, safeEqual } from "@/lib/server/crypto";
+import { safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
-import { dailyOrders, dailySessions } from "@/lib/server/shopify";
+import { accessToken, dailyOrders, dailySessions } from "@/lib/server/shopify";
 import { db, must } from "@/lib/server/supabase";
 import type { StorePlan } from "@/lib/store-schema";
 
@@ -16,14 +16,14 @@ export async function GET(req: Request) {
   const auth = req.headers.get("authorization") ?? "";
   if (!secret || !safeEqual(auth, `Bearer ${secret}`)) return new NextResponse("non autorisé", { status: 401 });
 
-  const stores = must(await db().from("stores").select("id, user_id, plan, shop_connection_id, shop_connections(shop_domain, access_token_encrypted, status)").eq("status", "published")) as Record<string, any>[];
+  const stores = must(await db().from("stores").select("id, user_id, plan, shop_connection_id, shop_connections(id, shop_domain, access_token_encrypted, status)").eq("status", "published")) as Record<string, any>[];
   const report: Record<string, string> = {};
 
   for (const s of stores) {
     const conn = s.shop_connections;
     if (!conn || conn.status !== "active" || !conn.access_token_encrypted) continue;
     try {
-      const token = decrypt(conn.access_token_encrypted);
+      const token = await accessToken(conn);
       const [orders, sessions] = await Promise.all([dailyOrders(conn.shop_domain, token, 30), dailySessions(conn.shop_domain, token, 30)]);
       const days = new Set([...orders.keys(), ...sessions.keys()]);
       const rows = [...days].map((date) => ({ store_id: s.id, date, sessions: sessions.get(date) ?? 0, orders: orders.get(date)?.orders ?? 0, revenue_cents: orders.get(date)?.revenue ?? 0 }));
