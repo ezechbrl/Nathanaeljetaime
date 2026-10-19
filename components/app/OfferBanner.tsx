@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Timer } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useCountdown } from "@/components/pricing/PlanCards";
 import * as api from "@/lib/api/client";
@@ -8,17 +8,37 @@ import { useApi } from "@/lib/api/hooks";
 import { LAUNCH_OFFER } from "@/lib/content/pricing";
 import { useApp } from "./AppContext";
 
-// Bandeau en haut de l'espace client : compte à rebours de l'offre de lancement tant qu'on n'est pas abonné.
+// Grand bandeau en haut de l'espace client : compte à rebours de l'offre de lancement tant qu'on n'est pas abonné.
 export function OfferBanner() {
   const { user } = useApp();
   const billing = useApi(() => (user.plan === "free" ? api.getBilling() : Promise.resolve(null)), [user.plan]);
   const left = useCountdown(billing.data?.offerEndsAt);
   if (user.plan !== "free" || !left) return null;
+  const units = [{ v: left.h, l: "heures" }, { v: left.m, l: "minutes" }, { v: left.s, l: "secondes" }];
   return (
-    <Link href="/app/abonnement" className="group sticky top-0 z-30 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-b border-[#2ee6a6]/30 bg-[linear-gradient(90deg,rgb(16_176_127/0.35),rgb(163_230_53/0.18))] px-4 py-2 text-[13.5px] backdrop-blur">
-      <span className="font-bold uppercase tracking-[0.04em]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</span>
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-0.5 font-semibold tabular-nums"><Timer className="h-3.5 w-3.5 text-[#a7f3d0]" /> {left.h}:{left.m}:{left.s}</span>
-      <span className="inline-flex items-center gap-1 font-semibold text-[#d9f99d]">Choisir mon offre <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" /></span>
+    <Link href="/app/abonnement" className="group relative z-30 block border-b lg:sticky lg:top-0 border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(6_60_44/0.92),rgb(16_110_80/0.9)_55%,rgb(70_110_20/0.85))] px-4 py-3 shadow-[0_10px_40px_-15px_rgb(46_230_166/0.6)] backdrop-blur sm:px-8">
+      <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <div>
+          <p className="text-[15px] font-bold uppercase tracking-[0.04em] sm:text-[17px]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
+          <p className="text-[12.5px] text-white/75 sm:text-[13.5px]">Abonne-toi avant la fin du compteur : 39 € par mois au lieu de 78 €, pour toujours.</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-end gap-1.5 tabular-nums" aria-label={`Il reste ${left.h} heures et ${left.m} minutes`}>
+            {units.map((u, i) => (
+              <div key={u.l} className="flex items-end gap-1.5">
+                {i > 0 && <span className="pb-5 text-2xl font-semibold text-white/60">:</span>}
+                <span className="flex flex-col items-center">
+                  <span className="grid h-12 min-w-[3.2rem] place-items-center rounded-xl border border-white/20 bg-black/35 px-2 text-[1.75rem] font-bold leading-none shadow-[inset_0_1px_0_rgb(255_255_255/0.1)] sm:h-14 sm:text-[2rem]">{u.v}</span>
+                  <span className="mt-1 text-[9.5px] font-semibold uppercase tracking-wider text-white/60">{u.l}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+          <span className="hidden items-center gap-1.5 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 py-2.5 text-[14px] font-semibold text-[#03140d] shadow-[0_0_20px_rgb(46_230_166/0.5)] transition-transform group-hover:-translate-y-px md:inline-flex">
+            En profiter <ArrowRight className="h-4 w-4" />
+          </span>
+        </div>
+      </div>
     </Link>
   );
 }

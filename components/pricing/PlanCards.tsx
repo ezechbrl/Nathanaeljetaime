@@ -3,7 +3,7 @@
 import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Timer } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer, yearlyDiscount, type Plan } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer, type Plan } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -28,7 +28,7 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
           {v === "month" ? "Mensuel" : "Annuel"}
         </button>
       ))}
-      <span className="rounded-full bg-[#a3e635]/15 px-2.5 py-1 text-[12px] text-[#bef264]">−{yearlyDiscount(PAID_PLANS[0])} %</span>
+      <span className="rounded-full bg-[#a3e635]/15 px-2.5 py-1 text-[12px] text-[#bef264]">Le moins cher</span>
     </div>
   );
 }
@@ -98,7 +98,7 @@ export function PlanCards({ interval, action, left, offer = false }: { interval:
                 <span className="text-sm text-fg-muted">{interval === "year" ? "/ an" : "/ mois"}</span>
                 {was !== null && <span className="ml-2 self-center rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{LAUNCH_OFFER.percent} %</span>}
               </p>
-              <p className="mt-1.5 h-5 text-[13px] text-[#6ee7b7]">{interval === "year" ? "Payé une fois par an, sans engagement" : "Sans engagement"}</p>
+              <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#6ee7b7]">{interval === "year" ? `Soit environ ${(Math.round((billed / 12) * 10) / 10).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € par mois, payé une fois par an` : "Sans engagement"}</p>
               {left && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />

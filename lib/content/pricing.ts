@@ -13,9 +13,6 @@ export type Plan = {
   hidden?: boolean;
 };
 
-// Réduction de l'annuel affichée sur le bouton (par rapport à 12 mois payés au mois, offre Starter).
-export const yearlyDiscount = (p: { monthly: number; yearly: number }) => Math.round((1 - p.yearly / (p.monthly * 12)) * 100);
-
 // Identifiants internes gardés tels quels (contrainte de la base) : « pro » = offre Starter, « agency » = offre Pro.
 export const PLANS: Plan[] = [
   {
