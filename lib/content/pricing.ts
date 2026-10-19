@@ -38,6 +38,10 @@ export const PLANS: Plan[] = [
   },
 ];
 
+// Offre de lancement : −25 % à vie si on s'abonne dans les 48 h après l'inscription (coupon Stripe « forever »).
+export const LAUNCH_OFFER = { percent: 25, hours: 48 };
+export const withOffer = (price: number) => Math.round(price * (1 - LAUNCH_OFFER.percent / 100));
+
 export const PAID_PLANS = PLANS.filter((p) => !p.hidden);
 
 // Explication affichée sous les offres (doit correspondre à lib/server/budget.ts).

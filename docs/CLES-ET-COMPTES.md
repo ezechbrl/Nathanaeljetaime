@@ -123,8 +123,13 @@ Tant que les variables sont vides, les boutons de paiement affichent « Le paiem
 5. **Paramètres → Facturation → Portail client** : active-le, autorise « Annuler », « Changer de carte »
    et « Changer d'offre » (ajoute les 4 prix).
 
+6. **Catalogue de produits → Coupons → Créer** : « Offre de lancement », **25 %**, durée **Pour toujours**.
+   Copie son identifiant. C'est le −25 % à vie du compte à rebours (48 h après l'inscription).
+   Sans cette variable, le compte à rebours ne s'affiche pas.
+
 | Variable Vercel | Valeur |
 |---|---|
+| `STRIPE_LAUNCH_COUPON` | identifiant du coupon (étape 6) |
 | `STRIPE_SECRET_KEY` | la clé secrète (étape 3) |
 | `STRIPE_WEBHOOK_SECRET` | le secret de signature (étape 4) |
 | `STRIPE_PRICE_STARTER_MONTH` | prix 40 €/mois |

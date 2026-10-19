@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { AuroraBackground, IntervalToggle, PlanCards, TrustRow, planButtonClass, type Interval } from "@/components/pricing/PlanCards";
 import { CTA } from "@/lib/launch";
-import { AI_FAIR_USE, PAID_PLANS } from "@/lib/content/pricing";
+import { AI_FAIR_USE, LAUNCH_OFFER, PAID_PLANS } from "@/lib/content/pricing";
 
 // Les deux offres (Starter et Pro), au mois ou à l'année (−30 %).
 export function PricingCards() {
@@ -13,6 +13,7 @@ export function PricingCards() {
   return (
     <div className="relative isolate mx-auto max-w-[940px] overflow-hidden rounded-[28px] border border-white/10 px-4 py-10 sm:px-10">
       <AuroraBackground className="-z-10" />
+      <p className="mb-5 text-center text-[14px] font-semibold text-[#bef264]">🎁 Offre de lancement : −{LAUNCH_OFFER.percent} % à vie si tu t'abonnes dans les {LAUNCH_OFFER.hours} h après ton inscription</p>
       <IntervalToggle value={interval} onChange={setPeriod} />
       <div className="mx-auto mt-8 max-w-[780px]">
         <PlanCards

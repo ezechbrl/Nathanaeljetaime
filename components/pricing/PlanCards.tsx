@@ -1,9 +1,9 @@
 "use client";
 
-import { Check, CreditCard, Headphones, ShieldCheck, Sparkles } from "lucide-react";
-import type { ReactNode } from "react";
+import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Timer } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { PAID_PLANS, YEARLY_DISCOUNT, euro, type Plan } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PAID_PLANS, YEARLY_DISCOUNT, euro, withOffer, type Plan } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -33,16 +33,57 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
   );
 }
 
-export function planPrice(plan: Plan, interval: Interval) {
-  return interval === "year" ? { perMonth: Math.round(plan.yearly / 12), billed: plan.yearly } : { perMonth: plan.monthly, billed: plan.monthly };
+// Prix affiché ; avec l'offre de lancement, `was` est le prix normal (barré).
+export function planPrice(plan: Plan, interval: Interval, offer = false) {
+  const billed = interval === "year" ? plan.yearly : plan.monthly;
+  const perMonth = interval === "year" ? Math.round(plan.yearly / 12) : plan.monthly;
+  return offer ? { perMonth: withOffer(perMonth), billed: withOffer(billed), was: perMonth } : { perMonth, billed, was: null };
+}
+
+// Temps restant avant `endsAt`, mis à jour chaque seconde (null une fois écoulé).
+export function useCountdown(endsAt: string | null | undefined) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!endsAt) return;
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [endsAt]);
+  if (!endsAt) return null;
+  const left = Math.max(0, new Date(endsAt).getTime() - now);
+  if (!left) return null;
+  const s = Math.floor(left / 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return { h: pad(Math.floor(s / 3600)), m: pad(Math.floor((s % 3600) / 60)), s: pad(s % 60) };
+}
+
+type Left = NonNullable<ReturnType<typeof useCountdown>>;
+
+// Bandeau de l'offre de lancement, avec le compte à rebours.
+export function OfferBanner({ left }: { left: Left }) {
+  return (
+    <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(16_176_127/0.25),rgb(163_230_53/0.12))] px-5 py-3 shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
+      <div>
+        <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
+        <p className="text-[12.5px] text-fg-muted">Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
+      </div>
+      <div className="flex items-end gap-1.5 font-semibold tabular-nums" aria-label={`Il reste ${left.h} heures ${left.m} minutes`}>
+        {[{ v: left.h, l: "heures" }, { v: left.m, l: "min" }, { v: left.s, l: "sec" }].map((u, i) => (
+          <span key={u.l} className="flex items-end gap-1.5">
+            {i > 0 && <span className="pb-4 text-xl text-fg-muted">:</span>}
+            <span className="flex flex-col items-center"><span className="text-[1.7rem] leading-none">{u.v}</span><span className="mt-1 text-[10px] font-medium uppercase tracking-wider text-fg-faint">{u.l}</span></span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 // Les deux offres côte à côte. `action` rend le bouton (paiement dans l'app, inscription sur le site).
-export function PlanCards({ interval, action }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode }) {
+export function PlanCards({ interval, action, left }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {PAID_PLANS.map((plan) => {
-        const { perMonth, billed } = planPrice(plan, interval);
+        const { perMonth, billed, was } = planPrice(plan, interval, !!left);
         const featured = plan.featured;
         return (
           <div key={plan.id} className={cn("relative rounded-[22px] p-px", featured ? "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_60px_-18px_rgb(46_230_166/0.55)]" : "bg-[linear-gradient(160deg,rgb(52_211_153/0.45),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))]")}>
@@ -53,10 +94,12 @@ export function PlanCards({ interval, action }: { interval: Interval; action: (p
               </div>
               <p className="mt-1 text-[13.5px] text-fg-muted">{plan.tagline}</p>
               <p className="mt-4 flex items-baseline gap-1">
+                {was !== null && <span className="mr-1.5 text-xl font-semibold text-fg-faint line-through decoration-[#f87171] decoration-2">{euro(was)}</span>}
                 <span className="text-[2.8rem] font-semibold leading-none tracking-[-0.04em] tabular-nums">{euro(perMonth)}</span>
                 <span className="text-sm text-fg-muted">/ mois</span>
               </p>
               <p className="mt-1.5 h-5 text-[13px] text-[#6ee7b7]">{interval === "year" ? `${euro(billed)} payés une fois par an` : "Sans engagement"}</p>
+              {left && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />
               <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">{featured ? "Tout le Starter, et en plus" : "Ce qui est inclus"}</p>

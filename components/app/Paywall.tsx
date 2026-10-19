@@ -6,7 +6,8 @@ import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import type { GenerateStoreInput } from "@/lib/api/types";
-import { AuroraBackground, IntervalToggle, PlanCards, TrustRow, planButtonClass, planPrice, type Interval } from "@/components/pricing/PlanCards";
+import { AuroraBackground, IntervalToggle, OfferBanner, PlanCards, TrustRow, planButtonClass, planPrice, useCountdown, type Interval } from "@/components/pricing/PlanCards";
+import { useApi } from "@/lib/api/hooks";
 import { euro, type Plan } from "@/lib/content/pricing";
 
 export const PENDING_BRIEF_KEY = "vitrio-pending-brief";
@@ -36,6 +37,8 @@ export function Paywall({ brief, draft, initialInterval = "month" }: { brief?: s
   const toast = useToast();
   const [interval, setPeriod] = useState<Interval>(initialInterval);
   const [busy, setBusy] = useState<string | null>(null);
+  const billing = useApi(() => api.getBilling(), []);
+  const left = useCountdown(billing.data?.offerEndsAt);
 
   // Le projet en cours est gardé pour reprendre là où on en était au retour du paiement.
   function savePending() {
@@ -63,6 +66,7 @@ export function Paywall({ brief, draft, initialInterval = "month" }: { brief?: s
   return (
     <div className="relative isolate overflow-hidden rounded-[26px] border border-white/10 px-4 py-8 sm:px-8 sm:py-10">
       <AuroraBackground className="-z-10" />
+      {left && <div className="mb-6"><OfferBanner left={left} /></div>}
       {text && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
       <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 10 minutes.</p>
@@ -70,9 +74,10 @@ export function Paywall({ brief, draft, initialInterval = "month" }: { brief?: s
       <div className="mx-auto mt-7 max-w-[760px]">
         <PlanCards
           interval={interval}
+          left={left}
           action={(plan, iv) => (
             <button type="button" onClick={() => subscribe(plan, iv)} disabled={!!busy} className={planButtonClass(plan.featured)}>
-              {busy === plan.id ? <Spinner /> : <>Payer {euro(planPrice(plan, iv).billed)} et créer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+              {busy === plan.id ? <Spinner /> : <>Payer {euro(planPrice(plan, iv, !!left).billed)} et créer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
           )}
         />
