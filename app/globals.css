@@ -118,3 +118,4 @@
 .preview-fs:fullscreen { max-height: none; overflow-y: auto; border: 0; border-radius: 0; background: #fff; scroll-behavior: smooth; }
 @keyframes aurora { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(6%, -4%) scale(1.15); } }
 @keyframes caret { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes beams { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-4%); } }
