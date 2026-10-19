@@ -3,7 +3,7 @@
 import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Timer } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { LAUNCH_OFFER, PAID_PLANS, YEARLY_DISCOUNT, euro, withOffer, type Plan } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer, yearlyDiscount, type Plan } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -28,7 +28,7 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
           {v === "month" ? "Mensuel" : "Annuel"}
         </button>
       ))}
-      <span className="rounded-full bg-[#a3e635]/15 px-2.5 py-1 text-[12px] text-[#bef264]">−{Math.round(YEARLY_DISCOUNT * 100)} %</span>
+      <span className="rounded-full bg-[#a3e635]/15 px-2.5 py-1 text-[12px] text-[#bef264]">−{yearlyDiscount(PAID_PLANS[0])} %</span>
     </div>
   );
 }

@@ -533,14 +533,14 @@ export async function getBilling() {
   await wait(250);
   const s = load();
   const invoices: Invoice[] = s.subscription.plan === "free" ? [] : [
-    { id: "inv_1", number: "SHP-0001", amount: s.subscription.plan === "pro" ? 4000 : 8000, currency: "EUR", status: "paid", pdfUrl: "#", createdAt: iso() },
+    { id: "inv_1", number: "SHP-0001", amount: s.subscription.plan === "pro" ? 3900 : 7900, currency: "EUR", status: "paid", pdfUrl: "#", createdAt: iso() },
   ];
   return { subscription: clone(s.subscription), usage: usage(), invoices, offerEndsAt: s.subscription.plan === "free" ? MOCK_OFFER_END : null };
 }
 export async function checkout(plan: "pro" | "agency") {
   await wait(700);
   const s = load();
-  s.subscription = { plan, status: "active", interval: "month", renewsAt: new Date(Date.now() + 30 * 86_400_000).toISOString(), cancelAtPeriodEnd: false, amount: plan === "pro" ? 4000 : 8000 };
+  s.subscription = { plan, status: "active", interval: "month", renewsAt: new Date(Date.now() + 30 * 86_400_000).toISOString(), cancelAtPeriodEnd: false, amount: plan === "pro" ? 3900 : 7900 };
   if (s.user) s.user.plan = plan;
   save();
   return { url: "/app?checkout=success" };

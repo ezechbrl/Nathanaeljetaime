@@ -105,15 +105,15 @@ automatiquement avec l'e-mail de la boutique.
 
 ## 4. Paiement par Stripe (abonnements Starter et Pro)
 
-Le client paie par carte (ou Apple Pay / Google Pay) sur une page Stripe. Stripe garde ~1,5 % + 0,25 € par paiement
-(cartes européennes) et verse l'argent sur le compte bancaire du titulaire du compte Stripe.
+Le client paie par carte (ou Apple Pay / Google Pay) sur une page Stripe. Frais : environ 1,5 % + 0,25 € par paiement
+(cartes européennes) + 0,7 % pour la gestion des abonnements. Stripe verse l'argent sur le compte bancaire du titulaire.
 **Le titulaire doit être majeur** : c'est le parent qui ouvre le compte Stripe, avec sa pièce d'identité et son IBAN.
 Tant que les variables sont vides, les boutons de paiement affichent « Le paiement en ligne arrive très bientôt ».
 
 1. **dashboard.stripe.com** → créer le compte (au nom du parent) et l'activer.
-2. **Catalogue de produits → Ajouter un produit** :
-   - « Vitrio Starter » : prix récurrent **80 €/mois**, puis un 2e prix **576 €/an** ;
-   - « Vitrio Pro » : prix récurrent **160 €/mois**, puis un 2e prix **1 152 €/an**.
+2. **Catalogue de produits → Ajouter un produit** (prix normaux, payés après les 48 h de l'offre) :
+   - « Vitrio Starter » : prix récurrent **78 €/mois**, puis un 2e prix **398 €/an** ;
+   - « Vitrio Pro » : prix récurrent **158 €/mois**, puis un 2e prix **798 €/an**.
    Copie l'identifiant de chaque prix (`price_…`).
 3. **Développeurs → Clés API** : copie la **clé secrète** (`sk_live_…`).
 4. **Développeurs → Webhooks → Ajouter une destination** :
@@ -122,92 +122,22 @@ Tant que les variables sont vides, les boutons de paiement affichent « Le paiem
    `customer.subscription.deleted`, `invoice.paid`. Copie le **secret de signature** (`whsec_…`).
 5. **Paramètres → Facturation → Portail client** : active-le, autorise « Annuler », « Changer de carte »
    et « Changer d'offre » (ajoute les 4 prix).
-
 6. **Catalogue de produits → Coupons → Créer** : « Offre de lancement », **50 %**, durée **Pour toujours**.
-   C'est l'offre du compte à rebours (48 h après l'inscription) : 80 → 40 €, 160 → 80 €.
-   Sans cette variable, le compte à rebours ne s'affiche pas.
-
-| Variable Vercel | Valeur |
-|---|---|
-| `ANTHROPIC_API_KEY` | la clé (`sk-ant-...`), affichée une seule fois |
-
----
-
-## 3. Shopify (connecter les boutiques des clients) — obligatoire
-
-Il te faut une **app Shopify publique** à toi :
-
-1. **https://partners.shopify.com** → crée un compte Partenaire (gratuit).
-2. Crée une **boutique de développement** pour tester : Partner Dashboard → **Stores → Add store → Development store**.
-3. Crée l'app : Partner Dashboard → **Apps → Create app → Create app manually** (selon ton compte, Shopify peut t'envoyer vers le **Dev Dashboard**, https://dev.shopify.com : c'est la même chose, « Create app »). Nom : `Vitrio`.
-4. Dans la configuration de l'app :
-   - **App URL** : `https://ton-domaine.vercel.app`
-   - **Allowed redirection URL(s)** : `https://ton-domaine.vercel.app/api/shopify/callback`
-   - **Distribution** : ⚠️ ce choix est **définitif**. Le plus simple : **deux apps**.
-     - « Vitrio dev » en **Custom distribution** pour tester sur tes boutiques de développement ;
-     - « Vitrio » en **Public distribution** pour la vraie version (validation Shopify, App Store).
-     Mets les clés de « Vitrio dev » dans Vercel pendant les tests, puis celles de « Vitrio » au lancement.
-5. Dans **Overview / Settings** (ou « Client credentials ») :
-
-| Variable Vercel | Où la trouver |
-|---|---|
-| `SHOPIFY_API_KEY` | **Client ID** |
-| `SHOPIFY_API_SECRET` | **Client secret** |
-
-6. **Webhooks obligatoires** (dans la configuration de l'app, rubrique « Webhooks » / « Compliance webhooks ») :
-   mets l'URL `https://ton-domaine.vercel.app/api/webhooks/shopify` pour **app/uninstalled**,
-   **customers/data_request**, **customers/redact** et **shop/redact**. Format : JSON.
-7. **Accès aux données protégées** (« API access » → « Protected customer data access ») : demande le **niveau 1**
-   (accès aux commandes, sans aucun champ personnel : ni nom, ni e-mail, ni adresse). Raison à indiquer :
-   « Calcul du chiffre d'affaires et du nombre de commandes par jour pour recommander des améliorations de la boutique. »
-   Nécessaire pour la partie Pilotage ; le reste fonctionne sans.
-
-Les autorisations (scopes) sont demandées par le code au moment de la connexion, tu n'as rien à cocher.
-Connexion des utilisateurs : ils tapent l'adresse de leur boutique, valident sur Shopify, et leur compte Vitrio est créé
-automatiquement avec l'e-mail de la boutique.
-
----
-
-## 4. Paiement par Stripe (abonnements Starter et Pro)
-
-Le client paie par carte (ou Apple Pay / Google Pay) sur une page Stripe. Stripe garde ~1,5 % + 0,25 € par paiement
-(cartes européennes) et verse l'argent sur le compte bancaire du titulaire du compte Stripe.
-**Le titulaire doit être majeur** : c'est le parent qui ouvre le compte Stripe, avec sa pièce d'identité et son IBAN.
-Tant que les variables sont vides, les boutons de paiement affichent « Le paiement en ligne arrive très bientôt ».
-
-1. **dashboard.stripe.com** → créer le compte (au nom du parent) et l'activer.
-2. **Catalogue de produits → Ajouter un produit** :
-   - « Vitrio Starter » : prix récurrent **80 €/mois**, puis un 2e prix **576 €/an** ;
-   - « Vitrio Pro » : prix récurrent **160 €/mois**, puis un 2e prix **1 152 €/an**.
-   Copie l'identifiant de chaque prix (`price_…`).
-3. **Développeurs → Clés API** : copie la **clé secrète** (`sk_live_…`).
-4. **Développeurs → Webhooks → Ajouter une destination** :
-   URL `https://nathanaeljetaime.vercel.app/api/webhooks/stripe`, événements
-   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`,
-   `customer.subscription.deleted`, `invoice.paid`. Copie le **secret de signature** (`whsec_…`).
-5. **Paramètres → Facturation → Portail client** : active-le, autorise « Annuler », « Changer de carte »
-   et « Changer d'offre » (ajoute les 4 prix).
-
-6. **Catalogue de produits → Coupons → Créer** deux coupons, durée **Pour toujours** :
-   - « Lancement mensuel » : **montant fixe 10 €** (50 → 40 €, 90 → 80 €) ;
-   - « Lancement annuel » : **montant fixe 72 €** (360 → 288 €, 648 → 576 €).
-   C'est l'offre du compte à rebours (48 h après l'inscription). Sans ces variables, le compte à rebours ne s'affiche pas.
+   C'est l'offre du compte à rebours (48 h après l'inscription) : 78 → 39 €, 158 → 79 €, 398 → 199 €, 798 → 399 €.
+   Le paiement reste fermé tant que ce coupon n'est pas configuré (le prix affiché est toujours le prix payé).
 
 | Variable Vercel | Valeur |
 |---|---|
 | `STRIPE_LAUNCH_COUPON` | identifiant du coupon −50 % (étape 6) |
 | `STRIPE_SECRET_KEY` | la clé secrète (étape 3) |
 | `STRIPE_WEBHOOK_SECRET` | le secret de signature (étape 4) |
-| `STRIPE_PRICE_STARTER_MONTH` | prix 80 €/mois |
-| `STRIPE_PRICE_STARTER_YEAR` | prix 576 €/an |
-| `STRIPE_PRICE_PRO_MONTH` | prix 160 €/mois |
-| `STRIPE_PRICE_PRO_YEAR` | prix 1 152 €/an |
+| `STRIPE_PRICE_STARTER_MONTH` | prix 78 €/mois |
+| `STRIPE_PRICE_STARTER_YEAR` | prix 398 €/an |
+| `STRIPE_PRICE_PRO_MONTH` | prix 158 €/mois |
+| `STRIPE_PRICE_PRO_YEAR` | prix 798 €/an |
 
 Pour tester sans payer : fais tout en **mode test** (clés `sk_test_…`, carte `4242 4242 4242 4242`), ou dans
 Supabase → Table Editor → `users`, mets ta ligne à `plan = pro` (Starter) ou `plan = agency` (Pro).
-
-Les anciennes variables Shopify (`SHOPIFY_APP_HANDLE`, `SHOPIFY_APP_ID`, `SHOPIFY_PARTNER_ORG_ID`,
-`SHOPIFY_PARTNER_TOKEN`) ne servent plus.
 
 ## 4 bis. Couleurs de la marque dans le thème Shopify
 
@@ -302,7 +232,7 @@ Modèles modifiables avec `FAL_MODEL` (défaut `fal-ai/flux/dev`) et `FAL_EDIT_M
 - [ ] `ANTHROPIC_API_KEY`
 - [ ] `SHOPIFY_API_KEY`
 - [ ] `SHOPIFY_API_SECRET`
-- [ ] Stripe : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` et les 4 `STRIPE_PRICE_…`
+- [ ] Stripe : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_LAUNCH_COUPON` et les 4 `STRIPE_PRICE_…`
 - [ ] Extension de thème déployée + `NEXT_PUBLIC_SHOPIFY_API_KEY`
 - [ ] `NEXT_PUBLIC_LAUNCH_MODE` (`waitlist` puis `open`)
 - [ ] `ENCRYPTION_KEY`

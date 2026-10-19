@@ -5,7 +5,7 @@ import { FinalCta } from "@/components/site/FinalCta";
 import { PageHero } from "@/components/site/PageHero";
 import { PricingCards } from "@/components/site/Pricing";
 
-export const metadata: Metadata = { title: "Tarifs", description: "Vitrio Starter à 80 € par mois, Pro à 160 € par mois, −40 % à l'année, et −50 % à vie avec l'offre de lancement : 40 € et 80 € par mois. Sans engagement." };
+export const metadata: Metadata = { title: "Tarifs", description: "Vitrio Starter à 39 € par mois et Pro à 79 € par mois avec l'offre de lancement (−50 % à vie), ou 199 € et 399 € par an. Sans engagement." };
 
 const PRICING_FAQ = [
   { q: "Comment je paie ?", a: "Par carte bancaire, Apple Pay ou Google Pay, sur une page de paiement sécurisée par Stripe. Tu reçois une facture à chaque paiement." },
@@ -20,7 +20,7 @@ const PRICING_FAQ = [
 export default function PricingPage() {
   return (
     <>
-      <PageHero eyebrow="Tarifs" title={<>Un prix <span className="serif-accent">clair</span>, sans engagement</>} subtitle="Deux offres, sans engagement. −40 % en payant à l'année." />
+      <PageHero eyebrow="Tarifs" title={<>Un prix <span className="serif-accent">clair</span>, sans engagement</>} subtitle="Deux offres, sans engagement. Encore moins cher en payant à l'année." />
       <Container><PricingCards /></Container>
       <FaqSection title="Questions sur les tarifs" items={PRICING_FAQ} />
       <FinalCta />

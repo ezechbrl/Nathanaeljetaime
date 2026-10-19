@@ -57,7 +57,7 @@ export async function GET(req: Request) {
     if (dup || !u.email) continue;
     const hours = Math.max(1, Math.round((new Date(u.created_at).getTime() + 48 * 3_600_000 - now) / 3_600_000));
     const ok = await sendEmail(u.email, `Plus que ${hours} h pour ton prix de lancement (−50 % à vie)`,
-      `Salut${u.first_name ? ` ${u.first_name}` : ""},\n\nTon offre de lancement Vitrio se termine dans ${hours} h : −50 % à vie sur ton abonnement (40 € par mois au lieu de 80 € pour Starter).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${env.appUrl()}/app/abonnement\n\nÀ tout de suite,\nL'équipe Vitrio`);
+      `Salut${u.first_name ? ` ${u.first_name}` : ""},\n\nTon offre de lancement Vitrio se termine dans ${hours} h : −50 % à vie sur ton abonnement (39 € par mois au lieu de 78 € pour Starter, ou 199 € par an).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${env.appUrl()}/app/abonnement\n\nÀ tout de suite,\nL'équipe Vitrio`);
     if (ok) reminders++;
     else await db().from("webhook_events").delete().eq("id", `offer-reminder:${u.id}`); // réessai demain si encore dans la fenêtre
   }

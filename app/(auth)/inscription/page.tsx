@@ -18,7 +18,7 @@ export default function Page() {
     );
   }
   return (
-    <AuthShell title="Crée ta boutique" subtitle="Connecte ta boutique Shopify, puis choisis ton offre (dès 40 €/mois avec l'offre de lancement, sans engagement).">
+    <AuthShell title="Crée ta boutique" subtitle="Connecte ta boutique Shopify, puis choisis ton offre (dès 39 €/mois avec l'offre de lancement, sans engagement).">
       <Suspense><AuthPanel mode="register" /></Suspense>
     </AuthShell>
   );
