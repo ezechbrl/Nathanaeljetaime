@@ -24,6 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${sans.variable} ${display.variable} ${serif.variable} ${accent.variable}`}>
       <head>
+        {/* Vérification du site pour le programme d'affiliation Shopify (impact.com). */}
+        {/* @ts-expect-error -- impact.com lit l'attribut « value » */}
+        <meta name="impact-site-verification" value="c74c98d0-75c9-4b7f-ba43-fd910cf5cbb8" content="c74c98d0-75c9-4b7f-ba43-fd910cf5cbb8" />
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;filter:none!important}`}</style>
         </noscript>
