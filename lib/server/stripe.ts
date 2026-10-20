@@ -118,7 +118,8 @@ export async function billingFor(user: UserRow): Promise<{ subscription: Subscri
   if (user.stripe_customer_id) {
     try {
       const list = await stripe().invoices.list({ customer: user.stripe_customer_id, limit: 24 });
-      invoices = list.data.filter((i) => i.status !== "draft").map((i) => ({
+      // Les factures à 0 € (essai, coupon 100 %) ne servent à rien au client : on les cache.
+      invoices = list.data.filter((i) => i.status !== "draft" && (i.amount_paid || i.amount_due) > 0).map((i) => ({
         id: i.id!, number: i.number ?? "", amount: i.amount_paid || i.amount_due, currency: i.currency.toUpperCase(),
         status: i.status === "paid" ? "paid" : i.status === "void" ? "void" : "open", pdfUrl: i.invoice_pdf ?? "#", createdAt: new Date(i.created * 1000).toISOString(),
       }));

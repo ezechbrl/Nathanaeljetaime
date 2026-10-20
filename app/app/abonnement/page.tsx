@@ -99,7 +99,7 @@ function Billing() {
           <Button variant="secondary" className="mt-4" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Gérer mon abonnement</Button>
         </section>}
 
-        <section>
+        {!(sub && !sub.interval && !sub.renewsAt && !billing.data?.invoices.length) && <section>
           <h2 className="text-lg tracking-tight">Factures</h2>
           {billing.data?.invoices.length ? (
             <table className="mt-4 w-full text-sm">
@@ -114,7 +114,7 @@ function Billing() {
               </tbody>
             </table>
           ) : <p className="mt-3 text-sm text-fg-muted">Aucune facture pour l'instant.</p>}
-        </section>
+        </section>}
       </div>
     </>
   );
