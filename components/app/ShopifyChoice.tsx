@@ -41,7 +41,7 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
             <span className="flex items-center gap-2"><ShopifyBag className="h-12 w-12 drop-shadow" /><span className="text-[1.9rem] font-bold italic tracking-[-0.02em] text-white drop-shadow">shopify</span></span>
           </div>
           <p className="mt-5 text-[1.35rem] font-semibold tracking-[-0.02em]">Pas de compte Shopify ?</p>
-          <p className="mt-1 flex-1 text-[13.5px] text-fg-muted">Crée ta boutique Shopify : {site.shopifyOffer} en ce moment. Reviens ensuite ici pour la relier.</p>
+          <p className="mt-1 flex-1 text-[13.5px] text-fg-muted">Crée ta boutique Shopify : {site.shopifyOffer} en ce moment. Reviens ensuite ici pour la relier. <span className="text-fg-faint">(Lien partenaire Shopify.)</span></p>
           <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#c4f04a,#8fbf2f)] text-[15px] font-semibold text-[#0f1f05] shadow-[0_10px_30px_-10px_rgb(196_240_74/0.7)] transition-transform hover:-translate-y-px">
             Créer un compte Shopify <ArrowUpRight className="h-4 w-4" />
           </a>

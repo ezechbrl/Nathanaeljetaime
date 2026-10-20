@@ -87,7 +87,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
           <p className="mt-2 text-xs text-fg-faint">Visible en haut de ton admin Shopify.</p>
         </form>
       )}
-      <p className="text-center text-xs text-fg-faint">Shopify : {site.shopifyOffer} en ce moment</p>
+      <p className="text-center text-xs text-fg-faint">Shopify : {site.shopifyOffer} en ce moment · lien partenaire</p>
     </div>
   );
 }

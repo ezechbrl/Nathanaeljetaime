@@ -5,9 +5,10 @@ export const site = {
   email: "bonjour@vitrio.ai",
   whatsapp: "", // ex. "33600000000" pour afficher le lien WhatsApp
   legalEntity: "Vitrio SAS (à compléter)",
-  // Lien pour ouvrir une boutique Shopify. Mets ton lien d'affilié Shopify dans NEXT_PUBLIC_SHOPIFY_REFERRAL_URL pour toucher une commission.
-  shopifySignupUrl: process.env.NEXT_PUBLIC_SHOPIFY_REFERRAL_URL || "https://www.shopify.com/fr/essai-gratuit",
-  shopifyReferral: Boolean(process.env.NEXT_PUBLIC_SHOPIFY_REFERRAL_URL),
+  // Lien pour ouvrir une boutique Shopify : lien d'affilié Shopify (impact.com), commission sur chaque boutique payante.
+  // NEXT_PUBLIC_SHOPIFY_REFERRAL_URL permet de le remplacer sans toucher au code.
+  shopifySignupUrl: process.env.NEXT_PUBLIC_SHOPIFY_REFERRAL_URL || "https://shopify.pxf.io/m43koq",
+  shopifyReferral: true,
   // Offre de lancement Shopify en cours (à mettre à jour si Shopify la change).
   shopifyOffer: "1 €/mois pendant 3 mois",
 };
