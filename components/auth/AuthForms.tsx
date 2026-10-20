@@ -11,7 +11,7 @@ import * as api from "@/lib/api/client";
 const ERRORS: Record<string, string> = {
   signature: "La connexion Shopify n'a pas pu être vérifiée. Réessaie.",
   session: "La connexion a expiré. Réessaie.",
-  "compte-existant": "Un compte Vitrio existe déjà avec l'e-mail de cette boutique. Écris-nous via la page Contact et on règle ça.",
+  "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec Google ou ton e-mail, puis relie ta boutique.",
   google: "La connexion Google a échoué. Réessaie.",
   lien: "Ce lien de connexion n'est plus valide (il expire au bout d'une heure). Demande-en un nouveau.",
 };
@@ -63,7 +63,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
         <button type="button" onClick={() => setOpen(true)} aria-expanded={open} className={`${tile} border-accent/50 bg-accent/[0.12] shadow-[0_14px_40px_-18px_rgb(46_230_166/0.6)] hover:border-accent hover:bg-accent/[0.18]`}>
           <ShopifyBag className="h-12 w-12 drop-shadow" />
           <span className="text-[15px] font-semibold leading-snug sm:text-base">Connecter mon compte Shopify</span>
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-accent text-[#03140d] transition-transform group-hover:translate-x-1"><ArrowRight className="h-5 w-5" /></span>
+          <span className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full bg-accent px-4 text-sm font-semibold text-[#03140d]">Connexion <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
         </button>
         <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className={`${tile} border-line/15 bg-white/[0.04] hover:border-line/30 hover:bg-white/[0.07]`}>
           <span className="relative">
@@ -71,7 +71,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
             <span className="absolute -bottom-1 -right-2 grid h-6 w-6 place-items-center rounded-full border border-line/20 bg-bg"><Store className="h-3.5 w-3.5 text-accent" /></span>
           </span>
           <span className="text-[15px] font-semibold leading-snug sm:text-base">Créer mon compte Shopify</span>
-          <span className="grid h-9 w-9 place-items-center rounded-full border border-line/20 bg-white/[0.06] transition-transform group-hover:-translate-y-1"><ArrowUp className="h-5 w-5" /></span>
+          <span className="inline-flex h-9 items-center gap-1.5 rounded-full border border-line/20 bg-white/[0.06] whitespace-nowrap px-3.5 text-sm font-semibold"><span className="sm:hidden">Création</span><span className="hidden sm:inline">Créer mon compte</span> <ArrowUp className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" /></span>
         </a>
       </div>
 
@@ -103,11 +103,10 @@ export function ShopifyBag({ className }: { className?: string }) {
   );
 }
 
-// Google et l'e-mail sont masqués par défaut (Shopify suffit, et il est obligatoire).
-// Google : provider à activer dans Supabase, puis NEXT_PUBLIC_GOOGLE_AUTH=on.
-// E-mail : SMTP perso (Resend + nom de domaine) à configurer dans Supabase, puis NEXT_PUBLIC_EMAIL_AUTH=on.
-const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on";
-const EMAIL_ENABLED = process.env.NEXT_PUBLIC_EMAIL_AUTH === "on";
+// Google et e-mail : affichés par défaut, masquables avec NEXT_PUBLIC_GOOGLE_AUTH=off / NEXT_PUBLIC_EMAIL_AUTH=off.
+// Google exige le provider activé dans Supabase ; l'e-mail, un SMTP perso (Resend) pour lever la limite de Supabase.
+const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH !== "off";
+const EMAIL_ENABLED = process.env.NEXT_PUBLIC_EMAIL_AUTH !== "off";
 
 function GoogleButton({ next }: { next: string }) {
   const router = useRouter();

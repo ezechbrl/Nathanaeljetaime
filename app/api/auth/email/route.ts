@@ -22,7 +22,7 @@ export const POST = route(async (req) => {
     },
   });
   if (error) {
-    if (/rate|limit/i.test(error.message)) throw new HttpError(429, "rate_limited", "Trop de demandes de lien. Réessaie dans quelques minutes.");
+    if (/rate|limit/i.test(error.message)) throw new HttpError(429, "rate_limited", "Le lien ne peut pas partir pour le moment. Connecte-toi avec Shopify ou Google en attendant.");
     throw new HttpError(400, "invalid_input", "Impossible d'envoyer le lien à cette adresse.");
   }
   return noContent();

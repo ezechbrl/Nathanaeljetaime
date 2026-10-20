@@ -40,10 +40,10 @@ export async function launchOfferEndsAt(user: UserRow) {
 }
 
 export async function checkoutUrl(user: UserRow, plan: "pro" | "agency", interval: "month" | "year") {
-  const offer = await launchOfferEndsAt(user);
+  const [offer, customer] = await Promise.all([launchOfferEndsAt(user), customerFor(user)]);
   const session = await stripe().checkout.sessions.create({
     mode: "subscription",
-    customer: await customerFor(user),
+    customer,
     line_items: [{ price: env.stripePrice(plan, interval), quantity: 1 }],
     client_reference_id: user.id,
     subscription_data: { metadata: { user_id: user.id } },

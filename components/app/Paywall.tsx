@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
@@ -50,11 +50,29 @@ export function Paywall({ brief, draft, initialInterval = "month" }: { brief?: s
     }
   }
 
+  // La page de paiement Stripe est préparée à l'avance (Starter à l'ouverture, les autres au survol) :
+  // au clic, la redirection est quasi immédiate.
+  const sessions = useRef(new Map<string, Promise<{ url: string }>>());
+  function prepare(plan: Plan["id"], iv: Interval) {
+    const key = `${plan}:${iv}`;
+    let p = sessions.current.get(key);
+    if (!p) {
+      p = api.startCheckout(plan as "pro" | "agency", iv);
+      p.catch(() => sessions.current.delete(key));
+      sessions.current.set(key, p);
+    }
+    return p;
+  }
+  const ready = !!billing.data;
+  useEffect(() => {
+    if (ready) prepare("pro", interval).catch(() => {});
+  }, [ready, interval]); // eslint-disable-line react-hooks/exhaustive-deps
+
   async function subscribe(plan: Plan, iv: Interval) {
     setBusy(plan.id);
     savePending();
     try {
-      const { url } = await api.startCheckout(plan.id as "pro" | "agency", iv);
+      const { url } = await prepare(plan.id, iv);
       window.location.href = url;
     } catch (e) {
       toast((e as Error).message, "error");
@@ -76,7 +94,7 @@ export function Paywall({ brief, draft, initialInterval = "month" }: { brief?: s
           interval={interval}
           left={left}
           action={(plan, iv) => (
-            <button type="button" onClick={() => subscribe(plan, iv)} disabled={!!busy} className={planButtonClass(plan.featured)}>
+            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv).catch(() => {})} onFocus={() => prepare(plan.id, iv).catch(() => {})} disabled={!!busy} className={planButtonClass(plan.featured)}>
               {busy === plan.id ? <Spinner /> : <>Payer {euro(planPrice(plan, iv, !!left).billed)} et créer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
           )}

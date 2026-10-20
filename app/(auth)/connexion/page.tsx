@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Connexion", robots: { index: false }
 
 export default function Page() {
   return (
-    <AuthShell title="Connexion" subtitle="Connecte-toi avec ton compte Shopify.">
+    <AuthShell title="Connexion" subtitle="Connecte-toi avec ton compte Shopify, Google ou ton e-mail.">
       <Suspense><AuthPanel mode="login" /></Suspense>
     </AuthShell>
   );

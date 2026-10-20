@@ -102,7 +102,7 @@ export function PlanCards({ interval, action, left, offer = false }: { interval:
               {left && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />
-              <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">{featured ? "Tout le Starter, et en plus" : "Ce qui est inclus"}</p>
+              <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">{plan.id === "agency" ? "Tout le Starter, et en plus" : "Ce qui est inclus"}</p>
               <ul className="mt-3 space-y-2.5 text-[14.5px]">
                 {plan.features.map((f) => (
                   <li key={f} className="flex gap-2.5">
