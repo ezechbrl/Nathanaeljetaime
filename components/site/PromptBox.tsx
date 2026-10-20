@@ -75,14 +75,14 @@ export function PromptBox({ target = "/inscription", className, align = "center"
         </div>
       </form>
 
-      <div role="tablist" aria-label="Mode de création" className={cn("mt-5 flex w-fit max-w-full gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-black/25 p-1.5 backdrop-blur", align === "center" && "mx-auto")}>
+      <div role="tablist" aria-label="Mode de création" className={cn("mt-5 grid w-full grid-cols-3 gap-1 rounded-[18px] border border-white/10 bg-black/25 p-1 backdrop-blur sm:flex sm:w-fit sm:max-w-full sm:gap-1.5 sm:rounded-full sm:p-1.5", align === "center" && "mx-auto")}>
         {MODES.map((m) => (
           <button
             key={m.id}
             role="tab"
             aria-selected={mode === m.id}
             onClick={() => setMode(m.id)}
-            className={cn("flex items-center gap-2 shrink-0 rounded-full px-3.5 py-2 text-[14px] font-medium transition-all sm:px-5 sm:py-2.5 sm:text-[15.5px]", mode === m.id ? "border border-[#6ee7b7]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_rgb(46_230_166/0.45),inset_0_0_10px_rgb(46_230_166/0.15)]" : "border border-transparent text-fg-muted hover:text-fg")}
+            className={cn("flex items-center justify-center gap-2 rounded-[14px] px-2 py-2.5 text-center text-[13px] font-medium leading-tight transition-all sm:shrink-0 sm:rounded-full sm:px-5 sm:text-[15.5px]", mode === m.id ? "border border-[#6ee7b7]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_rgb(46_230_166/0.45),inset_0_0_10px_rgb(46_230_166/0.15)]" : "border border-transparent text-fg-muted hover:text-fg")}
           >
             <m.icon className="hidden h-4 w-4 sm:block" /> {m.label}
           </button>

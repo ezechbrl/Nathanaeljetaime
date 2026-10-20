@@ -142,17 +142,17 @@ export function Instant() {
             Créer une boutique ne prend plus 3 semaines : ça se fait pendant que tu bois ton café. <span className="text-fg">Essaie, c'est en direct :</span>
           </Reveal>
         </div>
-        <Reveal delay={150} className="mt-12 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)]">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1" role="tablist" aria-label="Ce que fait Vitrio">
+        <Reveal delay={150} className="mt-10 grid gap-4 lg:mt-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)]">
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-1 lg:gap-3 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Ce que fait Vitrio">
             {TABS.map(({ id, icon: I, title, text }) => (
-              <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => pick(id)} className={cn("flex items-center gap-4 rounded-[18px] border p-4 text-left transition-all", tab === id ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/10 shadow-[0_0_30px_-10px_rgb(46_230_166/0.6)]" : "border-white/10 bg-black/20 hover:border-white/25")}>
-                <span className={cn("grid h-11 w-11 shrink-0 place-items-center rounded-2xl border transition-colors", tab === id ? "border-[#2ee6a6]/50 bg-[#2ee6a6]/20 text-[#a7f3d0]" : "border-white/10 text-fg-muted")}><I className="h-5 w-5" /></span>
-                <span><span className="block text-[16px] font-semibold">{title}</span><span className="block text-[13px] text-fg-muted">{text}</span></span>
+              <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => pick(id)} className={cn("flex shrink-0 items-center gap-3 rounded-full border px-4 py-2.5 text-left transition-all lg:gap-4 lg:rounded-[18px] lg:p-4", tab === id ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/10 shadow-[0_0_30px_-10px_rgb(46_230_166/0.6)]" : "border-white/10 bg-black/20 hover:border-white/25")}>
+                <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-xl border transition-colors lg:h-11 lg:w-11 lg:rounded-2xl", tab === id ? "border-[#2ee6a6]/50 bg-[#2ee6a6]/20 text-[#a7f3d0]" : "border-white/10 text-fg-muted")}><I className="h-4 w-4 lg:h-5 lg:w-5" /></span>
+                <span><span className="block whitespace-nowrap text-[14px] font-semibold lg:whitespace-normal lg:text-[16px]">{title}</span><span className="hidden text-[13px] text-fg-muted lg:block">{text}</span></span>
               </button>
             ))}
           </div>
           <div className="rounded-[22px] bg-[linear-gradient(160deg,rgb(46_230_166/0.6),rgb(255_255_255/0.06)_45%,rgb(46_230_166/0.25))] p-px">
-            <div key={tab} className="h-[420px] rounded-[21px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] p-6 [animation:fade-in_.3s_ease-out] sm:p-8">
+            <div key={tab} className="h-[400px] rounded-[21px] sm:h-[420px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] p-6 [animation:fade-in_.3s_ease-out] sm:p-8">
               {tab === "text" ? <TextDemo /> : tab === "photo" ? <PhotoDemo /> : tab === "reviews" ? <ReviewsDemo /> : <PublishDemo />}
             </div>
           </div>

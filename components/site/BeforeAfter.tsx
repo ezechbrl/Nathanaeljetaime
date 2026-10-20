@@ -57,7 +57,7 @@ function CodingLoop() {
   );
 }
 
-function VitrioLoop() {
+function VitrioLoop({ name }: { name: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const v = ref.current;
@@ -67,9 +67,9 @@ function VitrioLoop() {
     return () => io.disconnect();
   }, []);
   return (
-    <video ref={ref} muted loop playsInline preload="metadata" poster="/videos/tuto-lien.jpg" className="h-full w-full rounded-[14px] bg-black object-cover" aria-label="Vitrio crée une boutique à partir d'un lien">
-      <source src="/videos/tuto-lien.mp4" type="video/mp4" />
-      <source src="/videos/tuto-lien.webm" type="video/webm" />
+    <video ref={ref} muted loop playsInline preload="metadata" poster={`/videos/${name}.jpg`} className="h-full w-full rounded-[14px] bg-black object-cover" aria-label="Vitrio crée une boutique à partir d'un lien">
+      <source src={`/videos/${name}.mp4`} type="video/mp4" />
+      <source src={`/videos/${name}.webm`} type="video/webm" />
     </video>
   );
 }
@@ -90,7 +90,8 @@ export function BeforeAfter() {
             <p className="text-[15px] font-semibold">Maintenant · avec Vitrio</p>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2ee6a6]/15 px-3 py-1 text-[12px] font-semibold text-[#a7f3d0]"><Sparkles className="h-3.5 w-3.5" /> 10 minutes</span>
           </div>
-          <div className="aspect-video"><VitrioLoop /></div>
+          <div className="hidden aspect-video sm:block"><VitrioLoop name="tuto-lien" /></div>
+          <div className="mx-auto aspect-[390/844] max-w-[240px] sm:hidden"><VitrioLoop name="tuto-boutique-mobile" /></div>
         </div>
       </div>
     </div>
