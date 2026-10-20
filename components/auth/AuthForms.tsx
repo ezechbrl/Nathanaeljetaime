@@ -1,7 +1,7 @@
 "use client";
 
 import { site } from "@/lib/site";
-import { ArrowRight, ArrowUp, Link2, Mail, Store } from "lucide-react";
+import { ArrowRight, ArrowUp, Mail, Store } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -11,7 +11,7 @@ import * as api from "@/lib/api/client";
 const ERRORS: Record<string, string> = {
   signature: "La connexion Shopify n'a pas pu être vérifiée. Réessaie.",
   session: "La connexion a expiré. Réessaie.",
-  "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec ton e-mail, puis relie ta boutique.",
+  "compte-existant": "Un compte Vitrio existe déjà avec l'e-mail de cette boutique. Écris-nous via la page Contact et on règle ça.",
   google: "La connexion Google a échoué. Réessaie.",
   lien: "Ce lien de connexion n'est plus valide (il expire au bout d'une heure). Demande-en un nouveau.",
 };
@@ -36,7 +36,7 @@ export function normalizeShop(input: string) {
   return /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(full) ? full : null;
 }
 
-export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBeforeRedirect }: { next: string; cta?: string; onBeforeRedirect?: (autostart: boolean) => void }) {
+export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { next: string; cta?: string; onBeforeRedirect?: (autostart: boolean) => void }) {
   const [shop, setShop] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -55,15 +55,27 @@ export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBefor
     });
   }
 
+  const tile = "group flex min-h-[176px] flex-col items-center justify-center gap-3 rounded-[20px] border p-4 text-center transition-all hover:-translate-y-0.5";
   return (
     <div className="space-y-3">
-      {/* Logo Shopify et deux actions courtes : relier sa boutique, ou en créer une. */}
-      <div className="flex items-center gap-3 pb-1">
-        <ShopifyBag className="h-11 w-11 shrink-0" />
-        <p className="text-sm leading-snug text-fg-muted">Vitrio crée ta boutique directement dans <strong className="text-fg">Shopify</strong>.</p>
+      {/* Deux grands encadrés : relier son compte Shopify, ou en créer un. */}
+      <div className="grid grid-cols-2 gap-3">
+        <button type="button" onClick={() => setOpen(true)} aria-expanded={open} className={`${tile} border-accent/50 bg-accent/[0.12] shadow-[0_14px_40px_-18px_rgb(46_230_166/0.6)] hover:border-accent hover:bg-accent/[0.18]`}>
+          <ShopifyBag className="h-12 w-12 drop-shadow" />
+          <span className="text-[15px] font-semibold leading-snug sm:text-base">Connecter mon compte Shopify</span>
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-accent text-[#03140d] transition-transform group-hover:translate-x-1"><ArrowRight className="h-5 w-5" /></span>
+        </button>
+        <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className={`${tile} border-line/15 bg-white/[0.04] hover:border-line/30 hover:bg-white/[0.07]`}>
+          <span className="relative">
+            <ShopifyBag className="h-12 w-12 drop-shadow" />
+            <span className="absolute -bottom-1 -right-2 grid h-6 w-6 place-items-center rounded-full border border-line/20 bg-bg"><Store className="h-3.5 w-3.5 text-accent" /></span>
+          </span>
+          <span className="text-[15px] font-semibold leading-snug sm:text-base">Créer mon compte Shopify</span>
+          <span className="grid h-9 w-9 place-items-center rounded-full border border-line/20 bg-white/[0.06] transition-transform group-hover:-translate-y-1"><ArrowUp className="h-5 w-5" /></span>
+        </a>
       </div>
 
-      {open ? (
+      {open && (
         <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-3">
           <label htmlFor="shop" className="text-sm font-medium">Adresse de ta boutique</label>
           <div className="mt-2 flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
@@ -74,15 +86,7 @@ export function ShopifyForm({ next, cta = "Connecter Vitrio à Shopify", onBefor
           <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
           <p className="mt-2 text-xs text-fg-faint">Visible en haut de ton admin Shopify.</p>
         </form>
-      ) : (
-        <Button type="button" size="lg" className="h-14 w-full gap-3 text-base" onClick={() => setOpen(true)}>
-          <Link2 className="h-5 w-5" /> Connecter mon compte Shopify <ArrowRight className="h-5 w-5" />
-        </Button>
       )}
-
-      <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="flex h-14 w-full items-center justify-center gap-3 rounded-ctl border border-line/15 bg-white/[0.04] text-base font-medium transition-colors hover:border-line/30 hover:bg-white/[0.07]">
-        <Store className="h-5 w-5 text-accent" /> Créer mon compte Shopify <ArrowUp className="h-5 w-5 text-fg-muted" />
-      </a>
       <p className="text-center text-xs text-fg-faint">Shopify : {site.shopifyOffer} en ce moment</p>
     </div>
   );
@@ -99,8 +103,11 @@ export function ShopifyBag({ className }: { className?: string }) {
   );
 }
 
-// Google n'apparaît que s'il est activé dans Supabase (Authentication → Providers) : NEXT_PUBLIC_GOOGLE_AUTH=on.
-const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on" || api.API_MODE !== "live";
+// Google et l'e-mail sont masqués par défaut (Shopify suffit, et il est obligatoire).
+// Google : provider à activer dans Supabase, puis NEXT_PUBLIC_GOOGLE_AUTH=on.
+// E-mail : SMTP perso (Resend + nom de domaine) à configurer dans Supabase, puis NEXT_PUBLIC_EMAIL_AUTH=on.
+const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on";
+const EMAIL_ENABLED = process.env.NEXT_PUBLIC_EMAIL_AUTH === "on";
 
 function GoogleButton({ next }: { next: string }) {
   const router = useRouter();
@@ -195,12 +202,16 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
         </div>
       )}
       <ShopifyForm next={next} />
-      <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
-      <div className="space-y-2.5">
-        {GOOGLE_ENABLED && <GoogleButton next={next} />}
-        <EmailOption next={next} />
-      </div>
-      <p className="mt-3 text-xs text-fg-faint">Avec {GOOGLE_ENABLED ? "Google ou ton e-mail" : "ton e-mail"}, on te demandera ensuite de relier ta boutique Shopify.</p>
+      {(GOOGLE_ENABLED || EMAIL_ENABLED) && (
+        <>
+          <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
+          <div className="space-y-2.5">
+            {GOOGLE_ENABLED && <GoogleButton next={next} />}
+            {EMAIL_ENABLED && <EmailOption next={next} />}
+          </div>
+          <p className="mt-3 text-xs text-fg-faint">On te demandera ensuite de relier ta boutique Shopify.</p>
+        </>
+      )}
       <p className="mt-8 text-xs leading-relaxed text-fg-faint">
         En continuant, tu acceptes les <Link href="/legal/cgu" className="underline">CGU</Link> et la <Link href="/legal/confidentialite" className="underline">politique de confidentialité</Link>.
       </p>
