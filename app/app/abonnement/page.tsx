@@ -93,11 +93,11 @@ function Billing() {
           </section>
         </div>
 
-        <section className="surface rounded-card p-5">
+        {!(sub && !sub.interval && !sub.renewsAt) && <section className="surface rounded-card p-5">
           <h2 className="text-lg tracking-tight">Changer ou arrêter mon abonnement</h2>
           <p className="mt-2 text-sm text-fg-muted">Sur la page sécurisée de Stripe, tu peux : changer de carte bancaire, passer de Starter à Pro (ou à l'annuel), télécharger tes factures, ou arrêter ton abonnement en un clic. Si tu arrêtes, tout ce qui a été créé reste dans ta boutique.</p>
           <Button variant="secondary" className="mt-4" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Gérer mon abonnement</Button>
-        </section>
+        </section>}
 
         <section>
           <h2 className="text-lg tracking-tight">Factures</h2>
