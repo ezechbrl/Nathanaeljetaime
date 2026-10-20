@@ -137,8 +137,8 @@
   transition: box-shadow .3s;
 }
 .glow-frame-lime {
-  background: conic-gradient(from var(--frame-angle), rgb(196 240 74 / 0.35), rgb(236 252 203) 8%, rgb(196 240 74 / 0.35) 18%, rgb(196 240 74 / 0.35) 50%, rgb(217 249 157 / 0.9) 58%, rgb(196 240 74 / 0.35) 68%);
-  box-shadow: 0 0 22px rgb(196 240 74 / 0.28), 0 0 70px -10px rgb(196 240 74 / 0.35);
+  background: conic-gradient(from var(--frame-angle), rgb(74 222 128 / 0.35), rgb(220 252 231) 8%, rgb(74 222 128 / 0.35) 18%, rgb(74 222 128 / 0.35) 50%, rgb(134 239 172 / 0.9) 58%, rgb(74 222 128 / 0.35) 68%);
+  box-shadow: 0 0 22px rgb(74 222 128 / 0.3), 0 0 70px -10px rgb(74 222 128 / 0.4);
 }
 .glow-frame:focus-within { box-shadow: 0 0 28px rgb(46 230 166 / 0.55), 0 0 90px -10px rgb(46 230 166 / 0.6); }
 

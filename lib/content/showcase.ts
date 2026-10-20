@@ -26,6 +26,14 @@ export const SHOWCASE: ShowcaseStore[] = [
     image: "/showcase/norde.jpg",
   },
   {
+    slug: "macho", name: "Mâchô", category: "Gourmandise", language: "français",
+    brief: "Chewing-gums aux saveurs originales, sans sucres ajoutés, en coffret découverte.",
+    headline: "Six saveurs. Zéro sucre ajouté.", sub: "Le coffret découverte, à glisser dans le sac.", product: "Coffret découverte Mâchô", price: "14,90 €",
+    palette: { bg: "#f6d9d0", ink: "#1f2a44", accent: "#1f2a44", soft: "#eebfb2" }, font: "serif", layout: "split",
+    highlights: ["Photo produit créée par l'IA", "Lots de 3 et de 6 boîtes", "Vrais avis acheteurs importés"],
+    image: "/showcase/macho.jpg",
+  },
+  {
     slug: "seve", name: "Sève", category: "Soin du visage", language: "français",
     brief: "Sérum visage à la sève de bouleau, peaux sensibles, fabriqué dans le Jura.",
     headline: "La douceur d'une forêt, en dix gouttes.", sub: "Sérum apaisant à 92 % de sève de bouleau.", product: "Sérum Première Sève", price: "32,00 €",

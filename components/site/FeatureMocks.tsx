@@ -98,7 +98,7 @@ export function RecraftMock() {
       </div>
       <div>
         <p className="mb-2 text-xs text-accent">Après</p>
-        <StoreFrame s={SHOWCASE[1]} phone={false} />
+        <StoreFrame s={SHOWCASE.find((x) => x.slug === "seve")!} phone={false} />
       </div>
     </div>
   );

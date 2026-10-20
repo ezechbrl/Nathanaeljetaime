@@ -69,15 +69,15 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
           </span>
         </button>
         <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="glow-frame glow-frame-lime group rounded-[22px] p-[1.5px] transition-transform hover:-translate-y-1">
-          <span className={`${inner} bg-[linear-gradient(180deg,rgb(30_52_14/0.95),rgb(8_24_10/0.98))]`}>
-            <span className="absolute right-2 top-2 rounded-full bg-[#c4f04a] px-2 py-0.5 text-[10.5px] font-bold text-[#0f1f05] sm:text-[11px]">1 €/mois</span>
-            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#c4f04a]/20 blur-2xl" />
-            <span className="relative mt-3">
+          <span className={`${inner} pt-9 bg-[linear-gradient(180deg,rgb(12_60_32/0.96),rgb(4_26_14/0.98))] sm:pt-10`}>
+            <span className="absolute inset-x-0 top-0 bg-[linear-gradient(90deg,#22c55e,#4ade80)] py-1.5 text-center text-[11px] font-bold leading-tight text-[#052e16] sm:text-[12px]">1 €/mois pendant 3 mois</span>
+            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#4ade80]/20 blur-2xl" />
+            <span className="relative">
               <ShopifyBag className="h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
-              <span className="absolute -bottom-1 -right-2 grid h-7 w-7 place-items-center rounded-full border border-[#c4f04a]/40 bg-[#0f1f05]"><Store className="h-4 w-4 text-[#c4f04a]" /></span>
+              <span className="absolute -bottom-1 -right-2 grid h-7 w-7 place-items-center rounded-full border border-[#4ade80]/40 bg-[#052e16]"><Store className="h-4 w-4 text-[#4ade80]" /></span>
             </span>
             <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">Créer mon compte Shopify</span>
-            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#d4f76a,#8fbf2f)] px-3.5 text-sm font-semibold text-[#0f1f05] shadow-[0_8px_24px_-6px_rgb(196_240_74/0.7)]"><span className="sm:hidden">Création</span><span className="hidden sm:inline">Créer mon compte</span> <ArrowUp className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" /></span>
+            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#6ee7a0,#22c55e)] px-3.5 text-sm font-semibold text-[#052e16] shadow-[0_8px_24px_-6px_rgb(74_222_128/0.7)]"><span className="sm:hidden">Création</span><span className="hidden sm:inline">Créer mon compte</span> <ArrowUp className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" /></span>
           </span>
         </a>
       </div>
@@ -94,7 +94,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
           <p className="mt-2 text-xs text-fg-faint">Visible en haut de ton admin Shopify.</p>
         </form>
       )}
-      <p className="text-center text-xs text-fg-faint">Shopify : {site.shopifyOffer} en ce moment · lien partenaire</p>
+      <p className="text-center text-xs text-fg-faint">Offre Shopify en ce moment · lien partenaire</p>
     </div>
   );
 }

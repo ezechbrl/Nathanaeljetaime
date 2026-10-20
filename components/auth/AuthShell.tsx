@@ -19,10 +19,12 @@ export function AuthShell({ title, subtitle, children }: { title: React.ReactNod
         <LightRays />
         <div className="absolute inset-0 flex flex-col justify-center px-16">
           <p className="max-w-md text-h2">Ta vitrine Shopify, prête en <span className="serif-accent">10 minutes</span>.</p>
-          <div className="relative mt-14 h-[320px]">
-            <div className="absolute left-0 top-10 w-[58%] -rotate-3 opacity-80"><StoreFrame s={SHOWCASE[2]} phone={false} /></div>
-            <div className="absolute right-0 top-0 w-[62%] rotate-2"><StoreFrame s={SHOWCASE[1]} /></div>
+          {/* Deux vraies boutiques créées par Vitrio (photos produit générées par l'IA). */}
+          <div className="relative mt-12 h-[360px]">
+            <div className="absolute left-0 top-16 w-[58%] -rotate-3 transition-transform duration-500 hover:rotate-0"><StoreFrame s={SHOWCASE.find((x) => x.slug === "macho")!} phone={false} /></div>
+            <div className="absolute right-0 top-0 w-[62%] rotate-2 transition-transform duration-500 hover:rotate-0"><StoreFrame s={SHOWCASE.find((x) => x.slug === "norde")!} /></div>
           </div>
+          <p className="mt-6 text-sm text-fg-muted">Deux vraies boutiques créées par Vitrio : textes, photos et offres.</p>
         </div>
       </div>
     </main>
