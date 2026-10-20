@@ -59,7 +59,7 @@ function Billing() {
       <div className="space-y-8 p-5 sm:p-8">
         <div className="grid gap-4 lg:grid-cols-[1.3fr_1fr]">
           {/* Ton abonnement, en grand, avec le prix réellement payé (offre de lancement comprise) */}
-          <section className="relative overflow-hidden rounded-[22px] bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,rgb(46_230_166/0.45))] p-px shadow-[0_0_60px_-20px_rgb(46_230_166/0.55)]">
+          <section className="glow-frame relative overflow-hidden rounded-[22px] p-[1.5px]">
             <div className="h-full rounded-[21px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] p-6 sm:p-8">
               <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6ee7b7]">Ton abonnement</p>
               {sub ? (

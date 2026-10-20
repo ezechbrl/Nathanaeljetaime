@@ -7,9 +7,9 @@ import { cn } from "@/lib/cn";
 
 // « Nouvelle ère. » : ce que fait Vitrio, à essayer directement (textes, photos, avis, publication).
 const TABS = [
+  { id: "reviews", icon: Star, title: "De vrais avis", text: "Ceux des acheteurs du produit, traduits." },
   { id: "text", icon: MessageSquareText, title: "Des textes qui vendent", text: "Accueil, fiche produit, FAQ, offres par lot." },
   { id: "photo", icon: Camera, title: "Des photos de pro", text: "Ton produit en studio et en situation." },
-  { id: "reviews", icon: Star, title: "De vrais avis", text: "Ceux des acheteurs du produit, traduits." },
   { id: "publish", icon: Rocket, title: "Publié sur Shopify", text: "Thème, produit et pages en un clic." },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
@@ -119,7 +119,7 @@ function PublishDemo() {
 }
 
 export function Instant() {
-  const [tab, setTab] = useState<Tab>("text");
+  const [tab, setTab] = useState<Tab>("reviews");
   const touched = useRef(false);
   // Fait défiler les démos tout seul tant que le visiteur n'a pas cliqué.
   useEffect(() => {
@@ -131,14 +131,14 @@ export function Instant() {
   }, []);
   const pick = (id: Tab) => { touched.current = true; setTab(id); };
   return (
-    <section className="relative overflow-hidden py-24">
+    <section className="relative overflow-hidden py-14 sm:py-24">
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-10 h-[26rem] w-[70rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(46_230_166/0.16),transparent)]" />
       <div className="relative mx-auto max-w-[1200px] px-4 sm:px-6">
         <div className="text-center">
           <Reveal as="h2" className="bg-[linear-gradient(180deg,#ffffff_20%,#a7f3d0_60%,rgb(110_231_183/0.35))] bg-clip-text pb-2 font-display text-[clamp(3.4rem,1.5rem+8vw,9rem)] font-medium leading-[0.95] tracking-[-0.06em] text-transparent">
             Nouvelle ère.
           </Reveal>
-          <Reveal delay={100} as="p" className="mx-auto mt-6 max-w-2xl text-[clamp(1.05rem,0.9rem+0.5vw,1.3rem)] leading-relaxed text-fg-muted">
+          <Reveal delay={100} as="p" className="mx-auto mt-4 max-w-2xl text-[clamp(1.05rem,0.9rem+0.5vw,1.3rem)] leading-relaxed text-fg-muted">
             Créer une boutique ne prend plus 3 semaines : ça se fait pendant que tu bois ton café. <span className="text-fg">Essaie, c'est en direct :</span>
           </Reveal>
         </div>
@@ -152,7 +152,7 @@ export function Instant() {
             ))}
           </div>
           <div className="rounded-[22px] bg-[linear-gradient(160deg,rgb(46_230_166/0.6),rgb(255_255_255/0.06)_45%,rgb(46_230_166/0.25))] p-px">
-            <div key={tab} className="h-[400px] rounded-[21px] sm:h-[420px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] p-6 [animation:fade-in_.3s_ease-out] sm:p-8">
+            <div key={tab} className="h-[360px] rounded-[21px] sm:h-[420px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] p-5 [animation:fade-in_.3s_ease-out] sm:p-8">
               {tab === "text" ? <TextDemo /> : tab === "photo" ? <PhotoDemo /> : tab === "reviews" ? <ReviewsDemo /> : <PublishDemo />}
             </div>
           </div>

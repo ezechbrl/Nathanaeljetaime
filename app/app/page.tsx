@@ -50,7 +50,7 @@ export default function AppHome() {
           <Suspense><Welcome /><CreateStore /></Suspense>
           <div className="mx-auto mt-14 max-w-[1100px]">
             <p className="mb-4 text-center text-[15px] font-medium text-fg-muted">Comment ça marche, en 15 secondes</p>
-            <div className="rounded-[17px] bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_40%,rgb(46_230_166/0.5))] p-px shadow-[0_0_60px_-20px_rgb(46_230_166/0.55)]">
+            <div className="glow-frame rounded-[17px] p-[1.5px]">
               <TutorialVideo name="tuto-lien" title="Créer sa boutique à partir d'un lien" speed="×2,5" className="max-w-none" />
             </div>
           </div>

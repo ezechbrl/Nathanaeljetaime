@@ -179,8 +179,8 @@ export function CreateStore() {
 
   return (
     <div className="mx-auto w-full max-w-[720px]">
-      <form onSubmit={submit} onPaste={(e) => { if (mode === "link" && e.clipboardData.files.length) { e.preventDefault(); addShots(e.clipboardData.files); } }} className="rounded-[14px] p-px [background:linear-gradient(180deg,rgb(0_166_118/0.45),rgb(0_166_118/0.08)_45%,rgb(255_255_255/0.06))]">
-        <div className="rounded-[13px] bg-[linear-gradient(180deg,#123d35,#0c2b26)]">
+      <form onSubmit={submit} onPaste={(e) => { if (mode === "link" && e.clipboardData.files.length) { e.preventDefault(); addShots(e.clipboardData.files); } }} className="glow-frame rounded-[16px] p-[1.5px]">
+        <div className="rounded-[15px] bg-[linear-gradient(180deg,#0d3a2d,#062419)]">
           {mode === "link" && (
             <div className="border-b border-white/[0.06]">
               <div className="flex items-center gap-2 px-4 py-3.5">

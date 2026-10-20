@@ -18,7 +18,7 @@ import { useApi } from "@/lib/api/hooks";
 import type { ChatMessage } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
-const SUGGESTIONS = ["Rends le ton plus premium", "Change la couleur principale", "Ajoute un lot de 3 à −20 %", "Raccourcis le titre produit", "Ajoute une question à la FAQ"];
+const SUGGESTIONS = ["Ajoute un lot de 3 à −20 %", "Raccourcis le titre produit", "Ajoute une question à la FAQ", "Rends le ton plus premium", "Change la couleur principale"];
 // Grandes cartes de départ, quand la discussion ne fait que commencer.
 const STARTERS = [
   { icon: Sparkles, text: "Rends le ton plus premium" },
@@ -56,6 +56,7 @@ export default function EditorPage() {
     if (q) setDraft(q);
   }, []);
   const [sending, setSending] = useState(false);
+  const started = messages.some((m) => m.role === "user");
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [device, setDevice] = useState<"auto" | "mobile">("auto");
   const [flash, setFlash] = useState(false);
@@ -179,11 +180,11 @@ export default function EditorPage() {
                 </div>
               ))}
 
-              {!messages.some((m) => m.role === "user") && !sending && (
-                <div className="grid gap-3 pt-2 sm:grid-cols-2">
+              {!started && !sending && (
+                <div className="grid grid-cols-2 gap-2 pt-2 sm:gap-3">
                   {STARTERS.map(({ icon: I, text }) => (
-                    <button key={text} type="button" onClick={() => send(text)} className="group flex items-center gap-3 rounded-[18px] border border-white/10 bg-white/[0.03] p-4 text-left text-[15px] transition-all hover:-translate-y-0.5 hover:border-accent/50 hover:bg-accent/[0.06]">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] border border-accent/30 bg-accent/10 text-accent transition-transform group-hover:scale-105"><I className="h-5 w-5" /></span>
+                    <button key={text} type="button" onClick={() => send(text)} className="group flex items-center gap-2.5 rounded-[14px] border border-white/10 bg-white/[0.03] p-2.5 text-left text-[13px] leading-snug transition-all hover:-translate-y-0.5 hover:border-accent/50 hover:bg-accent/[0.06] sm:gap-3 sm:rounded-[18px] sm:p-4 sm:text-[15px]">
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] border border-accent/30 bg-accent/10 text-accent transition-transform group-hover:scale-105 sm:h-10 sm:w-10 sm:rounded-[12px]"><I className="h-4 w-4 sm:h-5 sm:w-5" /></span>
                       {text}
                     </button>
                   ))}
@@ -224,12 +225,13 @@ export default function EditorPage() {
                   {user.plan === "pro" && <> <Link href="/app/abonnement" className="text-accent underline underline-offset-2">Passe à l'offre Pro</Link> pour 2× plus de crédit.</>}
                 </p>
               )}
-              <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+              {/* Les suggestions n'apparaissent qu'une fois : en grandes cartes au départ, puis en petites pastilles. */}
+              {started && <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
                 {SUGGESTIONS.map((s) => (
                   <button key={s} onClick={() => send(s)} disabled={sending} className="shrink-0 rounded-full border border-white/[0.1] bg-white/[0.02] px-3.5 py-1.5 text-[13.5px] text-fg-muted transition-colors hover:border-accent/40 hover:text-fg disabled:opacity-50">{s}</button>
                 ))}
-              </div>
-              <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-[22px] border border-white/15 bg-black/30 p-2.5 shadow-[0_0_30px_-10px_rgb(46_230_166/0.4)] transition-colors focus-within:border-accent/60">
+              </div>}
+              <div className="glow-frame rounded-[23px] p-[1.5px]"><form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-[22px] bg-[linear-gradient(180deg,#0d3a2d,#062419)] p-2.5">
                 <label htmlFor="msg" className="sr-only">Ta demande</label>
                 <textarea
                   ref={inputRef}
@@ -242,7 +244,7 @@ export default function EditorPage() {
                   className="max-h-[216px] min-h-[60px] flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-6 placeholder:text-fg-faint focus:outline-none"
                 />
                 <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_20px_rgb(46_230_166/0.55)] transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"><ArrowUp className="h-5 w-5" /></button>
-              </form>
+              </form></div>
               <p className="mt-2 hidden text-center text-[12px] text-fg-faint sm:block">Entrée pour envoyer · Maj+Entrée pour aller à la ligne</p>
             </div>
           </div>

@@ -127,9 +127,31 @@ export async function billingFor(user: UserRow): Promise<{ subscription: Subscri
       console.error("Factures Stripe", e);
     }
   }
-  // Prix réellement payé : dernière facture payée (inclut la remise de lancement).
-  subscription.amount = invoices.find((i) => i.status === "paid" && i.amount > 0)?.amount ?? null;
+  // Prix de l'abonnement, remise comprise : 39 € à vie pour l'offre de lancement, jamais le prix barré.
+  // À défaut (Stripe indisponible), le montant de la dernière facture payée.
+  subscription.amount = (row?.stripe_subscription_id ? await discountedPrice(row.stripe_subscription_id) : null)
+    ?? invoices.find((i) => i.status === "paid" && i.amount > 0)?.amount ?? null;
   return { subscription, invoices };
+}
+
+async function discountedPrice(subscriptionId: string): Promise<number | null> {
+  try {
+    const sub = await stripe().subscriptions.retrieve(subscriptionId, { expand: ["discounts.source.coupon"] });
+    const unit = sub.items.data[0]?.price.unit_amount;
+    if (unit == null) return null;
+    let price = unit;
+    for (const d of sub.discounts) {
+      if (typeof d === "string") continue;
+      const coupon = d.source?.coupon;
+      if (!coupon || typeof coupon === "string" || (d.end && d.end * 1000 < Date.now())) continue;
+      if (coupon.percent_off) price = price * (1 - coupon.percent_off / 100);
+      if (coupon.amount_off) price -= coupon.amount_off;
+    }
+    return Math.max(0, Math.round(price));
+  } catch (e) {
+    console.error("Prix de l'abonnement Stripe", e);
+    return null;
+  }
 }
 
 export async function cancelSubscriptionNow(userId: string) {

@@ -82,7 +82,7 @@ export function BeforeAfter() {
           <p className="text-[15px] font-semibold text-fg-muted">Avant · coder sa boutique</p>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/15 px-3 py-1 text-[12px] font-semibold text-red-200"><Clock className="h-3.5 w-3.5" /> 3 semaines</span>
         </div>
-        <div className="aspect-video"><CodingLoop /></div>
+        <div className="h-[190px] sm:h-auto sm:aspect-video"><CodingLoop /></div>
       </div>
       <div className="rounded-[22px] bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,rgb(46_230_166/0.5))] p-px shadow-[0_0_60px_-20px_rgb(46_230_166/0.6)]">
         <div className="h-full rounded-[21px] bg-[#05261d]/90 p-3">
@@ -91,7 +91,14 @@ export function BeforeAfter() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2ee6a6]/15 px-3 py-1 text-[12px] font-semibold text-[#a7f3d0]"><Sparkles className="h-3.5 w-3.5" /> 10 minutes</span>
           </div>
           <div className="hidden aspect-video sm:block"><VitrioLoop name="tuto-lien" /></div>
-          <div className="mx-auto aspect-[390/844] max-w-[240px] sm:hidden"><VitrioLoop name="tuto-boutique-mobile" /></div>
+          {/* Sur téléphone, la vidéo est déjà en haut de la page : ici, juste les 3 étapes. */}
+          <ol className="space-y-2 px-2 pb-2 sm:hidden">
+            {["Tu colles le lien de ton produit", "L'IA écrit, crée les photos et importe les vrais avis", "Tu valides : c'est en ligne sur Shopify"].map((t, i) => (
+              <li key={t} className="flex items-center gap-3 rounded-[12px] border border-white/[0.08] bg-black/20 px-3 py-2.5 text-[14px]">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#2ee6a6] text-[12px] font-bold text-[#03140d]">{i + 1}</span>{t}
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </div>
