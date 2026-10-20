@@ -1,36 +1,56 @@
-import { ArrowRight, Check, Timer } from "lucide-react";
+"use client";
+
+import { ArrowRight, Check, Sparkles, Timer } from "lucide-react";
 import Link from "next/link";
+import { planButtonClass } from "@/components/pricing/PlanCards";
 import { Reveal } from "@/components/ui/Reveal";
+import { cn } from "@/lib/cn";
 import { CTA } from "@/lib/launch";
 import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer } from "@/lib/content/pricing";
 
-// Aperçu des prix sur l'accueil : court, avec l'offre de lancement, et un lien vers la page Tarifs complète.
+// Les prix sur l'accueil : un bandeau court pour l'offre, puis les deux offres en version compacte
+// (sur téléphone, seulement le Starter, avec un lien vers le Pro).
+const KEY_FEATURES: Record<string, string[]> = {
+  pro: ["1 boutique Shopify connectée", "Photos et textes créés par l'IA", "Vrais avis clients importés"],
+  agency: ["3 boutiques Shopify connectées", "2× plus de crédit IA", "Optimisation chaque matin"],
+};
+
 export function PriceTeaser() {
-  const [starter, pro] = PAID_PLANS;
   return (
     <section id="tarifs" className="py-16 sm:py-20">
-      <div className="mx-auto max-w-[880px] px-4 sm:px-6">
-        <Reveal className="relative overflow-hidden rounded-[26px] bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,rgb(163_230_53/0.45))] p-px shadow-[0_0_70px_-25px_rgb(46_230_166/0.6)]">
-          <div className="rounded-[25px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] px-5 py-8 text-center sm:px-10 sm:py-10">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#d9f99d]/40 bg-[#a3e635]/10 px-3 py-1 text-[12.5px] font-bold uppercase tracking-[0.06em] text-[#d9f99d]"><Timer className="h-3.5 w-3.5" /> Offre de lancement · −{LAUNCH_OFFER.percent} % à vie</span>
-            <p className="mt-5 text-[15px] text-fg-muted">Ta boutique Shopify complète, dès</p>
-            <p className="mt-1 flex items-baseline justify-center gap-2">
-              <span className="text-2xl font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(starter.monthly)}</span>
-              <span className="text-[clamp(3.2rem,2.4rem+3vw,4.5rem)] font-semibold leading-none tracking-[-0.04em]">{euro(withOffer(starter.monthly))}</span>
-              <span className="text-fg-muted">/ mois</span>
-            </p>
-            <p className="mt-2 text-[14px] text-[#6ee7b7]">ou {euro(withOffer(starter.yearly))} par an · Pro dès {euro(withOffer(pro.monthly))} par mois</p>
-            <ul className="mx-auto mt-6 grid max-w-md gap-2 text-left text-[14.5px] sm:grid-cols-2">
-              {["Sans engagement", "Annulable en un clic", "Prix bloqué à vie", `Valable ${LAUNCH_OFFER.hours} h après l'inscription`].map((t) => (
-                <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 shrink-0 text-[#2ee6a6]" /> {t}</li>
-              ))}
-            </ul>
-            <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/inscription?mode=start" className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-7 text-[15px] font-semibold text-[#03140d] shadow-[0_0_24px_rgb(46_230_166/0.45)] sm:w-auto">{CTA.main} <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/tarifs" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-white/15 px-7 text-[15px] font-medium text-fg/90 hover:border-white/30 sm:w-auto">Voir les tarifs</Link>
-            </div>
-          </div>
+      <div className="mx-auto max-w-[860px] px-4 sm:px-6">
+        <Reveal as="h2" className="text-center text-h2">Un prix <span className="serif-accent">simple</span></Reveal>
+        <Reveal delay={60} className="mx-auto mt-6 flex max-w-[640px] items-center justify-between gap-3 rounded-[16px] border border-[#2ee6a6]/45 bg-[linear-gradient(90deg,rgb(16_176_127/0.28),rgb(163_230_53/0.14))] px-4 py-3 shadow-[0_0_36px_-14px_rgb(46_230_166/0.7)] sm:px-5">
+          <p className="text-[14px] font-extrabold uppercase tracking-[0.05em] sm:text-[15px]">−{LAUNCH_OFFER.percent} % à vie<span className="hidden font-semibold text-white/70 sm:inline"> · offre de lancement</span></p>
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-black/30 px-3 py-1 text-[12.5px] font-semibold text-[#d9f99d]"><Timer className="h-3.5 w-3.5" /> {LAUNCH_OFFER.hours} h</span>
         </Reveal>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {PAID_PLANS.map((plan, i) => (
+            <Reveal key={plan.id} delay={100 + i * 80} className={cn(i > 0 && "hidden sm:block")}>
+              <div className={cn("h-full rounded-[22px] p-px", plan.featured ? "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_50px_-18px_rgb(46_230_166/0.6)]" : "bg-[linear-gradient(160deg,rgb(52_211_153/0.5),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))]")}>
+                <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.9),rgb(4_16_12/0.95))] p-6">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[1.4rem] font-semibold tracking-[-0.02em]">{plan.name}</p>
+                    {plan.featured && <span className="inline-flex items-center gap-1 rounded-full border border-[#a3e635]/40 bg-[#a3e635]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#bef264]"><Sparkles className="h-3 w-3" /> Recommandé</span>}
+                  </div>
+                  <p className="mt-3 flex items-baseline gap-1.5">
+                    <span className="text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(plan.monthly)}</span>
+                    <span className="text-[2.6rem] font-semibold leading-none tracking-[-0.04em]">{euro(withOffer(plan.monthly))}</span>
+                    <span className="text-sm text-fg-muted">/ mois</span>
+                  </p>
+                  <p className="mt-1.5 text-[13.5px] font-medium text-[#6ee7b7]">ou {euro(withOffer(plan.yearly))} par an</p>
+                  <ul className="mt-5 flex-1 space-y-2 text-[14.5px]">
+                    {KEY_FEATURES[plan.id].map((f) => (
+                      <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>{f}</li>
+                    ))}
+                  </ul>
+                  <Link href={`/inscription?plan=${plan.id}`} className={cn(planButtonClass(plan.featured || i === 0), "mt-6")}>{CTA.main} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <p className="mt-5 text-center text-[13.5px] text-fg-muted">Sans engagement · Annulable en 1 clic · <Link href="/tarifs" className="text-[#6ee7b7] underline underline-offset-4">Voir le détail des offres{" "}<span className="sm:hidden">et le Pro</span></Link></p>
       </div>
     </section>
   );

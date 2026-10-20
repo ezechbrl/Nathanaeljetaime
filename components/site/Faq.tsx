@@ -5,14 +5,14 @@ import { useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
 
-export function FaqList({ items, defaultOpen = 0 }: { items: { q: string; a: string }[]; defaultOpen?: number | null }) {
+export function FaqList({ items, defaultOpen = 0, mobileCount }: { items: { q: string; a: string }[]; defaultOpen?: number | null; mobileCount?: number }) {
   const [open, setOpen] = useState<number | null>(defaultOpen);
   return (
     <div className="space-y-2">
       {items.map((item, i) => {
         const isOpen = open === i;
         return (
-          <Reveal key={item.q} delay={i * 50}>
+          <Reveal key={item.q} delay={i * 50} className={mobileCount !== undefined && i >= mobileCount ? "hidden sm:block" : undefined}>
             <div className={cn("rounded-card border transition-colors duration-300", isOpen ? "border-accent/25 bg-accent-deep/20" : "border-white/[0.08] bg-white/[0.02] hover:border-white/15")}>
               <h3>
                 <button
@@ -41,15 +41,15 @@ export function FaqList({ items, defaultOpen = 0 }: { items: { q: string; a: str
   );
 }
 
-export function FaqSection({ items, title, subtitle }: { items: { q: string; a: string }[]; title: React.ReactNode; subtitle?: string }) {
+export function FaqSection({ items, title, subtitle, mobileCount }: { items: { q: string; a: string }[]; title: React.ReactNode; subtitle?: string; mobileCount?: number }) {
   return (
-    <section id="faq" className="py-24">
+    <section id="faq" className="py-16 sm:py-24">
       <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.4fr] lg:gap-20">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Reveal as="h2" className="text-h2">{title}</Reveal>
           {subtitle && <Reveal delay={80} as="p" className="mt-4 text-fg-muted">{subtitle}</Reveal>}
         </div>
-        <FaqList items={items} />
+        <FaqList items={items} mobileCount={mobileCount} />
       </div>
     </section>
   );

@@ -17,15 +17,22 @@ export function Hero() {
         <Reveal delay={80} as="h1" className="mx-auto mt-7 max-w-4xl text-[clamp(2.6rem,1.4rem+3.8vw,4.8rem)] leading-[1.02] tracking-[-0.045em] [text-shadow:0_4px_40px_rgb(0_0_0/0.35)]">
           Ta boutique Shopify qui <span className="serif-accent pr-1">vend</span>, prête en 10 minutes avec l'IA
         </Reveal>
-        <Reveal delay={180} as="p" className="mx-auto mt-6 max-w-2xl text-[17px] font-medium leading-relaxed text-fg-muted sm:text-lg">
-          Textes, photos, vrais avis et design à ta marque : l'IA fait le travail d'une agence. Toi, tu valides et tu vends.
+        <Reveal delay={180} as="p" className="mx-auto mt-5 max-w-2xl text-[16px] font-medium leading-relaxed text-fg-muted sm:mt-6 sm:text-lg">
+          <span className="sm:hidden">La qualité d'une agence, pour le prix d'un resto.</span>
+          <span className="hidden sm:inline">Textes, photos, vrais avis et design à ta marque : la qualité d'une agence, pour le prix d'un resto. Toi, tu valides et tu vends.</span>
         </Reveal>
         <Reveal delay={260} className="mt-9">
           <PromptBox align="center" />
         </Reveal>
-        <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-fg-muted">
-          {["Dès 39 €/mois avec l'offre de lancement", "Annulable en un clic", "Publiée directement dans Shopify"].map((t) => (
-            <li key={t} className="flex items-center gap-1.5"><Check className="h-4 w-4 text-accent" /> {t}</li>
+        {/* Petites preuves prix / qualité, vérifiables (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
+        <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap justify-center gap-2 text-[13px] sm:text-sm">
+          {[
+            { t: "Dès 39 €/mois", mobile: true },
+            { t: "50× moins cher qu'une agence", mobile: true },
+            { t: "Photos de pro incluses", mobile: false },
+            { t: "Annulable en un clic", mobile: false },
+          ].map(({ t, mobile }) => (
+            <li key={t} className={`${mobile ? "flex" : "hidden sm:flex"} items-center gap-1.5 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-fg/85`}><Check className="h-3.5 w-3.5 text-accent" /> {t}</li>
           ))}</ul>
         </Reveal>
       </div>

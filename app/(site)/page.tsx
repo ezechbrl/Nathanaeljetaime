@@ -17,11 +17,12 @@ export default function HomePage() {
       <Compare />
       <PriceTeaser />
       <Reviews />
-      <FinalCta />
+      <div className="hidden sm:block"><FinalCta /></div>
       <FaqSection
         title={<>Les questions qu'on nous <span className="serif-accent">pose vraiment</span></>}
         subtitle="Prix, Shopify, résultat : on répond franchement."
         items={HOME_FAQ.slice(0, 5)}
+        mobileCount={3}
       />
     </>
   );

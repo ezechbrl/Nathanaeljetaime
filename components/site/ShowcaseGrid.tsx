@@ -15,7 +15,7 @@ export function ShowcaseGrid() {
         </div>
         <div className="-mx-4 mt-10 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
           {SHOWCASE.map((s, i) => (
-            <Reveal key={s.slug} delay={(i % 4) * 70} className="w-[78vw] max-w-[320px] shrink-0 snap-center sm:w-auto sm:max-w-none">
+            <Reveal key={s.slug} delay={(i % 4) * 70} className={`w-[78vw] max-w-[320px] shrink-0 snap-center sm:w-auto sm:max-w-none ${i >= 5 ? "hidden sm:block" : ""}`}>
               <Link
                 href={`/exemples/${s.slug}`}
                 className="group relative block overflow-hidden rounded-[22px] p-4 pb-16 shadow-[0_24px_60px_-30px_rgb(0_0_0/0.8)] ring-1 ring-white/10 transition-all duration-500 hover:-translate-y-1.5 hover:ring-white/30"
