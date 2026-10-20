@@ -65,6 +65,10 @@ function Billing() {
               {sub ? (
                 <>
                   <p className="mt-3 text-[clamp(2.2rem,1.6rem+2vw,3.2rem)] font-semibold leading-none tracking-[-0.03em]">Vitrio {current?.name}</p>
+                  {/* Accès donné à la main (pas d'abonnement Stripe) : rien n'est facturé. */}
+                  {!sub.interval && !sub.renewsAt ? (
+                    <p className="mt-4 text-[2.4rem] font-semibold leading-none tracking-[-0.03em]">Accès offert</p>
+                  ) : (
                   <p className="mt-4 flex items-baseline gap-2">
                     <span className="text-[2.4rem] font-semibold leading-none tracking-[-0.03em] tabular-nums">{sub.amount ? formatMoney(sub.amount, "EUR") : euro(sub.interval === "year" ? current?.yearly ?? 0 : current?.monthly ?? 0)}</span>
                     <span className="text-fg-muted">{sub.interval === "year" ? "/ an" : "/ mois"}</span>
@@ -72,7 +76,8 @@ function Billing() {
                       <span className="ml-1 rounded-full bg-[#2ee6a6]/15 px-2.5 py-1 text-[12px] font-semibold text-[#a7f3d0]">Prix de lancement à vie</span>
                     )}
                   </p>
-                  <p className="mt-3 text-sm text-fg-muted">{sub.renewsAt ? `${sub.cancelAtPeriodEnd ? "Se termine" : "Prochain paiement"} le ${formatDate(sub.renewsAt)}` : "Abonnement actif"}</p>
+                  )}
+                  <p className="mt-3 text-sm text-fg-muted">{!sub.interval && !sub.renewsAt ? "Rien n'est facturé sur ce compte." : sub.renewsAt ? `${sub.cancelAtPeriodEnd ? "Se termine" : "Prochain paiement"} le ${formatDate(sub.renewsAt)}` : "Abonnement actif"}</p>
                 </>
               ) : <Skeleton className="mt-3 h-12 w-56" />}
             </div>
