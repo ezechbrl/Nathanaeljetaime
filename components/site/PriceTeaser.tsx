@@ -31,8 +31,9 @@ export function PriceTeaser() {
                 <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.9),rgb(4_16_12/0.95))] p-6">
                   <div className="flex items-center justify-between">
                     <p className="text-[1.4rem] font-semibold tracking-[-0.02em]">{plan.name}</p>
-                    {plan.featured && <span className="inline-flex items-center gap-1 rounded-full border border-[#a3e635]/40 bg-[#a3e635]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#bef264]"><Sparkles className="h-3 w-3" /> Recommandé</span>}
+                    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] font-semibold", plan.featured ? "border-[#a3e635]/40 bg-[#a3e635]/10 text-[#bef264]" : "border-[#2ee6a6]/35 bg-[#2ee6a6]/10 text-[#a7f3d0]")}>{plan.featured && <Sparkles className="h-3 w-3" />} {plan.badge}</span>
                   </div>
+                  <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">{plan.tagline}</p>
                   <p className="mt-3 flex items-baseline gap-1.5">
                     <span className="text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(plan.monthly)}</span>
                     <span className="text-[2.6rem] font-semibold leading-none tracking-[-0.04em]">{euro(withOffer(plan.monthly))}</span>

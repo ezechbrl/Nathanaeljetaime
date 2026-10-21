@@ -4,6 +4,7 @@ export type Plan = {
   id: PlanId;
   name: string;
   tagline: string;
+  badge: string; // à qui s'adresse l'offre
   monthly: number; // en euros
   yearly: number;  // prix annuel total
   features: string[];
@@ -17,17 +18,17 @@ export type Plan = {
 export const PLANS: Plan[] = [
   {
     // Compte sans abonnement (pas affiché sur la page Tarifs : il n'y a pas d'offre gratuite).
-    id: "free", name: "Sans abonnement", tagline: "", monthly: 0, yearly: 0, hidden: true,
+    id: "free", name: "Sans abonnement", badge: "", tagline: "", monthly: 0, yearly: 0, hidden: true,
     features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
-    id: "pro", name: "Starter", tagline: "Pour lancer ta marque.", monthly: 78, yearly: 398,
+    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en moins de 10 minutes, sans rien connaître à Shopify.", monthly: 78, yearly: 398,
     features: ["1 boutique Shopify connectée", "Change de produit à volonté", "Photos produit et mises en situation par l'IA", "Vrais avis clients importés", "Modifications par l'IA", "Thème Shopify à ta marque"],
     limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
     cta: "Commencer", featured: true,
   },
   {
-    id: "agency", name: "Pro", tagline: "Pour tester plusieurs produits et grandir.", monthly: 158, yearly: 798,
+    id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 158, yearly: 798,
     features: ["3 boutiques Shopify connectées", "Teste plusieurs produits à la fois", "2× plus de crédit IA", "Optimisation quotidienne de la boutique", "Images et modifications en plus", "Support prioritaire"],
     limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "3", ai: "2 € toutes les 5 h, 7 € / semaine" },
     cta: "Commencer",
