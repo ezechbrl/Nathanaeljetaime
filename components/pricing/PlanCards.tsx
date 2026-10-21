@@ -62,14 +62,14 @@ export function OfferBanner({ left }: { left: Left }) {
   return (
     <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-white/[0.04] px-5 py-3 backdrop-blur shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
       <div>
-        <p className="bg-[linear-gradient(90deg,#6ee7b7,#2ee6a6_45%,#bef264)] bg-clip-text text-[17px] font-extrabold uppercase tracking-[0.03em] text-transparent">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
+        <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
         <p className="text-[12.5px] text-fg-muted">Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
       </div>
       <div className="flex items-end gap-1.5 font-semibold tabular-nums" aria-label={`Il reste ${left.h} heures ${left.m} minutes`}>
         {[{ v: left.h, l: "heures" }, { v: left.m, l: "min" }, { v: left.s, l: "sec" }].map((u, i) => (
           <span key={u.l} className="flex items-end gap-1.5">
-            {i > 0 && <span className="pb-4 text-xl text-[#2ee6a6]">:</span>}
-            <span className="flex flex-col items-center"><span className="grid h-11 min-w-[2.8rem] place-items-center rounded-lg border border-[#2ee6a6]/45 bg-[#2ee6a6]/10 px-1.5 text-[1.6rem] leading-none text-[#a7f3d0] shadow-[0_0_18px_-4px_rgb(46_230_166/0.6)]">{u.v}</span><span className="mt-1 text-[10px] font-medium uppercase tracking-wider text-[#6ee7b7]/80">{u.l}</span></span>
+            {i > 0 && <span className="pb-4 text-xl text-fg-muted">:</span>}
+            <span className="flex flex-col items-center"><span className="text-[1.7rem] leading-none text-white">{u.v}</span><span className="mt-1 text-[10px] font-medium uppercase tracking-wider text-fg-faint">{u.l}</span></span>
           </span>
         ))}
       </div>

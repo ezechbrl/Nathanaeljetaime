@@ -1,14 +1,13 @@
-// Fond commun à tous les écrans (site, connexion, espace client), fixe derrière la page :
-// dégradé vert profond, rayons de lumière doux, fine trame de points et lueurs émeraude et citron vert.
-// Hauteur « grand écran » (100lvh) : sur téléphone, le fond ne laisse jamais de bande vide quand la barre d'adresse se replie.
+// Fond commun à tous les écrans (site, connexion, espace client) : dégradé vert avec de larges rayons
+// de lumière obliques qui bougent lentement. Fixe derrière la page ; hauteur « grand écran » (100lvh)
+// pour qu'aucune bande vide n'apparaisse sur téléphone quand la barre d'adresse se replie.
 export function PageBackdrop() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[100lvh] overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,#04110c_0%,#062018_45%,#04110c_100%)]" />
-      <div className="absolute -inset-x-[15%] -top-[10%] bottom-0 opacity-80 blur-[34px] [animation:beams_26s_ease-in-out_infinite] [background:repeating-linear-gradient(122deg,transparent_0_120px,rgb(110_231_183/0.11)_180px,transparent_260px,transparent_380px,rgb(163_230_53/0.06)_420px,transparent_500px)]" />
-      <div className="absolute inset-0 opacity-[0.22] [background-image:radial-gradient(rgb(167_243_208/0.55)_1px,transparent_1.2px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_75%_60%_at_50%_30%,black,transparent_75%)]" />
-      <div className="absolute -left-[10%] top-[8%] h-[38rem] w-[38rem] rounded-full bg-[radial-gradient(closest-side,rgb(16_176_127/0.35),transparent)] [animation:aurora_18s_ease-in-out_infinite]" />
-      <div className="absolute -right-[8%] top-[35%] h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(closest-side,rgb(163_230_53/0.14),transparent)] [animation:aurora_24s_ease-in-out_infinite_reverse]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#05261d_0%,#0a3a2c_50%,#06261e_100%)]" />
+      <div className="absolute -inset-x-[15%] -top-[10%] bottom-0 blur-[28px] [animation:beams_22s_ease-in-out_infinite] [background:repeating-linear-gradient(112deg,transparent_0_90px,rgb(110_231_183/0.16)_150px,transparent_230px,transparent_300px,rgb(52_211_153/0.10)_340px,transparent_420px)]" />
+      <div className="absolute -inset-x-[15%] -top-[10%] bottom-0 blur-[40px] [animation:beams_30s_ease-in-out_infinite_reverse] [background:repeating-linear-gradient(108deg,transparent_0_160px,rgb(0_0_0/0.28)_230px,transparent_320px)]" />
+      <div className="absolute left-1/2 top-[30%] h-[30rem] w-[60rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(46_230_166/0.14),transparent)]" />
     </div>
   );
 }

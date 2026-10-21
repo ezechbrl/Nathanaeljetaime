@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      // Ancienne adresse : tout le monde passe sur vigenia.com (les cookies de connexion restent sur le même domaine).
+      // Les webhooks et retours Shopify / Stripe déjà configurés sur l'ancienne adresse ne sont pas redirigés.
+      { source: "/:path((?!api/).*)", has: [{ type: "host", value: "nathanaeljetaime.vercel.app" }], destination: "https://vigenia.com/:path", permanent: true },
       // Les outils (nom, slogan, description, FAQ) sont maintenant dans l'app, après la création de la boutique.
       { source: "/outils", destination: "/app/outils", permanent: false },
       // Ouverture de l'app depuis Shopify (installation ou admin) : l'adresse de l'app reçoit ?shop=…&hmac=…

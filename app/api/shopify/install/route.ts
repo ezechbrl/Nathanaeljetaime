@@ -12,8 +12,10 @@ export const GET = route(async (req) => {
   const next = params.get("next") ?? "/app";
   const state = randomToken();
   const res = NextResponse.redirect(authorizeUrl(shop, state));
-  const opts = { httpOnly: true, secure: true, sameSite: "lax" as const, maxAge: 600, path: "/" };
+  const opts = { httpOnly: true, secure: true, sameSite: "lax" as const, maxAge: 3600, path: "/" };
   res.cookies.set("shopify_state", state, opts);
   res.cookies.set("shopify_next", next.startsWith("/") && !next.startsWith("//") ? next : "/app", opts);
+  if (params.get("retry")) res.cookies.set("shopify_retry", "1", { ...opts, maxAge: 300 });
+  else res.cookies.delete("shopify_retry");
   return res;
 });

@@ -10,7 +10,7 @@ import * as api from "@/lib/api/client";
 
 const ERRORS: Record<string, string> = {
   signature: "La connexion Shopify n'a pas pu être vérifiée. Réessaie.",
-  session: "La connexion a expiré. Réessaie.",
+  session: "La connexion n'a pas pu aboutir : vérifie que les cookies sont autorisés dans ton navigateur, puis réessaie.",
   "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec Google ou ton e-mail, puis relie ta boutique.",
   google: "La connexion Google a échoué. Réessaie.",
   lien: "Ce lien de connexion n'est plus valide (il expire au bout d'une heure). Demande-en un nouveau.",

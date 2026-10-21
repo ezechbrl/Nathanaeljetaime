@@ -25,7 +25,13 @@ export const GET = route(async (req) => {
   const state = jar.get("shopify_state")?.value ?? "";
   const next = jar.get("shopify_next")?.value ?? "/app";
   if (!SHOP_RE.test(shop) || !verifyQueryHmac(params)) return fail("signature");
-  if (!state || !safeEqual(state, params.get("state") ?? "")) return fail("session");
+  // Jeton de sécurité absent ou différent (lien trop ancien, autre onglet, autre adresse du site) :
+  // la demande vient bien de Shopify (signature vérifiée), on relance simplement la connexion, sans erreur.
+  // Une seule relance automatique (cookie « shopify_retry ») pour ne jamais tourner en boucle si les cookies sont bloqués.
+  if (!state || !safeEqual(state, params.get("state") ?? "")) {
+    if (jar.get("shopify_retry")) return fail("session");
+    return NextResponse.redirect(`${app}/api/shopify/install?shop=${encodeURIComponent(shop)}&next=${encodeURIComponent(next)}&retry=1`);
+  }
 
   const tokens = await exchangeCode(shop, params.get("code") ?? "");
   const { access_token, scope } = tokens;
