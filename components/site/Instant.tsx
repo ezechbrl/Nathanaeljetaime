@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
 
-// « Nouvelle ère. » : ce que fait Vitrio, à essayer directement (textes, photos, avis, publication).
+// « Nouvelle ère. » : ce que fait Vigenia, à essayer directement (textes, photos, avis, publication).
 const TABS = [
   { id: "reviews", icon: Star, title: "De vrais avis", text: "Ceux des acheteurs du produit, traduits." },
   { id: "text", icon: MessageSquareText, title: "Des textes qui vendent", text: "Accueil, fiche produit, FAQ, offres par lot." },
@@ -53,7 +53,7 @@ function PhotoDemo() {
         <span className="absolute right-3 top-3 rounded-full bg-[#2ee6a6]/90 px-2.5 py-1 text-[11px] font-semibold text-[#03140d]">En situation</span>
         <input type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} aria-label="Comparer les deux photos" className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0" />
       </div>
-      <p className="mt-3 text-center text-[13px] text-fg-muted">Fais glisser : deux photos du même casque, créées par l'IA de Vitrio.</p>
+      <p className="mt-3 text-center text-[13px] text-fg-muted">Fais glisser : deux photos du même casque, créées par l'IA de Vigenia.</p>
     </div>
   );
 }
@@ -143,7 +143,7 @@ export function Instant() {
           </Reveal>
         </div>
         <Reveal delay={150} className="mt-10 grid gap-4 lg:mt-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)]">
-          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-1 lg:gap-3 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Ce que fait Vitrio">
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-1 lg:gap-3 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Ce que fait Vigenia">
             {TABS.map(({ id, icon: I, title, text }) => (
               <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => pick(id)} className={cn("flex shrink-0 items-center gap-3 rounded-full border px-4 py-2.5 text-left transition-all lg:gap-4 lg:rounded-[18px] lg:p-4", tab === id ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/10 shadow-[0_0_30px_-10px_rgb(46_230_166/0.6)]" : "border-white/10 bg-black/20 hover:border-white/25")}>
                 <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-xl border transition-colors lg:h-11 lg:w-11 lg:rounded-2xl", tab === id ? "border-[#2ee6a6]/50 bg-[#2ee6a6]/20 text-[#a7f3d0]" : "border-white/10 text-fg-muted")}><I className="h-4 w-4 lg:h-5 lg:w-5" /></span>

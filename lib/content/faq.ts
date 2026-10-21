@@ -11,7 +11,7 @@ export const HOME_FAQ = [
   },
   {
     q: "Combien ça me coûte, au total ?",
-    a: `Vitrio : 78 € par mois (Starter) ou 158 € par mois (Pro), ou à l'année pour beaucoup moins cher, sans engagement. Offre de lancement : −50 % à vie (39 € et 79 € par mois, ou 199 € et 399 € par an) si tu t'abonnes dans les 48 h après ton inscription. Shopify : ${site.shopifyOffer} en ce moment, puis son prix normal. Pas de designer, pas de photographe, pas de thème payant à acheter.`,
+    a: `Vigenia : 78 € par mois (Starter) ou 158 € par mois (Pro), ou à l'année pour beaucoup moins cher, sans engagement. Offre de lancement : −50 % à vie (39 € et 79 € par mois, ou 199 € et 399 € par an) si tu t'abonnes dans les 48 h après ton inscription. Shopify : ${site.shopifyOffer} en ce moment, puis son prix normal. Pas de designer, pas de photographe, pas de thème payant à acheter.`,
   },
   {
     q: "Les photos et les avis, ils viennent d'où ?",
@@ -23,14 +23,14 @@ export const HOME_FAQ = [
   },
   {
     q: "Il faut déjà avoir une boutique Shopify ?",
-    a: "Il faut un compte Shopify, oui : c'est là que ta boutique vit. Si tu n'en as pas, tu le crées en quelques minutes, puis tu le relies à Vitrio en un clic.",
+    a: "Il faut un compte Shopify, oui : c'est là que ta boutique vit. Si tu n'en as pas, tu le crées en quelques minutes, puis tu le relies à Vigenia en un clic.",
   },
   {
     q: "Je dois savoir coder ou faire du design ?",
-    a: "Non. Tout se fait en français, avec des boutons et des phrases. Si tu sais coller un lien, tu sais utiliser Vitrio.",
+    a: "Non. Tout se fait en français, avec des boutons et des phrases. Si tu sais coller un lien, tu sais utiliser Vigenia.",
   },
   {
     q: "Si j'arrête, je perds tout ?",
-    a: "Non. La boutique, les produits, les textes et les clients sont sur ton compte Shopify : ils y restent, même si tu résilies Vitrio.",
+    a: "Non. La boutique, les produits, les textes et les clients sont sur ton compte Shopify : ils y restent, même si tu résilies Vigenia.",
   },
 ];

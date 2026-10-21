@@ -13,7 +13,7 @@ export type ShowcaseStore = {
   font: "serif" | "sans" | "mono";
   layout: "split" | "center" | "grid";
   highlights: string[];
-  image?: string; // vraie photo générée par Vitrio (sinon visuel dessiné aux couleurs de la marque)
+  image?: string; // vraie photo générée par Vigenia (sinon visuel dessiné aux couleurs de la marque)
 };
 
 export const SHOWCASE: ShowcaseStore[] = [

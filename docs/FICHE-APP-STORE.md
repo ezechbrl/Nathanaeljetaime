@@ -5,7 +5,7 @@
 Fiche en français (langue principale). Shopify la traduit automatiquement dans les autres langues.
 
 ## Basic app information
-- **App name** : `Vitrio`
+- **App name** : `Vigenia`
 - **App category** : Store design → (sous-catégorie la plus proche de « Store builder / Page builder »)
 - **Languages** : Français (ajouter Anglais plus tard si l'interface est traduite)
 
@@ -13,7 +13,7 @@ Fiche en français (langue principale). Shopify la traduit automatiquement dans 
 - **App introduction** (100 caractères max) :
   `Colle le lien d'un produit : l'IA crée ta boutique Shopify complète en 5 minutes, prête à vendre.`
 - **App details** (500 caractères max) :
-  `Vitrio construit pour toi une boutique Shopify pensée pour vendre. Colle le lien d'un produit (AliExpress, Amazon…) ou décris ton idée : l'IA écrit l'accueil, la fiche produit, la FAQ et les offres par lot, crée des photos professionnelles de ton produit, ajoute les vrais avis des acheteurs et applique un design à ta marque. Ensuite, tu modifies tout en discutant avec l'IA, et tu publies dans ta boutique en un clic. Aucune compétence technique ni designer nécessaire.`
+  `Vigenia construit pour toi une boutique Shopify pensée pour vendre. Colle le lien d'un produit (AliExpress, Amazon…) ou décris ton idée : l'IA écrit l'accueil, la fiche produit, la FAQ et les offres par lot, crée des photos professionnelles de ton produit, ajoute les vrais avis des acheteurs et applique un design à ta marque. Ensuite, tu modifies tout en discutant avec l'IA, et tu publies dans ta boutique en un clic. Aucune compétence technique ni designer nécessaire.`
 - **Features** (80 caractères max chacune) :
   1. `Boutique complète en 5 minutes à partir d'un lien produit ou d'une idée`
   2. `Photos studio et mises en situation de ton produit, générées par l'IA`
@@ -47,4 +47,4 @@ Fiche en français (langue principale). Shopify la traduit automatiquement dans 
 - **Test account** : compte de test fourni par Claude
 - **Screencast URL** : vidéo de démonstration (fournie par Claude)
 - **Testing instructions** :
-  `1. Installez l'app sur une boutique de développement : vous êtes connecté automatiquement à Vitrio. 2. Sur l'accueil, collez un lien produit (ex. une page AliExpress) ou décrivez un produit, puis cliquez sur « Générer » : la boutique est prête en environ 5 minutes. 3. Ouvrez l'éditeur IA et demandez une modification (ex. « change la couleur principale en bleu »). 4. Cliquez sur « Publier sur Shopify » : le produit, les pages et les visuels sont créés dans la boutique. La boutique de test peut créer une boutique gratuite sans abonnement.`
+  `1. Installez l'app sur une boutique de développement : vous êtes connecté automatiquement à Vigenia. 2. Sur l'accueil, collez un lien produit (ex. une page AliExpress) ou décrivez un produit, puis cliquez sur « Générer » : la boutique est prête en environ 5 minutes. 3. Ouvrez l'éditeur IA et demandez une modification (ex. « change la couleur principale en bleu »). 4. Cliquez sur « Publier sur Shopify » : le produit, les pages et les visuels sont créés dans la boutique. La boutique de test peut créer une boutique gratuite sans abonnement.`

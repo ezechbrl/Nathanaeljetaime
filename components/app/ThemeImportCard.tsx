@@ -6,7 +6,7 @@ import { API_MODE } from "@/lib/api/client";
 import type { Store } from "@/lib/api/types";
 import { shopifyLinks } from "@/lib/shopify-links";
 
-// Shopify n'autorise pas encore Vitrio à installer le thème tout seul : le marchand l'importe en 3 clics.
+// Shopify n'autorise pas encore Vigenia à installer le thème tout seul : le marchand l'importe en 3 clics.
 const doneKey = (store: Store) => `vitrio-theme-imported-${store.id}-${store.updatedAt}`;
 
 // Le marchand a confirmé l'import du thème depuis la dernière publication.
@@ -23,7 +23,7 @@ export function ThemeImportCard({ store, compact = false, onDone }: { store: Sto
   const steps = [
     { title: "Télécharge ton thème", text: "Un fichier .zip avec ton design, tes couleurs et tes photos.", action: download && <a href={download} download className="inline-flex h-10 items-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-4 text-sm font-medium text-white"><Download className="h-4 w-4" /> Télécharger le thème</a> },
     { title: "Importe-le dans Shopify", text: "Thèmes → bouton « Importer » (ou « … » → Importer) → choisis le fichier .zip, sans le décompresser.", action: links && <a href={links.themes} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-white/15 px-4 text-sm text-fg hover:bg-white/5">Ouvrir mes thèmes Shopify <ExternalLink className="h-4 w-4" /></a> },
-    { title: "Publie-le", text: "Sur le thème « Vitrio » importé : « … » → Publier. Ta boutique prend son nouveau look tout de suite.", action: onDone && <button type="button" onClick={onDone} className="inline-flex h-10 items-center gap-2 rounded-ctl border border-white/15 px-4 text-sm text-fg hover:bg-white/5"><Check className="h-4 w-4" /> C'est fait</button> },
+    { title: "Publie-le", text: "Sur le thème « Vigenia » importé : « … » → Publier. Ta boutique prend son nouveau look tout de suite.", action: onDone && <button type="button" onClick={onDone} className="inline-flex h-10 items-center gap-2 rounded-ctl border border-white/15 px-4 text-sm text-fg hover:bg-white/5"><Check className="h-4 w-4" /> C'est fait</button> },
   ];
   if (compact) {
     return (
@@ -47,7 +47,7 @@ export function ThemeImportCard({ store, compact = false, onDone }: { store: Sto
         <span className="grid h-10 w-10 place-items-center rounded-full bg-accent/15 text-accent"><Palette className="h-5 w-5" /></span>
         <div>
           <h2 className="text-lg font-medium tracking-tight">Dernière étape : installe ton thème en 3 clics</h2>
-          <p className="text-sm text-fg-muted">Ton produit est dans Shopify. Il reste à mettre le design Vitrio sur ta boutique.</p>
+          <p className="text-sm text-fg-muted">Ton produit est dans Shopify. Il reste à mettre le design Vigenia sur ta boutique.</p>
         </div>
       </div>
       <ol className="mt-5 grid gap-3 md:grid-cols-3">

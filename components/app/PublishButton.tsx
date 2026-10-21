@@ -57,7 +57,7 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
       {confirm && reauth && (
         <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-card border border-white/10 bg-bg-2 p-4 text-sm shadow-2xl">
           <p className="text-fg">Une autorisation à donner</p>
-              <p className="mt-1 text-fg-muted">Vitrio installe maintenant un vrai thème à tes couleurs dans Shopify. Shopify te demande de l'autoriser une fois, puis tu reviens ici.</p>
+              <p className="mt-1 text-fg-muted">Vigenia installe maintenant un vrai thème à tes couleurs dans Shopify. Shopify te demande de l'autoriser une fois, puis tu reviens ici.</p>
               <a href={api.shopifyLoginUrl(reauth, `/app/boutiques/${store.id}`)} className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-ctl bg-accent px-3 text-sm font-medium text-white">Autoriser dans Shopify</a>
         </div>
       )}

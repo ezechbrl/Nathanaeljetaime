@@ -4,7 +4,7 @@ import { db } from "@/lib/server/supabase";
 import { buildThemeZip, type ThemeContext } from "@/lib/server/theme/build";
 import { readThemeToken } from "@/lib/server/theme/link";
 
-// Archive du thème Vitrio d'une boutique, téléchargée par Shopify (lien signé, valable 30 min).
+// Archive du thème Vigenia d'une boutique, téléchargée par Shopify (lien signé, valable 30 min).
 export async function GET(_req: Request, { params }: { params: Promise<{ token: string }> }) {
   const access = readThemeToken((await params).token);
   if (!access) return new Response("Lien expiré", { status: 403 });

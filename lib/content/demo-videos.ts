@@ -23,7 +23,7 @@ export const DEMO_VIDEOS: DemoVideo[] = [
   },
   {
     id: "generate", step: "Étape 2", title: "Une phrase, une boutique",
-    text: "Tu dis ce que tu vends et à qui. Vitrio réfléchit d'abord à ta cible et à tes arguments, puis remplit chaque page.",
+    text: "Tu dis ce que tu vends et à qui. Vigenia réfléchit d'abord à ta cible et à tes arguments, puis remplit chaque page.",
     src: "/videos/generate.webm", poster: "/videos/generate.jpg",
     captions: [
       { t: 0, text: "Tu décris ton produit en une phrase." },
@@ -45,7 +45,7 @@ export const DEMO_VIDEOS: DemoVideo[] = [
   },
   {
     id: "pilot", step: "Étape 4", title: "Progresse chaque matin",
-    text: "Vitrio lit tes ventes et tes visites, repère ce qui bloque et te propose une correction prête à appliquer.",
+    text: "Vigenia lit tes ventes et tes visites, repère ce qui bloque et te propose une correction prête à appliquer.",
     src: "/videos/pilot.webm", poster: "/videos/pilot.jpg",
     captions: [
       { t: 0, text: "Chaque matin, l'IA lit les statistiques de ta boutique." },

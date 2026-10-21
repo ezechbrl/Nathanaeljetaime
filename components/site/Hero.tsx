@@ -41,7 +41,7 @@ export function Hero() {
         <Reveal delay={380} className="relative mx-auto mt-10 max-w-[1320px] sm:mt-14">
           <div aria-hidden className="absolute -inset-6 rounded-[32px] bg-[radial-gradient(closest-side,rgb(46_230_166/0.35),transparent)] blur-2xl" />
           <div className="relative sm:rounded-[17px] sm:bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_40%,rgb(46_230_166/0.5))] sm:p-px sm:shadow-[0_0_80px_-20px_rgb(46_230_166/0.6)]">
-            <TutorialVideo name="tuto-boutique" mobile="tuto-boutique-mobile" title="vitrio.app · Du lien à la boutique en ligne, étape par étape" speed="×1,8" className="max-w-none" />
+            <TutorialVideo name="tuto-boutique" mobile="tuto-boutique-mobile" title="vigenia.com · Du lien à la boutique en ligne, étape par étape" speed="×1,8" className="max-w-none" />
           </div>
         </Reveal>
       </div>

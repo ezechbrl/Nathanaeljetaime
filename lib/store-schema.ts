@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Icônes disponibles dans le thème (le même jeu côté aperçu Vitrio et côté Shopify).
+// Icônes disponibles dans le thème (le même jeu côté aperçu Vigenia et côté Shopify).
 export const ICONS = ["bolt", "leaf", "heart", "check", "shield", "truck", "star", "sparkle", "drop", "sun", "clock", "gift", "recycle", "hand", "award", "feather", "smile", "home", "moon", "flame"] as const;
 export const IconSchema = z.enum(ICONS);
 export type IconName = z.infer<typeof IconSchema>;

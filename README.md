@@ -1,4 +1,4 @@
-# Vitrio — créateur de boutiques Shopify par IA
+# Vigenia — créateur de boutiques Shopify par IA
 
 Décris ton produit : l'IA pose la stratégie (marché, promesse, offres, objections), construit la boutique
 (marque, pages, fiches produits, FAQ, visuels), la publie sur Shopify, puis l'optimise chaque jour.

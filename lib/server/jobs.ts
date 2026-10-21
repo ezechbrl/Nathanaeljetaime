@@ -28,7 +28,7 @@ export const GENERATE_STEPS: Omit<Step, "status">[] = [
 export const PUBLISH_STEPS: Omit<Step, "status">[] = [
   { key: "product", label: "Produit, prix et images" },
   { key: "publish", label: "Mise en vente" },
-  { key: "theme", label: "Installation du thème Vitrio" },
+  { key: "theme", label: "Installation du thème Vigenia" },
 ];
 
 export async function createJob(storeId: string, userId: string, kind: "generate" | "publish" | "image" | "recraft", steps: Omit<Step, "status">[], input: Record<string, unknown> = {}) {
@@ -75,7 +75,7 @@ async function finish(jobId: string, steps: Step[], error?: string) {
 const errorMessage = (e: unknown) => {
   if (e instanceof Anthropic.APIError) {
     console.error("API Claude :", e.status, e.message);
-    if (e.status === 400 && /credit balance/i.test(e.message)) return "L'IA de Vitrio est momentanément indisponible. Réessaie dans quelques minutes. (code : crédit IA)";
+    if (e.status === 400 && /credit balance/i.test(e.message)) return "L'IA de Vigenia est momentanément indisponible. Réessaie dans quelques minutes. (code : crédit IA)";
     if (e.status === 429 || e.status === 529 || (e.status ?? 0) >= 500) return "L'IA est très demandée en ce moment. Réessaie dans une minute.";
     return `L'IA n'a pas pu traiter la demande. Réessaie dans un instant. (code : ${e.status ?? "réseau"})`;
   }
@@ -282,12 +282,12 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     const liveUrl = `https://${conn.shop}`;
     await db().from("stores").update({ shopify: ids, status: "published", live_url: liveUrl, shop_connection_id: conn.id, updated_at: new Date().toISOString() }).eq("id", store.id);
 
-    // Thème Vitrio : produit et pages sont déjà enregistrés, un échec ici ne crée pas de doublon.
+    // Thème Vigenia : produit et pages sont déjà enregistrés, un échec ici ne crée pas de doublon.
     await step("theme");
     const plan = store.plan as StorePlan;
     const install = (withFiles: boolean) => installTheme(conn.shop, conn.token, {
       zipUrl: themeZipUrl(store.id, { withFiles }),
-      name: `Vitrio · ${plan.brand.name}`,
+      name: `Vigenia · ${plan.brand.name}`,
       publish: Boolean((job.input as { publishTheme?: boolean } | null)?.publishTheme),
       previousThemeId: ids.themeId,
     });

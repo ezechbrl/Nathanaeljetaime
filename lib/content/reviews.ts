@@ -1,4 +1,4 @@
-// Avis de vrais utilisateurs de Vitrio, affichés sur l'accueil. Uniquement des avis réels (jamais inventés),
+// Avis de vrais utilisateurs de Vigenia, affichés sur l'accueil. Uniquement des avis réels (jamais inventés),
 // avec l'accord de la personne. La section reste masquée tant que la liste est vide.
 export type Review = {
   name: string;   // prénom + initiale, ex. « Léa M. »

@@ -139,7 +139,7 @@ export default function EditorPage() {
           <div className="flex items-center gap-3 border-b border-white/[0.06] bg-black/15 px-5 py-3.5">
             <LogoMark className="h-10 w-10 shrink-0" />
             <div className="leading-tight">
-              <p className="text-[15.5px] font-semibold">Assistant IA Vitrio</p>
+              <p className="text-[15.5px] font-semibold">Assistant IA Vigenia</p>
               <p className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-fg-muted">
                 <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" /><span className="relative h-2 w-2 rounded-full bg-accent" /></span>
                 En ligne · modifie ta boutique en direct

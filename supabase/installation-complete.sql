@@ -1,8 +1,8 @@
--- Installation complète de la base Vitrio : les 5 migrations, dans l'ordre.
+-- Installation complète de la base Vigenia : les 5 migrations, dans l'ordre.
 -- À coller en une fois dans Supabase → SQL Editor → New query → Run.
 
 -- ===== 0001_init.sql =====
--- Schéma Vitrio. À coller dans Supabase → SQL Editor → New query → Run (une seule fois).
+-- Schéma Vigenia. À coller dans Supabase → SQL Editor → New query → Run (une seule fois).
 -- Toutes les lectures/écritures passent par le serveur (clé service_role) : la RLS est activée
 -- sans politique, ce qui bloque tout accès direct depuis le navigateur.
 

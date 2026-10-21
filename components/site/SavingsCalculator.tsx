@@ -40,7 +40,7 @@ export function SavingsCalculator() {
           </div>
         </div>
         <div>
-          <div className="flex justify-between text-sm"><span className="text-fg-muted">Avec Vitrio</span><span className="tabular-nums text-accent">{minutes} minutes</span></div>
+          <div className="flex justify-between text-sm"><span className="text-fg-muted">Avec Vigenia</span><span className="tabular-nums text-accent">{minutes} minutes</span></div>
           <div className="mt-2 h-4 overflow-hidden rounded-full bg-white/[0.06]">
             <div className="h-full w-[1.5%] min-w-3 rounded-full bg-accent" />
           </div>

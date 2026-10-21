@@ -87,9 +87,9 @@ export async function syncSubscription(sub: Stripe.Subscription) {
   const was = before?.plan ?? "free";
   const info = PLANS.find((p) => p.id === plan);
   if (was === "free" && plan !== "free" && info && mapped) {
-    await notifyOwner("💰 Nouvelle vente Vitrio", saleMessage(before?.email ?? "Un client", info.name, mapped.interval === "year" ? `${euro(info.yearly)}/an` : `${euro(info.monthly)}/mois`));
+    await notifyOwner("💰 Nouvelle vente Vigenia", saleMessage(before?.email ?? "Un client", info.name, mapped.interval === "year" ? `${euro(info.yearly)}/an` : `${euro(info.monthly)}/mois`));
   } else if (was !== "free" && plan === "free") {
-    await notifyOwner("Abonné parti", `${before?.email ?? "Un client"} a arrêté son abonnement Vitrio.`);
+    await notifyOwner("Abonné parti", `${before?.email ?? "Un client"} a arrêté son abonnement Vigenia.`);
   }
 }
 

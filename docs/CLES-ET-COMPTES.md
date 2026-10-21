@@ -74,14 +74,14 @@ Il te faut une **app Shopify publique** à toi :
 
 1. **https://partners.shopify.com** → crée un compte Partenaire (gratuit).
 2. Crée une **boutique de développement** pour tester : Partner Dashboard → **Stores → Add store → Development store**.
-3. Crée l'app : Partner Dashboard → **Apps → Create app → Create app manually** (selon ton compte, Shopify peut t'envoyer vers le **Dev Dashboard**, https://dev.shopify.com : c'est la même chose, « Create app »). Nom : `Vitrio`.
+3. Crée l'app : Partner Dashboard → **Apps → Create app → Create app manually** (selon ton compte, Shopify peut t'envoyer vers le **Dev Dashboard**, https://dev.shopify.com : c'est la même chose, « Create app »). Nom : `Vigenia`.
 4. Dans la configuration de l'app :
    - **App URL** : `https://ton-domaine.vercel.app`
    - **Allowed redirection URL(s)** : `https://ton-domaine.vercel.app/api/shopify/callback`
    - **Distribution** : ⚠️ ce choix est **définitif**. Le plus simple : **deux apps**.
-     - « Vitrio dev » en **Custom distribution** pour tester sur tes boutiques de développement ;
-     - « Vitrio » en **Public distribution** pour la vraie version (validation Shopify, App Store).
-     Mets les clés de « Vitrio dev » dans Vercel pendant les tests, puis celles de « Vitrio » au lancement.
+     - « Vigenia dev » en **Custom distribution** pour tester sur tes boutiques de développement ;
+     - « Vigenia » en **Public distribution** pour la vraie version (validation Shopify, App Store).
+     Mets les clés de « Vigenia dev » dans Vercel pendant les tests, puis celles de « Vigenia » au lancement.
 5. Dans **Overview / Settings** (ou « Client credentials ») :
 
 | Variable Vercel | Où la trouver |
@@ -98,7 +98,7 @@ Il te faut une **app Shopify publique** à toi :
    Nécessaire pour la partie Pilotage ; le reste fonctionne sans.
 
 Les autorisations (scopes) sont demandées par le code au moment de la connexion, tu n'as rien à cocher.
-Connexion des utilisateurs : ils tapent l'adresse de leur boutique, valident sur Shopify, et leur compte Vitrio est créé
+Connexion des utilisateurs : ils tapent l'adresse de leur boutique, valident sur Shopify, et leur compte Vigenia est créé
 automatiquement avec l'e-mail de la boutique.
 
 ---
@@ -112,8 +112,8 @@ Tant que les variables sont vides, les boutons de paiement affichent « Le paiem
 
 1. **dashboard.stripe.com** → créer le compte (au nom du parent) et l'activer.
 2. **Catalogue de produits → Ajouter un produit** (prix normaux, payés après les 48 h de l'offre) :
-   - « Vitrio Starter » : prix récurrent **78 €/mois**, puis un 2e prix **398 €/an** ;
-   - « Vitrio Pro » : prix récurrent **158 €/mois**, puis un 2e prix **798 €/an**.
+   - « Vigenia Starter » : prix récurrent **78 €/mois**, puis un 2e prix **398 €/an** ;
+   - « Vigenia Pro » : prix récurrent **158 €/mois**, puis un 2e prix **798 €/an**.
    Copie l'identifiant de chaque prix (`price_…`).
 3. **Développeurs → Clés API** : copie la **clé secrète** (`sk_live_…`).
 4. **Développeurs → Webhooks → Ajouter une destination** :
@@ -141,7 +141,7 @@ Supabase → Table Editor → `users`, mets ta ligne à `plan = pro` (Starter) o
 
 ## 4 bis. Couleurs de la marque dans le thème Shopify
 
-Vitrio applique les couleurs et polices de la marque grâce à une « intégration d'app » (dossier `extensions/vitrio-brand`) :
+Vigenia applique les couleurs et polices de la marque grâce à une « intégration d'app » (dossier `extensions/vitrio-brand`) :
 le marchand l'active d'un clic dans son éditeur de thème, sans qu'aucun fichier du thème soit modifié.
 Elle fonctionne avec Dawn et les thèmes qui en dérivent.
 
@@ -171,7 +171,7 @@ Elle fonctionne avec Dawn et les thèmes qui en dérivent.
 
 ## 6. Lecture des liens AliExpress (ScraperAPI) — facultatif
 
-AliExpress, Amazon et Temu bloquent la lecture de leurs pages par les serveurs (captcha). Sans cette clé, Vitrio
+AliExpress, Amazon et Temu bloquent la lecture de leurs pages par les serveurs (captcha). Sans cette clé, Vigenia
 lit les sites qui l'acceptent ; pour les autres, le client ajoute 1 à 3 captures d'écran de la page produit
 (l'IA les lit) ou décrit le produit. Avec cette clé, les liens AliExpress se lisent directement.
 
@@ -183,19 +183,19 @@ Ne m'envoie jamais la clé : elle va uniquement dans Vercel.
 
 ## 7. Notification « Nouvelle vente » sur ton téléphone — facultatif
 
-À chaque nouvel abonné Pro (et à chaque départ), Vitrio t'envoie une notification.
+À chaque nouvel abonné Pro (et à chaque départ), Vigenia t'envoie une notification.
 
 **Option A — Pushover (son « caisse enregistreuse », iPhone et Android, 5 $ une fois après 30 jours d'essai)**
 1. Installe l'app **Pushover** sur ton téléphone et crée un compte.
 2. Sur **https://pushover.net** : copie ta **User Key** (en haut de la page).
-3. **Create an Application/API Token** → nom « Vitrio » → copie l'**API Token**.
+3. **Create an Application/API Token** → nom « Vigenia » → copie l'**API Token**.
 4. Dans Vercel : `PUSHOVER_USER_KEY` = la User Key, `PUSHOVER_APP_TOKEN` = l'API Token.
 
 **Option B — ntfy (gratuit)**
 1. Installe l'app **ntfy** et abonne-toi à un sujet secret (ex. `vitrio-ventes-8f3k2q`).
 2. Dans Vercel : `NTFY_TOPIC` = ce sujet. Le son se choisit dans les réglages du sujet de l'app (Android).
 
-**Tester** : ajoute `OWNER_EMAIL` = l'e-mail de ton compte Vitrio dans Vercel, redéploie, connecte-toi à Vitrio
+**Tester** : ajoute `OWNER_EMAIL` = l'e-mail de ton compte Vigenia dans Vercel, redéploie, connecte-toi à Vigenia
 puis ouvre `https://nathanaeljetaime.vercel.app/api/owner/test-notification`.
 
 ## Pour plus tard

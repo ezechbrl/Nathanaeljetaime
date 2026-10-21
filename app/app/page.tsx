@@ -44,7 +44,7 @@ export default function AppHome() {
           <h1 className="mx-auto mt-4 max-w-3xl font-sans text-[clamp(2.6rem,1.4rem+3.6vw,4.4rem)] font-semibold leading-[1.04] tracking-[-0.04em] [animation:rise_.7s_.1s_cubic-bezier(.2,.8,.2,1)_both]">
             {stores.length ? <>Qu'est-ce qu'on <span className="serif-accent font-medium">construit</span> aujourd'hui ?</> : <>Ta boutique en <span className="serif-accent font-medium">3 minutes</span></>}
           </h1>
-          {!stores.length && <p className="mx-auto mt-3 max-w-md text-fg-muted">Colle le lien du produit que tu veux vendre. Vitrio s'occupe du reste.</p>}
+          {!stores.length && <p className="mx-auto mt-3 max-w-md text-fg-muted">Colle le lien du produit que tu veux vendre. Vigenia s'occupe du reste.</p>}
         </div>
         <div className="relative mt-10">
           <Suspense><Welcome /><CreateStore /></Suspense>

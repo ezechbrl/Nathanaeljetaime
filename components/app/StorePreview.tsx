@@ -43,7 +43,7 @@ function pickImages(assets: Asset[]) {
   };
 }
 
-// Rendu de la boutique générée, fidèle au thème Vitrio installé dans Shopify.
+// Rendu de la boutique générée, fidèle au thème Vigenia installé dans Shopify.
 export function StorePreview({ store, page = "accueil", device = "auto", assets = [], className }: { store: Store; page?: PreviewPage; device?: "desktop" | "mobile" | "auto"; assets?: Asset[]; className?: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [narrow, setNarrow] = useState(false);

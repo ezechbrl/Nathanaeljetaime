@@ -30,7 +30,7 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
 const demoUser: User = {
   id: "user_demo",
-  email: "demo@vitrio.ai",
+  email: "demo@vigenia.com",
   firstName: "Alex",
   avatarUrl: null,
   emailVerified: true,
@@ -368,7 +368,7 @@ export async function publishStore(id: string) {
   const job = newJob(id, "publish", [
     { key: "product", label: "Produit, prix et images" },
     { key: "publish", label: "Mise en vente" },
-    { key: "theme", label: "Installation du thème Vitrio" },
+    { key: "theme", label: "Installation du thème Vigenia" },
   ], 9_000);
   save();
   return { job: clone(job) as Job };

@@ -64,7 +64,7 @@ function Billing() {
               <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6ee7b7]">Ton abonnement</p>
               {sub ? (
                 <>
-                  <p className="mt-3 text-[clamp(2.2rem,1.6rem+2vw,3.2rem)] font-semibold leading-none tracking-[-0.03em]">Vitrio {current?.name}</p>
+                  <p className="mt-3 text-[clamp(2.2rem,1.6rem+2vw,3.2rem)] font-semibold leading-none tracking-[-0.03em]">Vigenia {current?.name}</p>
                   {/* Accès donné à la main (pas d'abonnement Stripe) : rien n'est facturé. */}
                   {!sub.interval && !sub.renewsAt ? (
                     <p className="mt-4 text-[2.4rem] font-semibold leading-none tracking-[-0.03em]">Accès offert</p>

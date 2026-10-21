@@ -25,7 +25,7 @@ export default function ProductPage() {
       <PageHero
         eyebrow="Fonctionnalités"
         title={<>Tout ce qu'une agence ferait. <span className="serif-accent">En une conversation.</span></>}
-        subtitle="Stratégie, textes, visuels, mise en ligne, puis un suivi chaque matin : voici ce que Vitrio fait pour ta boutique Shopify."
+        subtitle="Stratégie, textes, visuels, mise en ligne, puis un suivi chaque matin : voici ce que Vigenia fait pour ta boutique Shopify."
       >
         <div className="flex flex-wrap justify-center gap-3">
           <ButtonLink href="/inscription" size="lg">Créer ma boutique</ButtonLink>

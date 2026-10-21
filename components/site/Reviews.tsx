@@ -8,7 +8,7 @@ export function Reviews() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <Reveal as="h2" className="text-center text-h2">Ils ont lancé leur boutique avec <span className="serif-accent">Vitrio</span></Reveal>
+        <Reveal as="h2" className="text-center text-h2">Ils ont lancé leur boutique avec <span className="serif-accent">Vigenia</span></Reveal>
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {REVIEWS.map((r, i) => (
             <Reveal key={r.name + i} delay={(i % 3) * 80} className="group rounded-[22px] bg-[linear-gradient(160deg,rgb(46_230_166/0.55),rgb(255_255_255/0.05)_40%,rgb(163_230_53/0.25))] p-px transition-transform duration-500 hover:-translate-y-1">

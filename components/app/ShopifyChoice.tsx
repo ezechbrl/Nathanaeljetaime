@@ -33,7 +33,7 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
       <AuroraBackground className="-z-10" />
       {brief && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {brief} »</span></p>}
       <h2 className="mt-2 text-center text-[clamp(1.6rem,1.2rem+1.4vw,2.2rem)] font-semibold tracking-[-0.03em]">Relie ta boutique Shopify</h2>
-      <p className="mt-1.5 text-center text-sm text-fg-muted">Vitrio publie ta boutique directement dans Shopify.</p>
+      <p className="mt-1.5 text-center text-sm text-fg-muted">Vigenia publie ta boutique directement dans Shopify.</p>
 
       <div className="mx-auto mt-7 grid max-w-[760px] gap-4 sm:grid-cols-2">
         <div className="flex flex-col rounded-[22px] border border-white/10 bg-black/30 p-4 backdrop-blur-xl">
@@ -56,7 +56,7 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
             </span>
           </div>
           <p className="mt-5 text-[1.35rem] font-semibold tracking-[-0.02em]">J'ai un compte Shopify</p>
-          <p className="mt-1 flex-1 text-[13.5px] text-fg-muted">Relie ta boutique à Vitrio en 10 secondes.</p>
+          <p className="mt-1 flex-1 text-[13.5px] text-fg-muted">Relie ta boutique à Vigenia en 10 secondes.</p>
           {open ? (
             <form onSubmit={connect} className="mt-4">
               <div className="flex items-center rounded-full border border-white/15 bg-white/[0.04] focus-within:border-[#2ee6a6]">
@@ -70,7 +70,7 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
             </form>
           ) : (
             <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.7)] transition-transform hover:-translate-y-px">
-              Connecter Vitrio à Shopify <ArrowRight className="h-4 w-4" />
+              Connecter Vigenia à Shopify <ArrowRight className="h-4 w-4" />
             </button>
           )}
         </div>

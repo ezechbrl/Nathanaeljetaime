@@ -6,7 +6,7 @@ import type { Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { shopifyLinks } from "@/lib/shopify-links";
 
-// Réglages à faire par le marchand dans SON admin Shopify (pas dans Vitrio) avant d'ouvrir la vente.
+// Réglages à faire par le marchand dans SON admin Shopify (pas dans Vigenia) avant d'ouvrir la vente.
 // Il coche au fur et à mesure ; l'état reste dans son navigateur.
 export function ShopifySetupCard({ store }: { store: Store }) {
   const links = shopifyLinks(store.liveUrl);
@@ -38,7 +38,7 @@ export function ShopifySetupCard({ store }: { store: Store }) {
             À faire dans Shopify
           </p>
           <h2 className="mt-1.5 font-medium">Ta boutique est prête, ouvre la vente</h2>
-          <p className="mt-1 text-sm text-fg-muted">Ces réglages se font une seule fois dans ton admin Shopify, pas dans Vitrio. Compte 30 minutes.</p>
+          <p className="mt-1 text-sm text-fg-muted">Ces réglages se font une seule fois dans ton admin Shopify, pas dans Vigenia. Compte 30 minutes.</p>
         </div>
         <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-xs tabular-nums text-fg-muted">{count}/{steps.length}</span>
       </div>

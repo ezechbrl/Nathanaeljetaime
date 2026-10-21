@@ -60,7 +60,7 @@ export type Store = {
   plan: StorePlan | null; // null tant que la génération n'est pas terminée
   previewUrl: string | null; // aperçu Shopify (thème non publié) quand disponible
   liveUrl: string | null;
-  // Thème Vitrio dans Shopify : installé automatiquement, ou à importer à la main (appli sans dérogation thèmes).
+  // Thème Vigenia dans Shopify : installé automatiquement, ou à importer à la main (appli sans dérogation thèmes).
   themeStatus?: "installed" | "manual" | null;
   createdAt: string;
   updatedAt: string;

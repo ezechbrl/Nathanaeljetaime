@@ -1,4 +1,4 @@
-# Extension de thème Vitrio : applique les couleurs et polices de la marque à la boutique.
+# Extension de thème Vigenia : applique les couleurs et polices de la marque à la boutique.
 # Déployée avec `npx shopify app deploy` (voir docs/CLES-ET-COMPTES.md).
 name = "vitrio-brand"
 type = "theme"

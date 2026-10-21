@@ -35,7 +35,7 @@ async function aliExpressReviews(productId: string): Promise<RawReviews | undefi
 }
 
 // Avis réels des acheteurs du produit, chez le fournisseur : jamais inventés ni réécrits, seulement
-// traduits dans la langue de la boutique. Les photos des clients sont recopiées dans le stockage Vitrio.
+// traduits dans la langue de la boutique. Les photos des clients sont recopiées dans le stockage Vigenia.
 export async function supplierReviews(opts: { url: string; fromPage?: RawReviews; storeId: string; language: string; userId: string }): Promise<Reviews | undefined> {
   const id = opts.url.match(/aliexpress\.[a-z.]+\/item\/(?:[^/]*\/)?(\d{6,})/i)?.[1];
   const found = (id ? await aliExpressReviews(id).catch(() => undefined) : undefined) ?? opts.fromPage;

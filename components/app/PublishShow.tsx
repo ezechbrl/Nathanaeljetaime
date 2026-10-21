@@ -16,7 +16,7 @@ const STEP_LINE: Partial<Record<JobStepKey, string>> = {
   product: "J'envoie ton produit, son prix et ses photos…",
   publish: "Je le mets en vente sur ta boutique en ligne…",
   pages: "J'installe ta FAQ et ta page « Notre histoire »…",
-  theme: "J'installe ton thème Vitrio à tes couleurs…",
+  theme: "J'installe ton thème Vigenia à tes couleurs…",
 };
 
 const PATH = "M70,150 C190,10 370,10 490,150";
@@ -45,7 +45,7 @@ function useFit(width: number) {
   return [ref, k] as const;
 }
 
-// Écran plein pendant la publication : les éléments de la boutique voyagent de Vitrio vers Shopify.
+// Écran plein pendant la publication : les éléments de la boutique voyagent de Vigenia vers Shopify.
 export function PublishProgress({ store, job }: { store: Store; job: Job }) {
   const elapsed = useElapsed();
   const pct = useLiveProgress(job.progress);
@@ -69,7 +69,7 @@ export function PublishProgress({ store, job }: { store: Store; job: Job }) {
         </p>
         <h2 className="mt-3 text-h2">On met ta boutique <span className="serif-accent">en ligne</span></h2>
 
-        {/* Le voyage : Vitrio → Shopify */}
+        {/* Le voyage : Vigenia → Shopify */}
         <div ref={fitRef} className="relative mx-auto mt-6 aspect-[560/220] w-full max-w-[560px]">
           <div className="absolute left-0 top-0 h-[220px] w-[560px] origin-top-left" style={{ transform: `scale(${k})` }}>
           <svg viewBox="0 0 560 220" className="absolute inset-0 h-full w-full" aria-hidden>
@@ -91,7 +91,7 @@ export function PublishProgress({ store, job }: { store: Store; job: Job }) {
           {/* Départ */}
           <div className="absolute left-[70px] top-[150px] grid -translate-x-1/2 -translate-y-1/2 place-items-center">
             <span className="grid h-16 w-16 place-items-center rounded-2xl border border-accent/30 bg-accent-deep/60 text-2xl font-semibold text-accent shadow-[0_0_40px_-6px_rgb(104_230_176/.5)]">V</span>
-            <span className="mt-2 text-xs text-fg-muted">Vitrio</span>
+            <span className="mt-2 text-xs text-fg-muted">Vigenia</span>
           </div>
           {/* Arrivée : la vitrine se remplit */}
           <div className="absolute left-[490px] top-[150px] grid -translate-x-1/2 -translate-y-1/2 place-items-center">
@@ -163,10 +163,10 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
         <h2 className="mt-4 text-h2">{manual ? <>Plus qu'<span className="serif-accent">une étape</span></> : live ? <>Ta boutique est <span className="serif-accent">en ligne</span></> : <>Tout est dans <span className="serif-accent">Shopify</span></>}</h2>
         <p className="mx-auto mt-3 max-w-sm text-fg-muted">
           {store.themeStatus === "manual"
-            ? <>Ton produit, tes prix et tes photos sont dans Shopify. Installe maintenant le design Vitrio de ta boutique :</>
+            ? <>Ton produit, tes prix et tes photos sont dans Shopify. Installe maintenant le design Vigenia de ta boutique :</>
             : live
             ? <>{store.name} est publiée sur Shopify avec son thème, son produit et ses pages.{shop ? <> Adresse : <span className="text-fg">{shop}</span></> : null}</>
-            : <>Produit, pages et thème Vitrio sont installés. Ton ancien thème reste affiché tant que tu ne publies pas le nouveau depuis Shopify → Thèmes.</>}
+            : <>Produit, pages et thème Vigenia sont installés. Ton ancien thème reste affiché tant que tu ne publies pas le nouveau depuis Shopify → Thèmes.</>}
         </p>
         {manual && <ThemeImportCard store={store} compact />}
         <p className="mx-auto mt-2 max-w-sm text-xs text-fg-faint">Boutique de test ou protégée par mot de passe ? {links ? <a href={links.password} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-fg">Voir le mot de passe dans Shopify</a> : "Le mot de passe est dans Shopify → Boutique en ligne → Préférences."}</p>

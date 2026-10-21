@@ -3,7 +3,7 @@
 import { AlertTriangle, Clock, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-// Avant / maintenant : coder sa boutique à la main (des semaines) contre Vitrio (quelques minutes).
+// Avant / maintenant : coder sa boutique à la main (des semaines) contre Vigenia (quelques minutes).
 const CODE = [
   "{% schema %}",
   '  "name": "Section produit",',
@@ -57,7 +57,7 @@ function CodingLoop() {
   );
 }
 
-function VitrioLoop({ name }: { name: string }) {
+function VigeniaLoop({ name }: { name: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const v = ref.current;
@@ -67,7 +67,7 @@ function VitrioLoop({ name }: { name: string }) {
     return () => io.disconnect();
   }, []);
   return (
-    <video ref={ref} muted loop playsInline preload="metadata" poster={`/videos/${name}.jpg`} className="h-full w-full rounded-[14px] bg-black object-cover" aria-label="Vitrio crée une boutique à partir d'un lien">
+    <video ref={ref} muted loop playsInline preload="metadata" poster={`/videos/${name}.jpg`} className="h-full w-full rounded-[14px] bg-black object-cover" aria-label="Vigenia crée une boutique à partir d'un lien">
       <source src={`/videos/${name}.mp4`} type="video/mp4" />
       <source src={`/videos/${name}.webm`} type="video/webm" />
     </video>
@@ -87,10 +87,10 @@ export function BeforeAfter() {
       <div className="rounded-[22px] bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,rgb(46_230_166/0.5))] p-px shadow-[0_0_60px_-20px_rgb(46_230_166/0.6)]">
         <div className="h-full rounded-[21px] bg-[#05261d]/90 p-3">
           <div className="flex items-center justify-between px-2 pb-3 pt-1">
-            <p className="text-[15px] font-semibold">Maintenant · avec Vitrio</p>
+            <p className="text-[15px] font-semibold">Maintenant · avec Vigenia</p>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2ee6a6]/15 px-3 py-1 text-[12px] font-semibold text-[#a7f3d0]"><Sparkles className="h-3.5 w-3.5" /> 10 minutes</span>
           </div>
-          <div className="hidden aspect-video sm:block"><VitrioLoop name="tuto-lien" /></div>
+          <div className="hidden aspect-video sm:block"><VigeniaLoop name="tuto-lien" /></div>
           {/* Sur téléphone, la vidéo est déjà en haut de la page : ici, juste les 3 étapes. */}
           <ol className="space-y-2 px-2 pb-2 sm:hidden">
             {["Tu colles le lien de ton produit", "L'IA écrit, crée les photos et importe les vrais avis", "Tu valides : c'est en ligne sur Shopify"].map((t, i) => (

@@ -218,13 +218,13 @@ export async function publish(shop: string, token: string, plan: StorePlan, imag
       { product: { id: next.productId, ...productInput } });
     check(d.productUpdate.userErrors);
     next.productHandle = d.productUpdate.product?.handle ?? next.productHandle;
-    // Photos : si la sélection a changé (photos refaites…), on remplace celles posées par Vitrio
+    // Photos : si la sélection a changé (photos refaites…), on remplace celles posées par Vigenia
     // pour que la fiche Shopify montre exactement les photos du studio. Celles du marchand restent.
     const wanted = images.slice(0, 8);
     const same = next.mediaSources?.length === wanted.length && wanted.every((i, k) => next.mediaSources![k] === i.url);
     if (!same) {
       const m = await graphql<{ product: { media: { nodes: { id: string }[] } } }>(shop, token, `query ($id: ID!) { product(id: $id) { media(first: 50) { nodes { id } } } }`, { id: next.productId });
-      // Boutiques publiées avant le suivi des photos : toutes les photos venaient de Vitrio.
+      // Boutiques publiées avant le suivi des photos : toutes les photos venaient de Vigenia.
       const ours = next.mediaIds ? m.product.media.nodes.filter((n) => next.mediaIds!.includes(n.id)) : m.product.media.nodes;
       if (ours.length) {
         const del = await graphql<{ productDeleteMedia: { mediaUserErrors: UserError[] } }>(shop, token,
@@ -321,8 +321,8 @@ export async function dailySessions(shop: string, token: string, days = 30) {
   return out;
 }
 
-// Installe le thème Vitrio de la boutique (archive générée par /api/shopify/theme) et, si demandé, le met en ligne.
-// L'ancien thème Vitrio non publié est supprimé pour ne pas encombrer la bibliothèque de thèmes.
+// Installe le thème Vigenia de la boutique (archive générée par /api/shopify/theme) et, si demandé, le met en ligne.
+// L'ancien thème Vigenia non publié est supprimé pour ne pas encombrer la bibliothèque de thèmes.
 export async function installTheme(shop: string, token: string, opts: { zipUrl: string; name: string; publish: boolean; previousThemeId?: string }) {
   const c = await graphql<{ themeCreate: { theme: { id: string } | null; userErrors: UserError[] } }>(shop, token,
     `mutation ($source: URL!, $name: String!) { themeCreate(source: $source, name: $name, role: UNPUBLISHED) { theme { id } userErrors { field message } } }`,
@@ -335,7 +335,7 @@ export async function installTheme(shop: string, token: string, opts: { zipUrl: 
     const t = await graphql<{ theme: { processing: boolean; processingFailed: boolean } | null }>(shop, token, `query ($id: ID!) { theme(id: $id) { processing processingFailed } }`, { id });
     if (t.theme?.processingFailed) {
       await graphql(shop, token, `mutation ($id: ID!) { themeDelete(id: $id) { deletedThemeId } }`, { id }).catch(() => {});
-      throw new HttpError(502, "upstream_error", "Shopify a refusé le thème Vitrio. Réessaie dans un instant.");
+      throw new HttpError(502, "upstream_error", "Shopify a refusé le thème Vigenia. Réessaie dans un instant.");
     }
     if (t.theme && !t.theme.processing) break;
     await new Promise((r) => setTimeout(r, 2000));

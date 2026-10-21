@@ -81,7 +81,7 @@ export function VideoSteps({ videos = DEMO_VIDEOS, className }: { videos?: DemoV
         <div className="overflow-hidden rounded-[14px] border border-white/10 bg-bg-2 shadow-[0_40px_80px_-40px_rgb(0_0_0/0.7)]">
           <div className="flex items-center gap-1.5 border-b border-white/[0.06] bg-bg-2 px-3 py-2.5">
             <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-            <span className="ml-3 flex-1 truncate rounded-[6px] bg-white/[0.06] px-3 py-1 text-center text-xs text-fg-faint">vitrio.ai/app</span>
+            <span className="ml-3 flex-1 truncate rounded-[6px] bg-white/[0.06] px-3 py-1 text-center text-xs text-fg-faint">vigenia.com/app</span>
           </div>
           <div className="relative aspect-[16/10] bg-bg-2">
             <video

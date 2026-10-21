@@ -146,7 +146,7 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
         <div className="grid grid-cols-3 gap-1.5">
           {["/showcase/norde-scene.jpg", "/showcase/norde-detail.jpg", "/showcase/norde-packshot.jpg"].map((src) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt="Photo produit créée par l'IA de Vitrio" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
+            <img key={src} src={src} alt="Photo produit créée par l'IA de Vigenia" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
           ))}
         </div>
         <p className="mt-1.5 text-[11.5px] text-fg-muted">Mises en situation, détails, packshots : <span className="font-semibold text-white">300 / mois</span></p>
@@ -185,10 +185,10 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
         <div className="grid grid-cols-3 gap-1.5">
           {["/showcase/norde-white.jpg", "/showcase/norde.jpg", "/showcase/macho.jpg"].map((src) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt="Photo produit créée par l'IA de Vitrio" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
+            <img key={src} src={src} alt="Photo produit créée par l'IA de Vigenia" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
           ))}
         </div>
-        <p className="mt-1.5 text-[11.5px] text-fg-muted">Créées par l'IA de Vitrio</p>
+        <p className="mt-1.5 text-[11.5px] text-fg-muted">Créées par l'IA de Vigenia</p>
       </div>
     );
   }
@@ -233,7 +233,7 @@ export function TrustRow() {
     <>
     {/* Le prix remis en perspective : ordres de grandeur pour une boutique complète. */}
     <div className="mx-auto mt-6 grid max-w-[640px] grid-cols-3 overflow-hidden rounded-[16px] border border-white/10 text-center">
-      {[["Une agence", "≈ 2 000 €", "et 3 semaines"], ["Un freelance", "≈ 500 €", "et 1 à 2 semaines"], ["Vitrio", "39 €/mois", "et 10 minutes"]].map(([who, price, time], i) => (
+      {[["Une agence", "≈ 2 000 €", "et 3 semaines"], ["Un freelance", "≈ 500 €", "et 1 à 2 semaines"], ["Vigenia", "39 €/mois", "et 10 minutes"]].map(([who, price, time], i) => (
         <div key={who} className={cn("px-2 py-3", i === 2 ? "bg-[#2ee6a6]/12 shadow-[inset_0_0_30px_-10px_rgb(46_230_166/0.5)]" : "bg-black/20", i > 0 && "border-l border-white/10")}>
           <p className={cn("text-[11.5px] font-semibold uppercase tracking-[0.08em]", i === 2 ? "text-[#6ee7b7]" : "text-fg-faint")}>{who}</p>
           <p className={cn("mt-1 whitespace-nowrap text-[16px] font-bold tabular-nums sm:text-[20px]", i === 2 ? "text-white" : "text-fg-muted line-through decoration-[#ef4444]/70")}>{price}</p>
@@ -241,7 +241,7 @@ export function TrustRow() {
         </div>
       ))}
     </div>
-    <p className="mt-2 text-center text-[11.5px] text-fg-faint">Ordres de grandeur pour une boutique Shopify complète. Avec Vitrio, l'IA la plus récente fait le travail, et tu peux tout modifier.</p>
+    <p className="mt-2 text-center text-[11.5px] text-fg-faint">Ordres de grandeur pour une boutique Shopify complète. Avec Vigenia, l'IA la plus récente fait le travail, et tu peux tout modifier.</p>
     <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12.5px] text-fg-muted">
       <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[#2ee6a6]" /> Annulation en 1 clic</span>
       <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-[#2ee6a6]" /> Paiement sécurisé par Stripe</span>

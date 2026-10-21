@@ -1,4 +1,4 @@
--- Schéma Vitrio. À coller dans Supabase → SQL Editor → New query → Run (une seule fois).
+-- Schéma Vigenia. À coller dans Supabase → SQL Editor → New query → Run (une seule fois).
 -- Toutes les lectures/écritures passent par le serveur (clé service_role) : la RLS est activée
 -- sans politique, ce qui bloque tout accès direct depuis le navigateur.
 

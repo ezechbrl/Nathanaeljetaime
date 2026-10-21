@@ -3,7 +3,7 @@ import { useId } from "react";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
-// Vitrio : un sac de boutique (notre forme, pas celle de Shopify) avec le V au milieu,
+// Vigenia : un sac de boutique (notre forme, pas celle de Shopify) avec le V au milieu,
 // et une pastille « commande validée ».
 export function LogoMark({ className }: { className?: string }) {
   const id = useId().replace(/:/g, "");

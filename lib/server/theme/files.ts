@@ -1,4 +1,4 @@
-// Fichiers fixes du thème Shopify « Vitrio » (Online Store 2.0, version 2).
+// Fichiers fixes du thème Shopify « Vigenia » (Online Store 2.0, version 2).
 // Le contenu propre à chaque boutique (textes, couleurs, polices, visuels, offres) est injecté dans
 // config/settings_data.json et templates/*.json par build.ts : le marchand peut tout modifier
 // ensuite dans l'éditeur de thème Shopify.
@@ -816,7 +816,7 @@ const CUSTOMERS: Record<string, string> = {
 const GIFT_CARD = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ shop.name }}</title>{{ content_for_header }}</head><body style="font-family:system-ui;text-align:center;padding:48px"><h1>{{ shop.name }}</h1><p style="font-size:32px">{{ gift_card.balance | money }}</p><p><strong>{{ gift_card.code | format_code }}</strong></p></body></html>`;
 
 export const SETTINGS_SCHEMA = [
-  { name: "theme_info", theme_name: "Vitrio", theme_version: "2.0.0", theme_author: "Vitrio", theme_documentation_url: "https://nathanaeljetaime.vercel.app/aide", theme_support_url: "https://nathanaeljetaime.vercel.app/contact" },
+  { name: "theme_info", theme_name: "Vigenia", theme_version: "2.0.0", theme_author: "Vigenia", theme_documentation_url: "https://vigenia.com/aide", theme_support_url: "https://vigenia.com/contact" },
   { name: "Marque", settings: [
     { type: "text", id: "brand_name", label: "Nom de la marque" },
     { type: "color", id: "color_primary", label: "Couleur du texte et des fonds foncés", default: "#1d1d22" },
@@ -847,8 +847,8 @@ export function staticThemeFiles(): Record<string, string> {
     // Étoiles pleines, demi-étoile arrondie et vides, d'après une note sur 5 (ex. 4.6).
     "snippets/stars.liquid": `{%- assign r = rating | times: 1.0 -%}<span class="stars" aria-label="{{ r }}/5">{%- for i in (1..5) -%}{%- assign t = i | minus: 0.5 -%}<span{% if r < t %} class="off"{% endif %}>★</span>{%- endfor -%}</span>`,
     "config/settings_schema.json": JSON.stringify(SETTINGS_SCHEMA, null, 2),
-    "locales/fr.default.json": JSON.stringify({ general: { brand: "Vitrio" } }, null, 2),
-    "locales/en.json": JSON.stringify({ general: { brand: "Vitrio" } }, null, 2),
+    "locales/fr.default.json": JSON.stringify({ general: { brand: "Vigenia" } }, null, 2),
+    "locales/en.json": JSON.stringify({ general: { brand: "Vigenia" } }, null, 2),
     "templates/gift_card.liquid": GIFT_CARD,
   };
   for (const [name, src] of Object.entries(SECTIONS)) files[`sections/${name}.liquid`] = src;

@@ -47,7 +47,7 @@ const eurText = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits
 
 function blockedError(until: string, reason: "week" | "session", plan: PlanId) {
   const l = AI_LIMITS[plan];
-  const upsell = plan === "free" ? " Active un abonnement Vitrio pour utiliser l'IA." : plan === "pro" ? " Passe à l'offre Pro pour 2× plus de crédit." : "";
+  const upsell = plan === "free" ? " Active un abonnement Vigenia pour utiliser l'IA." : plan === "pro" ? " Passe à l'offre Pro pour 2× plus de crédit." : "";
   return reason === "session"
     ? new HttpError(429, "ai_session_blocked", `Tu as utilisé ton crédit d'IA (${eurText(l.session)} €) pour ces ${SESSION_HOURS} heures. Il se recharge dans ${wait(until)}.${upsell}`)
     : new HttpError(429, "ai_budget_blocked", `Tu as atteint ta limite d'IA de la semaine (${eurText(l.week)} €). Elle se débloque dans ${wait(until)}.${upsell}`);

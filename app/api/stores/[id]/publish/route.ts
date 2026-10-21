@@ -16,9 +16,9 @@ export const POST = route<{ params: Promise<{ id: string }> }>(async (req, { par
   if (!store.plan) throw new HttpError(409, "conflict", "La boutique est encore en cours de génération.");
   if (store.status === "publishing") throw new HttpError(409, "conflict", "Une publication est déjà en cours.");
   const conn = await connectionFor(user.id, store.shop_connection_id);
-  // Les boutiques connectées avant le thème Vitrio doivent autoriser l'installation de thèmes.
+  // Les boutiques connectées avant le thème Vigenia doivent autoriser l'installation de thèmes.
   if (!conn.scopes.split(",").includes("write_themes")) {
-    throw new HttpError(409, "reauth_required", "Shopify doit d'abord autoriser Vitrio à installer ton thème. Clique sur « Autoriser » : ça prend 10 secondes.", conn.shop);
+    throw new HttpError(409, "reauth_required", "Shopify doit d'abord autoriser Vigenia à installer ton thème. Clique sur « Autoriser » : ça prend 10 secondes.", conn.shop);
   }
   await db().from("stores").update({ status: "publishing" }).eq("id", store.id);
   const job = await createJob(store.id, user.id, "publish", PUBLISH_STEPS, { publishTheme });

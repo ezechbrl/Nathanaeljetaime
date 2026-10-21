@@ -6,7 +6,7 @@ import { buildThemeZip, type ThemeContext } from "@/lib/server/theme/build";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-// Thème Vitrio de la boutique en .zip, à importer à la main dans Shopify (Boutique en ligne → Thèmes → Importer).
+// Thème Vigenia de la boutique en .zip, à importer à la main dans Shopify (Boutique en ligne → Thèmes → Importer).
 export const GET = route<Ctx>(async (_req, { params }) => {
   const user = await requireUser();
   const store = await ownedStore(user.id, (await params).id);

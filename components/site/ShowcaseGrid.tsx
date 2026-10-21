@@ -4,7 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SHOWCASE } from "@/lib/content/showcase";
 import { StoreLongFrame } from "./StoreFrame";
 
-// Vitrine : une grille de boutiques créées avec Vitrio, chacune sur un fond à ses couleurs.
+// Vitrine : une grille de boutiques créées avec Vigenia, chacune sur un fond à ses couleurs.
 export function ShowcaseGrid() {
   return (
     <section className="py-16">

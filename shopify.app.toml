@@ -1,10 +1,10 @@
-# Configuration de l'app Vitrio, déployée avec `npx @shopify/cli app deploy` (crée une nouvelle version).
+# Configuration de l'app Vigenia, déployée avec `npx @shopify/cli app deploy` (crée une nouvelle version).
 # Doit rester identique aux réglages du tableau de bord Shopify (dev.shopify.com) : ce fichier les remplace.
 client_id = "da05327de5caa0989a67970304b18f71"
-name = "Vitrio"
+name = "Vigenia"
 # Nom court de l'app (adresse de la page des forfaits Shopify) : doit être égal à SHOPIFY_APP_HANDLE dans Vercel.
 handle = "vitrio"
-application_url = "https://nathanaeljetaime.vercel.app"
+application_url = "https://vigenia.com"
 embedded = false
 
 [build]
@@ -16,7 +16,7 @@ scopes = "read_products,write_products,read_content,write_content,read_online_st
 use_legacy_install_flow = true
 
 [auth]
-redirect_urls = ["https://nathanaeljetaime.vercel.app/api/shopify/callback"]
+redirect_urls = ["https://vigenia.com/api/shopify/callback", "https://nathanaeljetaime.vercel.app/api/shopify/callback"]
 
 [webhooks]
 api_version = "2026-10"
@@ -26,4 +26,4 @@ api_version = "2026-10"
   # Webhooks de conformité (RGPD) obligatoires pour l'App Store.
   [[webhooks.subscriptions]]
   compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
-  uri = "https://nathanaeljetaime.vercel.app/api/webhooks/shopify"
+  uri = "https://vigenia.com/api/webhooks/shopify"
