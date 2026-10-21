@@ -92,13 +92,18 @@ export function PlanCards({ interval, action, left, offer = false }: { interval:
                 <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] font-semibold", featured ? "border-[#a3e635]/40 bg-[#a3e635]/10 text-[#bef264]" : "border-[#2ee6a6]/35 bg-[#2ee6a6]/10 text-[#a7f3d0]")}>{featured && <Sparkles className="h-3 w-3" />} {plan.badge}</span>
               </div>
               <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">{plan.tagline}</p>
-              <p className="mt-4 flex items-baseline gap-1">
-                {was !== null && <span className="mr-1.5 text-xl font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(was)}</span>}
-                <span className="text-[2.8rem] font-semibold leading-none tracking-[-0.04em] tabular-nums">{euro(billed)}</span>
-                <span className="text-sm text-fg-muted">{interval === "year" ? "/ an" : "/ mois"}</span>
-                {was !== null && <span className="ml-2 self-center rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{LAUNCH_OFFER.percent} %</span>}
+              <p className="mt-4 flex flex-wrap items-baseline gap-x-1 gap-y-1">
+                {was !== null && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(was)}</span>}
+                <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(billed)}</span>
+                <span className="whitespace-nowrap text-sm text-fg-muted">{interval === "year" ? "/ an" : "/ mois"}</span>
+                {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{LAUNCH_OFFER.percent} %</span>}
               </p>
-              <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#6ee7b7]">{interval === "year" ? `Soit environ ${(Math.round((billed / 12) * 10) / 10).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € par mois, payé une fois par an` : "Sans engagement"}</p>
+              {interval === "year" ? (
+                <p className="mt-2 text-[14px] font-medium leading-snug text-[#6ee7b7]">
+                  <span className="text-[16px] font-semibold text-white">≈ {(Math.round((billed / 12) * 10) / 10).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € / mois</span>
+                  <span className="block text-[12.5px] text-fg-muted">payé une fois par an</span>
+                </p>
+              ) : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#6ee7b7]">Sans engagement</p>}
               {left && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />
