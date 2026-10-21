@@ -5,7 +5,7 @@
 :root {
   color-scheme: dark;
   /* Vert émeraude frais (plus clair et plus bleuté) : fond profond, accents menthe. */
-  --bg: 6 43 33;            /* #062b21 : même vert que le fond commun */
+  --bg: 4 17 12;            /* #04110c : noir-vert du fond commun */
   --bg-2: 19 59 53;         /* #133b35 */
   --bg-3: 26 72 64;         /* #1a4840 */
   --fg: 238 248 245;
@@ -25,8 +25,8 @@
 
 @layer base {
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-  html { background: #062b21; }
-  body { background: #062b21; @apply font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
+  html { background: #04110c; }
+  body { background: #04110c; @apply font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
   ::selection { background: rgb(var(--brand-leaf) / 0.35); }
   :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; border-radius: 6px; }
   h1, h2, h3, .text-display, .text-h1, .text-h2 { @apply font-display; font-weight: 500; text-wrap: balance; }

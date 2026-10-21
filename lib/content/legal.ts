@@ -1,15 +1,15 @@
 import { AFFILIATE } from "./affiliate";
 import { site } from "@/lib/site";
 
-// Modèles de textes légaux. Les éléments entre crochets [ ] sont à compléter avant la mise en ligne,
-// et l'ensemble doit être relu par un juriste.
+// Modèles de textes légaux, à faire relire par un juriste.
+// Les informations de l'éditeur se remplissent dans Vercel (variables LEGAL_*) : rien de personnel dans le code.
 export const COMPANY = {
-  name: site.legalEntity,
-  form: "[forme juridique, ex. SAS au capital de 1 000 €]",
-  address: "[adresse du siège social]",
-  rcs: "[RCS Ville B 000 000 000]",
-  vat: "[numéro de TVA intracommunautaire]",
-  director: "[nom du directeur de la publication]",
+  name: process.env.LEGAL_NAME || site.legalEntity,
+  form: process.env.LEGAL_FORM || "[statut, ex. entrepreneur individuel]",
+  address: process.env.LEGAL_ADDRESS || "[adresse]",
+  siret: process.env.LEGAL_SIRET || "[SIRET]",
+  vat: process.env.LEGAL_VAT || "TVA non applicable, art. 293 B du CGI",
+  director: process.env.LEGAL_NAME || "[nom du directeur de la publication]",
   host: "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
   email: site.email,
 };
@@ -22,7 +22,7 @@ export const LEGAL: LegalDoc[] = [
     title: "Mentions légales",
     updated: "2026-10-12",
     sections: [
-      { heading: "Éditeur du site", body: [`${COMPANY.name}, ${COMPANY.form}, dont le siège est situé ${COMPANY.address}, immatriculée au ${COMPANY.rcs}, TVA ${COMPANY.vat}.`, `Contact : ${COMPANY.email}.`, `Directeur de la publication : ${COMPANY.director}.`] },
+      { heading: "Éditeur du site", body: [`${site.name} est édité par ${COMPANY.name}, ${COMPANY.form}, ${COMPANY.address}.`, `SIRET : ${COMPANY.siret}. ${COMPANY.vat}.`, `Contact : ${COMPANY.email}.`, `Directeur de la publication : ${COMPANY.director}.`] },
       { heading: "Hébergement", body: [`Le site est hébergé par ${COMPANY.host}. Les données de l'application sont stockées par Supabase Inc. dans l'Union européenne.`] },
       { heading: "Propriété intellectuelle", body: [`Les contenus du site (textes, interface, logo, code) sont la propriété de ${COMPANY.name}. Toute reproduction sans autorisation est interdite.`, "Shopify est une marque de Shopify Inc. Le service n'est ni affilié à Shopify, ni approuvé par Shopify."] },
     ],
