@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, CreditCard, Headphones, Plus, ShieldCheck, Sparkles, Star, Timer } from "lucide-react";
+import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Star, Timer } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
@@ -119,20 +119,22 @@ export function PlanCards({ interval, action, left, offer = false }: { interval:
   );
 }
 
-// Une ligne d'offre ; avec « + », un petit aperçu réel de ce que fait l'IA s'ouvre juste dessous.
+// Une ligne d'offre ; au survol (ou au toucher sur téléphone), une petite bulle montre un aperçu réel.
 function FeatureItem({ f }: { f: PlanFeature }) {
   const [open, setOpen] = useState(false);
-  const text = typeof f === "string" ? f : f.text;
   const check = <span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>;
   if (typeof f === "string") return <li className="flex gap-2.5">{check}{f}</li>;
   return (
-    <li>
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="group flex w-full gap-2.5 text-left">
+    <li className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button type="button" onClick={() => setOpen((o) => !o)} onBlur={() => setOpen(false)} aria-expanded={open} className="flex w-full gap-2.5 text-left">
         {check}
-        <span className="flex-1">{text}</span>
-        <span className={cn("mt-0.5 grid h-[20px] w-[20px] shrink-0 place-items-center rounded-full border border-[#2ee6a6]/40 text-[#2ee6a6] transition-all group-hover:bg-[#2ee6a6]/15", open && "rotate-45 bg-[#2ee6a6]/15")}><Plus className="h-3 w-3" strokeWidth={3} /></span>
+        <span className="flex-1 underline decoration-[#2ee6a6]/50 decoration-dotted underline-offset-4">{f.text}</span>
       </button>
-      {open && <div className="mt-2.5 rounded-[14px] border border-white/10 bg-black/25 p-3 [animation:fade-in_.25s_ease-out]"><FeaturePreview kind={f.preview} /></div>}
+      {open && (
+        <div role="tooltip" className="absolute bottom-full left-0 right-0 z-30 mb-2 rounded-[14px] border border-[#2ee6a6]/30 bg-[#06261c]/95 p-2.5 shadow-[0_20px_50px_-15px_rgb(0_0_0/0.8),0_0_30px_-10px_rgb(46_230_166/0.5)] backdrop-blur-xl [animation:fade-in_.15s_ease-out]">
+          <FeaturePreview kind={f.preview} />
+        </div>
+      )}
     </li>
   );
 }
@@ -147,20 +149,21 @@ function FeaturePreview({ kind }: { kind: "photos" | "reviews" | "texts" | "offe
             <img key={src} src={src} alt="Photo produit créée par l'IA de Vitrio" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
           ))}
         </div>
-        <p className="mt-2 text-[12px] text-fg-muted">Vraies photos créées par l'IA de Vitrio, à partir d'un simple lien produit.</p>
+        <p className="mt-1.5 text-[11.5px] text-fg-muted">Créées par l'IA de Vitrio</p>
       </div>
     );
   }
   if (kind === "reviews") {
     return (
       <div className="space-y-1.5">
-        {[["Karim B.", "Le micro est super clair, mes potes m'entendent enfin bien."], ["Julie M.", "Confortable même après 4 h de jeu. Livré vite."]].map(([n, t]) => (
+        <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#6ee7b7]">Exemple d'avis importés</p>
+        {[["Karim B.", "Le micro est super clair."], ["Julie M.", "Confortable même après 4 h de jeu."]].map(([n, t]) => (
           <div key={n} className="rounded-[10px] bg-white/[0.05] px-3 py-2 text-[12.5px]">
             <p className="flex items-center justify-between font-semibold">{n}<span className="flex text-[#fbbf24]">{[0, 1, 2, 3, 4].map((i) => <Star key={i} className="h-3 w-3 fill-current" />)}</span></p>
             <p className="mt-0.5 text-fg-muted">« {t} »</p>
           </div>
         ))}
-        <p className="text-[12px] text-fg-muted">Exemple : les avis des acheteurs du produit, importés et traduits.</p>
+
       </div>
     );
   }
@@ -169,8 +172,8 @@ function FeaturePreview({ kind }: { kind: "photos" | "reviews" | "texts" | "offe
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6ee7b7]">Titre de l'accueil · casque gaming</p>
         <p className="mt-1 text-[17px] font-semibold leading-tight">Entends tout. Avant les autres.</p>
-        <p className="mt-1 text-[12.5px] text-fg-muted">Son spatial, micro antibruit et 40 h d'autonomie : pensé pour jouer en équipe, des heures, sans gêne.</p>
-        <p className="mt-2 text-[12px] text-fg-muted">Exemple de texte écrit par l'IA pour la boutique Nordé.</p>
+        <p className="mt-1 text-[12px] text-fg-muted">Son spatial, micro antibruit, 40 h d'autonomie.</p>
+
       </div>
     );
   }
@@ -182,7 +185,6 @@ function FeaturePreview({ kind }: { kind: "photos" | "reviews" | "texts" | "offe
           <span className="tabular-nums">{p}</span>
         </div>
       ))}
-      <p className="text-[12px] text-fg-muted">Exemple : les offres par lot créées sur la fiche produit.</p>
     </div>
   );
 }
