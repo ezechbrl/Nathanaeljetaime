@@ -12,7 +12,7 @@ import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer } from "@/lib/content/pricing
 // (sur téléphone, seulement le Starter, avec un lien vers le Pro).
 const KEY_FEATURES: Record<string, string[]> = {
   pro: ["Ta boutique complète en 10 minutes", "Photos pro et textes créés par l'IA", "Vrais avis clients importés et traduits"],
-  agency: ["5 boutiques Shopify connectées", "2× plus de crédit IA", "Optimisation chaque jour"],
+  agency: ["3 boutiques Shopify connectées", "2× plus de crédit IA", "Optimisation chaque jour"],
 };
 
 export function PriceTeaser() {
