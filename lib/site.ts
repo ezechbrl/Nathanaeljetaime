@@ -2,7 +2,7 @@
 export const site = {
   name: "Vigenia",
   description: "Ta boutique Shopify prête à vendre en 10 minutes, pas en 3 semaines : Vigenia étudie ton marché, écrit, illustre et met en ligne ta boutique, puis la fait progresser chaque jour.",
-  email: "bonjour@vigenia.com",
+  email: "contact@vigenia.com",
   whatsapp: "", // ex. "33600000000" pour afficher le lien WhatsApp
   legalEntity: "Vigenia (à compléter)",
   // Lien pour ouvrir une boutique Shopify : lien d'affilié Shopify (impact.com), commission sur chaque boutique payante.
