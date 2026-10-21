@@ -1,5 +1,8 @@
 import type { PlanId } from "@/lib/api/types";
 
+// Une ligne d'offre ; « preview » ouvre un petit aperçu de ce que fait l'IA (photos, avis, textes, offres).
+export type PlanFeature = string | { text: string; preview: "photos" | "reviews" | "texts" | "offers" };
+
 export type Plan = {
   id: PlanId;
   name: string;
@@ -7,7 +10,7 @@ export type Plan = {
   badge: string; // à qui s'adresse l'offre
   monthly: number; // en euros
   yearly: number;  // prix annuel total
-  features: string[];
+  features: PlanFeature[];
   limits: { stores: string; conversations: string; images: string; shops: string; ai: string };
   cta: string;
   featured?: boolean;
@@ -23,14 +26,30 @@ export const PLANS: Plan[] = [
   },
   {
     id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en moins de 10 minutes, sans rien connaître à Shopify.", monthly: 78, yearly: 398,
-    features: ["1 boutique Shopify connectée", "Change de produit à volonté", "Photos produit et mises en situation par l'IA", "Vrais avis clients importés", "Modifications par l'IA", "Thème Shopify à ta marque"],
-    limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
+    features: [
+      "Ta boutique complète en 10 minutes, à partir d'un simple lien",
+      { text: "Photos produit pro et mises en situation, créées par l'IA", preview: "photos" },
+      { text: "Textes qui donnent envie d'acheter : accueil, fiche produit, FAQ", preview: "texts" },
+      { text: "Vrais avis clients importés et traduits, avec étoiles", preview: "reviews" },
+      { text: "Offres par lot (×2, ×3) pour augmenter ton panier moyen", preview: "offers" },
+      "Change de produit à volonté, autant de fois que tu veux",
+      "Modifie tout en discutant avec l'IA, comme sur une messagerie",
+      "Thème Shopify à tes couleurs, publié en 1 clic",
+      "2 boutiques Shopify connectées",
+    ],
+    limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "2", ai: "1 € toutes les 5 h, 3 € / semaine" },
     cta: "Commencer", featured: true,
   },
   {
-    id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 158, yearly: 798,
-    features: ["3 boutiques Shopify connectées", "Teste plusieurs produits à la fois", "2× plus de crédit IA", "Optimisation quotidienne de la boutique", "Images et modifications en plus", "Support prioritaire"],
-    limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "3", ai: "2 € toutes les 5 h, 7 € / semaine" },
+    id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 5 boutiques et 2× plus d'IA.", monthly: 158, yearly: 798,
+    features: [
+      "5 boutiques Shopify connectées : teste plusieurs produits en même temps",
+      "2× plus de crédit IA : plus de photos, de textes et de modifications",
+      "3× plus d'images par mois (300 au lieu de 100)",
+      "Ta boutique optimisée chaque jour par l'IA, avec des idées pour vendre plus",
+      "Support prioritaire : réponse en priorité",
+    ],
+    limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "5", ai: "2 € toutes les 5 h, 7 € / semaine" },
     cta: "Commencer",
   },
 ];

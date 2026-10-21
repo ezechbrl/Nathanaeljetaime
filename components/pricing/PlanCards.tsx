@@ -1,9 +1,9 @@
 "use client";
 
-import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Timer } from "lucide-react";
+import { Check, CreditCard, Headphones, Plus, ShieldCheck, Sparkles, Star, Timer } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer, type Plan } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -109,17 +109,80 @@ export function PlanCards({ interval, action, left, offer = false }: { interval:
               <div className="my-5 h-px bg-white/10" />
               <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">{plan.id === "agency" ? "Tout le Starter, et en plus" : "Ce qui est inclus"}</p>
               <ul className="mt-3 space-y-2.5 text-[14.5px]">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex gap-2.5">
-                    <span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>
-                    {f}
-                  </li>
-                ))}
+                {plan.features.map((f) => <FeatureItem key={typeof f === "string" ? f : f.text} f={f} />)}
               </ul>
             </div>
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// Une ligne d'offre ; avec « + », un petit aperçu réel de ce que fait l'IA s'ouvre juste dessous.
+function FeatureItem({ f }: { f: PlanFeature }) {
+  const [open, setOpen] = useState(false);
+  const text = typeof f === "string" ? f : f.text;
+  const check = <span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>;
+  if (typeof f === "string") return <li className="flex gap-2.5">{check}{f}</li>;
+  return (
+    <li>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="group flex w-full gap-2.5 text-left">
+        {check}
+        <span className="flex-1">{text}</span>
+        <span className={cn("mt-0.5 grid h-[20px] w-[20px] shrink-0 place-items-center rounded-full border border-[#2ee6a6]/40 text-[#2ee6a6] transition-all group-hover:bg-[#2ee6a6]/15", open && "rotate-45 bg-[#2ee6a6]/15")}><Plus className="h-3 w-3" strokeWidth={3} /></span>
+      </button>
+      {open && <div className="mt-2.5 rounded-[14px] border border-white/10 bg-black/25 p-3 [animation:fade-in_.25s_ease-out]"><FeaturePreview kind={f.preview} /></div>}
+    </li>
+  );
+}
+
+function FeaturePreview({ kind }: { kind: "photos" | "reviews" | "texts" | "offers" }) {
+  if (kind === "photos") {
+    return (
+      <div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {["/showcase/norde-white.jpg", "/showcase/norde-scene.jpg", "/showcase/macho.jpg"].map((src) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={src} src={src} alt="Photo produit créée par l'IA de Vitrio" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
+          ))}
+        </div>
+        <p className="mt-2 text-[12px] text-fg-muted">Vraies photos créées par l'IA de Vitrio, à partir d'un simple lien produit.</p>
+      </div>
+    );
+  }
+  if (kind === "reviews") {
+    return (
+      <div className="space-y-1.5">
+        {[["Karim B.", "Le micro est super clair, mes potes m'entendent enfin bien."], ["Julie M.", "Confortable même après 4 h de jeu. Livré vite."]].map(([n, t]) => (
+          <div key={n} className="rounded-[10px] bg-white/[0.05] px-3 py-2 text-[12.5px]">
+            <p className="flex items-center justify-between font-semibold">{n}<span className="flex text-[#fbbf24]">{[0, 1, 2, 3, 4].map((i) => <Star key={i} className="h-3 w-3 fill-current" />)}</span></p>
+            <p className="mt-0.5 text-fg-muted">« {t} »</p>
+          </div>
+        ))}
+        <p className="text-[12px] text-fg-muted">Exemple : les avis des acheteurs du produit, importés et traduits.</p>
+      </div>
+    );
+  }
+  if (kind === "texts") {
+    return (
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6ee7b7]">Titre de l'accueil · casque gaming</p>
+        <p className="mt-1 text-[17px] font-semibold leading-tight">Entends tout. Avant les autres.</p>
+        <p className="mt-1 text-[12.5px] text-fg-muted">Son spatial, micro antibruit et 40 h d'autonomie : pensé pour jouer en équipe, des heures, sans gêne.</p>
+        <p className="mt-2 text-[12px] text-fg-muted">Exemple de texte écrit par l'IA pour la boutique Nordé.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-1.5 text-[12.5px]">
+      {[["1 casque", "59,00 €", ""], ["Lot de 2", "100,30 €", "−15 %"], ["Lot de 3", "141,60 €", "−20 %"]].map(([l, p, d], i) => (
+        <div key={l} className={cn("flex items-center justify-between rounded-[10px] border px-3 py-2", i === 1 ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/10" : "border-white/10 bg-white/[0.03]")}>
+          <span className="font-medium">{l}{d && <span className="ml-2 rounded-full bg-[#2ee6a6]/20 px-1.5 py-0.5 text-[10.5px] font-bold text-[#a7f3d0]">{d}</span>}</span>
+          <span className="tabular-nums">{p}</span>
+        </div>
+      ))}
+      <p className="text-[12px] text-fg-muted">Exemple : les offres par lot créées sur la fiche produit.</p>
     </div>
   );
 }
