@@ -16,7 +16,7 @@ export function OfferBanner() {
   if (user.plan !== "free" || !left) return null;
   const units = [{ v: left.h, l: "heures" }, { v: left.m, l: "minutes" }, { v: left.s, l: "secondes" }];
   return (
-    <Link href="/app/abonnement" className="group relative z-30 block border-b lg:sticky lg:top-0 border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(6_60_44/0.92),rgb(16_110_80/0.9)_55%,rgb(70_110_20/0.85))] px-4 py-2 shadow-[0_10px_40px_-15px_rgb(46_230_166/0.6)] backdrop-blur sm:px-8">
+    <Link href="/app/abonnement" className="group relative z-30 block border-b lg:sticky lg:top-0 border-white/[0.08] bg-bg/80 px-4 py-2 backdrop-blur-xl sm:px-8">
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <div>
           <p className="text-[13.5px] font-bold uppercase tracking-[0.04em] sm:text-[15px]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>

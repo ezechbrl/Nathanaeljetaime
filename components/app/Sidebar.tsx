@@ -128,7 +128,7 @@ export function Sidebar() {
       {open && (
         <div className="fixed inset-0 top-14 z-40 overflow-y-auto bg-bg lg:hidden"><SidebarBody /></div>
       )}
-      <aside className="sticky top-0 hidden h-dvh w-[248px] shrink-0 border-r border-white/[0.06] bg-bg-2 lg:block">
+      <aside className="sticky top-0 hidden h-dvh w-[248px] shrink-0 border-r border-white/[0.06] bg-black/10 backdrop-blur-sm lg:block">
         <SidebarBody />
       </aside>
     </>

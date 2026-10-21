@@ -11,7 +11,7 @@ export type Interval = "month" | "year";
 export function AuroraBackground({ className }: { className?: string }) {
   return (
     <div aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}>
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,#04110c_0%,#062018_45%,#04110c_100%)]" />
+      <div className="absolute inset-0 bg-black/10" />
       <div className="absolute -left-[15%] -top-[25%] h-[70%] w-[65%] rounded-full bg-[radial-gradient(closest-side,rgb(16_176_127/0.35),transparent)] [animation:aurora_14s_ease-in-out_infinite]" />
       <div className="absolute -right-[10%] top-[20%] h-[70%] w-[55%] rounded-full bg-[radial-gradient(closest-side,rgb(163_230_53/0.14),transparent)] [animation:aurora_18s_ease-in-out_infinite_reverse]" />
       {/* Rayons de lumière obliques */}
@@ -60,7 +60,7 @@ type Left = NonNullable<ReturnType<typeof useCountdown>>;
 // Bandeau de l'offre de lancement, avec le compte à rebours.
 export function OfferBanner({ left }: { left: Left }) {
   return (
-    <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(16_176_127/0.25),rgb(163_230_53/0.12))] px-5 py-3 shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
+    <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-white/[0.04] px-5 py-3 backdrop-blur shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
       <div>
         <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
         <p className="text-[12.5px] text-fg-muted">Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
