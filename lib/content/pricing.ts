@@ -1,7 +1,7 @@
 import type { PlanId } from "@/lib/api/types";
 
 // Une ligne d'offre ; « preview » ouvre un petit aperçu de ce que fait l'IA (photos, avis, textes, offres).
-export type PlanFeature = string | { text: string; preview: "photos" | "reviews" | "texts" | "offers" | "stores" | "coach" };
+export type PlanFeature = string | { text: string; preview: "photos" | "photos-pro" | "reviews" | "texts" | "offers" | "stores" | "coach" };
 
 export type Plan = {
   id: PlanId;
@@ -45,7 +45,7 @@ export const PLANS: Plan[] = [
     features: [
       { text: "3 boutiques Shopify : teste 3 produits en même temps et garde les gagnants", preview: "stores" },
       "2× plus de crédit IA pour créer et améliorer encore plus",
-      { text: "3× plus de photos chaque mois (300 au lieu de 100)", preview: "photos" },
+      { text: "3× plus de photos chaque mois (300 au lieu de 100)", preview: "photos-pro" },
       { text: "Chaque jour, l'IA analyse ta boutique et te dit quoi changer pour vendre plus", preview: "coach" },
       "Support prioritaire : on te répond en premier",
     ],

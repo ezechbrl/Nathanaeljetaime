@@ -140,6 +140,19 @@ function FeatureItem({ f }: { f: PlanFeature }) {
 }
 
 function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"] }) {
+  if (kind === "photos-pro") {
+    return (
+      <div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {["/showcase/norde-scene.jpg", "/showcase/norde-detail.jpg", "/showcase/norde-packshot.jpg"].map((src) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={src} src={src} alt="Photo produit créée par l'IA de Vitrio" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
+          ))}
+        </div>
+        <p className="mt-1.5 text-[11.5px] text-fg-muted">Mises en situation, détails, packshots : <span className="font-semibold text-white">300 / mois</span></p>
+      </div>
+    );
+  }
   if (kind === "stores") {
     return (
       <div>
@@ -170,7 +183,7 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
     return (
       <div>
         <div className="grid grid-cols-3 gap-1.5">
-          {["/showcase/norde-white.jpg", "/showcase/norde-scene.jpg", "/showcase/macho.jpg"].map((src) => (
+          {["/showcase/norde-white.jpg", "/showcase/norde.jpg", "/showcase/macho.jpg"].map((src) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img key={src} src={src} alt="Photo produit créée par l'IA de Vitrio" loading="lazy" className="aspect-square w-full rounded-[8px] object-cover" />
           ))}
