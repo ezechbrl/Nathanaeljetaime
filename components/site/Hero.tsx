@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 import { CTA } from "@/lib/launch";
 import { Reveal } from "@/components/ui/Reveal";
-import { TutorialVideo } from "@/components/ui/TutorialVideo";
+import { DemoVideos } from "./DemoVideos";
 import { PromptBox } from "./PromptBox";
 
 export function Hero() {
@@ -40,8 +40,8 @@ export function Hero() {
         {/* Démonstration : enregistrement réel de l'app, du lien produit à la boutique en ligne. */}
         <Reveal delay={380} className="relative mx-auto mt-10 max-w-[1320px] sm:mt-14">
           <div aria-hidden className="absolute -inset-6 rounded-[32px] bg-[radial-gradient(closest-side,rgb(46_230_166/0.35),transparent)] blur-2xl" />
-          <div className="relative sm:rounded-[17px] sm:bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_40%,rgb(46_230_166/0.5))] sm:p-px sm:shadow-[0_0_80px_-20px_rgb(46_230_166/0.6)]">
-            <TutorialVideo name="tuto-boutique" mobile="tuto-boutique-mobile" title="vigenia.com · Du lien à la boutique en ligne, étape par étape" speed="pendant les chargements" className="max-w-none" />
+          <div className="relative">
+            <DemoVideos />
           </div>
         </Reveal>
       </div>

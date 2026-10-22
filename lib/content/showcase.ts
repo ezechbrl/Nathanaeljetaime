@@ -61,7 +61,7 @@ export const SHOWCASE: ShowcaseStore[] = [
     slug: "pincee", name: "Pincée", category: "Cuisine", language: "français",
     brief: "Cuillère balance qui pèse levure, sel, épices ou café au dixième de gramme.",
     headline: "Le bon dosage, au dixième de gramme.", sub: "Pesez directement dans la cuillère, sans sortir la balance.", product: "Cuillère balance Pincée", price: "19,90 €",
-    palette: { bg: "#fff3ef", ink: "#3a100a", accent: "#ef4444", soft: "#ffd6cc" }, font: "serif", layout: "grid",
+    palette: { bg: "#fffbeb", ink: "#3a2604", accent: "#f59e0b", soft: "#fde68a" }, font: "serif", layout: "grid",
     highlights: ["Scène produit créée par l'IA", "Usages concrets en cuisine", "Lot cadeau de 2"],
     image: "/showcase/pincee.jpg",
   },

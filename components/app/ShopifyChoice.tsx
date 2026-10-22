@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, ArrowUpRight, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { normalizeShop, ReturnSteps, ShopifyBag } from "@/components/auth/AuthForms";
 import { AuroraBackground } from "@/components/pricing/PlanCards";
 import { Spinner } from "@/components/ui/Button";
@@ -17,12 +17,23 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const slow = useRef<number | undefined>(undefined);
+  // Retour arrière depuis Shopify : la page revient du cache avec le bouton encore « en cours ».
+  useEffect(() => {
+    const reset = (e: PageTransitionEvent) => { if (e.persisted) { window.clearTimeout(slow.current); setLoading(false); } };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
+
   async function connect(e: React.FormEvent) {
     e.preventDefault();
     const domain = normalizeShop(shop);
     if (!domain) return setError("Saisis l'adresse de ta boutique, par exemple ma-boutique.myshopify.com");
     setError("");
     setLoading(true);
+    // Si Shopify ne s'ouvre pas, on ne laisse jamais le bouton tourner indéfiniment.
+    window.clearTimeout(slow.current);
+    slow.current = window.setTimeout(() => { setLoading(false); setError("Shopify met du temps à répondre. Vérifie l'adresse puis réessaie."); }, 15000);
     await api.loginWithShopify(domain, next).catch((err) => {
       setError((err as Error).message);
       setLoading(false);

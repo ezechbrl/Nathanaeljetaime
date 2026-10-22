@@ -19,7 +19,7 @@ export function ShowcaseGrid() {
               <Link
                 href={`/exemples/${s.slug}`}
                 className="group relative block overflow-hidden rounded-[22px] p-4 pb-16 shadow-[0_24px_60px_-30px_rgb(0_0_0/0.8)] ring-1 ring-white/10 transition-all duration-500 hover:-translate-y-1.5 hover:ring-white/30"
-                style={{ background: `linear-gradient(160deg, ${s.palette.accent}, ${s.palette.ink})` }}
+                style={{ background: `linear-gradient(165deg, color-mix(in oklab, ${s.palette.accent} 70%, white), ${s.palette.accent} 50%, color-mix(in oklab, ${s.palette.accent} 78%, black))` }}
               >
                 <div className="pointer-events-none transition-transform duration-700 ease-out group-hover:scale-[1.04]">
                   <StoreLongFrame s={s} />

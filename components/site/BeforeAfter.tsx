@@ -90,7 +90,7 @@ export function BeforeAfter() {
             <p className="text-[15px] font-semibold">Maintenant · avec Vigenia</p>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2ee6a6]/15 px-3 py-1 text-[12px] font-semibold text-[#a7f3d0]"><Sparkles className="h-3.5 w-3.5" /> 10 minutes</span>
           </div>
-          <div className="hidden aspect-video sm:block"><VigeniaLoop name="tuto-lien" /></div>
+          <div className="hidden aspect-video sm:block"><VigeniaLoop name="demo-link" /></div>
           {/* Sur téléphone, la vidéo est déjà en haut de la page : ici, juste les 3 étapes. */}
           <ol className="space-y-2 px-2 pb-2 sm:hidden">
             {["Tu colles le lien de ton produit", "L'IA écrit, crée les photos et importe les vrais avis", "Tu valides : c'est en ligne sur Shopify"].map((t, i) => (

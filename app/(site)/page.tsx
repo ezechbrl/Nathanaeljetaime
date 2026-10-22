@@ -6,7 +6,6 @@ import { Hero } from "@/components/site/Hero";
 import { Instant } from "@/components/site/Instant";
 import { PriceTeaser } from "@/components/site/PriceTeaser";
 import { Reviews } from "@/components/site/Reviews";
-import { Stats } from "@/components/site/Stats";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
 import { HOME_FAQ } from "@/lib/content/faq";
 
@@ -17,7 +16,6 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <Stats />
       <ShowcaseGrid />
       <Instant />
       <BuyerReviews />
