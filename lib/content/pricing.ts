@@ -54,10 +54,10 @@ export const PLANS: Plan[] = [
   },
 ];
 
-// Offre de lancement : −50 % à vie si on s'abonne dans les 48 h après l'inscription (coupon Stripe « pour toujours »).
+// Offre de lancement : −50 % à vie si on s'abonne dans les 24 h après l'inscription (coupon Stripe « pour toujours »).
 // Starter 78 → 39 €/mois (398 → 199 €/an), Pro 158 → 79 €/mois (798 → 399 €/an).
-// Après 48 h, le client paie vraiment le prix normal : c'est ce qui rend le prix barré légal.
-export const LAUNCH_OFFER = { hours: 48, percent: 50 };
+// Après 24 h, le client paie vraiment le prix normal : c'est ce qui rend le prix barré légal.
+export const LAUNCH_OFFER = { hours: 24, percent: 50 };
 export const withOffer = (price: number) => Math.round(price * (1 - LAUNCH_OFFER.percent / 100));
 
 export const PAID_PLANS = PLANS.filter((p) => !p.hidden);

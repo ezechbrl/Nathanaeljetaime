@@ -1,19 +1,20 @@
 import "server-only";
 import { sendEmail } from "./email";
 import { env } from "./env";
+import { LAUNCH_OFFER } from "@/lib/content/pricing";
 import { db, must } from "./supabase";
 
-// Rappel de l'offre de lancement : un e-mail quand il reste moins de 24 h et que la personne n'est pas abonnée.
-// Appelé deux fois par jour (deux tâches Vercel) : l'e-mail part entre 24 h et 36 h après l'inscription, une seule fois.
+// Rappel de l'offre de lancement : un seul e-mail, à mi-parcours (12 h après l'inscription pour une offre de 24 h),
+// à chaque inscrit qui n'est pas abonné. Appelé toutes les heures (tâche Vercel) : l'e-mail part entre 12 h et 13 h.
 export async function sendOfferReminders() {
   const now = Date.now();
   const late = must(await db().from("users").select("id, email, first_name, created_at").eq("plan", "free")
-    .lte("created_at", new Date(now - 24 * 3_600_000).toISOString()).gt("created_at", new Date(now - 48 * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string }[];
+    .lte("created_at", new Date(now - (LAUNCH_OFFER.hours / 2) * 3_600_000).toISOString()).gt("created_at", new Date(now - (LAUNCH_OFFER.hours - 1) * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string }[];
   let reminders = 0;
   for (const u of late) {
     const { error: dup } = await db().from("webhook_events").insert({ id: `offer-reminder:${u.id}` });
     if (dup || !u.email) continue;
-    const hours = Math.max(1, Math.round((new Date(u.created_at).getTime() + 48 * 3_600_000 - now) / 3_600_000));
+    const hours = Math.max(1, Math.round((new Date(u.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000 - now) / 3_600_000));
     const name = u.first_name ? ` ${u.first_name}` : "";
     const url = `${env.appUrl()}/app/abonnement`;
     const ok = await sendEmail(

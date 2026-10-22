@@ -20,7 +20,7 @@ export function OfferBanner() {
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <div>
           <p className="text-[16px] font-bold uppercase tracking-[0.03em] text-white sm:text-[18px]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
-          <p className="text-[13px] text-white/85 sm:text-[14px]"><span className="font-semibold text-white">39 €/mois</span> au lieu de <span className="line-through decoration-[#ef4444] decoration-2">78 €</span>, pour toujours. Valable 48 h après ton inscription.</p>
+          <p className="text-[13px] text-white/85 sm:text-[14px]"><span className="font-semibold text-white">39 €/mois</span> au lieu de <span className="line-through decoration-[#ef4444] decoration-2">78 €</span>, pour toujours. Valable {LAUNCH_OFFER.hours} h après ton inscription.</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-end gap-1.5 tabular-nums" aria-label={`Il reste ${left.h} heures et ${left.m} minutes`}>

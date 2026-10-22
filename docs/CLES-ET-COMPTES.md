@@ -111,7 +111,7 @@ Le client paie par carte (ou Apple Pay / Google Pay) sur une page Stripe. Frais 
 Tant que les variables sont vides, les boutons de paiement affichent « Le paiement en ligne arrive très bientôt ».
 
 1. **dashboard.stripe.com** → créer le compte (au nom du parent) et l'activer.
-2. **Catalogue de produits → Ajouter un produit** (prix normaux, payés après les 48 h de l'offre) :
+2. **Catalogue de produits → Ajouter un produit** (prix normaux, payés après les 24 h de l'offre) :
    - « Vigenia Starter » : prix récurrent **78 €/mois**, puis un 2e prix **398 €/an** ;
    - « Vigenia Pro » : prix récurrent **158 €/mois**, puis un 2e prix **798 €/an**.
    Copie l'identifiant de chaque prix (`price_…`).
@@ -123,7 +123,7 @@ Tant que les variables sont vides, les boutons de paiement affichent « Le paiem
 5. **Paramètres → Facturation → Portail client** : active-le, autorise « Annuler », « Changer de carte »
    et « Changer d'offre » (ajoute les 4 prix).
 6. **Catalogue de produits → Coupons → Créer** : « Offre de lancement », **50 %**, durée **Pour toujours**.
-   C'est l'offre du compte à rebours (48 h après l'inscription) : 78 → 39 €, 158 → 79 €, 398 → 199 €, 798 → 399 €.
+   C'est l'offre du compte à rebours (24 h après l'inscription) : 78 → 39 €, 158 → 79 €, 398 → 199 €, 798 → 399 €.
    Le paiement reste fermé tant que ce coupon n'est pas configuré (le prix affiché est toujours le prix payé).
 
 | Variable Vercel | Valeur |

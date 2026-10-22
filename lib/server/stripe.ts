@@ -30,7 +30,7 @@ export async function customerFor(user: UserRow) {
   return c.id;
 }
 
-// Fin de l'offre de lancement pour ce compte (48 h après l'inscription, premier abonnement seulement), ou null.
+// Fin de l'offre de lancement pour ce compte (24 h après l'inscription, premier abonnement seulement), ou null.
 // Le paiement n'est ouvert que si le coupon existe (voir billingConfigured) : le prix affiché est toujours celui payé.
 export async function launchOfferEndsAt(user: UserRow) {
   const ends = new Date(user.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000;
