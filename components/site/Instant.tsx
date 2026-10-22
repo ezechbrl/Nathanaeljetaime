@@ -1,13 +1,12 @@
 "use client";
 
-import { Camera, Check, Loader2, MessageSquareText, RefreshCw, Rocket, Star } from "lucide-react";
+import { Camera, Check, Loader2, MessageSquareText, RefreshCw, Rocket } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
 
-// « Nouvelle ère. » : ce que fait Vigenia, à essayer directement (textes, photos, avis, publication).
+// « Nouvelle ère. » : ce que fait Vigenia, à essayer directement (textes, photos, publication).
 const TABS = [
-  { id: "reviews", icon: Star, title: "De vrais avis", text: "Ceux des acheteurs du produit, traduits." },
   { id: "text", icon: MessageSquareText, title: "Des textes qui vendent", text: "Accueil, fiche produit, FAQ, offres par lot." },
   { id: "photo", icon: Camera, title: "Des photos de pro", text: "Ton produit en studio et en situation." },
   { id: "publish", icon: Rocket, title: "Publié sur Shopify", text: "Thème, produit et pages en un clic." },
@@ -58,34 +57,6 @@ function PhotoDemo() {
   );
 }
 
-const REVIEWS = [
-  { n: "Karim B.", t: "Le micro est super clair, mes potes m'entendent enfin bien.", r: 5 },
-  { n: "Julie M.", t: "Confortable même après 4 h de jeu. Livré vite.", r: 5 },
-  { n: "Tom R.", t: "Très bon son pour le prix, la batterie tient vraiment.", r: 4 },
-];
-
-function ReviewsDemo() {
-  const [shown, setShown] = useState(0);
-  useEffect(() => {
-    if (shown < REVIEWS.length) { const t = window.setTimeout(() => setShown(shown + 1), 550); return () => window.clearTimeout(t); }
-  }, [shown]);
-  return (
-    <div className="flex h-full flex-col justify-center gap-3">
-      <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#6ee7b7]">Exemple · avis importés et traduits</p>
-      {REVIEWS.slice(0, shown).map((r) => (
-        <div key={r.n} className="rounded-[14px] border border-white/10 bg-white/[0.04] p-4 [animation:rise_.4s_cubic-bezier(.2,.8,.2,1)_both]">
-          <div className="flex items-center justify-between">
-            <span className="text-[14px] font-semibold">{r.n}</span>
-            <span className="flex gap-0.5">{Array.from({ length: 5 }).map((_, k) => <Star key={k} className={k < r.r ? "h-3.5 w-3.5 fill-[#f5b301] text-[#f5b301]" : "h-3.5 w-3.5 text-white/20"} />)}</span>
-          </div>
-          <p className="mt-1.5 text-[14px] text-fg-muted">« {r.t} »</p>
-        </div>
-      ))}
-      <button type="button" onClick={() => setShown(0)} className="mt-1 inline-flex w-fit items-center gap-2 text-[13px] text-[#6ee7b7] hover:underline"><RefreshCw className="h-3.5 w-3.5" /> Rejouer</button>
-    </div>
-  );
-}
-
 const STEPS = ["Thème à tes couleurs", "Produit, photos et variantes", "Pages Accueil, FAQ et À propos", "Boutique en ligne"];
 
 function PublishDemo() {
@@ -119,7 +90,7 @@ function PublishDemo() {
 }
 
 export function Instant() {
-  const [tab, setTab] = useState<Tab>("reviews");
+  const [tab, setTab] = useState<Tab>("text");
   const touched = useRef(false);
   // Fait défiler les démos tout seul tant que le visiteur n'a pas cliqué.
   useEffect(() => {
@@ -135,7 +106,8 @@ export function Instant() {
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-10 h-[26rem] w-[70rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(46_230_166/0.16),transparent)]" />
       <div className="relative mx-auto max-w-[1200px] px-4 sm:px-6">
         <div className="text-center">
-          <Reveal as="h2" className="bg-[linear-gradient(180deg,#ffffff_20%,#a7f3d0_60%,rgb(110_231_183/0.35))] bg-clip-text pb-2 font-display text-[clamp(3.4rem,1.5rem+8vw,9rem)] font-medium leading-[0.95] tracking-[-0.06em] text-transparent">
+          {/* Très grand titre qui s'efface vers le bas, comme un horizon. */}
+          <Reveal as="h2" className="bg-[linear-gradient(180deg,#ffffff_15%,#a7f3d0_55%,rgb(110_231_183/0.25))] bg-clip-text pb-2 font-display text-[clamp(4.2rem,1.6rem+11vw,12.5rem)] font-medium leading-[0.92] tracking-[-0.065em] text-transparent [-webkit-mask-image:linear-gradient(180deg,#000_45%,transparent_100%)] [mask-image:linear-gradient(180deg,#000_45%,transparent_100%)]">
             Nouvelle ère.
           </Reveal>
           <Reveal delay={100} as="p" className="mx-auto mt-4 max-w-2xl text-[clamp(1.05rem,0.9rem+0.5vw,1.3rem)] leading-relaxed text-fg-muted">
@@ -153,7 +125,7 @@ export function Instant() {
           </div>
           <div className="rounded-[22px] bg-[linear-gradient(160deg,rgb(46_230_166/0.6),rgb(255_255_255/0.06)_45%,rgb(46_230_166/0.25))] p-px">
             <div key={tab} className="h-[360px] rounded-[21px] sm:h-[420px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] p-5 [animation:fade-in_.3s_ease-out] sm:p-8">
-              {tab === "text" ? <TextDemo /> : tab === "photo" ? <PhotoDemo /> : tab === "reviews" ? <ReviewsDemo /> : <PublishDemo />}
+              {tab === "text" ? <TextDemo /> : tab === "photo" ? <PhotoDemo /> : <PublishDemo />}
             </div>
           </div>
         </Reveal>

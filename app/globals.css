@@ -152,3 +152,4 @@
 
 /* Mini studio photo de la création : projecteur qui balaie le produit. */
 @keyframes studio-spot { 0%, 100% { transform: translateX(-18%); } 50% { transform: translateX(18%); } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }

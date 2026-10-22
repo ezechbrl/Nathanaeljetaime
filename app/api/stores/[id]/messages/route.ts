@@ -25,6 +25,26 @@ export const GET = route<Ctx>(async (req, { params }) => {
   return json({ messages: (before || rows.length ? rows : [welcome]).map(toMessage) });
 });
 
+// « Change la couleur principale en #e11d48 » : appliqué tout de suite, sans passer par l'IA.
+const COLOR_REQUEST = /couleur (?:principale|de (?:la )?marque|du fond)[^#]{0,40}(#[0-9a-f]{6})\b/i;
+
+// Même teinte, très foncée : sert au texte et aux bandeaux, toujours lisible sur un fond clair.
+function deepShade(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => Math.round(c * 0.22));
+  return `#${ch.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function colorEdit(plan: StorePlan, hex: string) {
+  const colors = { ...plan.brand.colors, accent: hex.toLowerCase(), primary: deepShade(hex) };
+  const next = { ...plan, brand: { ...plan.brand, colors } };
+  return {
+    plan: next,
+    reply: `C'est fait : la couleur principale est maintenant ${colors.accent}. Boutons, badges et fonds teintés ont changé sur l'accueil et la fiche produit.`,
+    changes: [{ path: "brand.colors.accent", label: "Couleur principale", before: plan.brand.colors.accent, after: colors.accent }],
+  };
+}
+
 export const POST = route<Ctx>(async (req, { params }) => {
   const user = await requireUser();
   const store = await ownedStore(user.id, (await params).id);
@@ -33,12 +53,17 @@ export const POST = route<Ctx>(async (req, { params }) => {
   // Chaque accès à la base est étiqueté : une erreur dit à quelle étape elle a eu lieu.
   const step = <T,>(label: string, fn: () => Promise<T>) => fn().catch((e: unknown) => { throw e instanceof Error && e.message.startsWith("Supabase") ? new Error(`${e.message} [${label}]`) : e; });
   await step("limite", () => rateLimit(`chat:${user.id}`, 20, 60));
-  await step("crédit", () => assertAiBudget(user.id, user.plan)); // abonnement requis + crédit d'IA
-  await step("quota", () => assertQuota(user.id, user.plan, "conversations"));
-
-  const history = (await step("historique", async () => must(await db().from("chat_messages").select("role, content").eq("store_id", store.id).order("created_at", { ascending: false }).limit(10))) as { role: "user" | "assistant"; content: string }[]).reverse();
-  const result = await step("IA", () => editPlan({ plan: store.plan as StorePlan, language: store.language, history, message: content, userId: user.id }));
-  await step("compteur", () => consume(user.id, "conversations"));
+  const color = content.match(COLOR_REQUEST)?.[1];
+  let result: { plan: StorePlan; reply: string; changes: { path: string; label: string; before: string; after: string }[] };
+  if (color) {
+    result = colorEdit(store.plan as StorePlan, color);
+  } else {
+    await step("crédit", () => assertAiBudget(user.id, user.plan)); // abonnement requis + crédit d'IA
+    await step("quota", () => assertQuota(user.id, user.plan, "conversations"));
+    const history = (await step("historique", async () => must(await db().from("chat_messages").select("role, content").eq("store_id", store.id).order("created_at", { ascending: false }).limit(10))) as { role: "user" | "assistant"; content: string }[]).reverse();
+    result = await step("IA", () => editPlan({ plan: store.plan as StorePlan, language: store.language, history, message: content, userId: user.id }));
+    await step("compteur", () => consume(user.id, "conversations"));
+  }
 
   const theme = { ...(store.theme as Record<string, unknown>), colors: result.plan.brand.colors };
   const updated = result.changes.length

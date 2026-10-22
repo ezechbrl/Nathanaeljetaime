@@ -13,3 +13,13 @@ export function timeAgo(d: string) {
   if (s < 172800) return "hier";
   return `il y a ${Math.floor(s / 86400)} j`;
 }
+
+// Avis affichés en 1 ou 2 phrases : on garde le début du vrai texte, sans le réécrire.
+export function shortReview(text: string, max = 180) {
+  const sentences = text.trim().match(/[^.!?]+[.!?]*/g) ?? [text];
+  let out = sentences[0].trim();
+  if (sentences[1] && out.length + sentences[1].length <= max) out += ` ${sentences[1].trim()}`;
+  if (out.length > max) out = `${out.slice(0, max).replace(/\s+\S*$/, "")}…`;
+  else if (out.length < text.trim().length) out = out.replace(/[.!?]*$/, (p) => p || "…");
+  return out;
+}

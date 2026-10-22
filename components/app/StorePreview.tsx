@@ -9,6 +9,7 @@ import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
 import type { Asset, Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { shortReview } from "@/lib/format";
 import { sanitizeHtml } from "@/lib/sanitize";
 import type { IconName } from "@/lib/store-schema";
 
@@ -102,12 +103,11 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
         <h3 className={cn("text-[2rem] tracking-tight", H)}>Ce qu&apos;en disent les acheteurs</h3>
         <p className="mt-3 flex items-center justify-center gap-2 text-[15px]"><Stars rating={reviews.average} size={17} /><strong>{reviews.average.toFixed(1).replace(".", ",")}/5</strong><span className="opacity-60">· {reviews.total.toLocaleString("fr-FR")} avis</span></p>
       </div>
-      <div className={cn("mt-8 gap-4", mobile ? "columns-1" : "columns-3")}>
-        {reviews.items.slice(0, mobile ? 4 : 9).map((r, i) => (
-          <figure key={i} className="mb-4 grid break-inside-avoid gap-3 rounded-[18px] border p-5" style={{ borderColor: `${primary}1f` }}>
-            {r.photo && <img loading="lazy" decoding="async" src={r.photo} alt="" className="aspect-square w-full rounded-xl object-cover" />}
+      <div className={cn("mt-8 grid gap-4", mobile ? "grid-cols-1" : "grid-cols-2")}>
+        {reviews.items.slice(0, 4).map((r, i) => (
+          <figure key={i} className="grid content-start gap-3 rounded-[18px] border p-5" style={{ borderColor: `${primary}1f` }}>
             <Stars rating={r.rating} />
-            <p className="text-sm leading-relaxed">{r.text}</p>
+            <p className="text-sm leading-relaxed">{shortReview(r.text)}</p>
             <figcaption className="text-[13px]"><strong>{r.author || "—"}</strong> {flag(r.country)}</figcaption>
           </figure>
         ))}

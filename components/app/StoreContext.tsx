@@ -20,9 +20,10 @@ export function useStore() {
 }
 
 export function StoreProvider({ id, children }: { id: string; children: React.ReactNode }) {
-  const { setStores } = useApp();
+  const { stores, setStores } = useApp();
   const toast = useToast();
-  const [store, setStoreState] = useState<Store | null>(null);
+  // La liste des boutiques est déjà chargée : on affiche tout de suite, puis on rafraîchit en fond.
+  const [store, setStoreState] = useState<Store | null>(() => stores.find((s) => s.id === id) ?? null);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -49,7 +50,6 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
   }, [id, setStore]);
 
   useEffect(() => {
-    setStoreState(null);
     reload();
   }, [reload]);
 
@@ -71,7 +71,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
     }
   }, 1000, !!activeJob);
 
-  if (error) return <div className="p-8"><ErrorState message={error} onRetry={reload} /></div>;
+  if (error && !store) return <div className="p-8"><ErrorState message={error} onRetry={reload} /></div>;
   if (!store) {
     return (
       <div className="space-y-4 p-8">

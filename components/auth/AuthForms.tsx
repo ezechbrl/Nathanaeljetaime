@@ -4,14 +4,14 @@ import { site } from "@/lib/site";
 import { ArrowRight, ArrowUp, Mail, Store } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Spinner } from "@/components/ui/Button";
 import * as api from "@/lib/api/client";
 
 const ERRORS: Record<string, string> = {
   signature: "La connexion Shopify n'a pas pu être vérifiée. Réessaie.",
   session: "La connexion n'a pas pu aboutir : vérifie que les cookies sont autorisés dans ton navigateur, puis réessaie.",
-  "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec Google ou ton e-mail, puis relie ta boutique.",
+  "compte-existant": "Un compte existe déjà avec l'e-mail de cette boutique. Connecte-toi avec ta première boutique, puis relie celle-ci depuis Paramètres.",
   google: "La connexion Google a échoué. Réessaie.",
   lien: "Ce lien de connexion n'est plus valide (il expire au bout d'une heure). Demande-en un nouveau.",
 };
@@ -30,7 +30,10 @@ function nextUrl(params: URLSearchParams) {
 }
 
 export function normalizeShop(input: string) {
-  const d = input.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  const raw = input.trim().toLowerCase();
+  // Adresse copiée depuis l'admin : admin.shopify.com/store/ma-boutique/…
+  const admin = raw.match(/admin\.shopify\.com\/store\/([a-z0-9][a-z0-9-]*)/);
+  const d = admin ? admin[1] : raw.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
   if (!d) return null;
   const full = d.endsWith(".myshopify.com") ? d : `${d.replace(/\.myshopify$/, "")}.myshopify.com`;
   return /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(full) ? full : null;
@@ -41,6 +44,16 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const [created, setCreated] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+
+  // Retour depuis l'onglet Shopify : le champ est prêt, il n'y a plus qu'à coller.
+  useEffect(() => {
+    if (!created) return;
+    const onBack = () => { if (document.visibilityState === "visible") input.current?.focus(); };
+    document.addEventListener("visibilitychange", onBack);
+    return () => document.removeEventListener("visibilitychange", onBack);
+  }, [created]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,7 +82,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
             <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[0_8px_24px_-6px_rgb(46_230_166/0.8)]">Connexion <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
           </span>
         </button>
-        <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="glow-frame glow-frame-lime group rounded-[22px] p-[1.5px] transition-transform hover:-translate-y-1">
+        <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" onClick={() => { setCreated(true); setOpen(true); }} className="glow-frame glow-frame-lime group rounded-[22px] p-[1.5px] transition-transform hover:-translate-y-1">
           <span className={`${inner} pt-9 bg-[linear-gradient(180deg,rgb(12_60_32/0.96),rgb(4_26_14/0.98))] sm:pt-10`}>
             <span className="absolute inset-x-0 top-0 bg-[linear-gradient(90deg,#22c55e,#4ade80)] py-1.5 text-center text-[11px] font-bold leading-tight text-[#052e16] sm:text-[12px]">1 €/mois pendant 3 mois</span>
             <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#4ade80]/20 blur-2xl" />
@@ -85,18 +98,35 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
 
       {open && (
         <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-3">
-          <label htmlFor="shop" className="text-sm font-medium">Adresse de ta boutique</label>
+          {created && <ReturnSteps className="mb-4" />}
+          <label htmlFor="shop" className="text-sm font-medium">{created ? "Colle l'adresse de ta boutique" : "Adresse de ta boutique"}</label>
           <div className="mt-2 flex items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent focus-within:ring-[3px] focus-within:ring-accent/15">
-            <input id="shop" autoFocus value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" className="min-w-0 flex-1 bg-transparent px-3 py-3 text-[15px] focus:outline-none" />
+            <input ref={input} id="shop" autoFocus={!created} value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder={created ? "admin.shopify.com/store/…" : "ma-boutique"} className="min-w-0 flex-1 bg-transparent px-3 py-3 text-[15px] focus:outline-none" />
             <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
           </div>
           {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
           <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
-          <p className="mt-2 text-xs text-fg-faint">Visible en haut de ton admin Shopify.</p>
+          <p className="mt-2 text-xs text-fg-faint">Tu peux coller l'adresse complète de ton admin Shopify : on s'occupe du reste.</p>
         </form>
       )}
       <p className="text-center text-xs text-fg-faint">Offre Shopify en ce moment · lien partenaire</p>
     </div>
+  );
+}
+
+// Shopify s'ouvre dans un nouvel onglet : on explique comment revenir ici et quoi coller.
+export function ReturnSteps({ className }: { className?: string }) {
+  const steps = [
+    <>Crée ton compte dans l'onglet Shopify qui vient de s'ouvrir.</>,
+    <>Une fois dans ton admin, <b className="text-fg">copie l'adresse</b> en haut du navigateur (elle ressemble à <span className="text-accent">admin.shopify.com/store/ma-boutique</span>).</>,
+    <>Reviens sur <b className="text-fg">cet onglet Vigenia</b> et colle-la juste en dessous.</>,
+  ];
+  return (
+    <ol className={`space-y-2.5 text-left text-sm ${className ?? ""}`}>
+      {steps.map((t, i) => (
+        <li key={i} className="flex gap-3"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-[#03140d]">{i + 1}</span><span className="pt-0.5 text-fg-muted">{t}</span></li>
+      ))}
+    </ol>
   );
 }
 
@@ -111,10 +141,10 @@ export function ShopifyBag({ className }: { className?: string }) {
   );
 }
 
-// Google et e-mail : affichés par défaut, masquables avec NEXT_PUBLIC_GOOGLE_AUTH=off / NEXT_PUBLIC_EMAIL_AUTH=off.
+// Google et e-mail : masqués par défaut (on se connecte avec Shopify), réactivables avec NEXT_PUBLIC_GOOGLE_AUTH=on / NEXT_PUBLIC_EMAIL_AUTH=on.
 // Google exige le provider activé dans Supabase ; l'e-mail, un SMTP perso (Resend) pour lever la limite de Supabase.
-const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH !== "off";
-const EMAIL_ENABLED = process.env.NEXT_PUBLIC_EMAIL_AUTH !== "off";
+const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on";
+const EMAIL_ENABLED = process.env.NEXT_PUBLIC_EMAIL_AUTH === "on";
 
 function GoogleButton({ next }: { next: string }) {
   const router = useRouter();

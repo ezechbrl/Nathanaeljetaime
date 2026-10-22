@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Exemples de boutiques", description:
 export default function ExamplesPage() {
   return (
     <>
-      <PageHero eyebrow="Exemples" title={<>Huit briefs, huit <span className="serif-accent">boutiques</span></>} subtitle="Chaque boutique ci-dessous est partie d'un brief de deux lignes. Clique pour voir le brief et ce que l'IA a construit." />
+      <PageHero eyebrow="Exemples" title={<>De vraies <span className="serif-accent">boutiques</span></>} subtitle="Des boutiques réellement créées avec Vigenia, avec de vrais produits. Clique pour voir le brief et ce que l'IA a construit." />
       <Container>
         <div className="grid gap-x-6 gap-y-14 md:grid-cols-2">
           {SHOWCASE.map((s, i) => (

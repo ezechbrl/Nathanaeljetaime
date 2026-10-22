@@ -13,9 +13,9 @@ export function ShowcaseGrid() {
           <Reveal as="h2" className="text-h2">Un produit, une boutique. <span className="serif-accent">Aucun</span> modèle.</Reveal>
           <Reveal delay={80} as="p" className="mx-auto mt-4 max-w-xl text-fg-muted">Chaque boutique part d'un lien ou d'une phrase. Clique pour voir ce que l'IA en a fait.<span className="mt-1 block text-[13px] text-fg-faint sm:hidden">← Fais glisser pour voir les autres →</span></Reveal>
         </div>
-        <div className="-mx-4 mt-10 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
+        <div className="-mx-4 mt-10 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
           {SHOWCASE.map((s, i) => (
-            <Reveal key={s.slug} delay={(i % 4) * 70} className={`w-[78vw] max-w-[320px] shrink-0 snap-center sm:w-auto sm:max-w-none ${i >= 5 ? "hidden sm:block" : ""}`}>
+            <Reveal key={s.slug} delay={(i % 3) * 70} className={`w-[78vw] max-w-[320px] shrink-0 snap-center sm:w-auto sm:max-w-none`}>
               <Link
                 href={`/exemples/${s.slug}`}
                 className="group relative block overflow-hidden rounded-[22px] p-4 pb-16 shadow-[0_24px_60px_-30px_rgb(0_0_0/0.8)] ring-1 ring-white/10 transition-all duration-500 hover:-translate-y-1.5 hover:ring-white/30"

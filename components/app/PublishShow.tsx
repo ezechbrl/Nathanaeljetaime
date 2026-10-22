@@ -160,20 +160,26 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
         <p className="mt-7 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-deep/40 px-3 py-1 text-sm text-accent">
           <span className="h-2 w-2 animate-pulse rounded-full bg-accent" /> {live ? "En ligne" : "Prête en aperçu"}
         </p>
-        <h2 className="mt-4 text-h2">{manual ? <>Plus qu'<span className="serif-accent">une étape</span></> : live ? <>Ta boutique est <span className="serif-accent">en ligne</span></> : <>Tout est dans <span className="serif-accent">Shopify</span></>}</h2>
+        <h2 className="mt-4 text-h2">{manual ? <>Ta boutique est sur <span className="serif-accent">Shopify</span></> : live ? <>Ta boutique est <span className="serif-accent">en ligne</span></> : <>Tout est dans <span className="serif-accent">Shopify</span></>}</h2>
         <p className="mx-auto mt-3 max-w-sm text-fg-muted">
           {store.themeStatus === "manual"
-            ? <>Ton produit, tes prix et tes photos sont dans Shopify. Installe maintenant le design Vigenia de ta boutique :</>
+            ? <>Produit, prix, photos et pages sont publiés. Clique pour la voir.</>
             : live
             ? <>{store.name} est publiée sur Shopify avec son thème, son produit et ses pages.{shop ? <> Adresse : <span className="text-fg">{shop}</span></> : null}</>
             : <>Produit, pages et thème Vigenia sont installés. Ton ancien thème reste affiché tant que tu ne publies pas le nouveau depuis Shopify → Thèmes.</>}
         </p>
-        {manual && <ThemeImportCard store={store} compact />}
+        {manual && (
+          // En attendant que Shopify autorise l'installation automatique des thèmes, le design est facultatif.
+          <details className="mx-auto mt-5 max-w-md rounded-card border border-white/10 bg-white/[0.03] p-3 text-left">
+            <summary className="cursor-pointer text-sm text-fg-muted">Facultatif : appliquer aussi le design Vigenia</summary>
+            <ThemeImportCard store={store} compact />
+          </details>
+        )}
         <p className="mx-auto mt-2 max-w-sm text-xs text-fg-faint">Boutique de test ou protégée par mot de passe ? {links ? <a href={links.password} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-fg">Voir le mot de passe dans Shopify</a> : "Le mot de passe est dans Shopify → Boutique en ligne → Préférences."}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          {store.liveUrl && !manual && (
+          {store.liveUrl && (
             <a href={store.liveUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(16_176_127/0.7)]">
-              Voir ma boutique <ExternalLink className="h-4 w-4" />
+              Voir ma boutique Shopify <ExternalLink className="h-4 w-4" />
             </a>
           )}
           {!manual && !live && adminThemes ? (

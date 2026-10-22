@@ -1,3 +1,4 @@
+import { BuyerReviews } from "@/components/site/BuyerReviews";
 import { Compare } from "@/components/site/Compare";
 import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
@@ -14,6 +15,7 @@ export default function HomePage() {
       <Hero />
       <ShowcaseGrid />
       <Instant />
+      <BuyerReviews />
       <Compare />
       <PriceTeaser />
       <Reviews />

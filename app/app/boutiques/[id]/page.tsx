@@ -11,7 +11,6 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { PublishButton } from "@/components/app/PublishButton";
 import { ShopifySetupCard } from "@/components/app/ShopifySetupCard";
 import { StoreCoach } from "@/components/app/StoreCoach";
-import { ThemeImportCard, useThemeImported } from "@/components/app/ThemeImportCard";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
 import { Button } from "@/components/ui/Button";
@@ -37,7 +36,6 @@ export default function StoreDashboard() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const links = shopifyLinks(store.liveUrl);
-  const [themeImported, markThemeImported] = useThemeImported(store);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
@@ -69,7 +67,7 @@ export default function StoreDashboard() {
         title={store.name}
         subtitle={<span className="flex flex-wrap items-center gap-3"><StatusBadge status={store.status} /> <span>{store.language}</span></span>}
         actions={<>
-          {links && <a href={links.storefront} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-accent/40 bg-accent-deep/40 px-4 text-sm font-medium text-fg transition-colors hover:bg-accent-deep/70"><ExternalLink className="h-4 w-4" /> Voir ma boutique</a>}
+          {links && <a href={links.storefront} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-accent/40 bg-accent-deep/40 px-4 text-sm font-medium text-fg transition-colors hover:bg-accent-deep/70"><ExternalLink className="h-4 w-4" /> Voir ma boutique Shopify</a>}
           <PublishButton />
         </>}
       />
@@ -83,7 +81,6 @@ export default function StoreDashboard() {
           </div>
         </div>
       )}
-      {store.themeStatus === "manual" && store.status === "published" && !activeJob && !themeImported && <ThemeImportCard store={store} onDone={markThemeImported} />}
       <div className="grid gap-6 p-5 sm:p-8 xl:grid-cols-[1fr_340px]">
         <div className="min-w-0">
           <div className="flex gap-1 overflow-x-auto">
@@ -98,11 +95,11 @@ export default function StoreDashboard() {
               <StorePreview store={store} page={page} assets={assets.data?.assets} />
             </div>
           </div>
+          {store.status === "published" && <div className="mt-4"><ShopifySetupCard store={store} /></div>}
         </div>
 
         <aside className="space-y-4">
           <StoreCoach store={store} assets={assets.data?.assets} />
-          {store.status === "published" && <ShopifySetupCard store={store} />}
           <section className="surface rounded-card p-5">
             <h2 className="flex items-center gap-2 text-sm text-fg-muted"><History className="h-4 w-4" /> Versions</h2>
             <ul className="mt-3 max-h-56 space-y-1 overflow-y-auto">

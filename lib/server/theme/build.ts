@@ -1,5 +1,6 @@
 import { strToU8, zipSync } from "fflate";
 import { toIcon, type IconName, type StorePlan } from "@/lib/store-schema";
+import { shortReview } from "@/lib/format";
 import { staticThemeFiles } from "./files";
 import { labelsFor } from "./labels";
 
@@ -140,7 +141,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   const reviewsSection = {
     type: "testimonials",
     settings: { scheme: "base", title: "", note: reviews?.items.length ? L.reviews_note : "" },
-    ...blocks((reviews?.items ?? []).slice(0, 9).map((r) => ({ type: "review", settings: { quote: r.text, author: r.author || "—", country: flag(r.country), stars: Math.min(5, Math.max(1, Math.round(r.rating))), ...(r.photo ? { photo: r.photo } : {}) } }))),
+    ...blocks((reviews?.items ?? []).slice(0, 4).map((r) => ({ type: "review", settings: { quote: shortReview(r.text), author: r.author || "—", country: flag(r.country), stars: Math.min(5, Math.max(1, Math.round(r.rating))) } }))),
   };
   // Moments d'usage : une scène de vie par moment (personne de la cible qui utilise le produit).
   const moments = home.moments?.items.slice(0, 3).map((m, i) => ({ ...m, image: file(`life${i + 1}`) })) ?? [];

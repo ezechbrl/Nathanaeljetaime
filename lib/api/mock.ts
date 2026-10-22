@@ -282,7 +282,7 @@ export async function listStores() {
   return { stores: clone(s.stores).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)) };
 }
 
-const ACCENTS = ["#c8506a", "#4b62c9", "#5f9e47", "#b9813f", "#8a4fb0", "#d9822b", "#0f8f86"];
+const ACCENTS = ["#2563eb", "#ff4d8d", "#ef4444", "#f97316", "#7c3aed", "#06b6d4", "#e11d48"];
 
 const NAMES = ["Nova", "Maison Lune", "Atelier Brume", "Nordé", "Sable & Sel", "Kōra", "Ombre Douce", "Halo"];
 function guessName(_brief: string, url?: string) {

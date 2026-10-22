@@ -58,7 +58,7 @@ export function StoreFrame({ s, phone = true, className }: { s: ShowcaseStore; p
               <p className="mt-1.5 text-[8px] opacity-60">{s.sub}</p>
               <div className="mt-2.5 flex items-center gap-2">
                 <span className="rounded-full px-3 py-1 text-[7px] font-medium" style={{ background: accent, color: bg }}>Acheter · {s.price}</span>
-                <span className="text-[7px] opacity-60">★ 4,8</span>
+                <span className="text-[7px] opacity-60">Livraison offerte</span>
               </div>
             </div>
             <ProductVisual s={s} className="aspect-square rounded-md" />
@@ -107,7 +107,7 @@ export function StoreLongFrame({ s }: { s: ShowcaseStore }) {
           <ProductVisual s={s} className="aspect-square rounded-md" />
           <div>
             <p className="text-[9px] font-semibold leading-tight">{s.product}</p>
-            <p className="mt-0.5 text-[7px] opacity-70">★★★★★ 4,8 · 126 avis</p>
+            <p className="mt-0.5 text-[7px] opacity-70">Livraison offerte · Retours 30 jours</p>
             <p className="mt-1 text-[10px] font-bold">{s.price}</p>
             <div className="mt-1.5 space-y-1">
               {["1 unité", "Lot de 2 · −15 %"].map((o, i) => (

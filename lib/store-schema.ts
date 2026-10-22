@@ -71,7 +71,7 @@ export const ProductBaseSchema = z.object({
     subtitle: z.string(),
     price: z.string().describe("Prix conseillé, nombre décimal sans devise, ex. 29.90"),
     compareAtPrice: z.string().describe("Prix barré conseillé, ou chaîne vide"),
-    descriptionHtml: z.string().describe("Description produit en HTML simple (p, ul, li, strong, h3)"),
+    descriptionHtml: z.string().describe("Description produit courte en HTML simple (p, ul, li, strong) : 2-3 phrases puis 3 à 5 puces"),
     bulletPoints: z.array(z.string()),
     seoTitle: z.string(),
     seoDescription: z.string(),

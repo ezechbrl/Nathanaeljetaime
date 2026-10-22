@@ -2,7 +2,7 @@
 
 import { ArrowRight, ArrowUpRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { normalizeShop, ShopifyBag } from "@/components/auth/AuthForms";
+import { normalizeShop, ReturnSteps, ShopifyBag } from "@/components/auth/AuthForms";
 import { AuroraBackground } from "@/components/pricing/PlanCards";
 import { Spinner } from "@/components/ui/Button";
 import { LogoMark } from "@/components/ui/Logo";
@@ -12,6 +12,7 @@ import { site } from "@/lib/site";
 // Deux grandes cartes : créer un compte Shopify, ou relier celui qu'on a déjà.
 export function ShopifyChoice({ next, brief }: { next: string; brief?: string }) {
   const [open, setOpen] = useState(false);
+  const [created, setCreated] = useState(false);
   const [shop, setShop] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,7 +43,7 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
           </div>
           <p className="mt-5 text-[1.35rem] font-semibold tracking-[-0.02em]">Pas de compte Shopify ?</p>
           <p className="mt-1 flex-1 text-[13.5px] text-fg-muted">Crée ta boutique Shopify : {site.shopifyOffer} en ce moment. Reviens ensuite ici pour la relier. <span className="text-fg-faint">(Lien partenaire Shopify.)</span></p>
-          <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#c4f04a,#8fbf2f)] text-[15px] font-semibold text-[#0f1f05] shadow-[0_10px_30px_-10px_rgb(196_240_74/0.7)] transition-transform hover:-translate-y-px">
+          <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" onClick={() => { setCreated(true); setOpen(true); }} className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#c4f04a,#8fbf2f)] text-[15px] font-semibold text-[#0f1f05] shadow-[0_10px_30px_-10px_rgb(196_240_74/0.7)] transition-transform hover:-translate-y-px">
             Créer un compte Shopify <ArrowUpRight className="h-4 w-4" />
           </a>
         </div>
@@ -59,8 +60,9 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
           <p className="mt-1 flex-1 text-[13.5px] text-fg-muted">Relie ta boutique à Vigenia en 10 secondes.</p>
           {open ? (
             <form onSubmit={connect} className="mt-4">
+              {created && <ReturnSteps className="mb-4" />}
               <div className="flex items-center rounded-full border border-white/15 bg-white/[0.04] focus-within:border-[#2ee6a6]">
-                <input autoFocus value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder="ma-boutique" aria-label="Adresse de ta boutique" className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[15px] focus:outline-none" />
+                <input autoFocus value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder={created ? "admin.shopify.com/store/…" : "ma-boutique"} aria-label="Adresse de ta boutique" className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[15px] focus:outline-none" />
                 <span className="pr-4 text-sm text-fg-faint">.myshopify.com</span>
               </div>
               {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}

@@ -26,6 +26,13 @@ const STARTERS = [
   { icon: Gift, text: "Ajoute une offre 2 achetés = 1 offert" },
   { icon: HelpCircle, text: "Réécris la FAQ" },
 ];
+const COLOR_ASK = "Change la couleur principale";
+// Couleurs vives proposées en un clic (appliquées instantanément, sans IA).
+const SWATCHES = [
+  ["#e11d48", "Framboise"], ["#ff4d8d", "Rose"], ["#ef4444", "Rouge"], ["#f97316", "Orange"],
+  ["#facc15", "Jaune"], ["#22c55e", "Vert"], ["#06b6d4", "Turquoise"], ["#2563eb", "Bleu"],
+  ["#7c3aed", "Violet"], ["#111827", "Noir"],
+] as const;
 const PAGES: { id: PreviewPage; label: string }[] = [
   { id: "accueil", label: "Accueil" }, { id: "produit", label: "Produit" },
 ];
@@ -60,6 +67,7 @@ export default function EditorPage() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [device, setDevice] = useState<"auto" | "mobile">("auto");
   const [flash, setFlash] = useState(false);
+  const [picking, setPicking] = useState(false);
   // Sur téléphone : une seule vue à la fois (discussion ou aperçu), en plein écran.
   const [view, setView] = useState<"chat" | "preview">("chat");
   const previewRef = useRef<HTMLDivElement>(null);
@@ -81,6 +89,8 @@ export default function EditorPage() {
   async function send(text: string) {
     const content = text.trim();
     if (!content || sending) return;
+    if (content === COLOR_ASK) return setPicking(true);
+    setPicking(false);
     setDraft("");
     setSending(true);
     const optimistic: ChatMessage = { id: `tmp-${Date.now()}`, storeId: store.id, role: "user", content, changes: [], createdAt: new Date().toISOString() };
@@ -224,6 +234,16 @@ export default function EditorPage() {
                   {sessionLeft <= weekLeft && usage.aiBudget.session.resetsAt ? " Il se recharge bientôt." : ""}
                   {user.plan === "pro" && <> <Link href="/app/abonnement" className="text-accent underline underline-offset-2">Passe à l'offre Pro</Link> pour 2× plus de crédit.</>}
                 </p>
+              )}
+              {picking && (
+                <div className="mb-3 rounded-[16px] border border-white/10 bg-white/[0.03] p-3 [animation:fade-in_.2s_ease-out]">
+                  <p className="text-[13px] text-fg-muted">Choisis ta nouvelle couleur principale (ou écris le code, ex. « #ff4d8d ») :</p>
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    {SWATCHES.map(([hex, name]) => (
+                      <button key={hex} type="button" onClick={() => send(`${COLOR_ASK} en ${hex} (${name.toLowerCase()})`)} aria-label={name} title={name} className="h-9 w-9 rounded-full border-2 border-white/20 shadow-md transition-transform hover:scale-110 hover:border-white" style={{ background: hex }} />
+                    ))}
+                  </div>
+                </div>
               )}
               {/* Les suggestions n'apparaissent qu'une fois : en grandes cartes au départ, puis en petites pastilles. */}
               {started && <div className="mb-3 flex gap-2 overflow-x-auto pb-1">

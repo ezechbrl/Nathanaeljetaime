@@ -2,7 +2,6 @@ import "server-only";
 import { avg, fetchViaScraper, type RawReview, type RawReviews } from "@/lib/fetch-product-page";
 import type { Reviews } from "@/lib/store-schema";
 import { translateReviews } from "./ai";
-import { storeImage } from "./images";
 
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36";
 
@@ -35,14 +34,14 @@ async function aliExpressReviews(productId: string): Promise<RawReviews | undefi
 }
 
 // Avis réels des acheteurs du produit, chez le fournisseur : jamais inventés ni réécrits, seulement
-// traduits dans la langue de la boutique. Les photos des clients sont recopiées dans le stockage Vigenia.
+// traduits dans la langue de la boutique. Affichés sans photo : étoiles et texte seulement.
 export async function supplierReviews(opts: { url: string; fromPage?: RawReviews; storeId: string; language: string; userId: string }): Promise<Reviews | undefined> {
   const id = opts.url.match(/aliexpress\.[a-z.]+\/item\/(?:[^/]*\/)?(\d{6,})/i)?.[1];
   const found = (id ? await aliExpressReviews(id).catch(() => undefined) : undefined) ?? opts.fromPage;
   if (!found || (!found.items.length && found.total < 1)) return undefined;
-  // Les plus parlants d'abord : avec photo, bien notés, assez détaillés.
-  const score = (r: RawReview) => (r.photo ? 2 : 0) + r.rating + Math.min(r.text.length, 300) / 300;
-  const picked = [...found.items].sort((a, b) => score(b) - score(a)).slice(0, 9);
+  // 4 avis au plus, bien notés, ni trop courts ni trop longs (1 ou 2 phrases à l'affichage).
+  const score = (r: RawReview) => r.rating + (r.text.length >= 40 && r.text.length <= 220 ? 1 : 0);
+  const picked = [...found.items].sort((a, b) => score(b) - score(a)).slice(0, 4);
   // Traduction impossible : on garde la note, sans afficher d'avis dans une autre langue.
   const texts = picked.length ? await translateReviews(picked.map((r) => r.text), opts.language, opts.userId).catch(() => null) : [];
   const items = await Promise.all((texts ? picked : []).map(async (r, i) => ({
@@ -50,22 +49,6 @@ export async function supplierReviews(opts: { url: string; fromPage?: RawReviews
     country: r.country,
     rating: r.rating,
     text: texts?.[i] ?? "",
-    photo: r.photo ? await rehost(opts.storeId, r.photo) : undefined,
   })));
   return { average: Math.round(found.average * 10) / 10, total: found.total, source: id ? "aliexpress" : new URL(opts.url).hostname, items: items.filter((r) => r.text) };
-}
-
-async function rehost(storeId: string, raw: string): Promise<string | undefined> {
-  try {
-    const url = new URL(raw.startsWith("//") ? `https:${raw}` : raw);
-    if (url.protocol !== "https:") return undefined;
-    const res = await fetch(url, { signal: AbortSignal.timeout(10_000), headers: { "user-agent": UA } });
-    const type = res.headers.get("content-type") ?? "";
-    if (!res.ok || !type.startsWith("image/")) return undefined;
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    if (bytes.length > 8_000_000) return undefined;
-    return (await storeImage(storeId, bytes, type, "review")).url;
-  } catch {
-    return undefined;
-  }
 }
