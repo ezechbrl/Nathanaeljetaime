@@ -134,3 +134,7 @@ export const subscribeNewsletter = (email: string) =>
 export function runTool<T>(tool: string, input: Record<string, string>): Promise<{ result: T }> {
   return live ? request<{ result: T }>(`/api/tools/${tool}`, { method: "POST", json: input }) : mock.runTool<T>(tool, input);
 }
+
+// Avis sur Vigenia (publié sur le site après relecture).
+export const sendTestimonial = (input: { rating: number; text: string; name: string; role?: string }) =>
+  live ? request<{ ok: true }>("/api/testimonials", { method: "POST", json: input }) : mock.ok();

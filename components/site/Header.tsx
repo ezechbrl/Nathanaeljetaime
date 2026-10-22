@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CircleDollarSign, LayoutGrid, Mail, PlayCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,10 +11,10 @@ import { CTA } from "@/lib/launch";
 
 // Seulement les pages utiles, en pilules bien visibles. Les autres pages sont dans le pied de page.
 const NAV = [
-  { href: "/exemples", label: "Exemples", icon: LayoutGrid, text: "Des boutiques créées avec Vigenia" },
-  { href: "/demo", label: "Comment ça marche", icon: PlayCircle, text: "La démo en 3 étapes" },
-  { href: "/tarifs", label: "Tarifs", icon: CircleDollarSign, text: "−50 % à vie au lancement" },
-  { href: "/contact", label: "Contact", icon: Mail, text: "Une question ? On répond vite" },
+  { href: "/exemples", label: "Exemples" },
+  { href: "/demo", label: "Comment ça marche" },
+  { href: "/tarifs", label: "Tarifs" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const RESOURCES = [
@@ -75,27 +75,31 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-y-auto px-4 pb-6 pt-3 [animation:fade-in_.2s_ease-out] lg:hidden">
-          <nav aria-label="Navigation mobile" className="grid gap-2.5">
+        // Menu plein écran : grands liens animés, offre mise en avant, boutons en bas.
+        <div className="relative flex h-[calc(100dvh-4rem)] flex-col overflow-y-auto px-5 pb-6 pt-2 lg:hidden">
+          <div aria-hidden className="pointer-events-none absolute -right-24 top-10 h-72 w-72 rounded-full bg-[radial-gradient(closest-side,rgb(46_230_166/0.25),transparent)] blur-2xl" />
+          <nav aria-label="Navigation mobile" className="relative">
             {NAV.map((n, i) => (
-              <Link key={n.href} href={n.href} style={{ animationDelay: `${i * 50}ms` }} className={cn("group flex items-center gap-4 rounded-[20px] border p-4 [animation:rise_.4s_cubic-bezier(.2,.8,.2,1)_both]", active(n.href) ? "border-[#2ee6a6]/50 bg-[#2ee6a6]/10" : "border-white/10 bg-white/[0.04]")}>
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-[linear-gradient(160deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_8px_20px_-8px_rgb(46_230_166/0.8)]"><n.icon className="h-5 w-5" /></span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[17px] font-semibold tracking-tight">{n.label}</span>
-                  <span className="block truncate text-[13px] text-fg-muted">{n.text}</span>
+              <Link key={n.href} href={n.href} style={{ animationDelay: `${60 + i * 60}ms` }} className="group flex items-center justify-between border-b border-white/[0.08] py-4 [animation:rise_.5s_cubic-bezier(.2,.8,.2,1)_both]">
+                <span className="flex items-baseline gap-3">
+                  <span className="font-mono text-[11px] text-accent/70">0{i + 1}</span>
+                  <span className={cn("text-[2rem] font-semibold leading-none tracking-[-0.04em]", active(n.href) ? "text-accent" : "text-fg")}>{n.label}</span>
                 </span>
-                <ArrowRight className="h-4 w-4 text-fg-faint transition-transform group-active:translate-x-0.5" />
+                <span className="grid h-9 w-9 place-items-center rounded-full border border-white/12 transition-colors group-active:bg-accent group-active:text-[#03140d]"><ArrowRight className="h-4 w-4" /></span>
               </Link>
             ))}
           </nav>
-          <div className="mt-5 flex flex-wrap gap-2 [animation:fade-in_.4s_.2s_both]">
-            {RESOURCES.map((r) => (
-              <Link key={r.href} href={r.href} className="rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-2 text-[13px] text-fg-muted">{r.label}</Link>
-            ))}
+          <Link href="/tarifs" className="relative mt-6 overflow-hidden rounded-[20px] bg-[linear-gradient(120deg,#10b981,#2ee6a6_55%,#a3e635)] p-4 text-[#03140d] [animation:rise_.5s_.3s_cubic-bezier(.2,.8,.2,1)_both]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">Offre de lancement</p>
+            <p className="mt-1 text-xl font-bold tracking-tight">−50 % à vie sur ton abonnement</p>
+            <p className="mt-0.5 text-sm font-medium opacity-80">Valable 24 h après ton inscription →</p>
+          </Link>
+          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-[14px] text-fg-muted [animation:fade-in_.5s_.4s_both]">
+            {RESOURCES.map((r) => <Link key={r.href} href={r.href} className="hover:text-fg">{r.label}</Link>)}
           </div>
-          <div className="mt-auto grid gap-2 pt-8">
-            <div className="glow-frame rounded-[15px] p-[1.5px]"><ButtonLink href="/inscription" size="lg" className="w-full rounded-[14px]">{CTA.main} <ArrowRight className="h-4 w-4" /></ButtonLink></div>
-            <ButtonLink href="/connexion" variant="secondary" size="lg">J'ai déjà un compte</ButtonLink>
+          <div className="mt-auto grid grid-cols-2 gap-2 pt-8">
+            <ButtonLink href="/connexion" variant="secondary" size="lg">Connexion</ButtonLink>
+            <ButtonLink href="/inscription" size="lg">{CTA.short}</ButtonLink>
           </div>
         </div>
       )}

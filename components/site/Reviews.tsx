@@ -1,16 +1,28 @@
 import { Star } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
-import { REVIEWS } from "@/lib/content/reviews";
+import { REVIEWS, type Review } from "@/lib/content/reviews";
+import { db } from "@/lib/server/supabase";
+
+// Avis approuvés laissés par les utilisateurs dans l'app (table testimonials).
+async function approved(): Promise<Review[]> {
+  try {
+    const { data } = await db().from("testimonials").select("name, role, text, rating").eq("approved", true).order("created_at", { ascending: false }).limit(12);
+    return (data ?? []).map((r) => ({ name: r.name, role: r.role ?? "Utilisateur de Vigenia", text: r.text, rating: r.rating }));
+  } catch {
+    return []; // base indisponible (build local) : section masquée
+  }
+}
 
 // Avis des utilisateurs : cartes en verre lumineuses. Masqué tant qu'il n'y a pas de vrais avis.
-export function Reviews() {
-  if (!REVIEWS.length) return null;
+export async function Reviews() {
+  const all = [...REVIEWS, ...(await approved())];
+  if (!all.length) return null;
   return (
     <section className="py-20">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
         <Reveal as="h2" className="text-center text-h2">Ils ont lancé leur boutique avec <span className="serif-accent">Vigenia</span></Reveal>
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {REVIEWS.map((r, i) => (
+          {all.map((r, i) => (
             <Reveal key={r.name + i} delay={(i % 3) * 80} className="group rounded-[22px] bg-[linear-gradient(160deg,rgb(46_230_166/0.55),rgb(255_255_255/0.05)_40%,rgb(163_230_53/0.25))] p-px transition-transform duration-500 hover:-translate-y-1">
               <figure className="relative h-full overflow-hidden rounded-[21px] bg-[linear-gradient(180deg,rgb(8_40_31/0.92),rgb(3_16_12/0.96))] p-6 backdrop-blur-xl">
                 <div aria-hidden className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[radial-gradient(closest-side,rgb(46_230_166/0.25),transparent)] transition-opacity duration-500 group-hover:opacity-100 md:opacity-60" />
