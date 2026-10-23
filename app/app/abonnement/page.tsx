@@ -87,7 +87,7 @@ function Billing() {
                     <p className="mt-4 text-[2.4rem] font-semibold leading-none tracking-[-0.03em]">Accès offert</p>
                   ) : (
                   <p className="mt-4 flex items-baseline gap-2">
-                    <span className="text-[2.4rem] font-semibold leading-none tracking-[-0.03em] tabular-nums">{sub.amount ? formatMoney(sub.amount, "EUR") : euro(sub.interval === "year" ? current?.yearly ?? 0 : current?.monthly ?? 0)}</span>
+                    <span className="text-[2.4rem] font-semibold leading-none tracking-[-0.03em] tabular-nums">{sub.amount ? formatMoney(sub.amount, sub.currency ?? "EUR") : euro(sub.interval === "year" ? current?.yearly ?? 0 : current?.monthly ?? 0)}</span>
                     <span className="text-fg-muted">{sub.interval === "year" ? "/ an" : "/ mois"}</span>
                     {sub.amount != null && current && sub.amount < (sub.interval === "year" ? current.yearly : current.monthly) * 100 && (
                       <span className="ml-1 rounded-full bg-[#2ee6a6]/15 px-2.5 py-1 text-[12px] font-semibold text-[#a7f3d0]">Prix de lancement à vie</span>

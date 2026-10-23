@@ -147,6 +147,7 @@ export type Subscription = {
   renewsAt: string | null;
   cancelAtPeriodEnd: boolean;
   amount?: number | null; // montant réellement payé par période, en centimes (offre de lancement comprise)
+  currency?: string; // EUR, ou USD si la boutique paie Shopify en dollars
 };
 
 export type Invoice = { id: string; number: string; amount: number; currency: string; status: "paid" | "open" | "void"; pdfUrl: string; createdAt: string };

@@ -145,7 +145,7 @@ export async function cancelSubscriptionNow(userId: string) {
 export async function billingFor(user: UserRow): Promise<{ subscription: Subscription; invoices: Invoice[]; billingUrl: string | null }> {
   const row = must(await db().from("subscriptions").select("*").eq("user_id", user.id).maybeSingle()) as Record<string, any> | null;
   const subscription: Subscription = row
-    ? { plan: row.plan, status: row.status, interval: row.interval, renewsAt: row.current_period_end, cancelAtPeriodEnd: row.cancel_at_period_end, amount: row.amount_cents ?? null }
+    ? { plan: row.plan, status: row.status, interval: row.interval, renewsAt: row.current_period_end, cancelAtPeriodEnd: row.cancel_at_period_end, amount: row.amount_cents ?? null, currency: row.currency ?? "EUR" }
     : { plan: user.plan, status: "active", interval: null, renewsAt: null, cancelAtPeriodEnd: false };
   // Les factures sont celles de Shopify : lien direct vers la page Facturation de l'admin.
   const handle = String(row?.shop_domain ?? "").replace(".myshopify.com", "");
