@@ -20,7 +20,7 @@ export async function notifyOwner(title: string, message: string) {
     sends.push(fetch(`https://ntfy.sh/${encodeURIComponent(topic)}`, {
       method: "POST",
       signal: AbortSignal.timeout(8000),
-      headers: { Title: encodeURIComponent(title), Tags: "moneybag", Priority: "high", "Content-Type": "text/plain; charset=utf-8" },
+      headers: { Title: `=?UTF-8?B?${Buffer.from(title).toString("base64")}?=`, Priority: "high", "Content-Type": "text/plain; charset=utf-8" }, // l'emoji est déjà dans le titre
       body: message,
     }));
   }
