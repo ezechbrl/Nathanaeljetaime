@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Check, ExternalLink, FileText, Globe, Package, Palette, ShoppingBag, Tag } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Job, JobStepKey, Store } from "@/lib/api/types";
@@ -175,13 +176,10 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
             <ThemeImportCard store={store} compact />
           </details>
         )}
-        <p className="mx-auto mt-2 max-w-sm text-xs text-fg-faint">Boutique de test ou protégée par mot de passe ? {links ? <a href={links.password} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-fg">Voir le mot de passe dans Shopify</a> : "Le mot de passe est dans Shopify → Boutique en ligne → Préférences."}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          {store.liveUrl && (
-            <a href={store.liveUrl} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(16_176_127/0.7)]">
-              Voir ma boutique Shopify <ExternalLink className="h-4 w-4" />
-            </a>
-          )}
+          <Link href={`/app/boutiques/${store.id}/apercu`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(16_176_127/0.7)]">
+            Voir ma boutique <ExternalLink className="h-4 w-4" />
+          </Link>
           {!manual && !live && adminThemes ? (
             <a href={adminThemes} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">Ouvrir mes thèmes Shopify</a>
           ) : (

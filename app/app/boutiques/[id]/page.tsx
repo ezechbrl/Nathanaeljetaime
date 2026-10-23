@@ -20,7 +20,6 @@ import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
 import { cn } from "@/lib/cn";
-import { shopifyLinks } from "@/lib/shopify-links";
 import { timeAgo } from "@/lib/format";
 
 const PAGES: { id: PreviewPage; label: string }[] = [
@@ -36,7 +35,6 @@ export default function StoreDashboard() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
-  const links = shopifyLinks(store.liveUrl);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
@@ -68,7 +66,7 @@ export default function StoreDashboard() {
         title={store.name}
         subtitle={<span className="flex flex-wrap items-center gap-3"><StatusBadge status={store.status} /> <span>{store.language}</span></span>}
         actions={<>
-          {links && <a href={links.storefront} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-accent/40 bg-accent-deep/40 px-4 text-sm font-medium text-fg transition-colors hover:bg-accent-deep/70"><ExternalLink className="h-4 w-4" /> Voir ma boutique Shopify</a>}
+          <Link href={`/app/boutiques/${store.id}/apercu`} className="inline-flex h-10 items-center gap-2 rounded-ctl border border-accent/40 bg-accent-deep/40 px-4 text-sm font-medium text-fg transition-colors hover:bg-accent-deep/70"><ExternalLink className="h-4 w-4" /> Voir ma boutique</Link>
           <PublishButton />
         </>}
       />
