@@ -17,12 +17,14 @@ export function ThemeColorsCard({ store }: { store: Store }) {
 
   return (
     <section className="surface-accent rounded-card p-5">
-      <h2 className="flex items-center gap-2 text-sm text-fg"><Palette className="h-4 w-4 text-accent" /> Couleurs et polices dans ton thème</h2>
-      <p className="mt-2 text-sm leading-relaxed text-fg-muted">
-        Un clic dans Shopify pour appliquer les couleurs et polices de {store.name} à ton thème. Rien n'est modifié dans les fichiers du thème : tu peux désactiver quand tu veux.
-      </p>
+      <h2 className="flex items-center gap-2 text-sm text-fg"><Palette className="h-4 w-4 text-accent" /> Couleurs et polices de {store.name} dans ton thème</h2>
+      <p className="mt-2 text-sm leading-relaxed text-fg-muted">L'extension « Couleurs de marque » de Vigenia applique tes couleurs et polices à n'importe quel thème Shopify, sans modifier ses fichiers.</p>
+      <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-fg-muted">
+        <li>Clique sur « Activer dans Shopify » : l'éditeur de thème s'ouvre sur les intégrations d'applications.</li>
+        <li>Active « Couleurs de marque ».</li>
+        <li>Clique sur « Enregistrer » en haut à droite. Pour l'enlever, désactive-la et enregistre.</li>
+      </ol>
       <a href={href} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-9 items-center rounded-ctl bg-accent-strong px-3.5 text-sm text-white hover:brightness-110">Activer dans Shopify</a>
-      <p className="mt-2 text-xs text-fg-faint">Ensuite, clique sur « Enregistrer » dans l'éditeur de thème.</p>
     </section>
   );
 }

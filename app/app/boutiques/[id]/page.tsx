@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { PublishButton } from "@/components/app/PublishButton";
 import { ShopifySetupCard } from "@/components/app/ShopifySetupCard";
 import { TestimonialCard } from "@/components/app/TestimonialCard";
+import { ThemeColorsCard } from "@/components/app/ThemeColorsCard";
 import { StoreCoach } from "@/components/app/StoreCoach";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
@@ -99,6 +100,7 @@ export default function StoreDashboard() {
 
         <aside className="space-y-4">
           <StoreCoach store={store} assets={assets.data?.assets} />
+          <ThemeColorsCard store={store} />
           {store.status === "published" && <TestimonialCard />}
           <section className="surface rounded-card p-5">
             <h2 className="flex items-center gap-2 text-sm text-fg-muted"><History className="h-4 w-4" /> Versions</h2>
