@@ -1,6 +1,7 @@
 // Back-end simulé, utilisé quand NEXT_PUBLIC_API_MODE=mock.
 // L'état est gardé en mémoire et dans le localStorage du navigateur : c'est une démo, pas une base de données.
 
+import type { StorePlan } from "@/lib/store-schema";
 import { samplePlan, seedAssets, seedMetrics, seedRecommendations, seedStores } from "./fixtures";
 import type {
   Affiliate, Asset, ChatChange, ChatMessage, GenerateStoreInput, Invoice, Job, JobStepKey,
@@ -253,7 +254,10 @@ function tick(job: State["jobs"][number]): Job {
       store.updatedAt = iso();
     } else if (store && job.kind === "generate") {
       store.status = "ready";
-      store.plan = { ...samplePlan(store.name, store.niche), brand: { ...samplePlan(store.name, store.niche).brand, colors: store.theme.colors } };
+      const o = demoOverride() as Record<string, Record<string, unknown>> | null;
+      const base = samplePlan(store.name, store.niche);
+      if (o?.brand?.colors) store.theme = { ...store.theme, colors: o.brand.colors as Store["theme"]["colors"] };
+      store.plan = { ...base, brand: { ...base.brand, ...o?.brand, colors: store.theme.colors }, homepage: { ...base.homepage, ...o?.homepage }, product: { ...base.product, ...o?.product }, ...(o?.reviews ? { reviews: o.reviews as unknown as StorePlan["reviews"] } : {}) } as StorePlan;
       store.updatedAt = iso();
       s.versions.push({ id: uid("ver"), storeId: store.id, label: "Version initiale", createdAt: iso(), snapshot: { theme: store.theme, plan: store.plan } });
       s.assets.push(...seedAssets(store.id));
@@ -290,7 +294,14 @@ export async function listStores() {
 const ACCENTS = ["#2563eb", "#ff4d8d", "#ef4444", "#f97316", "#7c3aed", "#06b6d4", "#e11d48"];
 
 const NAMES = ["Nova", "Maison Lune", "Atelier Brume", "Nordé", "Sable & Sel", "Kōra", "Ombre Douce", "Halo"];
+// Démo seulement : contenu de boutique imposé pour les vidéos de présentation (clé localStorage « vg-demo-plan »).
+function demoOverride(): { brand?: { name?: string; colors?: Store["theme"]["colors"] } } & Record<string, unknown> | null {
+  try { return JSON.parse(localStorage.getItem("vg-demo-plan") ?? "null"); } catch { return null; }
+}
+
 function guessName(_brief: string, url?: string) {
+  const o = demoOverride();
+  if (o?.brand?.name) return o.brand.name;
   if (url) {
     const host = new URL(url).hostname.replace(/^(www|fr|de|es|it|m)\./, "").split(".")[0];
     // Lien fournisseur (AliExpress, Amazon…) : la boutique a sa propre marque.
@@ -314,7 +325,7 @@ export async function createStore(input: GenerateStoreInput) {
   const s = load();
   const teaser = s.subscription.plan === "free"; // sans abonnement : boutique d'aperçu floutée
   if (!teaser) { assertAi(); chargeAi(0.4); }
-  const accent = ACCENTS[s.stores.length % ACCENTS.length];
+  const accent = demoOverride()?.brand?.colors?.accent ?? ACCENTS[s.stores.length % ACCENTS.length];
   const store: Store = {
     id: uid("store"),
     name: guessName(input.brief, input.productUrl),
