@@ -148,7 +148,11 @@ p{margin:0}
 .hero__trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:30px;font-size:14.5px;opacity:.95}
 .hero__trust span{display:inline-flex;align-items:center;gap:8px}
 .hero__trust .ico{font-size:17px}
+.hero--right .hero__c{margin-left:auto;text-align:right}.hero--right .hero__c .hero__sub{margin-left:auto}.hero--right .hero__trust{justify-content:flex-end}.hero--right .hero__bg::after{background:linear-gradient(270deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,0) 75%)}
+.hero--center .hero__c{margin:0 auto;text-align:center;max-width:780px}.hero--center .hero__c .hero__sub{margin-left:auto;margin-right:auto}.hero--center .hero__trust{justify-content:center}.hero--center .hero__bg::after{background:rgba(0,0,0,.48)}
 .hero--split{color:var(--c-primary);background:var(--c-tint)}
+.hero--split.hero--right .hero__grid>:first-child{order:2}
+.hero--split.hero--center .hero__grid{grid-template-columns:1fr;text-align:center;max-width:860px;margin:0 auto}.hero--split.hero--center .hero__trust{justify-content:center}.hero--split.hero--center .hero__sub{margin-left:auto;margin-right:auto}
 .hero--split .hero__grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;width:100%}
 .hero--split .media{aspect-ratio:4/4.4}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);font-size:13px;margin-bottom:22px;border:1px solid rgba(255,255,255,.22)}
@@ -596,7 +600,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
 {%- assign bgimg = section.settings.image -%}
 {%- if bgimg == blank and p -%}{%- for m in p.media -%}{%- if m.alt contains 'ambiance' -%}{%- assign bgimg = m -%}{%- endif -%}{%- endfor -%}{%- endif -%}
 {%- if bgimg != blank -%}
-<section class="hero">
+<section class="hero hero--{{ section.settings.layout | default: 'left' }}">
   <div class="hero__bg">${img("bgimg", 2400, 1350, true)}</div>
   <div class="wrap"><div class="hero__c reveal">
     {% if section.settings.eyebrow != blank %}<p class="pill">{% render 'icon', name: 'sparkle' %}{{ section.settings.eyebrow }}</p>{% endif %}
@@ -607,7 +611,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
   </div></div>
 </section>
 {%- else -%}
-<section class="hero hero--split">
+<section class="hero hero--split hero--{{ section.settings.layout | default: 'left' }}">
   <div class="wrap hero__grid">
     <div class="reveal">
       {% if section.settings.eyebrow != blank %}<p class="pill">{% render 'icon', name: 'sparkle' %}{{ section.settings.eyebrow }}</p>{% endif %}
@@ -622,6 +626,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
 {%- endif -%}
 ${schema({ name: "Héros", settings: [
     { type: "image_picker", id: "image", label: "Image de fond" },
+    { type: "select", id: "layout", label: "Mise en page", options: [{ value: "left", label: "Texte à gauche" }, { value: "right", label: "Texte à droite" }, { value: "center", label: "Texte centré" }], default: "left" },
     { type: "product", id: "product", label: "Produit mis en avant" },
     { type: "text", id: "eyebrow", label: "Petite étiquette" },
     { type: "textarea", id: "title", label: "Titre" },

@@ -2,7 +2,7 @@
 
 import { ExternalLink, Monitor, Smartphone, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
 import * as api from "@/lib/api/client";
@@ -15,6 +15,8 @@ export default function StoreFullPreview() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [device, setDevice] = useState<"auto" | "mobile">("auto");
   const assets = useApi(() => api.listAssets(store.id), [store.id]);
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => { scroller.current?.scrollTo({ top: 0 }); }, [page]); // chaque page s'ouvre en haut
   const tab = (on: boolean) => cn("rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors", on ? "bg-white text-[#0b1f1b]" : "text-white/70 hover:text-white");
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-[#0b1f1b]">
@@ -30,7 +32,7 @@ export default function StoreFullPreview() {
         </div>
         {store.liveUrl && <a href={store.liveUrl} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] text-white/70 hover:bg-white/10 hover:text-white sm:ml-0">Sur Shopify <ExternalLink className="h-3.5 w-3.5" /></a>}
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto bg-white">
+      <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto bg-white">
         <StorePreview store={store} page={page} device={device} assets={assets.data?.assets} />
       </div>
     </div>

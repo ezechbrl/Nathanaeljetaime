@@ -31,7 +31,7 @@ const Input = z.object({
 export const POST = route(async (req) => {
   const user = await requireUser();
   const input = await body(req, Input);
-  if (input.mode === "link" && !input.productUrl) throw badRequest("Colle le lien de la page produit.", "productUrl");
+  if (input.mode === "link" && !input.productUrl && !input.screenshots?.length) throw badRequest("Colle le lien de la page produit, ou ajoute une photo du produit.", "productUrl");
   await rateLimit(`generate:${user.id}`, 5, 3600);
   // Sans abonnement : une seule boutique d'aperçu (floutée), débloquée après le paiement.
   const teaser = user.plan === "free";

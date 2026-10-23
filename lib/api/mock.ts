@@ -334,7 +334,7 @@ export async function createStore(input: GenerateStoreInput) {
     mode: input.mode,
     status: "generating",
     shopConnectionId: input.shopConnectionId ?? s.connections[0]?.id ?? null,
-    theme: { colors: { primary: "#1d1d22", accent, background: "#faf8f5" }, headingFont: "Instrument Serif", bodyFont: "DM Sans" },
+    theme: { colors: { primary: "#1d1d22", accent, background: "#faf8f5" }, headingFont: "Instrument Serif", bodyFont: "DM Sans", heroLayout: (demoOverride()?.heroLayout as Store["theme"]["heroLayout"]) ?? (["left", "right", "center"] as const)[s.stores.length % 3] },
     plan: null,
     previewUrl: null,
     liveUrl: null,

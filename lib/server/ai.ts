@@ -127,7 +127,7 @@ export async function generatePages(input: { brief: string; language: string; st
   const user = parts.join("\n\n");
   let done = 0;
   const call = <T extends z.ZodType>(schema: T, task: string) =>
-    structured({ schema, effort: "medium", userId: input.userId, maxTokens: 12000, system: `Tu es copywriter et directeur artistique e-commerce. ${STYLE}\n\n${task}\n\n${BASE_RULES}`, user, images: input.screenshots })
+    structured({ schema, effort: "low", userId: input.userId, maxTokens: 12000, system: `Tu es copywriter et directeur artistique e-commerce. ${STYLE}\n\n${task}\n\n${BASE_RULES}`, user, images: input.screenshots })
       .then((r) => { onProgress?.(++done, 3); return r; });
 
   const [core, homeExtras, productExtras] = await Promise.all([

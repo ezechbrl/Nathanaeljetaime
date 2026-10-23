@@ -90,6 +90,9 @@ const errorMessage = (e: unknown) => {
 };
 
 const FONTS = { serif: "Instrument Serif", sans: "DM Sans" } as const;
+// Mise en page de l'accroche tirée au hasard : toutes les boutiques ne se ressemblent pas.
+const LAYOUTS = ["left", "right", "center"] as const;
+const pickLayout = (prev?: unknown) => (LAYOUTS.includes(prev as never) ? prev : LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)]) as (typeof LAYOUTS)[number];
 
 // Génération complète d'une boutique. Exécutée après la réponse HTTP (voir `after()` dans la route).
 export async function runGeneration(job: Record<string, any>, store: StoreRow) {
@@ -123,7 +126,8 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     const strategy = await generateStrategy({ brief: store.brief, language: store.language, sourceText, screenshots, existingStore, userId: store.user_id });
 
     await step("brand");
-    await db().from("stores").update({ name: strategy.brand.name, theme: { colors: strategy.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" } }).eq("id", store.id);
+    const heroLayout = pickLayout((store.theme as { heroLayout?: string } | null)?.heroLayout);
+    await db().from("stores").update({ name: strategy.brand.name, theme: { colors: strategy.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans", heroLayout } }).eq("id", store.id);
 
     await step("pages");
     const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText, screenshots, userId: store.user_id }, (d, t) => void step.sub(d / t));
@@ -142,7 +146,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     if (reviews) plan.reviews = reviews;
 
     await step("theme");
-    const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans" };
+    const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans", heroLayout };
     await db().from("stores").update({ plan, theme, name: plan.brand.name, status: "ready", updated_at: new Date().toISOString() }).eq("id", store.id);
     await db().from("store_versions").insert({ store_id: store.id, label: "Version initiale", snapshot: { plan, theme } });
     await db().from("users").update({ free_store_used: true }).eq("id", store.user_id); // boutique offerte utilisée (une seule fois)
@@ -177,7 +181,7 @@ export async function runTeaser(job: Record<string, any>, store: StoreRow) {
     const t = await generateTeaser({ brief: store.brief, language: store.language, sourceText });
     await step("pages");
     const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), image };
-    await db().from("stores").update({ name: t.brand.name, teaser, theme: { colors: t.brand.colors, headingFont: "Instrument Serif", bodyFont: "DM Sans" }, status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
+    await db().from("stores").update({ name: t.brand.name, teaser, theme: { colors: t.brand.colors, headingFont: "Instrument Serif", bodyFont: "DM Sans", heroLayout: pickLayout() }, status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
     await finish(job.id, steps);
   } catch (e) {
     console.error("Aperçu échoué", e);

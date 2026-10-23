@@ -61,6 +61,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
   const plan = store.plan;
   if (!plan) return null;
   const { primary, accent, background } = store.theme.colors;
+  const layout = store.theme.heroLayout ?? "left";
   const tint = mix(background, accent, 0.14);
   const serif = SERIF.test(store.theme.headingFont);
   const H = serif ? "font-serif" : "font-sans font-bold";
@@ -214,18 +215,18 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
           {imgs.hero ? (
             <section className="relative flex min-h-[460px] items-end overflow-hidden text-white sm:items-center" style={{ minHeight: mobile ? 520 : 520 }}>
               <img decoding="async" src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : "linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)" }} />
-              <div className={cn("relative max-w-[560px] pb-10 pt-24", pad)}>
+              <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : layout === "center" ? "rgba(0,0,0,.48)" : `linear-gradient(${layout === "right" ? 270 : 90}deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)` }} />
+              <div className={cn("relative w-full pb-10 pt-24", pad, !mobile && layout === "right" && "flex justify-end text-right", !mobile && layout === "center" && "flex justify-center text-center")}><div className={cn(layout === "center" && !mobile ? "max-w-[720px]" : "max-w-[560px]")}>
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs backdrop-blur"><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
                 <h2 className={cn("text-[2.9rem] leading-[1.02]", H, mobile && "text-[2.2rem]")}>{home.heroTitle}</h2>
                 <p className="mt-4 max-w-[36ch] text-[16px] opacity-90">{home.heroSubtitle}</p>
                 <div className="mt-7"><Btn light>{home.ctaLabel}</Btn></div>
-                <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[13px] opacity-95">{[shipOffer, returnOffer].filter(Boolean).map((t) => <span key={t} className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5" />{t}</span>)}</div>
-              </div>
+                <div className={cn("mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[13px] opacity-95", !mobile && layout === "right" && "justify-end", !mobile && layout === "center" && "justify-center")}>{[shipOffer, returnOffer].filter(Boolean).map((t) => <span key={t} className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5" />{t}</span>)}</div>
+              </div></div>
             </section>
           ) : (
-            <section className={cn("grid items-center gap-8", pad, sec, !mobile && "grid-cols-2")} style={{ background: tint }}>
-              <div>
+            <section className={cn("grid items-center gap-8", pad, sec, !mobile && layout !== "center" && "grid-cols-2", layout === "center" && "text-center")} style={{ background: tint }}>
+              <div className={cn(!mobile && layout === "right" && "order-2", layout === "center" && "mx-auto max-w-[640px]")}>
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs" style={{ background: `${accent}24` }}><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
                 <h2 className={cn("text-[2.6rem] leading-[1.02]", H, mobile && "text-[2rem]")}>{home.heroTitle}</h2>
                 <p className="mt-4 text-[15px] opacity-70">{home.heroSubtitle}</p>

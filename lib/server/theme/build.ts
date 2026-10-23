@@ -6,7 +6,7 @@ import { labelsFor } from "./labels";
 
 export type ThemeContext = {
   plan: StorePlan;
-  theme: { colors: { primary: string; accent: string; background: string }; headingFont: string; bodyFont: string };
+  theme: { colors: { primary: string; accent: string; background: string }; headingFont: string; bodyFont: string; heroLayout?: "left" | "right" | "center" };
   language?: string;
   productHandle?: string;
   aboutHandle?: string;
@@ -152,7 +152,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   };
 
   const sections: Record<string, unknown> = {
-    hero: { type: "hero", settings: { image: file("hero"), ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
+    hero: { type: "hero", settings: { image: file("hero"), layout: ctx.theme.heroLayout ?? "left", ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
     features: featuresSection,
     benefits: benefitsSection,
     ...(momentsSection ? { moments: momentsSection } : {}),

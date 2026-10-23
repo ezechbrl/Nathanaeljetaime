@@ -142,13 +142,13 @@ export function CreateStore() {
   async function submit(e?: React.FormEvent) {
     e?.preventDefault();
     setError(null);
-    if (mode === "link" && !/^https?:\/\//.test(url.trim())) return setError(new ApiClientError(400, "invalid_input", "Colle le lien du produit (il commence par https://).", "url"));
+    if (mode === "link" && !shots.length && !/^https?:\/\//.test(url.trim())) return setError(new ApiClientError(400, "invalid_input", "Colle le lien du produit (il commence par https://), ou ajoute simplement une photo du produit.", "url"));
     if (mode === "link" && link.state === "blocked" && !shots.length && brief.trim().length < 25) {
       return setError(new ApiClientError(400, "invalid_input", "Ce site ne laisse pas lire sa page. Ajoute 1 à 3 captures d'écran de la page produit (ou décris le produit en une phrase), puis clique sur Générer.", "url"));
     }
     if (mode === "recraft" && !shop) return setError(new ApiClientError(400, "no_shop", "Connecte d'abord ta boutique Shopify pour la refondre."));
-    if (mode !== "link" && brief.trim().length < 10) return setError(new ApiClientError(400, "invalid_input", "Décris ton projet en une ou deux phrases.", "brief"));
-    const input: GenerateStoreInput = { mode, brief: brief.trim() || "Boutique à partir du lien produit", productUrl: mode === "link" ? url.trim() : undefined, screenshots: mode === "link" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
+    if (mode !== "link" && !(mode === "start" && shots.length) && brief.trim().length < 10) return setError(new ApiClientError(400, "invalid_input", "Décris ton projet en une ou deux phrases.", "brief"));
+    const input: GenerateStoreInput = { mode, brief: brief.trim() || (url.trim() ? "Boutique à partir du lien produit" : "Boutique à partir des photos du produit"), productUrl: mode === "link" && url.trim() ? url.trim() : undefined, screenshots: mode !== "recraft" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
     // Sans abonnement : une boutique d'aperçu gratuite (floutée), puis l'offre pour la débloquer.
     generate(input);
   }
@@ -175,12 +175,30 @@ export function CreateStore() {
     setBrief(value);
   }
 
+  // Photos ou captures du produit : utilisables avec ou sans lien, et en mode « Décrire ».
+  const shotsRow = (
+    <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
+      {shots.map((src, i) => (
+        <span key={i} className="relative h-12 w-12 overflow-hidden rounded-[8px] border border-white/15">
+          <img src={src} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+          <button type="button" onClick={() => setShots((s) => s.filter((_, j) => j !== i))} aria-label="Retirer la photo" className="absolute right-0.5 top-0.5 grid h-4 w-4 place-items-center rounded-full bg-black/70 text-white"><X className="h-3 w-3" /></button>
+        </span>
+      ))}
+      {shots.length < 3 && (
+        <label className={cn("inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed px-2.5 py-1 text-xs transition-colors", link.state === "blocked" && !shots.length ? "border-accent/60 bg-accent-deep/40 text-fg" : "border-white/15 text-fg-muted hover:border-white/30 hover:text-fg")}>
+          <ImagePlus className="h-3.5 w-3.5" /> {shots.length ? "Ajouter une photo" : mode === "start" ? "Ajouter une photo du produit (facultatif)" : link.state === "blocked" ? "Ajouter des captures d'écran" : "Pas de lien ? Ajoute juste une photo ou une capture"}
+          <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addShots(e.target.files); e.target.value = ""; }} />
+        </label>
+      )}
+    </div>
+  );
+
   const met = CRITERIA.map((c) => c.test.test(brief));
   const score = met.filter(Boolean).length;
 
   return (
     <div className="mx-auto w-full max-w-[720px]">
-      <form onSubmit={submit} onPaste={(e) => { if (mode === "link" && e.clipboardData.files.length) { e.preventDefault(); addShots(e.clipboardData.files); } }} className="glow-frame rounded-[16px] p-[1.5px]">
+      <form onSubmit={submit} onPaste={(e) => { if (mode !== "recraft" && e.clipboardData.files.length) { e.preventDefault(); addShots(e.clipboardData.files); } }} className="glow-frame rounded-[16px] p-[1.5px]">
         <div className="rounded-[15px] bg-[linear-gradient(180deg,#0d3a2d,#062419)]">
           {mode === "link" && (
             <div className="border-b border-white/[0.06]">
@@ -203,20 +221,7 @@ export function CreateStore() {
                   {link.protectedSite ? "Ce site bloque la lecture automatique." : "Cette page n'a pas pu être lue."} <strong className="text-fg">Ajoute 1 à 3 captures d'écran de la page produit</strong> (photo, titre, caractéristiques), ou colle-les ici avec Ctrl+V : l'IA les lit et crée ta boutique pareil.
                 </p>
               )}
-              <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
-                {shots.map((src, i) => (
-                  <span key={i} className="relative h-12 w-12 overflow-hidden rounded-[8px] border border-white/15">
-                    <img src={src} alt={`Capture ${i + 1}`} className="h-full w-full object-cover" />
-                    <button type="button" onClick={() => setShots((s) => s.filter((_, j) => j !== i))} aria-label="Retirer la capture" className="absolute right-0.5 top-0.5 grid h-4 w-4 place-items-center rounded-full bg-black/70 text-white"><X className="h-3 w-3" /></button>
-                  </span>
-                ))}
-                {shots.length < 3 && (
-                  <label className={cn("inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed px-2.5 py-1 text-xs transition-colors", link.state === "blocked" && !shots.length ? "border-accent/60 bg-accent-deep/40 text-fg" : "border-white/15 text-fg-muted hover:border-white/30 hover:text-fg")}>
-                    <ImagePlus className="h-3.5 w-3.5" /> {shots.length ? "Ajouter une capture" : link.state === "blocked" ? "Ajouter des captures d'écran" : "Facultatif : ajoute des captures de la page produit"}
-                    <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addShots(e.target.files); e.target.value = ""; }} />
-                  </label>
-                )}
-              </div>
+              {shotsRow}
             </div>
           )}
           <label htmlFor="brief" className="sr-only">Ton brief</label>
@@ -230,6 +235,7 @@ export function CreateStore() {
             placeholder={current.placeholder}
             className="block w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[15px] leading-relaxed placeholder:text-fg-faint focus:outline-none"
           />
+          {mode === "start" && shotsRow}
           <div className="flex flex-wrap items-center justify-between gap-2 px-3 pb-3">
             <div className="flex flex-wrap gap-2">
               <label className="sr-only" htmlFor="lang">Langue de la boutique</label>

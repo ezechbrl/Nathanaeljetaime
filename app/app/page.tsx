@@ -10,7 +10,7 @@ import { UNLOCK_KEY } from "@/components/app/Paywall";
 import { StoreCard } from "@/components/app/StoreCard";
 import { useToast } from "@/components/ui/Toast";
 import { LightRays } from "@/components/ui/LightRays";
-import { TutorialVideo } from "@/components/ui/TutorialVideo";
+import { DemoVideos } from "@/components/site/DemoVideos";
 
 function greeting() {
   const h = new Date().getHours();
@@ -54,7 +54,7 @@ export default function AppHome() {
           <div className="mx-auto mt-14 max-w-[1100px]">
             <p className="mb-4 text-center text-[15px] font-medium text-fg-muted">Comment ça marche, en 15 secondes</p>
             <div className="glow-frame rounded-[17px] p-[1.5px]">
-              <TutorialVideo name="demo-link" title="Créer sa boutique à partir d'un lien" speed="pendant les chargements" className="max-w-none" />
+              <DemoVideos />
             </div>
           </div>
         </div>

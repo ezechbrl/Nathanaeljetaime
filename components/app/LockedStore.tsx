@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import type { Job, Store } from "@/lib/api/types";
+import { cn } from "@/lib/cn";
 import { useApp } from "./AppContext";
 import { Paywall } from "./Paywall";
 
@@ -23,6 +24,7 @@ const eur = (p: string) => `${Number(p).toFixed(2).replace(".", ",")} €`;
 function TeaserPreview({ store }: { store: Store }) {
   const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
+  const layout = store.theme.heroLayout ?? "left";
   return (
     <div className="relative overflow-hidden rounded-[13px] text-left" style={{ background, color: primary }}>
       <div className="py-2 text-center text-[11px]" style={{ background: primary, color: background }}>Livraison offerte · Retours 30 jours</div>
@@ -30,14 +32,14 @@ function TeaserPreview({ store }: { store: Store }) {
         <span className="font-serif text-xl">{store.name}</span>
         <span className="text-xs opacity-60">Boutique · À propos · FAQ</span>
       </div>
-      <div className="grid items-center gap-6 p-5 sm:grid-cols-2 sm:p-8">
+      <div className={cn("grid items-center gap-6 p-5 sm:p-8", layout === "center" ? "text-center" : "sm:grid-cols-2")}>
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs" style={{ background: `${accent}22` }}><Sparkles className="h-3 w-3" />{t.tagline}</span>
           <h3 className="mt-4 font-serif text-[clamp(1.6rem,1.1rem+1.6vw,2.4rem)] leading-tight">{t.heroTitle}</h3>
           <p className="mt-3 text-sm opacity-70">{t.heroSubtitle}</p>
           <span className="mt-5 inline-flex rounded-full px-5 py-2.5 text-sm font-semibold text-white" style={{ background: accent }}>Acheter · {eur(t.price)}</span>
         </div>
-        <div className="aspect-[4/3] overflow-hidden rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}33, ${accent}88)` }}>
+        <div className={cn("aspect-[4/3] overflow-hidden rounded-[16px]", layout === "right" && "sm:-order-1", layout === "center" && "mx-auto w-full max-w-[520px]")} style={{ background: `linear-gradient(150deg, ${accent}33, ${accent}88)` }}>
           {t.image && <img src={t.image} alt="" className="h-full w-full object-cover" />}
         </div>
       </div>

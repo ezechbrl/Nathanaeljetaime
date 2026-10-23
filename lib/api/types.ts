@@ -57,6 +57,7 @@ export type StoreTheme = {
   colors: { primary: string; accent: string; background: string };
   headingFont: string;
   bodyFont: string;
+  heroLayout?: "left" | "right" | "center"; // varie d'une boutique à l'autre
 };
 
 export type Store = {
