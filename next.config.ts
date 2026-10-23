@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Service worker de l'app « Vigenia Ventes » : jamais mis en cache, pour que les mises à jour arrivent tout de suite.
+  async headers() {
+    return [{ source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }, { key: "Content-Type", value: "application/javascript; charset=utf-8" }] }];
+  },
   async redirects() {
     return [
       // Ancienne adresse : tout le monde passe sur vigenia.com (les cookies de connexion restent sur le même domaine).

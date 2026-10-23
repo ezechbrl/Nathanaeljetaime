@@ -67,7 +67,7 @@ function SidebarBody() {
       <div className="px-1.5 pb-4 pt-1"><Logo href="/app" /></div>
       <NavLink href="/app" icon={Home} exact>Accueil</NavLink>
       <NavLink href="/app/boutiques" icon={StoreIcon} exact>Mes boutiques</NavLink>
-      {user.isOwner && <NavLink href="/app/ventes" icon={TrendingUp}>Mes ventes</NavLink>}
+      {user.isOwner && <NavLink href="/ventes" icon={TrendingUp}>Mes ventes</NavLink>}
 
       {storeId && (
         <>

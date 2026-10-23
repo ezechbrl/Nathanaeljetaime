@@ -119,6 +119,7 @@ export const startCheckout = (plan: "pro" | "agency", interval: "month" | "year"
 export const openBillingPortal = () => (live ? request<{ url: string }>("/api/billing/portal", { method: "POST" }) : Promise.resolve({ url: "/app/abonnement" }));
 export const cancelSubscription = () => (live ? request<void>("/api/billing/cancel", { method: "POST" }) : mock.ok());
 export const getOwnerStats = () => request<import("./types").OwnerStats>("/api/owner/stats");
+export const savePushSubscription = (sub: PushSubscriptionJSON) => request<void>("/api/owner/push", { method: "POST", json: sub });
 
 // Affiliation
 export const getAffiliate = () => (live ? request<{ affiliate: Affiliate | null }>("/api/affiliate") : mock.getAffiliate());
