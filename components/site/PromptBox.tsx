@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 
 export const MODES = [
   { id: "start", label: "Décrire", icon: PenLine, placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…" },
-  { id: "link", label: "Coller un lien", icon: Link2, placeholder: "Colle le lien de ton produit : AliExpress, Amazon, Temu, ta propre page…" },
+  { id: "link", label: "Coller un lien", icon: Link2, placeholder: "Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…) ou ta propre page" },
   { id: "recraft", label: "Refaire ma boutique", icon: RefreshCw, placeholder: "Ma boutique ne convertit pas : rends-la plus rassurante et plus haut de gamme…" },
 ] as const;
 

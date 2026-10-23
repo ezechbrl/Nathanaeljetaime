@@ -64,7 +64,7 @@ export default function AppHome() {
         <section aria-label="Comment ça marche" className="px-5 pb-16 sm:px-8">
           <ol className="mx-auto grid max-w-[880px] gap-3 sm:grid-cols-3">
             {[
-              ["Colle ton lien", "Un produit trouvé sur AliExpress, Amazon ou ailleurs. Ou décris-le en une phrase."],
+              ["Colle ton lien", "Le lien de ton produit chez ton fournisseur, une photo, ou une phrase pour le décrire."],
               ["L'IA crée ta boutique", "Textes, offres, design et photos du produit, en 3 minutes environ."],
               ["Publie sur Shopify", "Un clic, et ta boutique est en ligne, prête à vendre."],
             ].map(([title, text], i) => (

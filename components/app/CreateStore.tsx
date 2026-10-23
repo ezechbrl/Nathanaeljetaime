@@ -14,7 +14,7 @@ import { useApp } from "./AppContext";
 import { PaywallDialog, readPendingDraft } from "./Paywall";
 
 const MODES: { id: CreationMode; label: string; sub: string; color: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
-  { id: "link", label: "Coller un lien", sub: "AliExpress, Amazon…", color: "#34d399", icon: Link2, placeholder: "Facultatif : ce que tu veux préciser (cible, prix de vente, ambiance)…", hint: "Le lien du produit que tu vends : AliExpress, Amazon, Temu, CJ, ta propre page… L'IA reprend le produit et ses photos, et écrit une boutique originale." },
+  { id: "link", label: "Coller un lien", sub: "Ton fournisseur, ex. AliExpress", color: "#34d399", icon: Link2, placeholder: "Facultatif : ce que tu veux préciser (cible, prix de vente, ambiance)…", hint: "Le lien du produit que tu vends chez ton fournisseur (AliExpress, CJ…) ou sur ta propre page. L'IA en relève les caractéristiques et écrit une boutique originale." },
   { id: "start", label: "Décrire", sub: "Ton idée en une phrase", color: "#a78bfa", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
   { id: "recraft", label: "Refaire ma boutique", sub: "Améliorer l'existante", color: "#fbbf24", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
 ];
@@ -205,7 +205,7 @@ export function CreateStore() {
               <div className="flex items-center gap-2 px-4 py-3.5">
                 <Link2 className="h-5 w-5 shrink-0 text-accent" />
                 <label htmlFor="url" className="sr-only">Lien du produit</label>
-                <input id="url" type="url" inputMode="url" autoFocus value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Colle le lien de ton produit (AliExpress, Amazon…)" className="w-full bg-transparent text-base placeholder:text-fg-faint focus:outline-none" />
+                <input id="url" type="url" inputMode="url" autoFocus value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…)" className="w-full bg-transparent text-base placeholder:text-fg-faint focus:outline-none" />
                 {url && <button type="button" onClick={() => setUrl("")} aria-label="Effacer le lien" className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-fg-faint hover:bg-white/5 hover:text-fg"><X className="h-4 w-4" /></button>}
               </div>
               {link.state === "checking" && <p className="flex items-center gap-2 px-4 pb-2 text-xs text-fg-muted"><Spinner /> Lecture du lien…</p>}
