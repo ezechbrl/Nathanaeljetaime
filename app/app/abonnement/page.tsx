@@ -68,6 +68,7 @@ function Billing() {
   }
   const usage = billing.data?.usage;
   const current = PLANS.find((p) => p.id === sub?.plan);
+  const gifted = Boolean(sub && !sub.interval && !sub.renewsAt);
 
   return (
     <>
@@ -82,7 +83,7 @@ function Billing() {
                 <>
                   <p className="mt-3 text-[clamp(2.2rem,1.6rem+2vw,3.2rem)] font-semibold leading-none tracking-[-0.03em]">Vigenia {current?.name}</p>
                   {/* Accès donné à la main (pas d'abonnement Shopify) : rien n'est facturé. */}
-                  {!sub.interval && !sub.renewsAt ? (
+                  {gifted ? (
                     <p className="mt-4 text-[2.4rem] font-semibold leading-none tracking-[-0.03em]">Accès offert</p>
                   ) : (
                   <p className="mt-4 flex items-baseline gap-2">
@@ -93,7 +94,7 @@ function Billing() {
                     )}
                   </p>
                   )}
-                  <p className="mt-3 text-sm text-fg-muted">{!sub.interval && !sub.renewsAt ? "Rien n'est facturé sur ce compte." : sub.renewsAt ? `${sub.cancelAtPeriodEnd ? "Se termine" : "Prochain paiement"} le ${formatDate(sub.renewsAt)}` : "Abonnement actif"}</p>
+                  <p className="mt-3 text-sm text-fg-muted">{gifted ? "Rien n'est facturé sur ce compte." : sub.renewsAt ? `${sub.cancelAtPeriodEnd ? "Se termine" : "Prochain paiement"} le ${formatDate(sub.renewsAt)}` : "Abonnement actif"}</p>
                 </>
               ) : <Skeleton className="mt-3 h-12 w-56" />}
             </div>
@@ -109,18 +110,20 @@ function Billing() {
           </section>
         </div>
 
-        {!(sub && !sub.interval && !sub.renewsAt) && <section className="surface rounded-card p-5">
-          <h2 className="text-lg tracking-tight">Changer ou arrêter mon abonnement</h2>
-          <p className="mt-2 text-sm text-fg-muted">Ton abonnement Vigenia est ajouté à ta facture Shopify : tes factures sont dans ton admin Shopify (Paramètres → Facturation). Si tu arrêtes, tout ce qui a été créé reste dans ta boutique.</p>
+        {sub && <section className="surface rounded-card p-5">
+          <h2 className="text-lg tracking-tight">{gifted ? "Changer d'offre" : "Changer ou arrêter mon abonnement"}</h2>
+          <p className="mt-2 text-sm text-fg-muted">{gifted
+            ? "Ton accès est offert. Tu peux quand même choisir une offre : elle sera ajoutée à ta facture Shopify."
+            : "Ton abonnement Vigenia est ajouté à ta facture Shopify : tes factures sont dans ton admin Shopify (Paramètres → Facturation). Si tu arrêtes, tout ce qui a été créé reste dans ta boutique."}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => setChanging((v) => !v)}>Changer d'offre</Button>
-            <Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Mes factures Shopify</Button>
+            {!gifted && <><Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Mes factures Shopify</Button>
             {confirmCancel ? (
               <span className="flex items-center gap-2 text-sm">Arrêter maintenant ?
                 <Button variant="danger" size="sm" onClick={cancel} disabled={busy === "cancel"}>{busy === "cancel" ? <Spinner /> : "Oui, arrêter"}</Button>
                 <Button variant="ghost" size="sm" onClick={() => setConfirmCancel(false)}>Annuler</Button>
               </span>
-            ) : <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Arrêter mon abonnement</Button>}
+            ) : <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Arrêter mon abonnement</Button>}</>}
           </div>
         </section>}
         {changing && <Paywall initialInterval={sub?.interval === "year" ? "year" : "month"} />}
