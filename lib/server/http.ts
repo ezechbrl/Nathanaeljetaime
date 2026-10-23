@@ -47,6 +47,19 @@ function errorResponse(e: unknown) {
   return NextResponse.json({ error: { code: "internal", message: `Une erreur est survenue${hint}. Réessaie ; si ça continue, écris-nous.` } }, { status: 500 });
 }
 
+// Erreurs serveur gardées 30 jours pour le tableau de bord du fondateur (jamais bloquant).
+async function logError(req: Request, status: number, e: unknown) {
+  try {
+    const { db } = await import("./supabase");
+    await db().from("app_errors").insert({
+      path: `${req.method} ${new URL(req.url).pathname}`,
+      status,
+      code: e instanceof HttpError ? e.code : (e as Error)?.name ?? null,
+      message: String((e as Error)?.message ?? e).slice(0, 300),
+    });
+  } catch {}
+}
+
 type Handler<C> = (req: Request, ctx: C) => Promise<Response>;
 
 // Enveloppe une route : convertit toutes les erreurs au format du contrat d'API.
@@ -55,7 +68,9 @@ export function route<C = { params: Promise<Record<string, string>> }>(handler: 
     try {
       return await handler(req, ctx);
     } catch (e) {
-      return errorResponse(e);
+      const res = errorResponse(e);
+      if (res.status >= 500) await logError(req, res.status, e);
+      return res;
     }
   };
 }

@@ -1,6 +1,9 @@
 "use client";
 
-import { Bell, BellRing, RefreshCw } from "lucide-react";
+import {
+  AlertTriangle, Bell, BellRing, CalendarRange, CircleDollarSign, Gauge, Hourglass, Percent, Receipt, RefreshCw,
+  ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as api from "@/lib/api/client";
@@ -68,9 +71,20 @@ function Card({ className, children }: { className?: string; children: React.Rea
   return <section className={cn("rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5", className)}>{children}</section>;
 }
 
-function Metric({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: "up" | "down" }) {
+// Une couleur par famille de chiffres : argent (vert), clients (bleu), départs (rouge), croissance (violet / ambre).
+const TONES = {
+  green: "bg-[#d9f7e8] text-[#0a8f5f]",
+  blue: "bg-[#e0ecff] text-[#2563eb]",
+  violet: "bg-[#efe7ff] text-[#7c3aed]",
+  amber: "bg-[#fff1d6] text-[#c2410c]",
+  red: "bg-[#fee8e5] text-[#d72c0d]",
+  pink: "bg-[#ffe4f1] text-[#db2777]",
+} as const;
+
+function Metric({ label, value, hint, tone, icon: Icon, color = "green" }: { label: string; value: string; hint?: string; tone?: "up" | "down"; icon: React.ComponentType<{ className?: string }>; color?: keyof typeof TONES }) {
   return (
     <Card>
+      <span className={cn("mb-2 grid h-8 w-8 place-items-center rounded-[10px]", TONES[color])}><Icon className="h-4 w-4" /></span>
       <p className="text-[13px] text-[#616161]">{label}</p>
       <p className={cn("mt-1 text-[1.6rem] font-semibold leading-tight tracking-[-0.02em] tabular-nums", tone === "up" && "text-[#0a8f5f]", tone === "down" && "text-[#d72c0d]")}>{value}</p>
       {hint && <p className="mt-0.5 text-xs text-[#8a8a8a]">{hint}</p>}
@@ -173,16 +187,16 @@ function Dashboard({ s }: { s: OwnerStats }) {
       </Card>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Metric label="MRR" value={eur(s.mrr)} hint="Revenu mensuel récurrent" />
-        <Metric label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
-        <Metric label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
-        <Metric label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
-        <Metric label="Nouveaux abonnés" value={`+${p.newSubs}`} tone={p.newSubs ? "up" : undefined} />
-        <Metric label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} tone={p.cancels ? "down" : undefined} hint={`Taux sur 30 j : ${pct(s.churn)}`} />
-        <Metric label="Liste d'attente" value={`+${p.waitlist}`} hint={`${s.totals.waitlist} au total`} />
-        <Metric label="Comptes créés" value={`+${p.accounts}`} hint={`${s.totals.accounts} au total`} />
-        <Metric label="Ventes" value={String(p.sales)} hint="Paiements reçus" />
-        <Metric label="Conversion" value={pct(s.conversion)} hint="Comptes devenus abonnés" />
+        <Metric icon={Wallet} color="green" label="MRR" value={eur(s.mrr)} hint="Revenu mensuel récurrent" />
+        <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
+        <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
+        <Metric icon={CircleDollarSign} color="amber" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
+        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} tone={p.newSubs ? "up" : undefined} />
+        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} tone={p.cancels ? "down" : undefined} hint={`Taux sur 30 j : ${pct(s.churn)}`} />
+        <Metric icon={Hourglass} color="pink" label="Liste d'attente" value={`+${p.waitlist}`} hint={`${s.totals.waitlist} au total`} />
+        <Metric icon={UserPlus} color="blue" label="Comptes créés" value={`+${p.accounts}`} hint={`${s.totals.accounts} au total`} />
+        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" />
+        <Metric icon={Percent} color="violet" label="Conversion" value={pct(s.conversion)} hint="Comptes devenus abonnés" />
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
@@ -218,8 +232,62 @@ function Dashboard({ s }: { s: OwnerStats }) {
         </Card>
       </div>
 
+      <div className="grid gap-3 lg:grid-cols-2">
+        {/* Entonnoir : où les gens s'arrêtent avant d'acheter (30 derniers jours). */}
+        <Card>
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.violet)}><Gauge className="h-3.5 w-3.5" /></span>Parcours avant l'achat <span className="font-normal text-[#8a8a8a]">· 30 j</span></h2>
+          <div className="mt-3 space-y-2.5">
+            {s.funnel.map((f, i) => {
+              const first = s.funnel[0].count || 1;
+              const prev = i ? s.funnel[i - 1].count : f.count;
+              const lost = i && prev ? Math.round(((prev - f.count) / prev) * 100) : 0;
+              return (
+                <div key={f.step}>
+                  <div className="flex justify-between text-sm"><span>{f.step}</span><span className="tabular-nums font-medium">{f.count}{i > 0 && prev > 0 && <span className="ml-1.5 text-xs font-normal text-[#d72c0d]">−{lost} %</span>}</span></div>
+                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#f1f1f1]"><div className={cn("h-full rounded-full", ["bg-[#2563eb]", "bg-[#7c3aed]", "bg-[#db2777]", "bg-[#0a8f5f]"][i])} style={{ width: `${Math.max(2, (f.count / first) * 100)}%` }} /></div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-[#8a8a8a]">Le plus gros pourcentage rouge = l'étape où tu perds le plus de monde.</p>
+        </Card>
+
+        <Card>
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Derniers inscrits</h2>
+          {s.signups.length ? (
+            <ul className="mt-1 divide-y divide-[#eee] text-sm">
+              {s.signups.map((u, i) => (
+                <li key={i} className="flex items-center gap-3 py-2.5">
+                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.kind === "account" ? TONES.blue : TONES.pink)}>{u.kind === "account" ? "Compte" : "Attente"}</span>
+                  <span className="min-w-0 flex-1 truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
+                  <span className="text-xs text-[#8a8a8a]">{formatShortDate(u.at)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : <p className="mt-2 text-sm text-[#8a8a8a]">Personne pour l'instant.</p>}
+        </Card>
+      </div>
+
       <Card>
-        <h2 className="text-[15px] font-semibold">Dernières ventes</h2>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", s.errors.day ? TONES.red : TONES.green)}><AlertTriangle className="h-3.5 w-3.5" /></span>Erreurs du site</h2>
+        {s.errors.month ? (
+          <>
+            <p className="mt-2 text-sm"><b className={s.errors.day ? "text-[#d72c0d]" : ""}>{s.errors.day}</b> sur 24 h · {s.errors.month} sur 30 jours</p>
+            <ul className="mt-1 divide-y divide-[#eee] text-sm">
+              {s.errors.recent.map((e, i) => (
+                <li key={i} className="py-2.5">
+                  <span className="block truncate font-medium">{e.path} <span className="font-normal text-[#d72c0d]">· {e.status}</span></span>
+                  <span className="block truncate text-xs text-[#8a8a8a]">{formatShortDate(e.at)} · {e.message}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs text-[#8a8a8a]">Je les regarde chaque matin dans ton topo et je corrige.</p>
+          </>
+        ) : <p className="mt-2 text-sm text-[#0a8f5f]">Aucune erreur sur 30 jours ✓</p>}
+      </Card>
+
+      <Card>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><ShoppingBag className="h-3.5 w-3.5" /></span>Dernières ventes</h2>
         {s.recent.length ? (
           <ul className="mt-1 divide-y divide-[#eee] text-sm">
             {s.recent.map((r, i) => (
@@ -255,6 +323,7 @@ export default function SalesApp() {
     try {
       setStats(await api.getOwnerStats());
       setError(null);
+      try { localStorage.setItem("vg-owner", "1"); } catch {} // pour ouvrir Ventes directement (voir app/app/layout)
     } catch (e) {
       setError(e as Error);
     } finally {
@@ -262,11 +331,19 @@ export default function SalesApp() {
     }
   }, []);
 
+  // Toujours à jour : au retour dans l'app, dès qu'une notification arrive, et toutes les 30 s à l'écran.
   useEffect(() => {
     load();
     const refresh = () => document.visibilityState === "visible" && load();
+    const onMessage = (e: MessageEvent) => { if (e.data === "refresh") { load(); if (document.visibilityState === "visible") clearBadge(); } };
+    const timer = window.setInterval(refresh, 30_000);
     document.addEventListener("visibilitychange", refresh);
-    return () => document.removeEventListener("visibilitychange", refresh);
+    navigator.serviceWorker?.addEventListener("message", onMessage);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refresh);
+      navigator.serviceWorker?.removeEventListener("message", onMessage);
+    };
   }, [load]);
 
   // La notification arrive 10 s plus tard : le temps de quitter l'app pour voir la pastille rouge.

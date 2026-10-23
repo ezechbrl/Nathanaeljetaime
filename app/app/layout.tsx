@@ -16,9 +16,14 @@ function Loading() {
   );
 }
 
+// App « Ventes » du fondateur ouverte depuis l'écran d'accueil sur /app : on part sur /ventes avant même
+// d'afficher quoi que ce soit (sinon on voit l'accueil Vigenia une fraction de seconde).
+const SALES_REDIRECT = `try{var s=matchMedia("(display-mode: standalone)").matches||navigator.standalone;if(s&&location.pathname==="/app"&&localStorage.getItem("vg-owner")&&!sessionStorage.getItem("vg-stay")){sessionStorage.setItem("vg-stay","1");location.replace("/ventes")}}catch(e){}`;
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
+      <script dangerouslySetInnerHTML={{ __html: SALES_REDIRECT }} />
       <AppProvider fallback={<Loading />}>
         <StandaloneHome />
         <div className="min-h-dvh lg:flex">

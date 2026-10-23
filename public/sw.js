@@ -18,6 +18,8 @@ self.addEventListener("push", (event) => {
   const data = event.data ? event.data.json() : {};
   event.waitUntil((async () => {
     await writeCount((await readCount()) + 1);
+    // App ouverte : elle recharge ses chiffres tout de suite (la vente apparaît sans rien toucher).
+    for (const c of await self.clients.matchAll({ type: "window", includeUncontrolled: true })) c.postMessage("refresh");
     await self.registration.showNotification(data.title || "Vigenia", {
       body: data.body || "",
       icon: "/brand/icon-192.png",

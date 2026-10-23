@@ -186,5 +186,8 @@ export type OwnerStats = {
   series: { day: string; revenue: number; signups: number }[];
   sources: { ref: string; count: number }[];
   affiliates: { code: string; name: string; clicks: number; signups: number; customers: number; commission: number; rate: number }[];
+  funnel: { step: string; count: number }[];
+  signups: { email: string; kind: "waitlist" | "account"; ref: string | null; at: string }[];
+  errors: { day: number; month: number; recent: { path: string; status: number; message: string | null; at: string }[] };
   recent: { kind: "new" | "payment" | "cancel"; plan: string | null; amount: number; email: string | null; at: string }[];
 };
