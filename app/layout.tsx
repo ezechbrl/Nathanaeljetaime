@@ -3,6 +3,7 @@ import { Bodoni_Moda, Bricolage_Grotesque, Fraunces, Plus_Jakarta_Sans } from "n
 import { PageBackdrop } from "@/components/ui/PageBackdrop";
 import { site } from "@/lib/site";
 import "./globals.css";
+import { Tracker } from "@/components/Tracker";
 
 const sans = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-sans", display: "swap" });
 // Titres : grotesque à caractère. Mots mis en avant : Fraunces en italique.
@@ -32,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;filter:none!important}`}</style>
         </noscript>
       </head>
-      <body><PageBackdrop />{children}</body>
+      <body><PageBackdrop />{children}<Tracker /></body>
     </html>
   );
 }

@@ -13,7 +13,7 @@ type Dated = { created_at: string };
 export const GET = route(async () => {
   await requireOwner();
   const since = new Date(Date.now() - 30 * DAY).toISOString();
-  const [subs, events, waitlist, users, stores, affiliates, affEvents, errors] = await Promise.all([
+  const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits] = await Promise.all([
     db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(1000),
     db().from("waitlist").select("email, ref, created_at").order("created_at", { ascending: false }),
@@ -22,6 +22,7 @@ export const GET = route(async () => {
     db().from("affiliates").select("code, commission_rate, users(email, first_name)"),
     db().from("affiliate_events").select("code, kind, amount_cents, referred_user_id, created_at"),
     db().from("app_errors").select("path, status, message, created_at").gte("created_at", since).order("created_at", { ascending: false }).limit(200),
+    db().from("site_sessions").select("first_seen, last_seen").gte("last_seen", since).limit(50000),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
   const active = subs.filter((s) => s.status === "active" && s.shopify_subscription_id && !s.test && s.plan !== "free");
@@ -36,6 +37,7 @@ export const GET = route(async () => {
     const f = inLast(d);
     const ev = events.filter((e) => f(e as Dated));
     return [k, {
+      visits: visits.filter((v) => f({ created_at: v.first_seen })).length,
       revenue: sum(ev.filter((e) => e.kind === "payment")),
       sales: ev.filter((e) => e.kind === "payment").length,
       newSubs: ev.filter((e) => e.kind === "new").length,
@@ -52,6 +54,7 @@ export const GET = route(async () => {
     day,
     revenue: sum(events.filter((e) => e.kind === "payment" && parisDay(e.created_at) === day)),
     signups: waitlist.filter((w) => parisDay(w.created_at) === day).length + users.filter((u) => parisDay(u.created_at) === day).length,
+    visits: visits.filter((v) => parisDay(v.first_seen) === day).length,
   }));
   // Aujourd'hui, heure par heure (heure de Paris).
   const parisHour = (d: string) => Number(new Date(d).toLocaleString("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }));
@@ -60,11 +63,13 @@ export const GET = route(async () => {
     hour: h,
     revenue: sum(todayRows(events).filter((e) => e.kind === "payment" && parisHour(e.created_at) === h)),
     signups: todayRows(waitlist).filter((w) => parisHour(w.created_at) === h).length + todayRows(users).filter((u) => parisHour(u.created_at) === h).length,
+    visits: visits.filter((v) => parisDay(v.first_seen) === today && parisHour(v.first_seen) === h).length,
   }));
   // Entonnoir sur 30 jours : où les gens s'arrêtent avant d'acheter.
   const last30 = inLast(30);
   const uniq = (rows: Record<string, any>[]) => new Set(rows.map((r) => r.user_id)).size;
   const funnel = [
+    { step: "Visiteurs du site", count: visits.filter((v) => last30({ created_at: v.first_seen })).length },
     { step: "Comptes créés", count: users.filter((u) => last30(u as Dated)).length },
     { step: "Aperçu de boutique créé", count: uniq(stores) },
     { step: "Page de paiement ouverte", count: uniq(events.filter((e) => e.kind === "checkout" && last30(e as Dated))) },
@@ -106,6 +111,7 @@ export const GET = route(async () => {
     series,
     sources,
     affiliates: affiliateRows,
+    liveNow: visits.filter((v) => Date.now() - new Date(v.last_seen).getTime() < 2 * 60_000).length,
     funnel,
     signups,
     errors: { day: errors.filter((e) => inLast(1)(e as Dated)).length, month: errors.length, recent: errors.slice(0, 5).map((e) => ({ path: e.path, status: e.status, message: e.message, at: e.created_at })) },

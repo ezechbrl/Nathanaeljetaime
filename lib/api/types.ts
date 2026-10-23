@@ -172,7 +172,7 @@ export type GenerateStoreInput = {
 };
 
 // Tableau de bord du fondateur (montants en centimes d'euro).
-export type OwnerPeriod = { revenue: number; sales: number; newSubs: number; cancels: number; waitlist: number; accounts: number; stores: number };
+export type OwnerPeriod = { visits: number; revenue: number; sales: number; newSubs: number; cancels: number; waitlist: number; accounts: number; stores: number };
 export type OwnerStats = {
   mrr: number;
   arr: number;
@@ -180,10 +180,11 @@ export type OwnerStats = {
   arpu: number; // revenu mensuel moyen par abonné (centimes)
   churn: number; // part des abonnés partis sur 30 jours (0 à 1)
   conversion: number; // abonnés payants / comptes créés (0 à 1)
-  hours: { hour: number; revenue: number; signups: number }[];
+  hours: { hour: number; revenue: number; signups: number; visits: number }[];
+  liveNow: number; // visiteurs sur le site dans les 2 dernières minutes
   totals: { waitlist: number; accounts: number };
   periods: { today: OwnerPeriod; week: OwnerPeriod; month: OwnerPeriod };
-  series: { day: string; revenue: number; signups: number }[];
+  series: { day: string; revenue: number; signups: number; visits: number }[];
   sources: { ref: string; count: number }[];
   affiliates: { code: string; name: string; clicks: number; signups: number; customers: number; commission: number; rate: number }[];
   funnel: { step: string; count: number }[];

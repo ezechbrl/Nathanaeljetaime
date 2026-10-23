@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  AlertTriangle, Bell, BellRing, CalendarRange, CircleDollarSign, Gauge, Hourglass, Percent, Receipt, RefreshCw,
+  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Hourglass, Percent, Receipt, RefreshCw,
   ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
 } from "lucide-react";
 import Link from "next/link";
@@ -81,6 +81,18 @@ const TONES = {
   pink: "bg-[#ffe4f1] text-[#db2777]",
 } as const;
 
+// Visiteurs en ce moment (2 dernières minutes), avec un point vert qui pulse.
+function Live({ count }: { count: number }) {
+  return (
+    <Card>
+      <span className="mb-2 flex h-8 items-center gap-2"><span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#10b981]" /></span><span className="text-xs font-medium text-[#0a8f5f]">En direct</span></span>
+      <p className="text-[13px] text-[#616161]">En ce moment sur le site</p>
+      <p className="mt-1 text-[1.6rem] font-semibold leading-tight tracking-[-0.02em] tabular-nums">{count}</p>
+      <p className="mt-0.5 text-xs text-[#8a8a8a]">visiteur{count > 1 ? "s" : ""} actif{count > 1 ? "s" : ""}</p>
+    </Card>
+  );
+}
+
 function Metric({ label, value, hint, tone, icon: Icon, color = "green" }: { label: string; value: string; hint?: string; tone?: "up" | "down"; icon: React.ComponentType<{ className?: string }>; color?: keyof typeof TONES }) {
   return (
     <Card>
@@ -139,20 +151,20 @@ function LineChart({ points, format }: { points: { label: string; value: number 
 }
 
 // Aujourd'hui : cumul heure par heure (comme « ventes du jour » dans Shopify).
-function cumulate(rows: { label: string; revenue: number; signups: number }[]) {
-  let r = 0, g = 0;
-  return rows.map((x) => ({ ...x, revenue: (r += x.revenue), signups: (g += x.signups) }));
+function cumulate(rows: { label: string; revenue: number; signups: number; visits: number }[]) {
+  let r = 0, g = 0, v = 0;
+  return rows.map((x) => ({ ...x, revenue: (r += x.revenue), signups: (g += x.signups), visits: (v += x.visits) }));
 }
 
 function Dashboard({ s }: { s: OwnerStats }) {
   const [period, setPeriod] = useState<PeriodId>("today");
-  const [metric, setMetric] = useState<"revenue" | "signups">("revenue");
+  const [metric, setMetric] = useState<"revenue" | "signups" | "visits">("revenue");
   const p = s.periods[period];
 
   const points = useMemo(() => {
     const rows = period === "today"
-      ? cumulate(s.hours.slice(0, new Date().getHours() + 1).map((x) => ({ label: `${x.hour} h`, revenue: x.revenue, signups: x.signups })))
-      : s.series.slice(period === "week" ? -7 : -30).map((x) => ({ label: formatShortDate(x.day), revenue: x.revenue, signups: x.signups }));
+      ? cumulate(s.hours.slice(0, new Date().getHours() + 1).map((x) => ({ label: `${x.hour} h`, revenue: x.revenue, signups: x.signups, visits: x.visits })))
+      : s.series.slice(period === "week" ? -7 : -30).map((x) => ({ label: formatShortDate(x.day), revenue: x.revenue, signups: x.signups, visits: x.visits }));
     return rows.map((r) => ({ label: r.label, value: r[metric] }));
   }, [s, period, metric]);
 
@@ -178,25 +190,27 @@ function Dashboard({ s }: { s: OwnerStats }) {
             <p className="mt-1.5 text-xs text-[#8a8a8a]">{p.sales} vente{p.sales > 1 ? "s" : ""} · {p.newSubs} nouvel{p.newSubs > 1 ? "s" : ""} abonné{p.newSubs > 1 ? "s" : ""}</p>
           </div>
           <div className="flex rounded-full bg-[#f1f1f1] p-0.5 text-xs">
-            {(["revenue", "signups"] as const).map((m) => (
-              <button key={m} type="button" onClick={() => setMetric(m)} className={cn("rounded-full px-2.5 py-1 font-medium", metric === m ? "bg-white shadow-sm" : "text-[#616161]")}>{m === "revenue" ? "Revenus" : "Inscrits"}</button>
+            {(["revenue", "visits", "signups"] as const).map((m) => (
+              <button key={m} type="button" onClick={() => setMetric(m)} className={cn("rounded-full px-2 py-1 font-medium", metric === m ? "bg-white shadow-sm" : "text-[#616161]")}>{m === "revenue" ? "Revenus" : m === "visits" ? "Visites" : "Inscrits"}</button>
             ))}
           </div>
         </div>
-        <LineChart points={points} format={metric === "revenue" ? eur : (n) => `${n} inscrit${n > 1 ? "s" : ""}`} />
+        <LineChart points={points} format={metric === "revenue" ? eur : (n) => `${n} ${metric === "visits" ? "visite" : "inscrit"}${n > 1 ? "s" : ""}`} />
       </Card>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Live count={s.liveNow} />
+        <Metric icon={Eye} color="amber" label="Visites" value={String(p.visits)} hint={period === "today" ? "Aujourd'hui" : period === "week" ? "Sur 7 jours" : "Sur 30 jours"} />
+        <Metric icon={Percent} color="violet" label="Conversion" value={p.visits ? pct((p.waitlist + p.accounts) / p.visits) : "—"} hint="Visiteurs devenus inscrits" />
         <Metric icon={Wallet} color="green" label="MRR" value={eur(s.mrr)} hint="Revenu mensuel récurrent" />
         <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
         <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
-        <Metric icon={CircleDollarSign} color="amber" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
         <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} tone={p.newSubs ? "up" : undefined} />
         <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} tone={p.cancels ? "down" : undefined} hint={`Taux sur 30 j : ${pct(s.churn)}`} />
         <Metric icon={Hourglass} color="pink" label="Liste d'attente" value={`+${p.waitlist}`} hint={`${s.totals.waitlist} au total`} />
         <Metric icon={UserPlus} color="blue" label="Comptes créés" value={`+${p.accounts}`} hint={`${s.totals.accounts} au total`} />
         <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" />
-        <Metric icon={Percent} color="violet" label="Conversion" value={pct(s.conversion)} hint="Comptes devenus abonnés" />
+        <Metric icon={BadgeCheck} color="green" label="Comptes → abonnés" value={pct(s.conversion)} hint="Comptes devenus payants" />
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
@@ -244,7 +258,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
               return (
                 <div key={f.step}>
                   <div className="flex justify-between text-sm"><span>{f.step}</span><span className="tabular-nums font-medium">{f.count}{i > 0 && prev > 0 && <span className="ml-1.5 text-xs font-normal text-[#d72c0d]">−{lost} %</span>}</span></div>
-                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#f1f1f1]"><div className={cn("h-full rounded-full", ["bg-[#2563eb]", "bg-[#7c3aed]", "bg-[#db2777]", "bg-[#0a8f5f]"][i])} style={{ width: `${Math.max(2, (f.count / first) * 100)}%` }} /></div>
+                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#f1f1f1]"><div className={cn("h-full rounded-full", ["bg-[#f59e0b]", "bg-[#2563eb]", "bg-[#7c3aed]", "bg-[#db2777]", "bg-[#0a8f5f]"][i])} style={{ width: `${Math.max(2, (f.count / first) * 100)}%` }} /></div>
                 </div>
               );
             })}
