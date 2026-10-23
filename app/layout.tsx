@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: { default: `${site.name} — Créateur de boutique Shopify IA`, template: `%s · ${site.name}` },
   description: site.description,
   openGraph: { title: site.name, description: site.description, type: "website", locale: "fr_FR" },
-  appleWebApp: { capable: true, title: site.name, statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: site.name, statusBarStyle: "black" },
 };
 
 export const viewport: Viewport = { themeColor: "#05261d" };
