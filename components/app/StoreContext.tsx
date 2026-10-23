@@ -8,6 +8,7 @@ import { usePoll } from "@/lib/api/hooks";
 import type { Job, Store } from "@/lib/api/types";
 import { useApp } from "./AppContext";
 import { LaunchCelebration } from "./LaunchCelebration";
+import { LockedStore } from "./LockedStore";
 import { PUBLISH_LIVE_KEY, PublishedCelebration, PublishProgress } from "./PublishShow";
 
 type Ctx = { store: Store; activeJob: Job | null; lastError: string | null; lastPublishError: string | null; setStore: (s: Store) => void; reload: () => Promise<void>; trackJob: (job: Job) => void };
@@ -80,6 +81,10 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
         <Skeleton className="mt-8 h-[360px] w-full" />
       </div>
     );
+  }
+  // Boutique d'aperçu (sans abonnement) : toutes les pages de la boutique montrent l'écran de déblocage.
+  if (store.status === "locked") {
+    return <LockedStore store={store} onUnlocked={(res) => { setStore(res.store); setActiveJob(res.job); }} />;
   }
   return (
     <StoreCtx.Provider value={{ store, activeJob, lastError, lastPublishError, setStore, reload, trackJob: setActiveJob }}>

@@ -138,3 +138,7 @@ export function runTool<T>(tool: string, input: Record<string, string>): Promise
 // Avis sur Vigenia (publié sur le site après relecture).
 export const sendTestimonial = (input: { rating: number; text: string; name: string; role?: string }) =>
   live ? request<{ ok: true }>("/api/testimonials", { method: "POST", json: input }) : mock.ok();
+
+// Boutique d'aperçu débloquée après l'abonnement : lance la génération complète.
+export const unlockStore = (id: string) =>
+  live ? request<{ store: Store; job: Job }>(`/api/stores/${id}/unlock`, { method: "POST" }) : mock.ok().then(() => { throw new ApiClientError(400, "demo", "Indisponible en démo."); });

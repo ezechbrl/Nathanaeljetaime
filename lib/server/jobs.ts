@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { StoreTheme } from "@/lib/api/types";
 import type { JobStepKey } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
-import { generatePages, generateStrategy } from "./ai";
+import { generatePages, generateStrategy, generateTeaser } from "./ai";
 import { UnreadablePageError, type ProductPage } from "@/lib/fetch-product-page";
 import { supplierReviews } from "./reviews";
 import { cachedProductPage } from "./link-cache";
@@ -23,6 +23,13 @@ export const GENERATE_STEPS: Omit<Step, "status">[] = [
   { key: "product", label: "Fiche produit et SEO" },
   { key: "images", label: "Visuels" },
   { key: "theme", label: "Réglages du thème" },
+];
+
+// Aperçu gratuit : mêmes étapes affichées, mais une seule petite génération de texte, sans photos IA.
+export const TEASER_STEPS: Omit<Step, "status">[] = [
+  { key: "strategy", label: "Analyse de ton produit" },
+  { key: "brand", label: "Identité de marque" },
+  { key: "pages", label: "Accroche et atouts" },
 ];
 
 export const PUBLISH_STEPS: Omit<Step, "status">[] = [
@@ -143,6 +150,39 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
   } catch (e) {
     console.error("Génération échouée", e);
     await db().from("stores").update({ status: "failed", updated_at: new Date().toISOString() }).eq("id", store.id);
+    await finish(job.id, steps, errorMessage(e));
+  }
+}
+
+// Aperçu gratuit : nom, couleurs, accroche et photo du fournisseur. La boutique complète est créée
+// après l'abonnement (runGeneration), à partir du même brief et du même lien.
+export async function runTeaser(job: Record<string, any>, store: StoreRow) {
+  const steps: Step[] = job.steps;
+  const step = tracker(job.id, steps);
+  try {
+    await step("strategy");
+    let sourceText: string | undefined;
+    let image: string | null = null;
+    if (store.mode === "link" && store.source_url) {
+      try {
+        const page = await cachedProductPage(store.source_url);
+        sourceText = page.text;
+        image = page.images[0] ?? null;
+      } catch (e) {
+        console.warn("Lien illisible pour l'aperçu :", (e as Error).message);
+      }
+    }
+    image ??= ((job.input as { screenshots?: string[] } | null)?.screenshots ?? [])[0] ?? null;
+    await step("brand");
+    const t = await generateTeaser({ brief: store.brief, language: store.language, sourceText });
+    await step("pages");
+    const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), image };
+    await db().from("stores").update({ name: t.brand.name, teaser, theme: { colors: t.brand.colors, headingFont: "Instrument Serif", bodyFont: "DM Sans" }, status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
+    await finish(job.id, steps);
+  } catch (e) {
+    console.error("Aperçu échoué", e);
+    await db().from("stores").update({ status: "failed", updated_at: new Date().toISOString() }).eq("id", store.id);
+    await db().from("users").update({ free_store_used: false }).eq("id", store.user_id); // il pourra réessayer
     await finish(job.id, steps, errorMessage(e));
   }
 }

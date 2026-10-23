@@ -28,6 +28,7 @@ export const toStore = (s: StoreRow): Store => ({
   shopConnectionId: s.shop_connection_id,
   theme: { ...DEFAULT_THEME, ...(s.theme as Partial<StoreTheme>) },
   plan: (s.plan as StorePlan | null) ?? null,
+  teaser: (s.teaser as Store["teaser"]) ?? null,
   previewUrl: s.preview_url,
   liveUrl: s.live_url,
   themeStatus: (s.shopify as { themeId?: string; themeManual?: boolean } | null)?.themeManual ? "manual" : (s.shopify as { themeId?: string } | null)?.themeId ? "installed" : null,

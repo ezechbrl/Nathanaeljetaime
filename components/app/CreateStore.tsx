@@ -131,9 +131,11 @@ export function CreateStore() {
       refresh();
       router.push(`/app/boutiques/${store.id}`);
     } catch (err) {
-      setError(err as ApiClientError);
       setLoading(false);
       refresh();
+      // Aperçu gratuit déjà utilisé : on propose directement l'abonnement, le projet est gardé.
+      if (err instanceof ApiClientError && err.code === "subscription_required") return setPaywall(input);
+      setError(err as ApiClientError);
     }
   }
 
@@ -147,8 +149,7 @@ export function CreateStore() {
     if (mode === "recraft" && !shop) return setError(new ApiClientError(400, "no_shop", "Connecte d'abord ta boutique Shopify pour la refondre."));
     if (mode !== "link" && brief.trim().length < 10) return setError(new ApiClientError(400, "invalid_input", "Décris ton projet en une ou deux phrases.", "brief"));
     const input: GenerateStoreInput = { mode, brief: brief.trim() || "Boutique à partir du lien produit", productUrl: mode === "link" ? url.trim() : undefined, screenshots: mode === "link" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
-    // Sans abonnement, rien n'est envoyé à l'IA : on propose Pro au moment où le projet est prêt.
-    if (user.plan === "free") return setPaywall(input);
+    // Sans abonnement : une boutique d'aperçu gratuite (floutée), puis l'offre pour la débloquer.
     generate(input);
   }
 

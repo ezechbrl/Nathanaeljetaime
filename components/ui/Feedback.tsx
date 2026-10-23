@@ -45,6 +45,7 @@ export function Meter({ label, used, limit }: { label: string; used: number; lim
 export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, [string, string]> = {
     generating: ["En génération", "border-accent/30 text-accent"],
+    locked: ["Aperçu · à débloquer", "border-warn/30 text-warn"],
     ready: ["Prête à publier", "border-warn/30 text-warn"],
     publishing: ["Publication…", "border-accent/30 text-accent"],
     published: ["En ligne", "border-good/30 text-good"],

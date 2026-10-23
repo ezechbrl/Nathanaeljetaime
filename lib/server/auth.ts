@@ -60,8 +60,9 @@ export type StoreRow = {
   niche: string;
   language: string;
   mode: "start" | "link" | "recraft";
-  status: "generating" | "ready" | "publishing" | "published" | "failed";
+  status: "generating" | "locked" | "ready" | "publishing" | "published" | "failed";
   brief: string;
+  teaser?: Record<string, unknown> | null;
   source_url: string | null;
   theme: Record<string, unknown>;
   plan: Record<string, unknown> | null;

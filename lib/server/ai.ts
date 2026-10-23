@@ -47,6 +47,38 @@ const SCREENSHOTS_NOTE = "Les images jointes sont des captures d'écran de la pa
 
 const data = (label: string, text: string) => `<donnees type="${label}">\n${text}\n</donnees>`;
 
+// Aperçu gratuit (sans abonnement) : un seul appel au modèle le moins cher, réponse courte.
+// Coût visé ≈ 0,01 €, plafond 0,20 € par client (texte source tronqué, sortie limitée).
+const TEASER_MODEL = "claude-haiku-5-5";
+const TeaserSchema = z.object({
+  brand: z.object({
+    name: z.string().describe("Nom de marque court et mémorable (sauf si le marchand en donne un)"),
+    tagline: z.string(),
+    colors: StorePlanSchema.shape.brand.shape.colors,
+  }),
+  heroTitle: z.string().describe("Accroche de la page d'accueil, 4 à 8 mots"),
+  heroSubtitle: z.string().describe("Une phrase"),
+  productTitle: z.string(),
+  price: z.string().describe("Prix conseillé, ex. 29.90"),
+  benefits: z.array(z.object({ title: z.string(), text: z.string() })).describe("3 atouts, texte d'une phrase courte"),
+});
+export type TeaserResult = z.infer<typeof TeaserSchema>;
+
+export async function generateTeaser(input: { brief: string; language: string; sourceText?: string }): Promise<TeaserResult> {
+  const res = await ai().beta.messages.parse({
+    model: TEASER_MODEL,
+    max_tokens: 2000,
+    output_config: { effort: "low", format: betaZodOutputFormat(TeaserSchema) },
+    system: `Tu poses l'identité d'une boutique Shopify à partir du brief d'un marchand : nom, slogan, palette, accroche, produit, prix et 3 atouts. Palette moderne et vive (accent franc et saturé : rose, rouge, bleu électrique, orange, violet, turquoise ; primary très foncé de la même teinte ; background blanc ou presque). Textes courts et concrets, dans la langue demandée (${input.language}).\n\n${BASE_RULES}`,
+    messages: [{ role: "user", content: [data("brief", input.brief), input.sourceText && data("page produit", input.sourceText.slice(0, 6000))].filter(Boolean).join("\n\n") }],
+  });
+  const usd = (res.usage.input_tokens * 0.1 + res.usage.output_tokens * 0.5) / 1_000_000;
+  console.info(`Aperçu gratuit : ${(usd * 0.92).toFixed(4)} € d'IA`);
+  if (res.stop_reason === "refusal") throw new HttpError(422, "generation_failed", "La demande a été refusée par l'IA. Reformule ton brief.");
+  if (!res.parsed_output) throw new HttpError(422, "generation_failed", "La réponse de l'IA est incomplète. Réessaie.");
+  return res.parsed_output;
+}
+
 // Étape 1 : stratégie et identité.
 const StrategySchema = z.object({
   brand: StorePlanSchema.shape.brand,

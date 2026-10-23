@@ -246,7 +246,12 @@ function tick(job: State["jobs"][number]): Job {
   if (job.status === "succeeded") {
     job.finishedAt = iso();
     const store = s.stores.find((x) => x.id === job.storeId);
-    if (store && job.kind === "generate") {
+    if (store && job.kind === "generate" && (job as { teaser?: boolean }).teaser) {
+      const p = samplePlan(store.name, store.niche);
+      store.status = "locked";
+      store.teaser = { tagline: p.brand.tagline, heroTitle: p.homepage.heroTitle, heroSubtitle: p.homepage.heroSubtitle, productTitle: p.product.title, price: p.product.price, benefits: p.homepage.benefits.slice(0, 3), image: "/showcase/delie.jpg" };
+      store.updatedAt = iso();
+    } else if (store && job.kind === "generate") {
       store.status = "ready";
       store.plan = { ...samplePlan(store.name, store.niche), brand: { ...samplePlan(store.name, store.niche).brand, colors: store.theme.colors } };
       store.updatedAt = iso();
@@ -307,8 +312,8 @@ export async function createStore(input: GenerateStoreInput) {
   await wait(500);
   requireUser();
   const s = load();
-  assertAi();
-  chargeAi(0.4);
+  const teaser = s.subscription.plan === "free"; // sans abonnement : boutique d'aperçu floutée
+  if (!teaser) { assertAi(); chargeAi(0.4); }
   const accent = ACCENTS[s.stores.length % ACCENTS.length];
   const store: Store = {
     id: uid("store"),
@@ -326,7 +331,8 @@ export async function createStore(input: GenerateStoreInput) {
     updatedAt: iso(),
   };
   s.stores.unshift(store);
-  const job = newJob(store.id, "generate", GENERATE_STEPS, 14_000);
+  const job = newJob(store.id, "generate", teaser ? GENERATE_STEPS.slice(0, 3) : GENERATE_STEPS, teaser ? 5_000 : 14_000);
+  if (teaser) (job as { teaser?: boolean }).teaser = true;
   save();
   return { store: clone(store), job: clone(job) as Job };
 }

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { CreateStore } from "@/components/app/CreateStore";
+import { UNLOCK_KEY } from "@/components/app/Paywall";
 import { StoreCard } from "@/components/app/StoreCard";
 import { useToast } from "@/components/ui/Toast";
 import { LightRays } from "@/components/ui/LightRays";
@@ -25,7 +26,9 @@ function Welcome() {
     if (params.get("checkout") !== "success") return;
     refresh();
     toast("Ton abonnement est activé. À toi de jouer !");
-    router.replace("/app");
+    let unlock: string | null = null;
+    try { unlock = localStorage.getItem(UNLOCK_KEY); localStorage.removeItem(UNLOCK_KEY); } catch { /* stockage indisponible */ }
+    router.replace(unlock ? `/app/boutiques/${unlock}` : "/app");
   }, [params, refresh, router, toast]);
   return null;
 }

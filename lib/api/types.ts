@@ -40,7 +40,18 @@ export type ShopConnection = {
 
 export type CreationMode = "start" | "link" | "recraft";
 
-export type StoreStatus = "generating" | "ready" | "publishing" | "published" | "failed";
+export type StoreStatus = "generating" | "locked" | "ready" | "publishing" | "published" | "failed";
+
+// Aperçu gratuit d'une boutique (sans abonnement) : vrai nom, vraies couleurs, vraie accroche, le reste flouté.
+export type StoreTeaser = {
+  tagline: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  productTitle: string;
+  price: string;
+  benefits: { title: string; text: string }[];
+  image: string | null;
+};
 
 export type StoreTheme = {
   colors: { primary: string; accent: string; background: string };
@@ -58,6 +69,7 @@ export type Store = {
   shopConnectionId: string | null;
   theme: StoreTheme;
   plan: StorePlan | null; // null tant que la génération n'est pas terminée
+  teaser?: StoreTeaser | null;
   previewUrl: string | null; // aperçu Shopify (thème non publié) quand disponible
   liveUrl: string | null;
   // Thème Vigenia dans Shopify : installé automatiquement, ou à importer à la main (appli sans dérogation thèmes).

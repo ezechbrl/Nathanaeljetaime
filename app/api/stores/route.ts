@@ -1,8 +1,8 @@
 import { after } from "next/server";
 import { z } from "zod";
 import { requireUser, type StoreRow } from "@/lib/server/auth";
-import { badRequest, body, json, route } from "@/lib/server/http";
-import { createJob, GENERATE_STEPS, runGeneration } from "@/lib/server/jobs";
+import { badRequest, body, HttpError, json, route } from "@/lib/server/http";
+import { createJob, GENERATE_STEPS, runGeneration, runTeaser, TEASER_STEPS } from "@/lib/server/jobs";
 import { toJob, toStore } from "@/lib/server/mappers";
 import { storeImage } from "@/lib/server/images";
 import { assertQuota, rateLimit } from "@/lib/server/quota";
@@ -33,9 +33,17 @@ export const POST = route(async (req) => {
   const input = await body(req, Input);
   if (input.mode === "link" && !input.productUrl) throw badRequest("Colle le lien de la page produit.", "productUrl");
   await rateLimit(`generate:${user.id}`, 5, 3600);
-  await assertAiBudget(user.id, user.plan); // abonnement requis
-  await assertQuota(user.id, user.plan, "stores");
-  if (input.mode === "recraft") await connectionFor(user.id, input.shopConnectionId ?? null);
+  // Sans abonnement : une seule boutique d'aperçu (floutée), débloquée après le paiement.
+  const teaser = user.plan === "free";
+  if (teaser) {
+    if (input.mode === "recraft" || user.free_store_used) throw new HttpError(402, "subscription_required", "Choisis ton offre pour créer ta boutique (sans engagement).");
+    const claimed = must(await db().from("users").update({ free_store_used: true }).eq("id", user.id).eq("free_store_used", false).select("id")) as unknown[];
+    if (!claimed.length) throw new HttpError(402, "subscription_required", "Choisis ton offre pour créer ta boutique (sans engagement).");
+  } else {
+    await assertAiBudget(user.id, user.plan); // abonnement requis
+    await assertQuota(user.id, user.plan, "stores");
+    if (input.mode === "recraft") await connectionFor(user.id, input.shopConnectionId ?? null);
+  }
 
   const store = must(await db().from("stores").insert({
     user_id: user.id,
@@ -54,7 +62,7 @@ export const POST = route(async (req) => {
     const type = head.match(/^data:(image\/[a-z]+);/)![1];
     screenshots.push((await storeImage(store.id, Buffer.from(b64, "base64"), type, "source")).url);
   }
-  const job = await createJob(store.id, user.id, input.mode === "recraft" ? "recraft" : "generate", GENERATE_STEPS, { screenshots });
-  after(() => runGeneration(job, store));
+  const job = await createJob(store.id, user.id, input.mode === "recraft" ? "recraft" : "generate", teaser ? TEASER_STEPS : GENERATE_STEPS, { screenshots, teaser });
+  after(() => (teaser ? runTeaser(job, store) : runGeneration(job, store)));
   return json({ store: toStore(store), job: toJob(job) }, 201);
 });
