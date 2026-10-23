@@ -1,5 +1,6 @@
 import { json, route } from "@/lib/server/http";
-import { requireOwner } from "@/lib/server/owner";
+import { isOwnerEmail, requireOwner } from "@/lib/server/owner";
+import { LAUNCH_OFFER } from "@/lib/content/pricing";
 import { USD_PER_EUR } from "@/lib/server/shopify-billing";
 import { db, must } from "@/lib/server/supabase";
 
@@ -13,7 +14,7 @@ type Dated = { created_at: string };
 export const GET = route(async () => {
   await requireOwner();
   const since = new Date(Date.now() - 30 * DAY).toISOString();
-  const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits] = await Promise.all([
+  const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits, reminders] = await Promise.all([
     db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(1000),
     db().from("waitlist").select("email, ref, created_at").order("created_at", { ascending: false }),
@@ -23,6 +24,7 @@ export const GET = route(async () => {
     db().from("affiliate_events").select("code, kind, amount_cents, referred_user_id, created_at"),
     db().from("app_errors").select("path, status, message, created_at").gte("created_at", since).order("created_at", { ascending: false }).limit(200),
     db().from("site_sessions").select("first_seen, last_seen").gte("last_seen", since).limit(50000),
+    db().from("webhook_events").select("id, created_at").like("id", "offer-reminder:%").gte("created_at", since),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
   const active = subs.filter((s) => s.status === "active" && s.shopify_subscription_id && !s.test && s.plan !== "free");
@@ -77,7 +79,19 @@ export const GET = route(async () => {
   ];
   const signups = [
     ...waitlist.slice(0, 15).map((w) => ({ email: w.email as string, kind: "waitlist" as const, ref: (w.ref as string | null) ?? null, at: w.created_at as string })),
-    ...users.slice(0, 15).map((u) => ({ email: u.email as string, kind: "account" as const, ref: null, at: u.created_at as string })),
+    ...users.filter((u) => !isOwnerEmail(u.email)).slice(0, 15).map((u) => {
+      // Offre de lancement (−50 %, 24 h) : temps restant, rappel de 12 h envoyé, abonnement pris ou non.
+      const sub = events.filter((e) => e.kind === "new" && e.user_id === u.id).at(-1);
+      return {
+        email: u.email as string, kind: "account" as const, ref: null, at: u.created_at as string,
+        offer: {
+          endsAt: new Date(new Date(u.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000).toISOString(),
+          reminderAt: (reminders.find((r) => r.id === `offer-reminder:${u.id}`)?.created_at as string | undefined) ?? null,
+          subscribedAt: (sub?.created_at as string | undefined) ?? null,
+          amount: sub ? toEur(Number(sub.amount_cents), sub.currency) : null,
+        },
+      };
+    }),
   ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 12);
   const monthCancels = events.filter((e) => e.kind === "cancel" && inLast(30)(e as Dated)).length;
 

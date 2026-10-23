@@ -1,6 +1,7 @@
 import "server-only";
 import type { Invoice, PlanId, Subscription } from "@/lib/api/types";
-import { LAUNCH_OFFER, PLANS, euro } from "@/lib/content/pricing";
+import { formatMoney } from "@/lib/format";
+import { LAUNCH_OFFER, PLANS } from "@/lib/content/pricing";
 import { env } from "./env";
 import { HttpError } from "./http";
 import { notifyOwner, saleMessage } from "./notify";
@@ -111,7 +112,7 @@ export async function syncFromShopify(userId: string) {
 
   const info = PLANS.find((x) => x.id === plan);
   if ((user?.plan ?? "free") === "free" && info) {
-    await notifyOwner("💰 Nouvelle vente Vigenia", saleMessage(user?.email ?? "Un client", info.name, `${euro(amount / 100)}/${interval === "year" ? "an" : "mois"}`));
+    await notifyOwner("💰 Nouvelle vente Vigenia", saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount, p?.price?.currencyCode ?? "EUR")}/${interval === "year" ? "an" : "mois"}${pct ? " avec l'offre −50 %" : ""}`));
   }
   // Historique pour le tableau de bord du fondateur (les charges de test ne comptent pas).
   if (!sub.test) {

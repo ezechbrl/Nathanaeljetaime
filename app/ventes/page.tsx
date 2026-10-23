@@ -156,7 +156,28 @@ function cumulate(rows: { label: string; revenue: number; signups: number; visit
   return rows.map((x) => ({ ...x, revenue: (r += x.revenue), signups: (g += x.signups), visits: (v += x.visits) }));
 }
 
+type Offer = NonNullable<OwnerStats["signups"][number]["offer"]>;
+
+// Offre de lancement de chaque compte : ✓ abonné, compte à rebours, ou ✗ offre expirée.
+function OfferBadge({ offer, now }: { offer: Offer; now: number }) {
+  if (offer.subscribedAt) return <span className={cn("shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold", TONES.green)}>✓ Abonné{offer.amount != null ? ` · ${eur(offer.amount)}` : ""}</span>;
+  const left = new Date(offer.endsAt).getTime() - now;
+  if (left <= 0) return <span className={cn("shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold", TONES.red)}>✗ Offre expirée</span>;
+  const h = Math.floor(left / 3_600_000), m = Math.floor((left % 3_600_000) / 60_000);
+  return <span className={cn("shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold tabular-nums", TONES.amber)}>⏳ {h} h {String(m).padStart(2, "0")}</span>;
+}
+
+function OfferNote({ offer }: { offer: Offer }) {
+  if (offer.subscribedAt) return <> · {offer.reminderAt && offer.subscribedAt > offer.reminderAt ? "abonné après le mail ✓" : "abonné avant le mail"}</>;
+  return <> · {offer.reminderAt ? "mail de rappel envoyé" : "mail de rappel à 12 h"}</>;
+}
+
 function Dashboard({ s }: { s: OwnerStats }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(t);
+  }, []);
   const [period, setPeriod] = useState<PeriodId>("today");
   const [metric, setMetric] = useState<"revenue" | "signups" | "visits">("revenue");
   const p = s.periods[period];
@@ -273,8 +294,11 @@ function Dashboard({ s }: { s: OwnerStats }) {
               {s.signups.map((u, i) => (
                 <li key={i} className="flex items-center gap-3 py-2.5">
                   <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.kind === "account" ? TONES.blue : TONES.pink)}>{u.kind === "account" ? "Compte" : "Attente"}</span>
-                  <span className="min-w-0 flex-1 truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
-                  <span className="text-xs text-[#8a8a8a]">{formatShortDate(u.at)}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
+                    <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && <OfferNote offer={u.offer} />}</span>
+                  </span>
+                  {u.offer && <OfferBadge offer={u.offer} now={now} />}
                 </li>
               ))}
             </ul>
