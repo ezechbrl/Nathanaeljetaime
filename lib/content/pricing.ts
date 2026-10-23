@@ -54,7 +54,7 @@ export const PLANS: Plan[] = [
   },
 ];
 
-// Offre de lancement : −50 % à vie si on s'abonne dans les 24 h après l'inscription (coupon Stripe « pour toujours »).
+// Offre de lancement : −50 % à vie si on s'abonne dans les 24 h après l'inscription (remise Shopify sans limite de durée).
 // Starter 78 → 39 €/mois (398 → 199 €/an), Pro 158 → 79 €/mois (798 → 399 €/an).
 // Après 24 h, le client paie vraiment le prix normal : c'est ce qui rend le prix barré légal.
 export const LAUNCH_OFFER = { hours: 24, percent: 50 };

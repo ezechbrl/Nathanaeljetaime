@@ -88,7 +88,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
     api.unlockStore(store.id).then(onUnlocked).catch((e) => { toast((e as Error).message, "error"); setBusy(false); });
   }, [paid, store.id, onUnlocked, toast]);
 
-  // Retour du paiement : le temps que Stripe confirme, on revérifie l'abonnement.
+  // Retour du paiement : le temps que Shopify confirme, on revérifie l'abonnement.
   useEffect(() => {
     if (paid) return;
     const id = window.setInterval(refresh, 5000);

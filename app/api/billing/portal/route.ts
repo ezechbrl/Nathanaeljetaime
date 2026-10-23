@@ -1,11 +1,11 @@
 import { requireUser } from "@/lib/server/auth";
-import { assertBillingConfigured } from "@/lib/server/billing";
-import { json, route } from "@/lib/server/http";
-import { portalUrl } from "@/lib/server/stripe";
+import { billingFor } from "@/lib/server/billing";
+import { HttpError, json, route } from "@/lib/server/http";
 
-// Portail Stripe : changer d'offre ou de carte, télécharger les factures, arrêter l'abonnement.
+// Factures : elles sont dans l'admin Shopify du marchand (Paramètres → Facturation).
 export const POST = route(async () => {
   const user = await requireUser();
-  assertBillingConfigured();
-  return json({ url: await portalUrl(user) });
+  const { billingUrl } = await billingFor(user);
+  if (!billingUrl) throw new HttpError(404, "not_found", "Aucun abonnement Shopify sur ce compte.");
+  return json({ url: billingUrl });
 });

@@ -117,6 +117,7 @@ export const getBilling = (sync = false) =>
 export const startCheckout = (plan: "pro" | "agency", interval: "month" | "year") =>
   live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan, interval } }) : mock.checkout(plan);
 export const openBillingPortal = () => (live ? request<{ url: string }>("/api/billing/portal", { method: "POST" }) : Promise.resolve({ url: "/app/abonnement" }));
+export const cancelSubscription = () => (live ? request<void>("/api/billing/cancel", { method: "POST" }) : mock.ok());
 
 // Affiliation
 export const getAffiliate = () => (live ? request<{ affiliate: Affiliate | null }>("/api/affiliate") : mock.getAffiliate());

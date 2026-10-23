@@ -53,8 +53,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
     }
   }
 
-  // La page de paiement Stripe est préparée à l'avance (Starter à l'ouverture, les autres au survol) :
-  // au clic, la redirection est quasi immédiate.
+  // Page de paiement Shopify créée au clic (chaque préparation crée une demande de paiement chez Shopify).
   const sessions = useRef(new Map<string, Promise<{ url: string }>>());
   function prepare(plan: Plan["id"], iv: Interval) {
     const key = `${plan}:${iv}`;
@@ -66,10 +65,6 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
     }
     return p;
   }
-  const ready = !!billing.data;
-  useEffect(() => {
-    if (ready) prepare("pro", interval).catch(() => {});
-  }, [ready, interval]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function subscribe(plan: Plan, iv: Interval) {
     setBusy(plan.id);
@@ -97,7 +92,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
           interval={interval}
           left={left}
           action={(plan, iv) => (
-            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv).catch(() => {})} onFocus={() => prepare(plan.id, iv).catch(() => {})} disabled={!!busy} className={planButtonClass(plan.featured)}>
+            <button type="button" onClick={() => subscribe(plan, iv)} disabled={!!busy} className={planButtonClass(plan.featured)}>
               {busy === plan.id ? <Spinner /> : <>{unlockStoreId ? "Débloquer" : "Payer"} {euro(planPrice(plan, iv, !!left).billed)}{unlockStoreId ? "" : " et créer"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
           )}

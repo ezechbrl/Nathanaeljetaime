@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { hmacBase64, safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { db, must } from "@/lib/server/supabase";
+import { syncShopSubscriptions } from "@/lib/server/shopify-billing";
 
-// Webhooks Shopify : app/uninstalled et les trois webhooks RGPD obligatoires.
+// Webhooks Shopify : app/uninstalled, app_subscriptions/update et les trois webhooks RGPD obligatoires.
 // À déclarer dans la configuration de l'app (Partner Dashboard / Dev Dashboard), URL : /api/webhooks/shopify
 export async function POST(req: Request) {
   const raw = Buffer.from(await req.arrayBuffer());
@@ -25,10 +26,19 @@ export async function POST(req: Request) {
   }
 
   switch (topic) {
+    case "app_subscriptions/update":
+      // Abonnement approuvé, annulé ou expiré chez Shopify.
+      await syncShopSubscriptions(shop);
+      break;
     case "app/uninstalled":
     case "shop/redact":
       // L'app est retirée (ou Shopify demande l'effacement 48 h après) : on supprime l'accès.
       await db().from("shop_connections").update({ status: "uninstalled", access_token_encrypted: null, updated_at: new Date().toISOString() }).eq("shop_domain", shop);
+      // Shopify arrête aussi l'abonnement de l'app : on retire l'offre payée par cette boutique.
+      for (const r of must(await db().from("subscriptions").select("user_id").eq("shop_domain", shop).not("shopify_subscription_id", "is", null)) as { user_id: string }[]) {
+        await db().from("subscriptions").update({ plan: "free", status: "canceled", updated_at: new Date().toISOString() }).eq("user_id", r.user_id);
+        await db().from("users").update({ plan: "free" }).eq("id", r.user_id);
+      }
       if (topic === "shop/redact") {
         // Effacement demandé par Shopify : statistiques de vente agrégées des boutiques reliées à ce domaine.
         const conns = must(await db().from("shop_connections").select("id").eq("shop_domain", shop)) as { id: string }[];

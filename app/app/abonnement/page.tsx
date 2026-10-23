@@ -30,6 +30,22 @@ function Billing() {
     }
   }, [params, refresh, router, toast]);
 
+  const [changing, setChanging] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  async function cancel() {
+    setBusy("cancel");
+    try {
+      await api.cancelSubscription();
+      toast("Abonnement arrêté. Tout ce qui a été créé reste dans ta boutique.");
+      refresh();
+      billing.reload?.();
+      window.location.reload();
+    } catch (e) {
+      toast((e as Error).message, "error");
+      setBusy(null);
+    }
+  }
+
   async function portal() {
     setBusy("portal");
     try {
@@ -65,7 +81,7 @@ function Billing() {
               {sub ? (
                 <>
                   <p className="mt-3 text-[clamp(2.2rem,1.6rem+2vw,3.2rem)] font-semibold leading-none tracking-[-0.03em]">Vigenia {current?.name}</p>
-                  {/* Accès donné à la main (pas d'abonnement Stripe) : rien n'est facturé. */}
+                  {/* Accès donné à la main (pas d'abonnement Shopify) : rien n'est facturé. */}
                   {!sub.interval && !sub.renewsAt ? (
                     <p className="mt-4 text-[2.4rem] font-semibold leading-none tracking-[-0.03em]">Accès offert</p>
                   ) : (
@@ -95,26 +111,19 @@ function Billing() {
 
         {!(sub && !sub.interval && !sub.renewsAt) && <section className="surface rounded-card p-5">
           <h2 className="text-lg tracking-tight">Changer ou arrêter mon abonnement</h2>
-          <p className="mt-2 text-sm text-fg-muted">Sur la page sécurisée de Stripe, tu peux : changer de carte bancaire, passer de Starter à Pro (ou à l'annuel), télécharger tes factures, ou arrêter ton abonnement en un clic. Si tu arrêtes, tout ce qui a été créé reste dans ta boutique.</p>
-          <Button variant="secondary" className="mt-4" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Gérer mon abonnement</Button>
+          <p className="mt-2 text-sm text-fg-muted">Ton abonnement Vigenia est ajouté à ta facture Shopify : tes factures sont dans ton admin Shopify (Paramètres → Facturation). Si tu arrêtes, tout ce qui a été créé reste dans ta boutique.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button variant="secondary" onClick={() => setChanging((v) => !v)}>Changer d'offre</Button>
+            <Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Mes factures Shopify</Button>
+            {confirmCancel ? (
+              <span className="flex items-center gap-2 text-sm">Arrêter maintenant ?
+                <Button variant="danger" size="sm" onClick={cancel} disabled={busy === "cancel"}>{busy === "cancel" ? <Spinner /> : "Oui, arrêter"}</Button>
+                <Button variant="ghost" size="sm" onClick={() => setConfirmCancel(false)}>Annuler</Button>
+              </span>
+            ) : <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Arrêter mon abonnement</Button>}
+          </div>
         </section>}
-
-        {!(sub && !sub.interval && !sub.renewsAt && !billing.data?.invoices.length) && <section>
-          <h2 className="text-lg tracking-tight">Factures</h2>
-          {billing.data?.invoices.length ? (
-            <table className="mt-4 w-full text-sm">
-              <thead className="text-left text-fg-faint"><tr><th className="py-2 font-normal">Numéro</th><th className="py-2 font-normal">Date</th><th className="py-2 font-normal">Montant</th><th className="py-2 font-normal" /></tr></thead>
-              <tbody>
-                {billing.data.invoices.map((i) => (
-                  <tr key={i.id} className="border-t border-white/[0.05]">
-                    <td className="py-3">{i.number}</td><td className="py-3 text-fg-muted">{formatDate(i.createdAt)}</td><td className="py-3 tabular-nums">{formatMoney(i.amount, i.currency)}</td>
-                    <td className="py-3 text-right"><a href={i.pdfUrl} className="text-fg-muted hover:text-fg">PDF</a></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : <p className="mt-3 text-sm text-fg-muted">Aucune facture pour l'instant.</p>}
-        </section>}
+        {changing && <Paywall initialInterval={sub?.interval === "year" ? "year" : "month"} />}
       </div>
     </>
   );

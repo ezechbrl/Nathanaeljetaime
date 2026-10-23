@@ -26,7 +26,7 @@ de fichiers de thème par une app publique demande une autorisation spéciale de
 | Tâches longues | **Inngest** ou **Trigger.dev** | Une génération dure 1 à 3 min, plus que la limite d'une fonction Vercel |
 | IA texte | API Claude (`@anthropic-ai/sdk`, déjà en place dans `lib/generate-store.ts`) | Sorties structurées validées par Zod |
 | IA images | Un fournisseur d'images (ex. fal.ai, Replicate, OpenAI Images) | Visuels produit et bannières |
-| Paiement | **Shopify App Pricing** (offres créées dans le Partner Dashboard, vérifiées par la Partner API) | Obligatoire pour une app de l'App Store Shopify ; le code Stripe reste dans `lib/server/stripe.ts` mais n'est plus utilisé |
+| Paiement | **Shopify Billing API** (appSubscriptionCreate, voir `lib/server/shopify-billing.ts`) | Obligatoire pour une app de l'App Store Shopify ; l'ancien code Stripe reste dans `lib/server/stripe.ts` pour les abonnements existants |
 | E-mails | Resend (+ React Email) | Vérification, mot de passe oublié, notifications |
 | Limitation de débit | Upstash Redis (`@upstash/ratelimit`) | Protéger les routes IA et publiques |
 | Suivi d'erreurs | Sentry | |

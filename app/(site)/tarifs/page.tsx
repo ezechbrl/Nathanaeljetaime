@@ -8,7 +8,7 @@ import { PricingCards } from "@/components/site/Pricing";
 export const metadata: Metadata = { title: "Tarifs", description: "Vigenia Starter à 39 € par mois et Pro à 79 € par mois avec l'offre de lancement (−50 % à vie), ou 199 € et 399 € par an. Sans engagement." };
 
 const PRICING_FAQ = [
-  { q: "Comment je paie ?", a: "Par carte bancaire, Apple Pay ou Google Pay, sur une page de paiement sécurisée par Stripe. Tu reçois une facture à chaque paiement." },
+  { q: "Comment je paie ?", a: "Directement sur ta facture Shopify : tu valides l'abonnement en un clic sur une page Shopify, sans entrer de carte. Tes factures sont dans ton admin Shopify (Paramètres → Facturation)." },
   { q: "Y a-t-il une version gratuite ?", a: "Non. Pour garder un outil rapide et de qualité, Vigenia fonctionne uniquement par abonnement. Il est sans engagement : tu peux arrêter en un clic." },
   { q: "Starter ou Pro ?", a: "Starter est fait pour débuter : 1 boutique Shopify, avec un produit que tu peux changer quand tu veux. Pro est fait pour les vendeurs déjà lancés : jusqu'à 3 boutiques pour tester plusieurs produits en même temps, et 2× plus de crédit IA. Tu peux changer d'offre à tout moment." },
   { q: "Puis-je arrêter à tout moment ?", a: "Oui. Si tu arrêtes, ta boutique et tout son contenu restent sur ton compte Shopify." },

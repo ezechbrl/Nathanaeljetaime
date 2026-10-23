@@ -37,7 +37,7 @@ export const DELETE = route(async (req) => {
   const user = await requireUser();
   const { confirm } = await body(req, z.object({ confirm: z.literal("SUPPRIMER") }));
   void confirm;
-  // Stripe facture tant que l'abonnement est actif : il faut d'abord l'arrêter.
+  // Shopify facture tant que l'abonnement est actif : il faut d'abord l'arrêter.
   const { subscription } = await billingFor(user);
   if (subscription.plan !== "free" && subscription.status !== "canceled") {
     throw new HttpError(409, "subscription_active", "Arrête d'abord ton abonnement depuis la page Abonnement, puis supprime ton compte.");

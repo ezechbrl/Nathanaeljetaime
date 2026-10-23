@@ -4,6 +4,7 @@ import { aiBlock } from "@/lib/server/budget";
 import { safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { sendOfferReminders } from "@/lib/server/offer-reminders";
+import { syncFromShopify } from "@/lib/server/billing";
 import { accessToken, dailyOrders, dailySessions } from "@/lib/server/shopify";
 import { db, must } from "@/lib/server/supabase";
 import type { StorePlan } from "@/lib/store-schema";
@@ -48,5 +49,8 @@ export async function GET(req: Request) {
   }
   const reminders = await sendOfferReminders();
 
-  return NextResponse.json({ processed: Object.keys(report).length, report, reminders });
+  // Abonnements Shopify : renouvellements (commission d'affiliation) et annulations manquées.
+  const subs = must(await db().from("subscriptions").select("user_id").eq("status", "active").not("shopify_subscription_id", "is", null)) as { user_id: string }[];
+  for (const r of subs) await syncFromShopify(r.user_id).catch((e) => console.error("Abonnement Shopify", r.user_id, e));
+  return NextResponse.json({ processed: Object.keys(report).length, report, reminders, subscriptions: subs.length });
 }

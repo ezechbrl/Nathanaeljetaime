@@ -45,7 +45,7 @@ function reminderHtml(name: string, hours: number, url: string) {
 <p style="margin:22px 0 0;font-size:16px;line-height:1.55;color:#e8fff6;text-align:left">Salut${name} 👋<br>Ta boutique t'attend. Si tu t'abonnes maintenant, tu gardes <b>−50 % pour toujours</b>, tant que tu restes abonné. Après le compteur, c'est le prix normal.</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin-top:14px"><tr>${price("Starter / mois", "39 €", "78 €")}${price("Starter / an", "199 €", "398 €")}</tr></table>
 <a href="${url}" style="display:inline-block;margin-top:22px;padding:15px 30px;border-radius:999px;background:#2ee6a6;color:#03140d;font-size:16px;font-weight:700;text-decoration:none">J'en profite maintenant →</a>
-<div style="margin-top:14px;font-size:12px;color:#9ca3af">Sans engagement · Annulable en 1 clic · Paiement sécurisé par Stripe</div>
+<div style="margin-top:14px;font-size:12px;color:#9ca3af">Sans engagement · Annulable en 1 clic · Payé sur ta facture Shopify</div>
 </td></tr>
 <tr><td style="padding:18px 6px 0;font-size:12px;color:#6b8f82;text-align:center">Tu reçois cet e-mail car tu as créé un compte Vigenia. Un seul rappel, promis.</td></tr>
 </table></td></tr></table></body></html>`;

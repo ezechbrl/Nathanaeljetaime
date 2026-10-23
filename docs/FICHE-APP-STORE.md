@@ -1,6 +1,6 @@
 # Fiche Shopify App Store — textes à copier-coller
 
-> ⚠️ En pause depuis le 19/10/2026 : le paiement passe par Stripe sur le site. Une app vendue sur l'App Store Shopify doit être payée par Shopify, donc cette fiche ne sert plus tant qu'on reste sur Stripe.
+> Paiement repassé par Shopify (Billing API, lib/server/shopify-billing.ts) le 23/10/2026 : la fiche peut être soumise.
 
 Fiche en français (langue principale). Shopify la traduit automatiquement dans les autres langues.
 
