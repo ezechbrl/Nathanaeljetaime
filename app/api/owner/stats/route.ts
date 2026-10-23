@@ -24,7 +24,7 @@ export const GET = route(async () => {
     db().from("affiliate_events").select("code, kind, amount_cents, referred_user_id, created_at"),
     db().from("app_errors").select("path, status, message, created_at").gte("created_at", since).order("created_at", { ascending: false }).limit(200),
     db().from("site_sessions").select("first_seen, last_seen").gte("last_seen", since).limit(50000),
-    db().from("webhook_events").select("id, created_at").like("id", "offer-reminder:%").gte("created_at", since),
+    db().from("webhook_events").select("id, created_at").like("id", "offer-%").gte("created_at", since),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
   const active = subs.filter((s) => s.status === "active" && s.shopify_subscription_id && !s.test && s.plan !== "free");
@@ -87,6 +87,7 @@ export const GET = route(async () => {
         offer: {
           endsAt: new Date(new Date(u.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000).toISOString(),
           reminderAt: (reminders.find((r) => r.id === `offer-reminder:${u.id}`)?.created_at as string | undefined) ?? null,
+          lastCallAt: (reminders.find((r) => r.id === `offer-last:${u.id}`)?.created_at as string | undefined) ?? null,
           subscribedAt: (sub?.created_at as string | undefined) ?? null,
           amount: sub ? toEur(Number(sub.amount_cents), sub.currency) : null,
         },

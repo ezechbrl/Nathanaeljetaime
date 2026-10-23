@@ -168,8 +168,11 @@ function OfferBadge({ offer, now }: { offer: Offer; now: number }) {
 }
 
 function OfferNote({ offer }: { offer: Offer }) {
-  if (offer.subscribedAt) return <> · {offer.reminderAt && offer.subscribedAt > offer.reminderAt ? "abonné après le mail ✓" : "abonné avant le mail"}</>;
-  return <> · {offer.reminderAt ? "mail de rappel envoyé" : "mail de rappel à 12 h"}</>;
+  if (offer.subscribedAt) {
+    const after = offer.lastCallAt && offer.subscribedAt > offer.lastCallAt ? "après le mail « dernière heure » ✓" : offer.reminderAt && offer.subscribedAt > offer.reminderAt ? "après le mail de 12 h ✓" : "avant les mails";
+    return <> · abonné {after}</>;
+  }
+  return <> · {offer.lastCallAt ? "2 mails envoyés (12 h + dernière heure)" : offer.reminderAt ? "mail de 12 h envoyé · dernier à 23 h" : "mail de rappel à 12 h"}</>;
 }
 
 function Dashboard({ s }: { s: OwnerStats }) {
