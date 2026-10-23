@@ -390,7 +390,7 @@ export default function SalesApp() {
   // La notification arrive 10 s plus tard : le temps de quitter l'app pour voir la pastille rouge.
   function test() {
     setTesting("sent");
-    fetch("/api/owner/test-notification?delay=10", { method: "POST", credentials: "include" }).catch(() => {});
+    fetch("/api/owner/test-notification?delay=10", { method: "POST", credentials: "include", headers: api.ownerHeaders() }).catch(() => {});
   }
 
   const status = error instanceof ApiClientError ? error.status : 0;

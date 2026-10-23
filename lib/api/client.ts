@@ -118,8 +118,22 @@ export const startCheckout = (plan: "pro" | "agency", interval: "month" | "year"
   live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan, interval } }) : mock.checkout(plan);
 export const openBillingPortal = () => (live ? request<{ url: string }>("/api/billing/portal", { method: "POST" }) : Promise.resolve({ url: "/app/abonnement" }));
 export const cancelSubscription = () => (live ? request<void>("/api/billing/cancel", { method: "POST" }) : mock.ok());
-export const getOwnerStats = () => request<import("./types").OwnerStats>("/api/owner/stats");
-export const savePushSubscription = (sub: PushSubscriptionJSON) => request<void>("/api/owner/push", { method: "POST", json: sub });
+// App « Ventes » : clé de l'appareil du fondateur (gardée sur le téléphone) pour ne jamais se reconnecter.
+const DEVICE_KEY = "vg-device";
+export const ownerHeaders = (): Record<string, string> => {
+  try {
+    const t = localStorage.getItem(DEVICE_KEY);
+    return t ? { "x-owner-device": t } : {};
+  } catch {
+    return {};
+  }
+};
+export async function getOwnerStats() {
+  const s = await request<import("./types").OwnerStats & { deviceToken?: string | null }>("/api/owner/stats", { headers: ownerHeaders() });
+  if (s.deviceToken) try { localStorage.setItem(DEVICE_KEY, s.deviceToken); } catch {}
+  return s;
+}
+export const savePushSubscription = (sub: PushSubscriptionJSON) => request<void>("/api/owner/push", { method: "POST", json: sub, headers: ownerHeaders() });
 
 // Affiliation
 export const getAffiliate = () => (live ? request<{ affiliate: Affiliate | null }>("/api/affiliate") : mock.getAffiliate());

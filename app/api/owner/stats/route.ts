@@ -12,7 +12,7 @@ const toEur = (cents: number, currency: string | null) => Math.round(currency ==
 type Dated = { created_at: string };
 
 export const GET = route(async () => {
-  await requireOwner();
+  const owner = await requireOwner({ issueDevice: true });
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits, reminders] = await Promise.all([
     db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id"),
@@ -114,6 +114,7 @@ export const GET = route(async () => {
   }).sort((a, b) => b.commission - a.commission || b.signups - a.signups || b.clicks - a.clicks);
 
   return json({
+    deviceToken: owner.newDeviceToken ?? null,
     mrr,
     arr: mrr * 12,
     subscribers: { total: active.length, starter: active.filter((s) => s.plan === "pro").length, pro: active.filter((s) => s.plan === "agency").length },
