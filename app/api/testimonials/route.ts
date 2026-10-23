@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { requireUser } from "@/lib/server/auth";
 import { body, json, route } from "@/lib/server/http";
+import { notifyOwner } from "@/lib/server/notify";
 import { rateLimit } from "@/lib/server/quota";
 import { db, must } from "@/lib/server/supabase";
 
@@ -17,5 +18,6 @@ export const POST = route(async (req) => {
   await rateLimit(`testimonial:${user.id}`, 5, 3600);
   const input = await body(req, Input);
   must(await db().from("testimonials").upsert({ user_id: user.id, ...input, role: input.role || null, approved: false }, { onConflict: "user_id" }));
+  await notifyOwner("⭐ Nouvel avis à valider", `${input.name} (${input.rating}/5) : « ${input.text.slice(0, 140)} »`);
   return json({ ok: true }, 201);
 });

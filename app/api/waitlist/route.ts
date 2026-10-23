@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { body, clientIp, noContent, route } from "@/lib/server/http";
 import { sendEmail } from "@/lib/server/email";
+import { notifyOwner } from "@/lib/server/notify";
 import { rateLimit } from "@/lib/server/quota";
 import { db } from "@/lib/server/supabase";
 import { site } from "@/lib/site";
@@ -15,6 +16,8 @@ export const POST = route(async (req) => {
   const ref = /(?:^|;\s*)ref=([^;]+)/.exec(req.headers.get("cookie") ?? "")?.[1] ?? null;
   const { data } = await db().from("waitlist").upsert({ email: input.email, brief: input.brief || null, ref }, { onConflict: "email", ignoreDuplicates: true }).select("email");
   if (data?.length) {
+    const { count } = await db().from("waitlist").select("*", { count: "exact", head: true });
+    await notifyOwner("🙌 Nouvel inscrit Vigenia", `Une personne de plus sur la liste d'attente${count ? ` (${count} au total)` : ""}.`);
     await sendEmail(
       input.email,
       `Ta place est réservée sur ${site.name}`,
