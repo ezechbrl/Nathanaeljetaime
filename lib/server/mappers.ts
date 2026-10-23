@@ -3,6 +3,7 @@ import type { StorePlan } from "@/lib/store-schema";
 import { slotOf } from "./images";
 import type { Asset, ChatMessage, Job, Recommendation, ShopConnection, Store, StoreTheme, User } from "@/lib/api/types";
 import type { StoreRow, UserRow } from "./auth";
+import { isOwnerEmail } from "./owner";
 
 // Conversion des lignes de la base vers les types du contrat d'API (lib/api/types.ts).
 
@@ -14,6 +15,7 @@ export const toUser = (u: UserRow & { email_verified?: boolean }): User => ({
   emailVerified: u.email_verified ?? true,
   plan: u.plan,
   createdAt: u.created_at,
+  isOwner: isOwnerEmail(u.email),
 });
 
 const DEFAULT_THEME: StoreTheme = { colors: { primary: "#1d1d22", accent: "#0f8f86", background: "#faf8f5" }, headingFont: "Instrument Serif", bodyFont: "DM Sans" };

@@ -14,11 +14,11 @@ import type { UserRow } from "./auth";
 type PaidPlan = "pro" | "agency";
 const NAMES: Record<PaidPlan, string> = { pro: "Vigenia Starter", agency: "Vigenia Pro" };
 const planOfName = (name: string): PaidPlan | null => (name === NAMES.agency ? "agency" : name === NAMES.pro ? "pro" : null);
-const USD_PER_EUR = 1.1; // boutiques facturées en dollars : prix converti et arrondi
+export const USD_PER_EUR = 1.1; // boutiques facturées en dollars : prix converti et arrondi
 
-type SubRow = { shopify_subscription_id: string | null; stripe_subscription_id: string | null; current_period_end: string | null; plan: PlanId } | null;
+type SubRow = { shopify_subscription_id: string | null; stripe_subscription_id: string | null; current_period_end: string | null; plan: PlanId; test: boolean } | null;
 const subRow = async (userId: string) =>
-  must(await db().from("subscriptions").select("shopify_subscription_id, stripe_subscription_id, current_period_end, plan").eq("user_id", userId).maybeSingle()) as SubRow;
+  must(await db().from("subscriptions").select("shopify_subscription_id, stripe_subscription_id, current_period_end, plan, test").eq("user_id", userId).maybeSingle()) as SubRow;
 
 // Fin de l'offre de lancement (24 h après l'inscription, premier abonnement seulement), ou null.
 export async function launchOfferEndsAt(user: UserRow) {
@@ -70,7 +70,7 @@ async function registerSubscriptionWebhook(shop: string, token: string) {
 }
 
 type ActiveSub = {
-  id: string; name: string; status: string; currentPeriodEnd: string | null;
+  id: string; name: string; status: string; currentPeriodEnd: string | null; test: boolean;
   lineItems: { plan: { pricingDetails: { __typename: string; interval?: string; price?: { amount: string; currencyCode: string }; discount?: { value: { percentage?: number; amount?: { amount: string } } } | null } } }[];
 };
 
@@ -78,7 +78,7 @@ type ActiveSub = {
 export async function syncFromShopify(userId: string) {
   const conn = await connectionFor(userId, null);
   const d = await graphql<{ currentAppInstallation: { activeSubscriptions: ActiveSub[] } }>(conn.shop, conn.token, `{
-    currentAppInstallation { activeSubscriptions { id name status currentPeriodEnd
+    currentAppInstallation { activeSubscriptions { id name status currentPeriodEnd test
       lineItems { plan { pricingDetails { __typename ... on AppRecurringPricing { interval price { amount currencyCode }
         discount { value { ... on AppSubscriptionDiscountPercentage { percentage } ... on AppSubscriptionDiscountAmount { amount { amount } } } } } } } } } }
   }`);
@@ -90,6 +90,7 @@ export async function syncFromShopify(userId: string) {
     // Plus d'abonnement Shopify actif : on ne retire que ce que Shopify facturait (pas un accès offert).
     if (before?.shopify_subscription_id) {
       await db().from("subscriptions").update({ plan: "free", status: "canceled", updated_at: new Date().toISOString() }).eq("user_id", userId);
+      if (!before.test) await logRevenue({ user_id: userId, kind: "cancel", plan: before.plan, external_id: `cancel:${before.shopify_subscription_id}` });
       await db().from("users").update({ plan: "free" }).eq("id", userId);
       if (user?.plan !== "free") await notifyOwner("Abonné parti", `${user?.email ?? "Un client"} a arrêté son abonnement Vigenia.`);
     }
@@ -103,7 +104,7 @@ export async function syncFromShopify(userId: string) {
   const amount = Math.round(Math.max(0, Number(p?.price?.amount ?? 0) * (1 - pct) - off) * 100);
   await db().from("subscriptions").upsert({
     user_id: userId, shopify_subscription_id: sub.id, shop_domain: conn.shop, plan, status: "active", interval,
-    current_period_end: sub.currentPeriodEnd, cancel_at_period_end: false, amount_cents: amount, currency: p?.price?.currencyCode ?? "EUR",
+    current_period_end: sub.currentPeriodEnd, cancel_at_period_end: false, amount_cents: amount, currency: p?.price?.currencyCode ?? "EUR", test: sub.test,
     updated_at: new Date().toISOString(),
   });
   await db().from("users").update({ plan }).eq("id", userId);
@@ -112,8 +113,18 @@ export async function syncFromShopify(userId: string) {
   if ((user?.plan ?? "free") === "free" && info) {
     await notifyOwner("💰 Nouvelle vente Vigenia", saleMessage(user?.email ?? "Un client", info.name, `${euro(amount / 100)}/${interval === "year" ? "an" : "mois"}`));
   }
+  // Historique pour le tableau de bord du fondateur (les charges de test ne comptent pas).
+  if (!sub.test) {
+    const currency = p?.price?.currencyCode ?? "EUR";
+    if (before?.shopify_subscription_id !== sub.id) await logRevenue({ user_id: userId, kind: "new", plan, amount_cents: amount, currency, external_id: `new:${sub.id}` });
+    if (sub.currentPeriodEnd) await logRevenue({ user_id: userId, kind: "payment", plan, amount_cents: amount, currency, external_id: `pay:${sub.id}:${sub.currentPeriodEnd}` });
+  }
   // Nouvelle période payée : commission d'affiliation (12 premiers mois).
   if (sub.currentPeriodEnd && sub.currentPeriodEnd !== before?.current_period_end) await creditAffiliate(userId, user?.referred_by ?? null, amount, `${sub.id}:${sub.currentPeriodEnd}`);
+}
+
+async function logRevenue(row: { user_id: string; kind: "new" | "payment" | "cancel"; plan: PlanId; amount_cents?: number; currency?: string; external_id: string }) {
+  await db().from("revenue_events").upsert(row, { onConflict: "external_id", ignoreDuplicates: true });
 }
 
 async function creditAffiliate(userId: string, code: string | null, amountCents: number, externalId: string) {

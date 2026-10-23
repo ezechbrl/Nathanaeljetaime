@@ -16,6 +16,7 @@ export type User = {
   emailVerified: boolean;
   plan: PlanId;
   createdAt: string;
+  isOwner?: boolean; // fondateur de Vigenia : accès au tableau de bord des ventes
 };
 
 export type Usage = {
@@ -168,4 +169,18 @@ export type GenerateStoreInput = {
   screenshots?: string[];
   language: string;
   shopConnectionId?: string;
+};
+
+// Tableau de bord du fondateur (montants en centimes d'euro).
+export type OwnerPeriod = { revenue: number; newSubs: number; cancels: number; waitlist: number; accounts: number; stores: number };
+export type OwnerStats = {
+  mrr: number;
+  arr: number;
+  subscribers: { total: number; starter: number; pro: number };
+  totals: { waitlist: number; accounts: number };
+  periods: { today: OwnerPeriod; week: OwnerPeriod; month: OwnerPeriod };
+  series: { day: string; revenue: number; signups: number }[];
+  sources: { ref: string; count: number }[];
+  affiliates: { code: string; name: string; clicks: number; signups: number; customers: number; commission: number; rate: number }[];
+  recent: { kind: "new" | "payment" | "cancel"; plan: string | null; amount: number; email: string | null; at: string }[];
 };

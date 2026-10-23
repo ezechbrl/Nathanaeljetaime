@@ -2,7 +2,7 @@
 
 import {
   BarChart3, ChevronsUpDown, CreditCard, Gift, HelpCircle, Home, Image as ImageIcon, LayoutGrid, LogOut,
-  Menu, MessageSquare, Plus, Settings, Store as StoreIcon, Wand2, X,
+  Menu, MessageSquare, Plus, Settings, Store as StoreIcon, TrendingUp, Wand2, X,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -67,6 +67,7 @@ function SidebarBody() {
       <div className="px-1.5 pb-4 pt-1"><Logo href="/app" /></div>
       <NavLink href="/app" icon={Home} exact>Accueil</NavLink>
       <NavLink href="/app/boutiques" icon={StoreIcon} exact>Mes boutiques</NavLink>
+      {user.isOwner && <NavLink href="/app/ventes" icon={TrendingUp}>Mes ventes</NavLink>}
 
       {storeId && (
         <>
