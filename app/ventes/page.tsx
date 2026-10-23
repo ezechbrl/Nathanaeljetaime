@@ -199,6 +199,8 @@ export default function SalesApp() {
           <Bell className="h-5 w-5 shrink-0" />
           <span className="flex-1 text-sm"><b className="block">Activer les notifications</b>Une alerte et une pastille rouge à chaque vente.</span>
         </button>
+      ) : notif.state === "on" ? (
+        <p className="mt-1 flex items-center gap-1.5 text-xs text-white/40"><Bell className="h-3.5 w-3.5" /> Notifications activées</p>
       ) : notif.state === "install" ? (
         <p className="mt-3 rounded-2xl border border-white/[0.08] p-4 text-sm text-white/60">Pour les notifications et la pastille rouge : bouton Partager → « Sur l'écran d'accueil », puis ouvre l'app depuis l'icône.</p>
       ) : null}
