@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export const viewport: Viewport = { themeColor: "#000000" };
+export const viewport: Viewport = { themeColor: "#05261d" };
 
 export default function SalesLayout({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-dvh bg-black text-white">{children}</div>;
+  return <div className="min-h-dvh">{children}</div>;
 }

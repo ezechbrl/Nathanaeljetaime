@@ -36,6 +36,7 @@ export const GET = route(async () => {
     const ev = events.filter((e) => f(e as Dated));
     return [k, {
       revenue: sum(ev.filter((e) => e.kind === "payment")),
+      sales: ev.filter((e) => e.kind === "payment").length,
       newSubs: ev.filter((e) => e.kind === "new").length,
       cancels: ev.filter((e) => e.kind === "cancel").length,
       waitlist: waitlist.filter((w) => f(w as Dated)).length,
@@ -51,6 +52,15 @@ export const GET = route(async () => {
     revenue: sum(events.filter((e) => e.kind === "payment" && parisDay(e.created_at) === day)),
     signups: waitlist.filter((w) => parisDay(w.created_at) === day).length + users.filter((u) => parisDay(u.created_at) === day).length,
   }));
+  // Aujourd'hui, heure par heure (heure de Paris).
+  const parisHour = (d: string) => Number(new Date(d).toLocaleString("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }));
+  const todayRows = (rows: Record<string, any>[]) => rows.filter((r) => parisDay(r.created_at) === today);
+  const hours = Array.from({ length: 24 }, (_, h) => ({
+    hour: h,
+    revenue: sum(todayRows(events).filter((e) => e.kind === "payment" && parisHour(e.created_at) === h)),
+    signups: todayRows(waitlist).filter((w) => parisHour(w.created_at) === h).length + todayRows(users).filter((u) => parisHour(u.created_at) === h).length,
+  }));
+  const monthCancels = events.filter((e) => e.kind === "cancel" && inLast(30)(e as Dated)).length;
 
   const sources = Object.entries(waitlist.reduce<Record<string, number>>((m, w) => ((m[w.ref || "direct"] = (m[w.ref || "direct"] ?? 0) + 1), m), {}))
     .map(([ref, count]) => ({ ref, count })).sort((a, b) => b.count - a.count);
@@ -73,6 +83,10 @@ export const GET = route(async () => {
     mrr,
     arr: mrr * 12,
     subscribers: { total: active.length, starter: active.filter((s) => s.plan === "pro").length, pro: active.filter((s) => s.plan === "agency").length },
+    arpu: active.length ? Math.round(mrr / active.length) : 0,
+    churn: active.length + monthCancels ? monthCancels / (active.length + monthCancels) : 0,
+    conversion: users.length ? active.length / users.length : 0,
+    hours,
     totals: { waitlist: waitlist.length, accounts: users.length },
     periods,
     series,
