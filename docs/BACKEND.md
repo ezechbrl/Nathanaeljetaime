@@ -26,7 +26,7 @@ de fichiers de thème par une app publique demande une autorisation spéciale de
 | Tâches longues | **Inngest** ou **Trigger.dev** | Une génération dure 1 à 3 min, plus que la limite d'une fonction Vercel |
 | IA texte | API Claude (`@anthropic-ai/sdk`, déjà en place dans `lib/generate-store.ts`) | Sorties structurées validées par Zod |
 | IA images | Un fournisseur d'images (ex. fal.ai, Replicate, OpenAI Images) | Visuels produit et bannières |
-| Paiement | **Shopify Billing API** (appSubscriptionCreate, voir `lib/server/shopify-billing.ts`) | Obligatoire pour une app de l'App Store Shopify ; l'ancien code Stripe reste dans `lib/server/stripe.ts` pour les abonnements existants |
+| Paiement | **Shopify Billing API** (appSubscriptionCreate, voir `lib/server/shopify-billing.ts`) | Obligatoire pour une app de l'App Store Shopify |
 | E-mails | Resend (+ React Email) | Vérification, mot de passe oublié, notifications |
 | Limitation de débit | Upstash Redis (`@upstash/ratelimit`) | Protéger les routes IA et publiques |
 | Suivi d'erreurs | Sentry | |
@@ -61,13 +61,8 @@ SHOPIFY_API_SECRET=
 SHOPIFY_SCOPES=read_products,write_products,read_content,write_content,read_online_store_pages,write_online_store_pages,read_themes,write_themes,read_files,write_files,read_online_store_navigation,write_online_store_navigation,read_orders,read_reports,read_analytics
 SHOPIFY_API_VERSION=2025-10
 
-# Paiement
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-STRIPE_PRICE_PRO_MONTH=
-STRIPE_PRICE_PRO_YEAR=
-STRIPE_PRICE_AGENCY_MONTH=
-STRIPE_PRICE_AGENCY_YEAR=
+# Notifications téléphone (app ntfy) : ventes, désabonnements, inscrits, avis
+NTFY_TOPIC=
 
 # Tâches, e-mails, sécurité
 INNGEST_EVENT_KEY=
