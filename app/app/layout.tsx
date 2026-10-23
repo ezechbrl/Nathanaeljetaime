@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppProvider } from "@/components/app/AppContext";
 import { OfferBanner } from "@/components/app/OfferBanner";
 import { Sidebar } from "@/components/app/Sidebar";
+import { StandaloneHome } from "@/components/app/StandaloneHome";
 import { LogoMark } from "@/components/ui/Logo";
 import { ToastProvider } from "@/components/ui/Toast";
 
@@ -18,6 +19,7 @@ function Loading() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
+      <StandaloneHome />
       <AppProvider fallback={<Loading />}>
         <div className="min-h-dvh lg:flex">
           <Sidebar />

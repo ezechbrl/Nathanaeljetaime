@@ -29,6 +29,8 @@ function urlBase64ToUint8Array(base64: string) {
 function useNotifications() {
   const [state, setState] = useState<"unsupported" | "install" | "off" | "on" | "busy">("unsupported");
   useEffect(() => {
+    // Cette app d'écran d'accueil est « Ventes » : après une connexion, on y revient directement.
+    if (window.matchMedia("(display-mode: standalone)").matches) try { localStorage.setItem("vg-home", "/ventes"); } catch {}
     if (!("serviceWorker" in navigator)) return;
     navigator.serviceWorker.register("/sw.js").then(async (reg) => {
       reg.active?.postMessage("clear-badge");
