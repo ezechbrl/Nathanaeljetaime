@@ -19,8 +19,8 @@ function Loading() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
-      <StandaloneHome />
       <AppProvider fallback={<Loading />}>
+        <StandaloneHome />
         <div className="min-h-dvh lg:flex">
           <Sidebar />
           <main id="main" className="min-w-0 flex-1"><OfferBanner />{children}</main>

@@ -29,8 +29,6 @@ function urlBase64ToUint8Array(base64: string) {
 function useNotifications() {
   const [state, setState] = useState<"unsupported" | "install" | "off" | "on" | "busy">("unsupported");
   useEffect(() => {
-    // Cette app d'écran d'accueil est « Ventes » : après une connexion, on y revient directement.
-    if (window.matchMedia("(display-mode: standalone)").matches) try { localStorage.setItem("vg-home", "/ventes"); } catch {}
     if (!("serviceWorker" in navigator)) return;
     navigator.serviceWorker.register("/sw.js").then(async (reg) => {
       reg.active?.postMessage("clear-badge");
@@ -191,9 +189,13 @@ export default function SalesApp() {
         <span className="flex items-center gap-2 text-[15px] font-semibold">
           <img src="/brand/ventes-180.png" alt="" className="h-7 w-7 rounded-lg" /> Ventes
         </span>
-        <button type="button" onClick={load} aria-label="Actualiser" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06]">
-          <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-        </button>
+        <span className="flex items-center gap-2">
+          {/* Aller dans Vigenia sans être renvoyé ici (voir StandaloneHome). */}
+          <Link href="/app" onClick={() => { try { sessionStorage.setItem("vg-stay", "1"); } catch {} }} className="rounded-full bg-white/[0.06] px-3 py-2 text-xs text-white/70">Vigenia</Link>
+          <button type="button" onClick={load} aria-label="Actualiser" className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06]">
+            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+          </button>
+        </span>
       </header>
 
       {notif.state === "off" || notif.state === "busy" ? (
