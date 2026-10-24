@@ -1,7 +1,7 @@
 import { json, route } from "@/lib/server/http";
 import { isOwnerEmail, requireOwner } from "@/lib/server/owner";
 import { LAUNCH_OFFER } from "@/lib/content/pricing";
-import { impactConfigured, trackerLabel } from "@/lib/server/impact";
+import { impactConfigured, syncImpact, trackerLabel } from "@/lib/server/impact";
 import { USD_PER_EUR } from "@/lib/server/shopify-billing";
 import { db, must } from "@/lib/server/supabase";
 
@@ -15,6 +15,11 @@ type Dated = { created_at: string };
 
 export const GET = route(async () => {
   const owner = await requireOwner({ issueDevice: true });
+  // Parrainages Shopify (Impact) relus aussi à l'ouverture de Ventes, au plus toutes les 10 min.
+  if (impactConfigured()) {
+    const { error: recent } = await db().from("webhook_events").insert({ id: `impact-sync:${Math.floor(Date.now() / 600_000)}` });
+    if (!recent) await syncImpact().catch((e) => console.warn("Impact", (e as Error).message));
+  }
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
     db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id"),
