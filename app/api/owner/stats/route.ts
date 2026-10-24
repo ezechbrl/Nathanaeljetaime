@@ -1,6 +1,7 @@
 import { json, route } from "@/lib/server/http";
 import { isOwnerEmail, requireOwner } from "@/lib/server/owner";
 import { LAUNCH_OFFER } from "@/lib/content/pricing";
+import { impactConfigured, trackerLabel } from "@/lib/server/impact";
 import { USD_PER_EUR } from "@/lib/server/shopify-billing";
 import { db, must } from "@/lib/server/supabase";
 
@@ -14,7 +15,7 @@ type Dated = { created_at: string };
 export const GET = route(async () => {
   const owner = await requireOwner({ issueDevice: true });
   const since = new Date(Date.now() - 30 * DAY).toISOString();
-  const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits, reminders, conns] = await Promise.all([
+  const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
     db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(1000),
     db().from("waitlist").select("email, ref, created_at").order("created_at", { ascending: false }),
@@ -26,6 +27,7 @@ export const GET = route(async () => {
     db().from("site_sessions").select("first_seen, last_seen").gte("last_seen", since).limit(50000),
     db().from("webhook_events").select("id, created_at").like("id", "offer-%").gte("created_at", since),
     db().from("shop_connections").select("user_id, shop_domain, shopify_plan").eq("status", "active"),
+    db().from("impact_actions").select("tracker, state, payout_cents, currency, event_at").order("event_at", { ascending: false }).limit(500),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
   const active = subs.filter((s) => s.status === "active" && s.shopify_subscription_id && !s.test && s.plan !== "free");
@@ -115,7 +117,19 @@ export const GET = route(async () => {
     };
   }).sort((a, b) => b.commission - a.commission || b.signups - a.signups || b.clicks - a.clicks);
 
+  // Affiliation Shopify (Impact) : parrainages et commissions (montants en dollars, comme Impact).
+  const shopifyAffiliation = {
+    configured: impactConfigured(),
+    trials: impact.filter((a) => trackerLabel(a.tracker) === "Essai gratuit").length,
+    paid: impact.filter((a) => trackerLabel(a.tracker) !== "Essai gratuit").length,
+    pending: impact.filter((a) => a.state === "PENDING").reduce((t, a) => t + Number(a.payout_cents), 0),
+    approved: impact.filter((a) => a.state === "APPROVED").reduce((t, a) => t + Number(a.payout_cents), 0),
+    currency: (impact[0]?.currency as string | undefined) ?? "USD",
+    recent: impact.slice(0, 5).map((a) => ({ label: trackerLabel(a.tracker), state: a.state as string | null, payout: Number(a.payout_cents), at: a.event_at as string | null })),
+  };
+
   return json({
+    shopifyAffiliation,
     deviceToken: owner.newDeviceToken ?? null,
     mrr,
     arr: mrr * 12,

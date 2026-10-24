@@ -267,11 +267,37 @@ function Dashboard({ s }: { s: OwnerStats }) {
               ))}
             </ul>
           ) : <p className="mt-3 text-sm text-[#8a8a8a]">Pas encore d'affiliés. Chaque utilisateur peut créer son lien depuis la page Affiliation de Vigenia.</p>}
-          <a href="https://app.impact.com" target="_blank" rel="noreferrer" className="mt-3 block rounded-xl bg-[#d9f7e8] px-3 py-2.5 text-xs text-[#0a6b48]">
-            <b>Tes commissions Shopify</b> (ton lien d'affiliation Shopify : essais, boutiques payantes) sont sur Impact → <u>ouvrir</u>
-          </a>
+
         </Card>
       </div>
+
+      {/* Affiliation Shopify : ton lien d'affiliation Shopify (Impact). */}
+      <Card>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><ShoppingBag className="h-3.5 w-3.5" /></span>Affiliation Shopify <span className="font-normal text-[#8a8a8a]">· ton lien Shopify</span></h2>
+        {s.shopifyAffiliation.configured ? (
+          <>
+            <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+              {[["Essais", String(s.shopifyAffiliation.trials)], ["Payants", String(s.shopifyAffiliation.paid)], ["En attente", formatMoney(s.shopifyAffiliation.pending, s.shopifyAffiliation.currency)], ["Validé", formatMoney(s.shopifyAffiliation.approved, s.shopifyAffiliation.currency)]].map(([l, v]) => (
+                <div key={l} className="rounded-xl bg-[#f6f6f6] px-1 py-2"><p className="text-[11px] text-[#616161]">{l}</p><p className="mt-0.5 text-sm font-semibold tabular-nums">{v}</p></div>
+              ))}
+            </div>
+            {s.shopifyAffiliation.recent.length > 0 && (
+              <ul className="mt-2 divide-y divide-[#eee] text-sm">
+                {s.shopifyAffiliation.recent.map((r, i) => (
+                  <li key={i} className="flex items-center gap-3 py-2.5">
+                    <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", r.state === "APPROVED" ? TONES.green : r.state === "REVERSED" ? TONES.red : TONES.amber)}>{r.state === "APPROVED" ? "Validé" : r.state === "REVERSED" ? "Annulé" : "En attente"}</span>
+                    <span className="min-w-0 flex-1 truncate">{r.label}{r.at && <span className="text-[#8a8a8a]"> · {formatShortDate(r.at)}</span>}</span>
+                    <span className="tabular-nums">{formatMoney(r.payout, s.shopifyAffiliation.currency)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-2 text-xs text-[#8a8a8a]">Mis à jour toutes les heures · 30 derniers jours</p>
+          </>
+        ) : (
+          <p className="mt-2 text-sm text-[#8a8a8a]">Pas encore branché : ajoute tes clés Impact dans Vercel (IMPACT_ACCOUNT_SID et IMPACT_AUTH_TOKEN) et tes parrainages apparaîtront ici, avec une notification à chaque fois.</p>
+        )}
+      </Card>
 
       <div className="grid gap-3 lg:grid-cols-2">
         {/* Entonnoir : où les gens s'arrêtent avant d'acheter (30 derniers jours). */}

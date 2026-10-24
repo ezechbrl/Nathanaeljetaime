@@ -187,6 +187,7 @@ export type OwnerStats = {
   series: { day: string; revenue: number; signups: number; visits: number }[];
   sources: { ref: string; count: number }[];
   affiliates: { code: string; name: string; clicks: number; signups: number; customers: number; commission: number; rate: number }[];
+  shopifyAffiliation: { configured: boolean; trials: number; paid: number; pending: number; approved: number; currency: string; recent: { label: string; state: string | null; payout: number; at: string | null }[] };
   funnel: { step: string; count: number }[];
   signups: { email: string; kind: "waitlist" | "account"; ref: string | null; at: string; shop?: { domain: string; plan: string | null } | null; offer?: { endsAt: string; reminderAt: string | null; lastCallAt: string | null; subscribedAt: string | null; amount: number | null } }[];
   errors: { day: number; month: number; recent: { path: string; status: number; message: string | null; at: string }[] };
