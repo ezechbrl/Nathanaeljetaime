@@ -7,6 +7,7 @@ import { db, must } from "@/lib/server/supabase";
 
 // Tableau de bord du fondateur : MRR, ventes, inscrits et affiliation (montants en centimes d'euro).
 const DAY = 86_400_000;
+const isShopifyTester = (email: string) => /@shopify\.com$/i.test(email ?? "");
 const parisDay = (d: Date | string) => new Date(d).toLocaleDateString("fr-CA", { timeZone: "Europe/Paris" });
 const toEur = (cents: number, currency: string | null) => Math.round(currency === "USD" ? cents / USD_PER_EUR : cents);
 
@@ -30,6 +31,8 @@ export const GET = route(async () => {
     db().from("impact_actions").select("tracker, state, payout_cents, currency, event_at").order("event_at", { ascending: false }).limit(500),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
+  // Les comptes des évaluateurs Shopify et le fondateur ne comptent pas dans les chiffres.
+  const realUsers = users.filter((u) => !isShopifyTester(u.email) && !isOwnerEmail(u.email));
   const active = subs.filter((s) => s.status === "active" && s.shopify_subscription_id && !s.test && s.plan !== "free");
   const monthly = (s: Record<string, any>) => toEur(Number(s.amount_cents ?? 0), s.currency) / (s.interval === "year" ? 12 : 1);
   const mrr = Math.round(active.reduce((t, s) => t + monthly(s), 0));
@@ -48,7 +51,7 @@ export const GET = route(async () => {
       newSubs: ev.filter((e) => e.kind === "new").length,
       cancels: ev.filter((e) => e.kind === "cancel").length,
       waitlist: waitlist.filter((w) => f(w as Dated)).length,
-      accounts: users.filter((u) => f(u as Dated)).length,
+      accounts: realUsers.filter((u) => f(u as Dated)).length,
       stores: stores.filter((s) => f(s as Dated)).length,
     }];
   }));
@@ -58,7 +61,7 @@ export const GET = route(async () => {
   const series = days.map((day) => ({
     day,
     revenue: sum(events.filter((e) => e.kind === "payment" && parisDay(e.created_at) === day)),
-    signups: waitlist.filter((w) => parisDay(w.created_at) === day).length + users.filter((u) => parisDay(u.created_at) === day).length,
+    signups: waitlist.filter((w) => parisDay(w.created_at) === day).length + realUsers.filter((u) => parisDay(u.created_at) === day).length,
     visits: visits.filter((v) => parisDay(v.first_seen) === day).length,
   }));
   // Aujourd'hui, heure par heure (heure de Paris).
@@ -67,7 +70,7 @@ export const GET = route(async () => {
   const hours = Array.from({ length: 24 }, (_, h) => ({
     hour: h,
     revenue: sum(todayRows(events).filter((e) => e.kind === "payment" && parisHour(e.created_at) === h)),
-    signups: todayRows(waitlist).filter((w) => parisHour(w.created_at) === h).length + todayRows(users).filter((u) => parisHour(u.created_at) === h).length,
+    signups: todayRows(waitlist).filter((w) => parisHour(w.created_at) === h).length + todayRows(realUsers).filter((u) => parisHour(u.created_at) === h).length,
     visits: visits.filter((v) => parisDay(v.first_seen) === today && parisHour(v.first_seen) === h).length,
   }));
   // Entonnoir sur 30 jours : où les gens s'arrêtent avant d'acheter.
@@ -75,7 +78,7 @@ export const GET = route(async () => {
   const uniq = (rows: Record<string, any>[]) => new Set(rows.map((r) => r.user_id)).size;
   const funnel = [
     { step: "Visiteurs du site", count: visits.filter((v) => last30({ created_at: v.first_seen })).length },
-    { step: "Comptes créés", count: users.filter((u) => last30(u as Dated)).length },
+    { step: "Comptes créés", count: realUsers.filter((u) => last30(u as Dated)).length },
     { step: "Aperçu de boutique créé", count: uniq(stores) },
     { step: "Page de paiement ouverte", count: uniq(events.filter((e) => e.kind === "checkout" && last30(e as Dated))) },
     { step: "Abonnés", count: uniq(events.filter((e) => e.kind === "new" && last30(e as Dated))) },
@@ -86,7 +89,7 @@ export const GET = route(async () => {
       // Offre de lancement (−50 %, 24 h) : temps restant, rappel de 12 h envoyé, abonnement pris ou non.
       const sub = events.filter((e) => e.kind === "new" && e.user_id === u.id).at(-1);
       return {
-        email: u.email as string, kind: "account" as const, ref: null, at: u.created_at as string,
+        email: u.email as string, kind: "account" as const, ref: null, at: u.created_at as string, tester: isShopifyTester(u.email),
         shop: (() => { const c = conns.find((x) => x.user_id === u.id); return c ? { domain: c.shop_domain as string, plan: (c.shopify_plan as string | null) ?? null } : null; })(),
         offer: {
           endsAt: new Date(new Date(u.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000).toISOString(),
@@ -136,9 +139,9 @@ export const GET = route(async () => {
     subscribers: { total: active.length, starter: active.filter((s) => s.plan === "pro").length, pro: active.filter((s) => s.plan === "agency").length },
     arpu: active.length ? Math.round(mrr / active.length) : 0,
     churn: active.length + monthCancels ? monthCancels / (active.length + monthCancels) : 0,
-    conversion: users.length ? active.length / users.length : 0,
+    conversion: realUsers.length ? active.length / realUsers.length : 0,
     hours,
-    totals: { waitlist: waitlist.length, accounts: users.length },
+    totals: { waitlist: waitlist.length, accounts: realUsers.length },
     periods,
     series,
     sources,

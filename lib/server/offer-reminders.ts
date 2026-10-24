@@ -22,7 +22,7 @@ export async function sendOfferReminders() {
       .lte("created_at", new Date(now - r.after * 3_600_000).toISOString()).gt("created_at", new Date(now - until * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string }[];
     for (const u of due) {
       const { error: dup } = await db().from("webhook_events").insert({ id: `${r.key}:${u.id}` });
-      if (dup || !u.email) continue;
+      if (dup || !u.email || /@shopify\.com$/i.test(u.email)) continue; // pas de relance aux évaluateurs Shopify
       const minutes = Math.max(1, Math.round((new Date(u.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000 - now) / 60_000));
       const left = minutes >= 90 ? `${Math.round(minutes / 60)} h` : `${minutes} min`;
       const last = r.key === "offer-last";

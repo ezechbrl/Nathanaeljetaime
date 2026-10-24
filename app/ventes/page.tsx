@@ -222,7 +222,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
         <LineChart points={points} format={metric === "revenue" ? eur : (n) => `${n} ${metric === "visits" ? "visite" : "inscrit"}${n > 1 ? "s" : ""}`} />
       </Card>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3">
         <Live count={s.liveNow} />
         <Metric icon={Eye} color="amber" label="Visites" value={String(p.visits)} hint={period === "today" ? "Aujourd'hui" : period === "week" ? "Sur 7 jours" : "Sur 30 jours"} />
         <Metric icon={Percent} color="violet" label="Conversion" value={p.visits ? pct((p.waitlist + p.accounts) / p.visits) : "—"} hint="Visiteurs devenus inscrits" />
@@ -237,7 +237,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
         <Metric icon={BadgeCheck} color="green" label="Comptes → abonnés" value={pct(s.conversion)} hint="Comptes devenus payants" />
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-3">
         <Card>
           <h2 className="text-[15px] font-semibold">Répartition des offres</h2>
           <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-[#f1f1f1]">
@@ -299,7 +299,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
         )}
       </Card>
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-3">
         {/* Entonnoir : où les gens s'arrêtent avant d'acheter (30 derniers jours). */}
         <Card>
           <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.violet)}><Gauge className="h-3.5 w-3.5" /></span>Parcours avant l'achat <span className="font-normal text-[#8a8a8a]">· 30 j</span></h2>
@@ -325,7 +325,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
             <ul className="mt-1 divide-y divide-[#eee] text-sm">
               {s.signups.map((u, i) => (
                 <li key={i} className="flex items-center gap-3 py-2.5">
-                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.kind === "account" ? TONES.blue : TONES.pink)}>{u.kind === "account" ? "Compte" : "Attente"}</span>
+                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.tester ? "bg-[#f1f1f1] text-[#616161]" : u.kind === "account" ? TONES.blue : TONES.pink)}>{u.tester ? "Test Shopify" : u.kind === "account" ? "Compte" : "Attente"}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
                     <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && <OfferNote offer={u.offer} />}</span>
@@ -335,7 +335,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
                       </span>
                     )}
                   </span>
-                  {u.offer && <OfferBadge offer={u.offer} now={now} />}
+                  {u.offer && !u.tester && <OfferBadge offer={u.offer} now={now} />}
                 </li>
               ))}
             </ul>
@@ -429,7 +429,7 @@ export default function SalesApp() {
 
   const status = error instanceof ApiClientError ? error.status : 0;
   return (
-    <main className="mx-auto max-w-[1100px] px-4 pt-[max(env(safe-area-inset-top),16px)] sm:px-6">
+    <main className="mx-auto max-w-[640px] px-4 pt-[max(env(safe-area-inset-top),16px)] sm:px-6">
       <header className="flex items-center justify-between py-2">
         <span className="flex items-center gap-2 text-[17px] font-semibold text-white">
           <img src="/brand/icon-192.png" alt="" className="h-8 w-8 rounded-[10px]" /> Ventes
