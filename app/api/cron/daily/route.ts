@@ -5,7 +5,7 @@ import { safeEqual } from "@/lib/server/crypto";
 import { env } from "@/lib/server/env";
 import { sendOfferReminders } from "@/lib/server/offer-reminders";
 import { syncFromShopify } from "@/lib/server/billing";
-import { accessToken, dailyOrders, dailySessions } from "@/lib/server/shopify";
+import { accessToken, dailyOrders, dailySessions, shopInfo } from "@/lib/server/shopify";
 import { db, must } from "@/lib/server/supabase";
 import type { StorePlan } from "@/lib/store-schema";
 
@@ -45,6 +45,17 @@ export async function GET(req: Request) {
     } catch (e) {
       report[s.id] = (e as Error).message;
       console.error("Pilotage", s.id, e);
+    }
+  }
+  // Forfait Shopify de chaque boutique connectée (pour le tableau de bord du fondateur).
+  const conns = must(await db().from("shop_connections").select("id, shop_domain, access_token_encrypted").eq("status", "active")) as { id: string; shop_domain: string; access_token_encrypted: string | null }[];
+  for (const c of conns) {
+    if (!c.access_token_encrypted) continue;
+    try {
+      const info = await shopInfo(c.shop_domain, await accessToken({ ...c, access_token_encrypted: c.access_token_encrypted }));
+      await db().from("shop_connections").update({ shopify_plan: info.planName }).eq("id", c.id);
+    } catch (e) {
+      console.warn("Forfait Shopify", c.shop_domain, (e as Error).message);
     }
   }
   const reminders = await sendOfferReminders();

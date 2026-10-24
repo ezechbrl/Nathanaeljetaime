@@ -111,8 +111,10 @@ export async function connectionFor(userId: string, connectionId: string | null)
 }
 
 export async function shopInfo(shop: string, token: string) {
-  const d = await graphql<{ shop: { name: string; email: string; shopOwnerName: string } }>(shop, token, `{ shop { name email shopOwnerName } }`);
-  return d.shop;
+  const d = await graphql<{ shop: { name: string; email: string; shopOwnerName: string; plan: { publicDisplayName: string; partnerDevelopment: boolean } } }>(shop, token, `{ shop { name email shopOwnerName plan { publicDisplayName partnerDevelopment } } }`);
+  // Forfait Shopify lisible pour le tableau de bord du fondateur.
+  const plan = d.shop.plan?.partnerDevelopment ? "Boutique de développement" : d.shop.plan?.publicDisplayName ?? null;
+  return { ...d.shop, planName: plan };
 }
 
 // Lit le contenu d'une boutique existante (mode « refonte »).

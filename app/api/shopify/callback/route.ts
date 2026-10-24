@@ -66,7 +66,7 @@ export const GET = route(async (req) => {
   if ((count ?? 0) >= LIMITS[user?.plan ?? "free"].shops) return NextResponse.redirect(`${app}/app/abonnement?raison=boutiques`);
 
   await db().from("shop_connections").upsert(
-    { user_id: userId, shop_domain: shop, shop_name: info.name, access_token_encrypted: sealTokens(tokens), scopes: scope, status: "active", updated_at: new Date().toISOString() },
+    { user_id: userId, shop_domain: shop, shop_name: info.name, shopify_plan: info.planName, access_token_encrypted: sealTokens(tokens), scopes: scope, status: "active", updated_at: new Date().toISOString() },
     { onConflict: "user_id,shop_domain" },
   );
   await registerUninstallWebhook(shop, access_token).catch((e) => console.warn("Webhook de désinstallation non enregistré :", (e as Error).message));

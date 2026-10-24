@@ -251,7 +251,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
         </Card>
 
         <Card>
-          <h2 className="text-[15px] font-semibold">Affiliation</h2>
+          <h2 className="text-[15px] font-semibold">Affiliation Vigenia <span className="font-normal text-[#8a8a8a]">· les gens qui font ta pub</span></h2>
           <div className="mt-3 grid grid-cols-4 gap-2 text-center">
             {[["Clics", String(aff.clicks)], ["Inscrits", String(aff.signups)], ["Clients", String(aff.customers)], ["À reverser", eur(aff.commission)]].map(([l, v]) => (
               <div key={l} className="rounded-xl bg-[#f6f6f6] px-1 py-2"><p className="text-[11px] text-[#616161]">{l}</p><p className="mt-0.5 text-sm font-semibold tabular-nums">{v}</p></div>
@@ -267,6 +267,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
               ))}
             </ul>
           ) : <p className="mt-3 text-sm text-[#8a8a8a]">Pas encore d'affiliés. Chaque utilisateur peut créer son lien depuis la page Affiliation de Vigenia.</p>}
+          <a href="https://app.impact.com" target="_blank" rel="noreferrer" className="mt-3 block rounded-xl bg-[#d9f7e8] px-3 py-2.5 text-xs text-[#0a6b48]">
+            <b>Tes commissions Shopify</b> (ton lien d'affiliation Shopify : essais, boutiques payantes) sont sur Impact → <u>ouvrir</u>
+          </a>
         </Card>
       </div>
 
@@ -300,6 +303,11 @@ function Dashboard({ s }: { s: OwnerStats }) {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
                     <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && <OfferNote offer={u.offer} />}</span>
+                    {u.kind === "account" && (
+                      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
+                        <ShoppingBag className="h-3 w-3" /> {u.shop ? `Shopify : ${u.shop.plan ?? "forfait inconnu"}` : "Pas de boutique Shopify connectée"}
+                      </span>
+                    )}
                   </span>
                   {u.offer && <OfferBadge offer={u.offer} now={now} />}
                 </li>
