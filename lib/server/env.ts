@@ -20,7 +20,7 @@ export const env = {
   shopifySecret: () => required("SHOPIFY_API_SECRET"),
   shopifyScopes: () =>
     process.env.SHOPIFY_SCOPES ??
-    "read_products,write_products,read_content,write_content,read_online_store_pages,write_online_store_pages,read_files,write_files,read_publications,write_publications,read_orders,read_reports,read_themes,write_themes",
+    "read_products,write_products,read_content,write_content,read_online_store_pages,write_online_store_pages,read_files,write_files,read_publications,write_publications,read_orders,read_reports",
   shopifyApiVersion: () => process.env.SHOPIFY_API_VERSION ?? "2025-10",
   // Paiement par Shopify App Pricing (voir docs/CLES-ET-COMPTES.md).
   shopifyAppHandle: () => process.env.SHOPIFY_APP_HANDLE ?? null,

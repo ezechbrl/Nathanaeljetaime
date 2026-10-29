@@ -339,7 +339,10 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Sans dérogation « thèmes » accordée par Shopify, l'installation automatique est interdite :
     // la publication réussit quand même et le marchand importe le thème (fichier .zip) en 3 clics.
     const noExemption = (e: unknown) => /access denied|exemption/i.test(errorMessage(e));
+    // Shopify a refusé la dérogation « thèmes » : sans write_themes, le marchand importe le .zip lui-même.
+    const canInstall = conn.scopes.split(",").includes("write_themes");
     try {
+      if (!canInstall) throw new Error("access denied: write_themes non accordé");
       const themeId = await install(true).catch((e) => {
         if (noExemption(e) || !Object.keys(ids.files ?? {}).length) throw e;
         console.warn("Thème refusé avec les visuels, nouvel essai sans :", errorMessage(e));

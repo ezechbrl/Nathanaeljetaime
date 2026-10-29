@@ -58,7 +58,7 @@ IMAGE_API_KEY=
 # Shopify (app publique, créée dans le Partner Dashboard)
 SHOPIFY_API_KEY=
 SHOPIFY_API_SECRET=
-SHOPIFY_SCOPES=read_products,write_products,read_content,write_content,read_online_store_pages,write_online_store_pages,read_themes,write_themes,read_files,write_files,read_online_store_navigation,write_online_store_navigation,read_orders,read_reports,read_analytics
+SHOPIFY_SCOPES=read_products,write_products,read_content,write_content,read_online_store_pages,write_online_store_pages,read_files,write_files,read_online_store_navigation,write_online_store_navigation,read_orders,read_reports,read_analytics
 SHOPIFY_API_VERSION=2025-10
 
 # Notifications téléphone (app ntfy) : ventes, désabonnements, inscrits, avis
