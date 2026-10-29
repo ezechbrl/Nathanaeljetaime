@@ -12,6 +12,7 @@ import { PublishButton } from "@/components/app/PublishButton";
 import { ShopifySetupCard } from "@/components/app/ShopifySetupCard";
 import { TestimonialCard } from "@/components/app/TestimonialCard";
 import { ThemeColorsCard } from "@/components/app/ThemeColorsCard";
+import { ThemeImportCard, useThemeImported } from "@/components/app/ThemeImportCard";
 import { StoreCoach } from "@/components/app/StoreCoach";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
@@ -36,6 +37,7 @@ export default function StoreDashboard() {
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+  const [themeImported, markThemeImported] = useThemeImported(store);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
@@ -95,6 +97,7 @@ export default function StoreDashboard() {
               <StorePreview store={store} page={page} assets={assets.data?.assets} />
             </div>
           </div>
+          {store.status === "published" && store.themeStatus === "manual" && !themeImported && <div className="-mx-5 sm:-mx-8"><ThemeImportCard store={store} onDone={markThemeImported} /></div>}
           {store.status === "published" && <div className="mt-4"><ShopifySetupCard store={store} /></div>}
         </div>
 

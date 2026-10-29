@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: { default: `${site.name} — Créateur de boutique Shopify IA`, template: `%s · ${site.name}` },
   description: site.description,
+  // Code de validation Google Search Console (balise HTML), à mettre dans Vercel.
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   openGraph: { title: site.name, description: site.description, type: "website", locale: "fr_FR" },
   appleWebApp: { capable: true, title: site.name, statusBarStyle: "black" },
 };

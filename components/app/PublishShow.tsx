@@ -170,11 +170,13 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
             : <>Produit, pages et thème Vigenia sont installés. Ton ancien thème reste affiché tant que tu ne publies pas le nouveau depuis Shopify → Thèmes.</>}
         </p>
         {manual && (
-          // En attendant que Shopify autorise l'installation automatique des thèmes, le design est facultatif.
-          <details className="mx-auto mt-5 max-w-md rounded-card border border-white/10 bg-white/[0.03] p-3 text-left">
-            <summary className="cursor-pointer text-sm text-fg-muted">Facultatif : appliquer aussi le design Vigenia</summary>
+          // Shopify n'autorise pas l'installation automatique des thèmes : le marchand importe son design lui-même.
+          <div className="mx-auto mt-5 max-w-lg rounded-card border border-accent/40 bg-accent-deep/30 p-4 text-left">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Dernière étape · très importante</p>
+            <p className="mt-1 font-medium">Installe ton design Vigenia sur Shopify (2 minutes)</p>
+            <p className="mt-1 text-sm text-fg-muted">Sans cette étape, ta boutique garde le design Shopify de base. Regarde la vidéo, puis suis les 3 étapes.</p>
             <ThemeImportCard store={store} compact />
-          </details>
+          </div>
         )}
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href={`/app/boutiques/${store.id}/apercu`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(16_176_127/0.7)]">
