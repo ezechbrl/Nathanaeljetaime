@@ -63,11 +63,29 @@ function openTokens(sealed: string): StoredTokens {
 // Jeton d'accès valide pour une connexion : renouvelé (et enregistré) s'il expire dans moins de 5 minutes.
 export async function accessToken(row: { id?: string; shop_domain: string; access_token_encrypted: string }) {
   const t = openTokens(row.access_token_encrypted);
-  if (!t.r || !t.e || t.e - Date.now() > 5 * 60_000) return t.a;
-  const fresh = await tokenRequest(row.shop_domain, { grant_type: "refresh_token", refresh_token: t.r });
-  const q = db().from("shop_connections").update({ access_token_encrypted: sealTokens(fresh), updated_at: new Date().toISOString() });
-  await (row.id ? q.eq("id", row.id) : q.eq("shop_domain", row.shop_domain));
-  return fresh.access_token;
+  const save = async (fresh: TokenResponse) => {
+    const q = db().from("shop_connections").update({ access_token_encrypted: sealTokens(fresh), updated_at: new Date().toISOString() });
+    await (row.id ? q.eq("id", row.id) : q.eq("shop_domain", row.shop_domain));
+    return fresh.access_token;
+  };
+  // Ancien jeton permanent : Shopify exige des jetons expirants (1er janvier 2027), on l'échange une fois pour toutes.
+  // En cas d'échec, l'ancien jeton reste utilisé ; s'il n'est plus valable, le marchand est invité à reconnecter sa boutique.
+  if (!t.r) {
+    try {
+      return await save(await tokenRequest(row.shop_domain, {
+        grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+        subject_token: t.a,
+        subject_token_type: "urn:shopify:params:oauth:token-type:offline-access-token",
+        requested_token_type: "urn:shopify:params:oauth:token-type:offline-access-token",
+        expiring: "1",
+      }));
+    } catch (e) {
+      console.warn(`Migration du jeton Shopify impossible pour ${row.shop_domain} :`, (e as Error).message);
+      return t.a;
+    }
+  }
+  if (!t.e || t.e - Date.now() > 5 * 60_000) return t.a;
+  return save(await tokenRequest(row.shop_domain, { grant_type: "refresh_token", refresh_token: t.r }));
 }
 
 // Webhook de désinstallation, enregistré boutique par boutique (le flux d'installation hérité ne permet
