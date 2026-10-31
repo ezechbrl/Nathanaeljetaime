@@ -164,7 +164,7 @@ Elle fonctionne avec Dawn et les thèmes qui en dérivent.
 | `NEXT_PUBLIC_APP_URL` | Ton adresse : `https://ton-domaine.vercel.app` (sans `/` à la fin) |
 | `NEXT_PUBLIC_API_MODE` | `live` quand le back-end est branché (`mock` = démo avec fausses données) |
 | `NEXT_PUBLIC_SHOPIFY_REFERRAL_URL` | Facultatif : ton lien d'affilié Shopify (programme Affiliés de Shopify ou rubrique « Affiliés / Referrals » de ton espace Partenaire, selon ce qui t'est proposé). Il remplace le lien « Ouvre une boutique sur Shopify » : tu touches une commission quand un client ouvre sa boutique grâce à toi. Vide = lien Shopify normal. |
-| `NEXT_PUBLIC_LAUNCH_MODE` | `waitlist` (par défaut) : les boutons mènent à la liste d'attente. Le jour du lancement : `open`, puis « Redeploy ». Les inscrits sont dans Supabase → Table Editor → `waitlist`. |
+| `NEXT_PUBLIC_LAUNCH_MODE` | `waitlist` (par défaut) : les boutons mènent à la liste d'attente. Le jour du lancement : `open`, puis « Redeploy ». Les inscrits sont dans Supabase → Table Editor → `waitlist`. Dès le passage en `open`, chaque inscrit reçoit automatiquement un e-mail « C'est ouvert » (une seule fois, envoyé par la tâche horaire). |
 | `CRON_SECRET` | Protège la tâche quotidienne d'optimisation. Génère-le comme `ENCRYPTION_KEY`. Vercel l'envoie automatiquement à `/api/cron/daily` (déclarée dans `vercel.json`). |
 
 ---
