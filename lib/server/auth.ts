@@ -11,6 +11,7 @@ export type UserRow = {
   stripe_customer_id: string | null;
   referred_by: string | null;
   free_store_used?: boolean;
+  waitlist_member?: boolean;
   created_at: string;
 };
 

@@ -552,7 +552,7 @@ export async function getBilling() {
   const invoices: Invoice[] = s.subscription.plan === "free" ? [] : [
     { id: "inv_1", number: "SHP-0001", amount: s.subscription.plan === "pro" ? 3900 : 7900, currency: "EUR", status: "paid", pdfUrl: "#", createdAt: iso() },
   ];
-  return { subscription: clone(s.subscription), usage: usage(), invoices, offerEndsAt: s.subscription.plan === "free" ? MOCK_OFFER_END : null };
+  return { subscription: clone(s.subscription), usage: usage(), invoices, offerEndsAt: s.subscription.plan === "free" ? MOCK_OFFER_END : null, offerKind: s.subscription.plan === "free" ? ("launch" as const) : null };
 }
 export async function checkout(plan: "pro" | "agency") {
   await wait(700);

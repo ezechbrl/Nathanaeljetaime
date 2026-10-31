@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCountdown } from "@/components/pricing/PlanCards";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
-import { LAUNCH_OFFER } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
 import { useApp } from "./AppContext";
 
 // Grand bandeau en haut de l'espace client : compte à rebours de l'offre de lancement tant qu'on n'est pas abonné.
@@ -14,13 +14,16 @@ export function OfferBanner() {
   const billing = useApi(() => (user.plan === "free" ? api.getBilling() : Promise.resolve(null)), [user.plan]);
   const left = useCountdown(billing.data?.offerEndsAt);
   if (user.plan !== "free" || !left) return null;
+  const waitlist = billing.data?.offerKind === "waitlist";
+  const starter = PLANS.find((p) => p.id === "pro")!;
+  const now = waitlist ? WAITLIST_PRICES.pro.monthly : withOffer(starter.monthly);
   const units = [{ v: left.h, l: "heures" }, { v: left.m, l: "minutes" }, { v: left.s, l: "secondes" }];
   return (
     <Link href="/app/abonnement" className="group relative z-30 block border-b lg:sticky lg:top-0 border-white/[0.08] bg-black/25 px-4 py-2.5 backdrop-blur-xl sm:px-8">
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <div>
-          <p className="text-[16px] font-bold uppercase tracking-[0.03em] text-white sm:text-[18px]">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
-          <p className="text-[13px] text-white/85 sm:text-[14px]"><span className="font-semibold text-white">39 €/mois</span> au lieu de <span className="line-through decoration-[#ef4444] decoration-2">78 €</span>, pour toujours. Valable {LAUNCH_OFFER.hours} h après ton inscription.</p>
+          <p className="text-[16px] font-bold uppercase tracking-[0.03em] text-white sm:text-[18px]">{waitlist ? "Prix liste d'attente, rien que pour toi" : `Offre de lancement : −${LAUNCH_OFFER.percent} % à vie`}</p>
+          <p className="text-[13px] text-white/85 sm:text-[14px]"><span className="font-semibold text-white">{euro(now)}/mois</span> au lieu de <span className="line-through decoration-[#ef4444] decoration-2">{euro(starter.monthly)}</span>, pour toujours. Valable {LAUNCH_OFFER.hours} h après ton inscription.</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-end gap-1.5 tabular-nums" aria-label={`Il reste ${left.h} heures et ${left.m} minutes`}>

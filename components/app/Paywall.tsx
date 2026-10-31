@@ -41,6 +41,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
   const [busy, setBusy] = useState<string | null>(null);
   const billing = useApi(() => api.getBilling(), []);
   const left = useCountdown(billing.data?.offerEndsAt);
+  const waitlist = billing.data?.offerKind === "waitlist";
 
   // Le projet en cours est gardé pour reprendre là où on en était au retour du paiement.
   function savePending() {
@@ -82,7 +83,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
   return (
     <div className="relative isolate overflow-hidden rounded-[26px] border border-white/10 px-4 py-8 sm:px-8 sm:py-10">
       <AuroraBackground className="-z-10" />
-      {left && <div className="mb-6"><OfferBanner left={left} /></div>}
+      {left && <div className="mb-6"><OfferBanner left={left} waitlist={waitlist} /></div>}
       {text && !unlockStoreId && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{unlockStoreId ? "Débloque ta boutique" : draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
       <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 10 minutes.</p>
@@ -91,9 +92,10 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
         <PlanCards
           interval={interval}
           left={left}
+          waitlist={waitlist}
           action={(plan, iv) => (
             <button type="button" onClick={() => subscribe(plan, iv)} disabled={!!busy} className={planButtonClass(plan.featured)}>
-              {busy === plan.id ? <Spinner /> : <>{unlockStoreId ? "Débloquer" : "Payer"} {euro(planPrice(plan, iv, !!left).billed)}{unlockStoreId ? "" : " et créer"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+              {busy === plan.id ? <Spinner /> : <>{unlockStoreId ? "Débloquer" : "Payer"} {euro(planPrice(plan, iv, !!left, waitlist).billed)}{unlockStoreId ? "" : " et créer"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
           )}
         />

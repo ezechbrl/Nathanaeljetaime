@@ -1,12 +1,13 @@
 import "server-only";
 import type { Invoice, PlanId, Subscription } from "@/lib/api/types";
 import { formatMoney } from "@/lib/format";
-import { LAUNCH_OFFER, PLANS } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PLANS, WAITLIST_PRICES } from "@/lib/content/pricing";
 import { env } from "./env";
 import { HttpError } from "./http";
 import { notifyOwner, saleMessage } from "./notify";
 import { connectionFor, graphql } from "./shopify";
 import { db, must } from "./supabase";
+import { isWaitlistMember } from "./waitlist";
 import type { UserRow } from "./auth";
 
 // Abonnements Vigenia facturés par Shopify (Billing API), obligatoire pour l'App Store (règle 1.2).
@@ -29,15 +30,24 @@ export async function launchOfferEndsAt(user: UserRow) {
   return sub?.shopify_subscription_id || sub?.stripe_subscription_id ? null : new Date(ends).toISOString();
 }
 
+// Offre en cours : liste d'attente (prix réservé) ou lancement (−50 %), pendant 24 h après l'inscription.
+export async function launchOffer(user: UserRow, cookie?: string | null) {
+  const endsAt = await launchOfferEndsAt(user);
+  return { endsAt, kind: endsAt ? ((await isWaitlistMember(user, cookie)) ? "waitlist" as const : "launch" as const) : null };
+}
+
 // Page de paiement Shopify pour l'offre choisie (prix en euros si la boutique paie Shopify en euros).
-export async function checkoutUrl(user: UserRow, plan: PaidPlan, interval: "month" | "year") {
-  const [conn, offer] = await Promise.all([connectionFor(user.id, null), launchOfferEndsAt(user)]);
+export async function checkoutUrl(user: UserRow, plan: PaidPlan, interval: "month" | "year", cookie?: string | null) {
+  const [conn, { kind: offer }] = await Promise.all([connectionFor(user.id, null), launchOffer(user, cookie)]);
   const info = PLANS.find((p) => p.id === plan)!;
   const d = await graphql<{ shop: { plan: { partnerDevelopment: boolean } }; shopBillingPreferences: { currency: string } | null }>(conn.shop, conn.token,
     `{ shop { plan { partnerDevelopment } } shopBillingPreferences { currency } }`).catch(() => null);
   const eur = !d?.shopBillingPreferences || d.shopBillingPreferences.currency === "EUR";
   const base = interval === "year" ? info.yearly : info.monthly;
   const amount = eur ? base : Math.round(base * USD_PER_EUR);
+  // Liste d'attente : remise fixe pour arriver pile au prix réservé (à vie).
+  const target = WAITLIST_PRICES[plan][interval === "year" ? "yearly" : "monthly"];
+  const off = amount - (eur ? target : Math.round(target * USD_PER_EUR));
   // Boutiques de développement : Shopify n'accepte que des charges de test.
   const test = process.env.SHOPIFY_BILLING_TEST === "1" || Boolean(d?.shop.plan.partnerDevelopment);
   const res = await graphql<{ appSubscriptionCreate: { confirmationUrl: string | null; userErrors: { message: string }[] } }>(conn.shop, conn.token,
@@ -53,8 +63,8 @@ export async function checkoutUrl(user: UserRow, plan: PaidPlan, interval: "mont
       lineItems: [{ plan: { appRecurringPricingDetails: {
         price: { amount, currencyCode: eur ? "EUR" : "USD" },
         interval: interval === "year" ? "ANNUAL" : "EVERY_30_DAYS",
-        // −50 % à vie pendant l'offre de lancement (sans limite de durée).
-        ...(offer ? { discount: { value: { percentage: LAUNCH_OFFER.percent / 100 } } } : {}),
+        // Remise à vie (sans limite de durée) : prix réservé pour la liste d'attente, sinon −50 % de lancement.
+        ...(offer === "waitlist" ? { discount: { value: { amount: off } } } : offer ? { discount: { value: { percentage: LAUNCH_OFFER.percent / 100 } } } : {}),
       } } }],
     });
   const err = res.appSubscriptionCreate.userErrors[0];
@@ -112,7 +122,7 @@ export async function syncFromShopify(userId: string) {
 
   const info = PLANS.find((x) => x.id === plan);
   if ((user?.plan ?? "free") === "free" && info) {
-    await notifyOwner("💰 Nouvelle vente Vigenia", saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount, p?.price?.currencyCode ?? "EUR")}/${interval === "year" ? "an" : "mois"}${pct ? " avec l'offre −50 %" : ""}`));
+    await notifyOwner("💰 Nouvelle vente Vigenia", saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount, p?.price?.currencyCode ?? "EUR")}/${interval === "year" ? "an" : "mois"}${pct ? " avec l'offre −50 %" : off ? " avec le prix liste d'attente" : ""}`));
   }
   // Historique pour le tableau de bord du fondateur (les charges de test ne comptent pas).
   if (!sub.test) {

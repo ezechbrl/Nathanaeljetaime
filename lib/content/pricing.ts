@@ -60,6 +60,12 @@ export const PLANS: Plan[] = [
 export const LAUNCH_OFFER = { hours: 24, percent: 50 };
 export const withOffer = (price: number) => Math.round(price * (1 - LAUNCH_OFFER.percent / 100));
 
+// Inscrits de la liste d'attente : un prix encore plus bas que l'offre de lancement, à vie, dans le même délai de 24 h.
+export const WAITLIST_PRICES: Record<"pro" | "agency", { monthly: number; yearly: number }> = {
+  pro: { monthly: 29, yearly: 149 },
+  agency: { monthly: 59, yearly: 299 },
+};
+
 export const PAID_PLANS = PLANS.filter((p) => !p.hidden);
 
 // Explication affichée sous les offres (doit correspondre à lib/server/budget.ts).

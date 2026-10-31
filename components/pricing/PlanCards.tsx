@@ -3,7 +3,7 @@
 import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Star, Timer } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { LAUNCH_OFFER, PAID_PLANS, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PAID_PLANS, WAITLIST_PRICES, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -33,9 +33,11 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
   );
 }
 
-// Prix payé à chaque période (mois ou an) ; avec l'offre de lancement, `was` est le prix normal (barré).
-export function planPrice(plan: Plan, interval: Interval, offer = false) {
+// Prix payé à chaque période (mois ou an) ; avec une offre, `was` est le prix normal (barré).
+// `waitlist` : prix réservé aux inscrits de la liste d'attente (plus bas que l'offre de lancement).
+export function planPrice(plan: Plan, interval: Interval, offer = false, waitlist = false) {
   const billed = interval === "year" ? plan.yearly : plan.monthly;
+  if (offer && waitlist && plan.id !== "free") return { billed: WAITLIST_PRICES[plan.id][interval === "year" ? "yearly" : "monthly"], was: billed };
   return offer ? { billed: withOffer(billed), was: billed } : { billed, was: null };
 }
 
@@ -58,12 +60,12 @@ export function useCountdown(endsAt: string | null | undefined) {
 type Left = NonNullable<ReturnType<typeof useCountdown>>;
 
 // Bandeau de l'offre de lancement, avec le compte à rebours.
-export function OfferBanner({ left }: { left: Left }) {
+export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?: boolean }) {
   return (
     <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-white/[0.04] px-5 py-3 backdrop-blur shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
       <div>
-        <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">Offre de lancement : −{LAUNCH_OFFER.percent} % à vie</p>
-        <p className="text-[12.5px] text-fg-muted">Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
+        <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">{waitlist ? `Prix liste d'attente : ${euro(WAITLIST_PRICES.pro.monthly)}/mois à vie` : `Offre de lancement : −${LAUNCH_OFFER.percent} % à vie`}</p>
+        <p className="text-[12.5px] text-fg-muted">{waitlist ? "Réservé aux inscrits de la liste d'attente, plus bas que l'offre de lancement. " : ""}Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
       </div>
       <div className="flex items-end gap-1.5 font-semibold tabular-nums" aria-label={`Il reste ${left.h} heures ${left.m} minutes`}>
         {[{ v: left.h, l: "heures" }, { v: left.m, l: "min" }, { v: left.s, l: "sec" }].map((u, i) => (
@@ -78,11 +80,11 @@ export function OfferBanner({ left }: { left: Left }) {
 }
 
 // Les deux offres côte à côte. `action` rend le bouton (paiement dans l'app, inscription sur le site).
-export function PlanCards({ interval, action, left, offer = false }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null; offer?: boolean }) {
+export function PlanCards({ interval, action, left, offer = false, waitlist = false }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null; offer?: boolean; waitlist?: boolean }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {PAID_PLANS.map((plan) => {
-        const { billed, was } = planPrice(plan, interval, offer || !!left);
+        const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
         const featured = plan.featured;
         return (
           <div key={plan.id} className={cn("relative rounded-[22px] p-px", featured ? "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_60px_-18px_rgb(46_230_166/0.55)]" : "bg-[linear-gradient(160deg,rgb(52_211_153/0.45),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))]")}>
@@ -96,7 +98,7 @@ export function PlanCards({ interval, action, left, offer = false }: { interval:
                 {was !== null && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(was)}</span>}
                 <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(billed)}</span>
                 <span className="whitespace-nowrap text-sm text-fg-muted">{interval === "year" ? "/ an" : "/ mois"}</span>
-                {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{LAUNCH_OFFER.percent} %</span>}
+                {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{Math.round((1 - billed / was) * 100)} %</span>}
               </p>
               {interval === "year" ? (
                 <p className="mt-2 text-[14px] font-medium leading-snug text-[#6ee7b7]">

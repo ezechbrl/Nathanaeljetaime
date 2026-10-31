@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/server/auth";
-import { billingFor, launchOfferEndsAt, syncFromShopify } from "@/lib/server/billing";
+import { billingFor, launchOffer, syncFromShopify } from "@/lib/server/billing";
 import { json, route } from "@/lib/server/http";
 import { getUsage } from "@/lib/server/quota";
 
@@ -10,6 +10,6 @@ export const GET = route(async (req) => {
     await syncFromShopify(user.id).catch((e) => console.error("Abonnement Shopify", e));
     user = await requireUser();
   }
-  const [{ subscription, invoices, billingUrl }, usage, offerEndsAt] = await Promise.all([billingFor(user), getUsage(user.id, user.plan), launchOfferEndsAt(user)]);
-  return json({ subscription, usage, invoices, offerEndsAt, billingUrl });
+  const [{ subscription, invoices, billingUrl }, usage, offer] = await Promise.all([billingFor(user), getUsage(user.id, user.plan), launchOffer(user, req.headers.get("cookie"))]);
+  return json({ subscription, usage, invoices, offerEndsAt: offer.endsAt, offerKind: offer.kind, billingUrl });
 });
