@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Globe, Hourglass, Percent, Receipt, RefreshCw, Smartphone,
+  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Hourglass, Percent, Receipt, RefreshCw,
   ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
 } from "lucide-react";
 import Link from "next/link";
@@ -69,7 +69,7 @@ function useNotifications() {
 }
 
 function Card({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <section className={cn("rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5", className)}>{children}</section>;
+  return <section className={cn("min-w-0 overflow-hidden rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5", className)}>{children}</section>;
 }
 
 // Une couleur par famille de chiffres : argent (vert), clients (bleu), départs (rouge), croissance (violet / ambre).
@@ -207,26 +207,6 @@ function Chart({ title, total, points, format, color, short, money = false }: {
   );
 }
 
-// Classement avec barres (pages, sources, pays, appareils) : toutes les cartes à la même hauteur.
-function Ranking({ title, icon: Icon, color, rows, total }: { title: string; icon: React.ComponentType<{ className?: string }>; color: keyof typeof TONES; rows: { name: string; count: number }[]; total: number }) {
-  return (
-    <Card className="h-[268px]">
-      <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES[color])}><Icon className="h-3.5 w-3.5" /></span>{title}</h2>
-      {rows.length ? (
-        <ul className="mt-3 space-y-2.5 text-sm">
-          {rows.slice(0, 5).map((r) => (
-            <li key={r.name}>
-              <p className="flex justify-between gap-2"><span className="truncate">{r.name}</span><span className="shrink-0 tabular-nums text-[#616161]">{r.count} · {Math.round((r.count / (total || 1)) * 100)} %</span></p>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f1f1f1]"><div className="h-full rounded-full bg-[#0a8f5f]" style={{ width: `${Math.max(3, (r.count / (rows[0].count || 1)) * 100)}%` }} /></div>
-            </li>
-          ))}
-        </ul>
-      ) : <p className="mt-3 text-sm text-[#8a8a8a]">Pas encore de visite sur cette période.</p>}
-    </Card>
-  );
-}
-
-const duration = (s: number) => (s < 60 ? `${s} s` : `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, "0")}`);
 const compact = (n: number) => (n >= 1000 ? `${Math.round(n / 100) / 10} k` : String(Math.round(n)));
 const euroShort = (cents: number) => `${compact(cents / 100)} €`;
 
@@ -256,6 +236,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
     return () => window.clearInterval(t);
   }, []);
   const [period, setPeriod] = useState<PeriodId>("today");
+  const [metric, setMetric] = useState<"signups" | "revenue" | "visits">("signups");
   const p = s.periods[period];
   const q = p.prev;
   const vs = PERIODS.find((x) => x.id === period)!.vs;
@@ -268,13 +249,22 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
   return (
     <div className="space-y-3 pb-10">
-      <div role="tablist" aria-label="Période" className="sticky top-2 z-20 grid grid-cols-4 rounded-full bg-black/40 p-1 backdrop-blur">
+      <div role="tablist" aria-label="Période" className="sticky top-[max(env(safe-area-inset-top),8px)] z-20 grid grid-cols-4 rounded-full bg-[#0b2a20]/95 p-1 shadow-lg backdrop-blur">
         {PERIODS.map((x) => (
           <button key={x.id} type="button" role="tab" aria-selected={period === x.id} onClick={() => setPeriod(x.id)} className={cn("rounded-full py-2 text-[13px] font-medium transition-colors", period === x.id ? "bg-white text-[#111]" : "text-white/75")}>
             {x.label}
           </button>
         ))}
       </div>
+      {/* Le graphique en premier : Inscrits, Revenus ou Visites */}
+      <div className="grid grid-cols-3 rounded-full bg-black/25 p-1">
+        {([["signups", "Inscrits"], ["revenue", "Revenus"], ["visits", "Visites"]] as const).map(([k, l]) => (
+          <button key={k} type="button" onClick={() => setMetric(k)} className={cn("rounded-full py-1.5 text-[13px] font-medium", metric === k ? "bg-white text-[#111]" : "text-white/75")}>{l}</button>
+        ))}
+      </div>
+      {metric === "signups" && <Chart title="Inscrits" total={String(p.signups)} points={chart("signups")} color="#2563eb" format={(n) => plural(n, "inscrit")} short={compact} />}
+      {metric === "revenue" && <Chart title="Revenus" total={eur(p.revenue)} points={chart("revenue")} color="#0a8f5f" format={eur} short={euroShort} money />}
+      {metric === "visits" && <Chart title="Visites" total={String(p.visits)} points={chart("visits")} color="#f59e0b" format={(n) => plural(n, "visiteur")} short={compact} />}
       <p className="px-1 text-xs text-white/60">Flèches : {vs} · vrais visiteurs seulement (sans robots ni passages Shopify)</p>
 
       {/* Les chiffres clés de la période, tous à la même taille */}
@@ -297,26 +287,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
         <Metric icon={UserPlus} color="blue" label="Comptes" value={String(s.totals.accounts)} hint={`${pct(s.conversion)} devenus payants`} />
       </div>
 
-      {/* Vrais graphiques : un par chiffre, même hauteur */}
-      <Chart title="Visiteurs" total={String(p.visits)} points={chart("visits")} color="#f59e0b" format={(n) => plural(n, "visiteur")} short={compact} />
-      <Chart title="Inscrits" total={String(p.signups)} points={chart("signups")} color="#2563eb" format={(n) => plural(n, "inscrit")} short={compact} />
-      <Chart title="Revenus" total={eur(p.revenue)} points={chart("revenue")} color="#0a8f5f" format={eur} short={euroShort} money />
-
-      {/* Comment les gens visitent le site */}
-      <div className="grid grid-cols-2 gap-3">
-        <Metric icon={Hourglass} color="amber" label="Temps moyen" value={duration(p.audience.avgSeconds)} hint="Par visite" />
-        <Metric icon={Eye} color="violet" label="Pages par visite" value={p.audience.pagesPerVisit.toLocaleString("fr-FR")} hint="En moyenne" />
-        <Metric icon={TrendingDown} color="red" label="Rebond" value={pct(p.audience.bounce)} hint="Partis en moins de 15 s" />
-        <Metric icon={Smartphone} color="blue" label="Sur téléphone" value={pct(p.audience.mobile)} hint="Le reste : ordinateur" />
-      </div>
-      <Ranking title="D'où ils viennent" icon={TrendingUp} color="green" rows={p.sources} total={p.visits} />
-      <Ranking title="Pages d'arrivée" icon={Eye} color="amber" rows={p.pages} total={p.visits} />
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Ranking title="Pays" icon={Globe} color="blue" rows={p.countries} total={p.visits} />
-        <Ranking title="Appareils" icon={Smartphone} color="violet" rows={p.devices} total={p.visits} />
-      </div>
-
-      <div className="grid gap-3">
+      <div className="grid grid-cols-1 gap-3">
         <Card>
           <h2 className="text-[15px] font-semibold">Répartition des offres</h2>
           <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-[#f1f1f1]">
@@ -378,7 +349,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
         )}
       </Card>
 
-      <div className="grid gap-3">
+      <div className="grid grid-cols-1 gap-3">
         {/* Entonnoir : où les gens s'arrêtent avant d'acheter (30 derniers jours). */}
         <Card>
           <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.violet)}><Gauge className="h-3.5 w-3.5" /></span>Parcours avant l'achat <span className="font-normal text-[#8a8a8a]">· 30 j</span></h2>
@@ -409,7 +380,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
                     <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
                     <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && <OfferNote offer={u.offer} />}</span>
                     {u.kind === "account" && (
-                      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
+                      <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
                         <ShoppingBag className="h-3 w-3" /> {u.shop ? `Shopify : ${u.shop.plan ?? "forfait inconnu"}` : "Pas de boutique Shopify connectée"}
                       </span>
                     )}
