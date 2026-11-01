@@ -172,7 +172,17 @@ export type GenerateStoreInput = {
 };
 
 // Tableau de bord du fondateur (montants en centimes d'euro).
-export type OwnerPeriod = { visits: number; revenue: number; sales: number; newSubs: number; cancels: number; waitlist: number; accounts: number; stores: number };
+// Chiffres d'une période ; `prev` = la même période juste avant (pour les flèches ↑ ↓).
+export type OwnerCounts = { visits: number; signups: number; revenue: number; sales: number; newSubs: number; cancels: number; waitlist: number; accounts: number; stores: number; checkouts: number };
+export type OwnerPeriod = OwnerCounts & {
+  prev: OwnerCounts;
+  audience: { avgSeconds: number; pagesPerVisit: number; bounce: number; mobile: number };
+  chart: { label: string; visits: number; signups: number; revenue: number; prevVisits: number; prevSignups: number; prevRevenue: number }[];
+  pages: { name: string; count: number }[];
+  sources: { name: string; count: number }[];
+  countries: { name: string; count: number }[];
+  devices: { name: string; count: number }[];
+};
 export type OwnerStats = {
   mrr: number;
   arr: number;
@@ -180,11 +190,9 @@ export type OwnerStats = {
   arpu: number; // revenu mensuel moyen par abonné (centimes)
   churn: number; // part des abonnés partis sur 30 jours (0 à 1)
   conversion: number; // abonnés payants / comptes créés (0 à 1)
-  hours: { hour: number; revenue: number; signups: number; visits: number }[];
   liveNow: number; // visiteurs sur le site dans les 2 dernières minutes
   totals: { waitlist: number; accounts: number };
-  periods: { today: OwnerPeriod; week: OwnerPeriod; month: OwnerPeriod };
-  series: { day: string; revenue: number; signups: number; visits: number }[];
+  periods: { today: OwnerPeriod; yesterday: OwnerPeriod; week: OwnerPeriod; month: OwnerPeriod };
   sources: { ref: string; count: number }[];
   affiliates: { code: string; name: string; clicks: number; signups: number; customers: number; commission: number; rate: number }[];
   shopifyAffiliation: { configured: boolean; trials: number; paid: number; pending: number; approved: number; currency: string; recent: { label: string; state: string | null; payout: number; at: string | null }[] };

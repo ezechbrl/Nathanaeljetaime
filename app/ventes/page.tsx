@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Hourglass, Percent, Receipt, RefreshCw,
+  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Globe, Hourglass, Percent, Receipt, RefreshCw, Smartphone,
   ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as api from "@/lib/api/client";
 import { ApiClientError } from "@/lib/api/errors";
 import type { OwnerStats } from "@/lib/api/types";
@@ -15,9 +15,10 @@ import { formatMoney, formatShortDate } from "@/lib/format";
 // « Vigenia Ventes » : le tableau de bord du fondateur, façon admin Shopify (cartes blanches sur le fond vert).
 
 const PERIODS = [
-  { id: "today", label: "Aujourd'hui" },
-  { id: "week", label: "7 jours" },
-  { id: "month", label: "30 jours" },
+  { id: "today", label: "Aujourd'hui", vs: "vs hier à la même heure" },
+  { id: "yesterday", label: "Hier", vs: "vs avant-hier" },
+  { id: "week", label: "7 jours", vs: "vs les 7 jours d'avant" },
+  { id: "month", label: "30 jours", vs: "vs les 30 jours d'avant" },
 ] as const;
 type PeriodId = (typeof PERIODS)[number]["id"];
 const PLAN_NAME: Record<string, string> = { pro: "Starter", agency: "Pro" };
@@ -84,77 +85,150 @@ const TONES = {
 // Visiteurs en ce moment (2 dernières minutes), avec un point vert qui pulse.
 function Live({ count }: { count: number }) {
   return (
-    <Card>
-      <span className="mb-2 flex h-8 items-center gap-2"><span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#10b981]" /></span><span className="text-xs font-medium text-[#0a8f5f]">En direct</span></span>
-      <p className="text-[13px] text-[#616161]">En ce moment sur le site</p>
-      <p className="mt-1 text-[1.6rem] font-semibold leading-tight tracking-[-0.02em] tabular-nums">{count}</p>
-      <p className="mt-0.5 text-xs text-[#8a8a8a]">visiteur{count > 1 ? "s" : ""} actif{count > 1 ? "s" : ""}</p>
+    <Card className="flex h-[140px] flex-col">
+      <span className="flex h-8 items-center gap-2"><span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#10b981]" /></span><span className="text-xs font-medium text-[#0a8f5f]">En direct</span></span>
+      <p className="mt-auto truncate text-[13px] text-[#616161]">En ce moment</p>
+      <p className="mt-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.02em] tabular-nums">{count}</p>
+      <p className="mt-1.5 truncate text-[11.5px] leading-tight text-[#8a8a8a]">visiteur{count > 1 ? "s" : ""} sur le site</p>
     </Card>
   );
 }
 
-function Metric({ label, value, hint, tone, icon: Icon, color = "green" }: { label: string; value: string; hint?: string; tone?: "up" | "down"; icon: React.ComponentType<{ className?: string }>; color?: keyof typeof TONES }) {
+// Évolution par rapport à la période d'avant : ↑ vert, ↓ rouge (inversé pour les départs).
+function Delta({ cur, prev, inverse = false }: { cur: number; prev: number; inverse?: boolean }) {
+  if (!cur && !prev) return <span className="text-xs text-[#8a8a8a]">—</span>;
+  const up = cur >= prev, good = inverse ? !up : up;
+  const txt = prev ? `${up ? "↑" : "↓"} ${Math.abs(Math.round(((cur - prev) / prev) * 100))} %` : "↑ nouveau";
+  return <span className={cn("rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums", cur === prev ? "bg-[#f1f1f1] text-[#616161]" : good ? TONES.green : TONES.red)}>{cur === prev ? "= stable" : txt}</span>;
+}
+
+// Toutes les tuiles ont exactement la même taille.
+function Metric({ label, value, hint, icon: Icon, color = "green", cur, prev, inverse }: { label: string; value: string; hint?: string; icon: React.ComponentType<{ className?: string }>; color?: keyof typeof TONES; cur?: number; prev?: number; inverse?: boolean }) {
   return (
-    <Card>
-      <span className={cn("mb-2 grid h-8 w-8 place-items-center rounded-[10px]", TONES[color])}><Icon className="h-4 w-4" /></span>
-      <p className="text-[13px] text-[#616161]">{label}</p>
-      <p className={cn("mt-1 text-[1.6rem] font-semibold leading-tight tracking-[-0.02em] tabular-nums", tone === "up" && "text-[#0a8f5f]", tone === "down" && "text-[#d72c0d]")}>{value}</p>
-      {hint && <p className="mt-0.5 text-xs text-[#8a8a8a]">{hint}</p>}
+    <Card className="flex h-[140px] flex-col">
+      <span className="flex items-center justify-between gap-2">
+        <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-[10px]", TONES[color])}><Icon className="h-4 w-4" /></span>
+        {cur !== undefined && prev !== undefined && <Delta cur={cur} prev={prev} inverse={inverse} />}
+      </span>
+      <p className="mt-auto truncate text-[13px] text-[#616161]">{label}</p>
+      <p className="mt-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.02em] tabular-nums">{value}</p>
+      <p className="mt-1.5 truncate text-[11.5px] leading-tight text-[#8a8a8a]">{hint ?? "\u00a0"}</p>
     </Card>
   );
 }
 
-// Courbe lissée (Catmull-Rom → Bézier) avec zone dégradée et valeur au doigt / à la souris.
-function LineChart({ points, format }: { points: { label: string; value: number }[]; format: (n: number) => string }) {
+// Graduations « rondes » de l'axe vertical (0, 5, 10… ou 0, 20 €, 40 €…).
+function niceMax(v: number, minStep = 1) {
+  const raw = Math.max(v / 4, minStep), p = 10 ** Math.floor(Math.log10(raw)), f = raw / p;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p * 4;
+}
+
+// Vrai graphique : axes gradués, courbe lissée avec zone colorée, période d'avant en pointillés,
+// et au doigt (ou à la souris) un repère avec la valeur exacte et celle de la période d'avant.
+function Chart({ title, total, points, format, color, short, money = false }: {
+  title: string; total: string; money?: boolean;
+  points: { label: string; value: number; prev: number }[];
+  format: (n: number) => string; short: (n: number) => string; color: string;
+}) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 320, H = 140, P = 6;
-  const max = Math.max(...points.map((p) => p.value), 1);
-  const xy = points.map((p, i) => [P + (i * (W - 2 * P)) / Math.max(points.length - 1, 1), H - P - (p.value / max) * (H - 2 * P - 10)] as const);
-  const line = xy.reduce((d, [x, y], i) => {
-    if (i === 0) return `M${x},${y}`;
-    const [x0, y0] = xy[i - 2] ?? xy[i - 1];
-    const [x1, y1] = xy[i - 1];
-    const [x3, y3] = xy[i + 1] ?? [x, y];
-    const lo = Math.min(y1, y), hi = Math.max(y1, y); // pas de creux sous zéro entre deux points
-    const c1 = Math.min(hi, Math.max(lo, y1 + (y - y0) / 6)), c2 = Math.min(hi, Math.max(lo, y - (y3 - y1) / 6));
-    return `${d} C${x1 + (x - x0) / 6},${c1} ${x - (x3 - x1) / 6},${c2} ${x},${y}`;
-  }, "");
-  const area = `${line} L${xy[xy.length - 1][0]},${H} L${xy[0][0]},${H} Z`;
+  const W = 340, H = 170, L = 38, R = 8, T = 10, B = 22;
+  const max = niceMax(Math.max(1, ...points.map((p) => Math.max(p.value, p.prev))), money ? 100 : 1);
+  const X = (i: number) => L + (i * (W - L - R)) / Math.max(points.length - 1, 1);
+  const Y = (v: number) => T + (1 - v / max) * (H - T - B);
+  const path = (vals: number[]) => {
+    const xy = vals.map((v, i) => [X(i), Y(v)] as const);
+    return xy.reduce((d, [x, y], i) => {
+      if (i === 0) return `M${x},${y}`;
+      const [x0, y0] = xy[i - 2] ?? xy[i - 1], [x1, y1] = xy[i - 1], [x3, y3] = xy[i + 1] ?? [x, y];
+      const lo = Math.min(y1, y), hi = Math.max(y1, y);
+      const c1 = Math.min(hi, Math.max(lo, y1 + (y - y0) / 6)), c2 = Math.min(hi, Math.max(lo, y - (y3 - y1) / 6));
+      return `${d} C${x1 + (x - x0) / 6},${c1} ${x - (x3 - x1) / 6},${c2} ${x},${y}`;
+    }, "");
+  };
+  const cur = path(points.map((p) => p.value)), prev = path(points.map((p) => p.prev));
+  const area = `${cur} L${X(points.length - 1)},${H - B} L${X(0)},${H - B} Z`;
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
+  const labelEvery = Math.max(1, Math.ceil(points.length / 5));
   const pick = (e: React.PointerEvent<SVGSVGElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
-    setHover(Math.round(((e.clientX - r.left) / r.width) * (points.length - 1)));
+    const x = ((e.clientX - r.left) / r.width) * W;
+    setHover(Math.min(points.length - 1, Math.max(0, Math.round(((x - L) / (W - L - R)) * (points.length - 1)))));
   };
-  const h = hover !== null ? Math.min(points.length - 1, Math.max(0, hover)) : null;
+  const h = hover;
+  const id = title.replace(/\W/g, "");
   return (
-    <div className="relative">
-      {h !== null && (
-        <div className="pointer-events-none absolute -top-1 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-[#111] px-2.5 py-1.5 text-xs text-white" style={{ left: `${Math.min(85, Math.max(15, (xy[h][0] / W) * 100))}%` }}>
-          <span className="block text-white/60">{points[h].label}</span>
-          <span className="font-semibold tabular-nums">{format(points[h].value)}</span>
-        </div>
-      )}
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="mt-8 h-40 w-full touch-none" onPointerMove={pick} onPointerDown={pick} onPointerLeave={() => setHover(null)} role="img" aria-label="Courbe">
-        <defs>
-          <linearGradient id="area" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#10b981" stopOpacity="0.28" />
-            <stop offset="1" stopColor="#10b981" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {[0.25, 0.5, 0.75].map((f) => <line key={f} x1="0" x2={W} y1={H * f} y2={H * f} stroke="#ececec" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
-        <path d={area} fill="url(#area)" />
-        <path d={line} fill="none" stroke="#0a8f5f" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        {h !== null && <line x1={xy[h][0]} x2={xy[h][0]} y1="0" y2={H} stroke="#111" strokeOpacity="0.25" strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />}
-      </svg>
-      <div className="mt-1 flex justify-between text-[11px] text-[#8a8a8a]"><span>{points[0].label}</span><span>{points[points.length - 1].label}</span></div>
-    </div>
+    <Card className="flex h-[300px] flex-col">
+      <div className="flex items-baseline justify-between gap-2">
+        <h2 className="text-[15px] font-semibold">{title}</h2>
+        <span className="text-[1.25rem] font-semibold tabular-nums">{total}</span>
+      </div>
+      <div className="relative mt-2 flex-1">
+        {h !== null && (
+          <div className="pointer-events-none absolute -top-2 z-10 -translate-x-1/2 whitespace-nowrap rounded-xl bg-[#111] px-3 py-2 text-xs text-white shadow-lg" style={{ left: `${Math.min(80, Math.max(20, (X(h) / W) * 100))}%` }}>
+            <span className="block text-white/60">{points[h].label}</span>
+            <span className="block font-semibold tabular-nums">{format(points[h].value)}</span>
+            <span className="block text-white/50 tabular-nums">avant : {format(points[h].prev)}</span>
+          </div>
+        )}
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full touch-none select-none" onPointerMove={pick} onPointerDown={pick} onPointerLeave={() => setHover(null)} role="img" aria-label={title}>
+          <defs>
+            <linearGradient id={`g${id}`} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor={color} stopOpacity="0.3" />
+              <stop offset="1" stopColor={color} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {ticks.map((t) => (
+            <g key={t}>
+              <line x1={L} x2={W - R} y1={Y(t)} y2={Y(t)} stroke="#eeeeee" strokeWidth="1" />
+              <text x={L - 6} y={Y(t) + 3.5} textAnchor="end" fontSize="9.5" fill="#9a9a9a">{short(t)}</text>
+            </g>
+          ))}
+          {points.map((p, i) => (i % labelEvery === 0 || i === points.length - 1) && (
+            <text key={i} x={X(i)} y={H - 5} textAnchor={i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"} fontSize="9.5" fill="#9a9a9a">{p.label}</text>
+          ))}
+          <path d={prev} fill="none" stroke="#b5b5b5" strokeWidth="1.6" strokeDasharray="4 4" strokeLinecap="round" />
+          <path d={area} fill={`url(#g${id})`} />
+          <path d={cur} fill="none" stroke={color} strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
+          {h !== null && (
+            <g>
+              <line x1={X(h)} x2={X(h)} y1={T} y2={H - B} stroke="#111" strokeOpacity="0.3" strokeDasharray="3 3" />
+              <circle cx={X(h)} cy={Y(points[h].prev)} r="3.5" fill="#fff" stroke="#b5b5b5" strokeWidth="2" />
+              <circle cx={X(h)} cy={Y(points[h].value)} r="5" fill="#fff" stroke={color} strokeWidth="3" />
+            </g>
+          )}
+        </svg>
+      </div>
+      <p className="mt-1 flex items-center gap-3 text-[11px] text-[#8a8a8a]">
+        <span className="flex items-center gap-1.5"><span className="h-[3px] w-4 rounded-full" style={{ background: color }} />Cette période</span>
+        <span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t-2 border-dashed border-[#b5b5b5]" />Période d'avant</span>
+        <span className="ml-auto">Touche la courbe</span>
+      </p>
+    </Card>
   );
 }
 
-// Aujourd'hui : cumul heure par heure (comme « ventes du jour » dans Shopify).
-function cumulate(rows: { label: string; revenue: number; signups: number; visits: number }[]) {
-  let r = 0, g = 0, v = 0;
-  return rows.map((x) => ({ ...x, revenue: (r += x.revenue), signups: (g += x.signups), visits: (v += x.visits) }));
+// Classement avec barres (pages, sources, pays, appareils) : toutes les cartes à la même hauteur.
+function Ranking({ title, icon: Icon, color, rows, total }: { title: string; icon: React.ComponentType<{ className?: string }>; color: keyof typeof TONES; rows: { name: string; count: number }[]; total: number }) {
+  return (
+    <Card className="h-[268px]">
+      <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES[color])}><Icon className="h-3.5 w-3.5" /></span>{title}</h2>
+      {rows.length ? (
+        <ul className="mt-3 space-y-2.5 text-sm">
+          {rows.slice(0, 5).map((r) => (
+            <li key={r.name}>
+              <p className="flex justify-between gap-2"><span className="truncate">{r.name}</span><span className="shrink-0 tabular-nums text-[#616161]">{r.count} · {Math.round((r.count / (total || 1)) * 100)} %</span></p>
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f1f1f1]"><div className="h-full rounded-full bg-[#0a8f5f]" style={{ width: `${Math.max(3, (r.count / (rows[0].count || 1)) * 100)}%` }} /></div>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="mt-3 text-sm text-[#8a8a8a]">Pas encore de visite sur cette période.</p>}
+    </Card>
+  );
 }
+
+const duration = (s: number) => (s < 60 ? `${s} s` : `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, "0")}`);
+const compact = (n: number) => (n >= 1000 ? `${Math.round(n / 100) / 10} k` : String(Math.round(n)));
+const euroShort = (cents: number) => `${compact(cents / 100)} €`;
 
 type Offer = NonNullable<OwnerStats["signups"][number]["offer"]>;
 
@@ -182,59 +256,64 @@ function Dashboard({ s }: { s: OwnerStats }) {
     return () => window.clearInterval(t);
   }, []);
   const [period, setPeriod] = useState<PeriodId>("today");
-  const [metric, setMetric] = useState<"revenue" | "signups" | "visits">("revenue");
   const p = s.periods[period];
-
-  const points = useMemo(() => {
-    const rows = period === "today"
-      ? cumulate(s.hours.slice(0, new Date().getHours() + 1).map((x) => ({ label: `${x.hour} h`, revenue: x.revenue, signups: x.signups, visits: x.visits })))
-      : s.series.slice(period === "week" ? -7 : -30).map((x) => ({ label: formatShortDate(x.day), revenue: x.revenue, signups: x.signups, visits: x.visits }));
-    return rows.map((r) => ({ label: r.label, value: r[metric] }));
-  }, [s, period, metric]);
+  const q = p.prev;
+  const vs = PERIODS.find((x) => x.id === period)!.vs;
+  const conv = (c: { signups: number; visits: number }) => (c.visits ? c.signups / c.visits : 0);
 
   const aff = s.affiliates.reduce((t, a) => ({ clicks: t.clicks + a.clicks, signups: t.signups + a.signups, customers: t.customers + a.customers, commission: t.commission + a.commission }), { clicks: 0, signups: 0, customers: 0, commission: 0 });
   const subs = s.subscribers.total || 1;
+  const chart = (k: "visits" | "signups" | "revenue") => p.chart.map((c) => ({ label: c.label, value: c[k], prev: c[k === "visits" ? "prevVisits" : k === "signups" ? "prevSignups" : "prevRevenue"] }));
+  const plural = (n: number, w: string) => `${n} ${w}${n > 1 ? "s" : ""}`;
 
   return (
     <div className="space-y-3 pb-10">
-      <div role="tablist" aria-label="Période" className="grid grid-cols-3 rounded-full bg-black/25 p-1 backdrop-blur">
+      <div role="tablist" aria-label="Période" className="sticky top-2 z-20 grid grid-cols-4 rounded-full bg-black/40 p-1 backdrop-blur">
         {PERIODS.map((x) => (
-          <button key={x.id} type="button" role="tab" aria-selected={period === x.id} onClick={() => setPeriod(x.id)} className={cn("rounded-full py-2 text-sm font-medium transition-colors", period === x.id ? "bg-white text-[#111]" : "text-white/75")}>
+          <button key={x.id} type="button" role="tab" aria-selected={period === x.id} onClick={() => setPeriod(x.id)} className={cn("rounded-full py-2 text-[13px] font-medium transition-colors", period === x.id ? "bg-white text-[#111]" : "text-white/75")}>
             {x.label}
           </button>
         ))}
       </div>
+      <p className="px-1 text-xs text-white/60">Flèches : {vs} · vrais visiteurs seulement (sans robots ni passages Shopify)</p>
 
-      {/* Carte principale : encaissé + courbe */}
-      <Card>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[13px] text-[#616161]">Total encaissé</p>
-            <p className="mt-0.5 text-[2.2rem] font-semibold leading-none tracking-[-0.03em] tabular-nums">{eur(p.revenue)}</p>
-            <p className="mt-1.5 text-xs text-[#8a8a8a]">{p.sales} vente{p.sales > 1 ? "s" : ""} · {p.newSubs} nouvel{p.newSubs > 1 ? "s" : ""} abonné{p.newSubs > 1 ? "s" : ""}</p>
-          </div>
-          <div className="flex rounded-full bg-[#f1f1f1] p-0.5 text-xs">
-            {(["revenue", "visits", "signups"] as const).map((m) => (
-              <button key={m} type="button" onClick={() => setMetric(m)} className={cn("rounded-full px-2 py-1 font-medium", metric === m ? "bg-white shadow-sm" : "text-[#616161]")}>{m === "revenue" ? "Revenus" : m === "visits" ? "Visites" : "Inscrits"}</button>
-            ))}
-          </div>
-        </div>
-        <LineChart points={points} format={metric === "revenue" ? eur : (n) => `${n} ${metric === "visits" ? "visite" : "inscrit"}${n > 1 ? "s" : ""}`} />
-      </Card>
-
+      {/* Les chiffres clés de la période, tous à la même taille */}
       <div className="grid grid-cols-2 gap-3">
         <Live count={s.liveNow} />
-        <Metric icon={Eye} color="amber" label="Visites" value={String(p.visits)} hint={period === "today" ? "Aujourd'hui" : period === "week" ? "Sur 7 jours" : "Sur 30 jours"} />
-        <Metric icon={Percent} color="violet" label="Conversion" value={p.visits ? pct((p.waitlist + p.accounts) / p.visits) : "—"} hint="Visiteurs devenus inscrits" />
+        <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={q.visits} />
+        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint={`${p.waitlist} attente · ${p.accounts} comptes`} cur={p.signups} prev={q.signups} />
+        <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={Math.round(conv(q) * 1000)} />
+        <Metric icon={Wallet} color="green" label="Encaissé" value={eur(p.revenue)} hint={plural(p.sales, "paiement")} cur={p.revenue} prev={q.revenue} />
+        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" cur={p.sales} prev={q.sales} />
+        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} hint="Premiers abonnements" cur={p.newSubs} prev={q.newSubs} />
+        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} hint={`Taux sur 30 j : ${pct(s.churn)}`} cur={p.cancels} prev={q.cancels} inverse />
+        <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={q.stores} />
+        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page Shopify" cur={p.checkouts} prev={q.checkouts} />
         <Metric icon={Wallet} color="green" label="MRR" value={eur(s.mrr)} hint="Revenu mensuel récurrent" />
         <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
         <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
-        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} tone={p.newSubs ? "up" : undefined} />
-        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} tone={p.cancels ? "down" : undefined} hint={`Taux sur 30 j : ${pct(s.churn)}`} />
-        <Metric icon={Hourglass} color="pink" label="Liste d'attente" value={`+${p.waitlist}`} hint={`${s.totals.waitlist} au total`} />
-        <Metric icon={UserPlus} color="blue" label="Comptes créés" value={`+${p.accounts}`} hint={`${s.totals.accounts} au total`} />
-        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" />
-        <Metric icon={BadgeCheck} color="green" label="Comptes → abonnés" value={pct(s.conversion)} hint="Comptes devenus payants" />
+        <Metric icon={Gauge} color="violet" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
+        <Metric icon={Hourglass} color="pink" label="Liste d'attente" value={String(s.totals.waitlist)} hint="Inscrits au total" />
+        <Metric icon={UserPlus} color="blue" label="Comptes" value={String(s.totals.accounts)} hint={`${pct(s.conversion)} devenus payants`} />
+      </div>
+
+      {/* Vrais graphiques : un par chiffre, même hauteur */}
+      <Chart title="Visiteurs" total={String(p.visits)} points={chart("visits")} color="#f59e0b" format={(n) => plural(n, "visiteur")} short={compact} />
+      <Chart title="Inscrits" total={String(p.signups)} points={chart("signups")} color="#2563eb" format={(n) => plural(n, "inscrit")} short={compact} />
+      <Chart title="Revenus" total={eur(p.revenue)} points={chart("revenue")} color="#0a8f5f" format={eur} short={euroShort} money />
+
+      {/* Comment les gens visitent le site */}
+      <div className="grid grid-cols-2 gap-3">
+        <Metric icon={Hourglass} color="amber" label="Temps moyen" value={duration(p.audience.avgSeconds)} hint="Par visite" />
+        <Metric icon={Eye} color="violet" label="Pages par visite" value={p.audience.pagesPerVisit.toLocaleString("fr-FR")} hint="En moyenne" />
+        <Metric icon={TrendingDown} color="red" label="Rebond" value={pct(p.audience.bounce)} hint="Partis en moins de 15 s" />
+        <Metric icon={Smartphone} color="blue" label="Sur téléphone" value={pct(p.audience.mobile)} hint="Le reste : ordinateur" />
+      </div>
+      <Ranking title="D'où ils viennent" icon={TrendingUp} color="green" rows={p.sources} total={p.visits} />
+      <Ranking title="Pages d'arrivée" icon={Eye} color="amber" rows={p.pages} total={p.visits} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Ranking title="Pays" icon={Globe} color="blue" rows={p.countries} total={p.visits} />
+        <Ranking title="Appareils" icon={Smartphone} color="violet" rows={p.devices} total={p.visits} />
       </div>
 
       <div className="grid gap-3">
