@@ -4,9 +4,9 @@ import { Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 
-// Lecture automatique en boucle, sans son, dès que la page s'affiche (pause hors de l'écran pour
-// économiser la batterie). Le bouton « Lire » n'apparaît que si le navigateur bloque la lecture
-// automatique (ex. iPhone en mode économie d'énergie).
+// Lecture automatique en boucle, sans son, quand la vidéo arrive à l'écran : rien n'est téléchargé avant
+// (page plus rapide), et pause hors de l'écran pour économiser la batterie. Le bouton « Lire » n'apparaît
+// que si le navigateur bloque la lecture automatique (ex. iPhone en mode économie d'énergie).
 function useAutoplay() {
   const ref = useRef<HTMLVideoElement>(null);
   const [blocked, setBlocked] = useState(false);
@@ -15,8 +15,7 @@ function useAutoplay() {
     if (!v) return;
     v.muted = true; // React ne pose pas toujours l'attribut muted : sans lui, la lecture auto est bloquée
     const play = () => v.play().then(() => setBlocked(false)).catch((e) => { if (e?.name === "NotAllowedError") setBlocked(true); }); // « interrompu par pause » n'est pas un blocage
-    play();
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) play(); else v.pause(); }, { threshold: 0.1 });
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) play(); else v.pause(); }, { threshold: 0.1, rootMargin: "200px 0px" });
     io.observe(v);
     return () => io.disconnect();
   }, []);
@@ -29,7 +28,7 @@ function PhoneVideo({ name, title }: { name: string; title: string }) {
   return (
     <figure className="mx-auto w-full max-w-[300px] sm:hidden">
       <div className="relative overflow-hidden rounded-[36px] border-[7px] border-[#0b0f12] bg-black shadow-[0_30px_70px_-25px_rgb(0_0_0/.9),0_0_40px_-10px_rgb(46_230_166/.45)]">
-        <video ref={ref} autoPlay muted loop playsInline preload="auto" poster={`/videos/${name}.jpg`} onPlay={() => setPlaying(true)} className="block aspect-[390/844] w-full object-cover" aria-label={title}>
+        <video ref={ref} muted loop playsInline preload="none" poster={`/videos/${name}.jpg`} onPlay={() => setPlaying(true)} className="block aspect-[390/844] w-full object-cover" aria-label={title}>
           <source src={`/videos/${name}.mp4`} type="video/mp4" />
           <source src={`/videos/${name}.webm`} type="video/webm" />
         </video>
@@ -61,11 +60,10 @@ export function TutorialVideo({ name, title, speed, className, mobile }: { name:
         <div className="relative">
           <video
             ref={ref}
-            autoPlay
             muted
             loop
             playsInline
-            preload="auto"
+            preload="none"
             poster={`/videos/${name}.jpg`}
             onPlay={() => setPlaying(true)}
            

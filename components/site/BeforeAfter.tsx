@@ -67,7 +67,7 @@ function VigeniaLoop({ name }: { name: string }) {
     return () => io.disconnect();
   }, []);
   return (
-    <video ref={ref} muted loop playsInline preload="metadata" poster={`/videos/${name}.jpg`} className="h-full w-full rounded-[14px] bg-black object-cover" aria-label="Vigenia crée une boutique à partir d'un lien">
+    <video ref={ref} muted loop playsInline preload="none" poster={`/videos/${name}.jpg`} className="h-full w-full rounded-[14px] bg-black object-cover" aria-label="Vigenia crée une boutique à partir d'un lien">
       <source src={`/videos/${name}.mp4`} type="video/mp4" />
       <source src={`/videos/${name}.webm`} type="video/webm" />
     </video>
