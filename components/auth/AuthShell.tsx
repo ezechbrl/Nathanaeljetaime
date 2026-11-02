@@ -6,7 +6,7 @@ import { SHOWCASE } from "@/lib/content/showcase";
 export function AuthShell({ title, subtitle, children }: { title: React.ReactNode; subtitle?: string; children: React.ReactNode }) {
   return (
     <main id="main" className="grid min-h-dvh grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-      <div className="flex min-w-0 flex-col px-5 py-8 sm:px-12 lg:px-20">
+      <div className="flex min-w-0 flex-col overflow-x-clip px-5 py-8 sm:px-12 lg:px-20">
         <Logo />
         <div className="relative mx-auto flex w-full max-w-[480px] flex-1 flex-col justify-center py-10 sm:py-12">
           <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(46_230_166/0.18),transparent)]" />

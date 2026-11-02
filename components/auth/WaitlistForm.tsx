@@ -6,6 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { ApiClientError, joinWaitlist } from "@/lib/api/client";
+import { PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
+
+const STARTER = PLANS.find((p) => p.id === "pro")!;
 
 // Formulaire de liste d'attente (mode NEXT_PUBLIC_LAUNCH_MODE=waitlist).
 export function WaitlistForm() {
@@ -32,7 +35,7 @@ export function WaitlistForm() {
     return (
       <div className="rounded-card border border-accent/30 bg-accent-deep/25 p-5">
         <p className="flex items-center gap-2 text-lg text-fg"><Check className="h-5 w-5 text-accent" /> Ta place est réservée</p>
-        <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">On t'écrit à <span className="text-fg">{email}</span> dès l'ouverture.</p>
+        <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">On t'écrit à <span className="text-fg">{email}</span> dès l'ouverture, avec ton prix réservé : <span className="text-fg">{euro(WAITLIST_PRICES.pro.monthly)}/mois à vie</span>.</p>
         <Link href="/" className="mt-4 inline-block text-sm text-accent underline-offset-4 hover:underline">Retour à l'accueil</Link>
       </div>
     );
@@ -40,6 +43,16 @@ export function WaitlistForm() {
 
   return (
     <form onSubmit={submit} className="space-y-4">
+      {/* Ce qu'on gagne à s'inscrire maintenant */}
+      <div className="rounded-card border border-accent/40 bg-accent-deep/25 p-4">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-accent">Prix réservé aux inscrits</p>
+        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
+          <span className="text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(STARTER.monthly)}</span>
+          <span className="text-[1.9rem] font-semibold leading-none tracking-[-0.03em] text-fg">{euro(WAITLIST_PRICES.pro.monthly)}</span>
+          <span className="text-sm text-fg-muted">/ mois, à vie</span>
+        </p>
+        <p className="mt-2 text-[13px] leading-relaxed text-fg-muted">Les autres paieront {euro(withOffer(STARTER.monthly))}/mois. À prendre dans les 24 h après la création de ton compte, à l&apos;ouverture. Sans engagement.</p>
+      </div>
       <div>
         <label htmlFor="wl-email" className="text-sm text-fg-muted">Ton e-mail</label>
         <div className="relative mt-1.5">

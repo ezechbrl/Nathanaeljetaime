@@ -4,5 +4,5 @@ export const LAUNCH_MODE = (process.env.NEXT_PUBLIC_LAUNCH_MODE === "open" ? "op
 export const isWaitlist = LAUNCH_MODE === "waitlist";
 
 export const CTA = isWaitlist
-  ? { main: "Réserver ma place", short: "Réserver ma place", eyebrow: "Ouverture très bientôt · réserve ta place" }
+  ? { main: "Réserver ma place", short: "Réserver ma place", eyebrow: "Ouverture très bientôt · 29 €/mois à vie pour les inscrits" }
   : { main: "Créer ma boutique", short: "Créer ma boutique", eyebrow: "Nouveau · ta boutique Shopify prête en quelques minutes" };
