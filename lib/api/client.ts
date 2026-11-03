@@ -143,8 +143,9 @@ export const joinAffiliate = (payoutEmail: string) =>
 // Public
 export const sendContact = (input: { name: string; email: string; topic: string; message: string; website: string }) =>
   live ? request<void>("/api/contact", { method: "POST", json: input }) : mock.ok(600);
-export const joinWaitlist = (email: string, brief?: string) =>
-  live ? request<void>("/api/waitlist", { method: "POST", json: { email, brief } }) : mock.ok(500);
+// ms : temps passé sur le formulaire ; hp : champ caché que seuls les robots remplissent.
+export const joinWaitlist = (email: string, brief?: string, guard?: { ms: number; hp: string }) =>
+  live ? request<void>("/api/waitlist", { method: "POST", json: { email, brief, ...guard } }) : mock.ok(500);
 
 export const subscribeNewsletter = (email: string) =>
   live ? request<void>("/api/newsletter", { method: "POST", json: { email } }) : mock.ok(400);

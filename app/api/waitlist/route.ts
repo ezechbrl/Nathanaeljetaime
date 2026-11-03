@@ -12,7 +12,14 @@ export const POST = route(async (req) => {
   const input = await body(req, z.object({
     email: z.string().trim().toLowerCase().email("Adresse e-mail invalide."),
     brief: z.string().trim().max(500).optional(),
+    ms: z.number().optional(),
+    hp: z.string().max(200).optional(),
   }));
+  // Robots : champ caché rempli, formulaire envoyé sans passer par la page ou en moins d'une seconde,
+  // ou texte au hasard (« kWQyaVDjvsHNJLWFyyMTy »). On répond « OK » sans rien enregistrer ni envoyer,
+  // pour ne pas écrire à des adresses volées.
+  const gibberish = (t?: string) => !!t && /^[A-Za-z]{10,}$/.test(t) && /[a-z][A-Z]/.test(t) && /[A-Z]{2}/.test(t);
+  if (input.hp || input.ms === undefined || input.ms < 1000 || gibberish(input.brief)) return noContent();
   const ref = /(?:^|;\s*)ref=([^;]+)/.exec(req.headers.get("cookie") ?? "")?.[1] ?? null;
   const { data } = await db().from("waitlist").upsert({ email: input.email, brief: input.brief || null, ref }, { onConflict: "email", ignoreDuplicates: true }).select("email");
   if (data?.length) {

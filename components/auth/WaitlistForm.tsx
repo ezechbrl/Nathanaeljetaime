@@ -3,7 +3,7 @@
 import { Check, Mail } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { ApiClientError, joinWaitlist } from "@/lib/api/client";
 import { PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
@@ -17,13 +17,16 @@ export function WaitlistForm() {
   const [brief, setBrief] = useState(params.get("brief") ?? "");
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState("");
+  const [hp, setHp] = useState(""); // piège à robots, invisible pour les vrais visiteurs
+  const shownAt = useRef(0);
+  useEffect(() => { shownAt.current = Date.now(); }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setState("sending");
     try {
-      await joinWaitlist(email.trim(), brief.trim() || undefined);
+      await joinWaitlist(email.trim(), brief.trim() || undefined, { ms: Date.now() - shownAt.current, hp });
       setState("done");
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Une erreur est survenue. Réessaie.");
@@ -42,7 +45,7 @@ export function WaitlistForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} className="relative space-y-4">
       {/* Ce qu'on gagne à s'inscrire maintenant */}
       <div className="rounded-card border border-accent/40 bg-accent-deep/25 p-4">
         <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-accent">Prix réservé aux inscrits</p>
@@ -63,6 +66,10 @@ export function WaitlistForm() {
       <div>
         <label htmlFor="wl-brief" className="text-sm text-fg-muted">Ce que tu veux vendre <span className="text-fg-faint">(facultatif)</span></label>
         <textarea id="wl-brief" rows={3} maxLength={500} value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Ex. : bougies parfumées artisanales, cible 30-45 ans" className="field mt-1.5 resize-none" />
+      </div>
+      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label htmlFor="wl-site">Site web</label>
+        <input id="wl-site" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
       </div>
       {error && <p role="alert" className="text-sm text-bad">{error}</p>}
       <Button type="submit" size="lg" className="w-full" disabled={state === "sending"}>
