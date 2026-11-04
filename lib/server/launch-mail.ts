@@ -4,7 +4,7 @@ import { env } from "./env";
 import { LAUNCH_MODE } from "@/lib/launch";
 import { LAUNCH_OFFER, PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
 import { db, must } from "./supabase";
-import { waitlistToken } from "./waitlist";
+import { isBotBrief, waitlistToken } from "./waitlist";
 
 // Le jour du lancement (NEXT_PUBLIC_LAUNCH_MODE=open), un e-mail « C'est ouvert » à chaque inscrit de la liste d'attente,
 // avec son prix réservé (moins cher que l'offre de lancement des autres).
@@ -13,13 +13,13 @@ const BATCH = 40;
 
 export async function sendLaunchEmails() {
   if (LAUNCH_MODE !== "open") return 0;
-  const list = must(await db().from("waitlist").select("email").order("created_at")) as { email: string }[];
+  const list = must(await db().from("waitlist").select("email, brief").order("created_at")) as { email: string; brief: string | null }[];
   const starter = PLANS.find((p) => p.id === "pro")!;
   const p = { now: euro(WAITLIST_PRICES.pro.monthly), year: euro(WAITLIST_PRICES.pro.yearly), was: euro(starter.monthly), others: euro(withOffer(starter.monthly)) };
   let sent = 0;
-  for (const { email } of list) {
+  for (const { email, brief } of list) {
     if (sent >= BATCH) break;
-    if (!email || /@shopify\.com$/i.test(email)) continue;
+    if (!email || /@shopify\.com$/i.test(email) || isBotBrief(brief)) continue; // comptes de test Shopify, robots
     const { error: dup } = await db().from("webhook_events").insert({ id: `launch:${email}` });
     if (dup) continue; // déjà prévenu
     const url = `${env.appUrl()}/r/liste?t=${encodeURIComponent(waitlistToken(email))}`;

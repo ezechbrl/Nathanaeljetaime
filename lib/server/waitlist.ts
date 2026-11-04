@@ -28,3 +28,6 @@ export async function isWaitlistMember(user: UserRow, cookie?: string | null) {
   if (ok) await db().from("users").update({ waitlist_member: true }).eq("id", user.id);
   return ok;
 }
+
+// Texte « ce que tu veux vendre » tapé au hasard par un robot (ex. « kWQyaVDjvsHNJLWFyyMTy »).
+export const isBotBrief = (t?: string | null) => !!t && /^[A-Za-z]{10,}$/.test(t) && /[a-z][A-Z]/.test(t) && /[A-Z]{2}/.test(t);

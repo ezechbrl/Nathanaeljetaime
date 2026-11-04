@@ -4,6 +4,7 @@ import { LAUNCH_OFFER } from "@/lib/content/pricing";
 import { impactConfigured, syncImpact, trackerLabel } from "@/lib/server/impact";
 import { USD_PER_EUR } from "@/lib/server/shopify-billing";
 import { db, must } from "@/lib/server/supabase";
+import { isBotBrief } from "@/lib/server/waitlist";
 
 // Tableau de bord du fondateur : MRR, ventes, inscrits et affiliation (montants en centimes d'euro).
 const DAY = 86_400_000;
@@ -40,10 +41,10 @@ export const GET = route(async () => {
   }
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const since60 = new Date(Date.now() - 61 * DAY).toISOString(); // 30 jours + les 30 d'avant, pour comparer
-  const [subs, events, waitlist, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
+  const [subs, events, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
     db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(2000),
-    db().from("waitlist").select("email, ref, created_at").order("created_at", { ascending: false }),
+    db().from("waitlist").select("email, ref, brief, created_at").order("created_at", { ascending: false }),
     db().from("users").select("id, email, created_at").order("created_at", { ascending: false }),
     db().from("stores").select("user_id, status, created_at").gte("created_at", since60),
     db().from("affiliates").select("code, commission_rate, users(email, first_name)"),
@@ -55,7 +56,8 @@ export const GET = route(async () => {
     db().from("impact_actions").select("tracker, state, payout_cents, currency, event_at").order("event_at", { ascending: false }).limit(500),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
-  // Les comptes des évaluateurs Shopify et le fondateur ne comptent pas dans les chiffres.
+  // Les comptes des évaluateurs Shopify, le fondateur et les robots ne comptent pas dans les chiffres.
+  const waitlist = waitlistAll.filter((w) => !isBotBrief(w.brief));
   const realUsers = users.filter((u) => !isShopifyTester(u.email) && !isOwnerEmail(u.email));
   const realWaitlist = waitlist.filter((w) => !isShopifyTester(w.email) && !isOwnerEmail(w.email));
   // Vrais visiteurs : ni robots (filtrés à l'enregistrement), ni passages venant de Shopify.

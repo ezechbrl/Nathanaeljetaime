@@ -4,6 +4,7 @@ import { sendEmail } from "@/lib/server/email";
 import { notifyOwner } from "@/lib/server/notify";
 import { rateLimit } from "@/lib/server/quota";
 import { db } from "@/lib/server/supabase";
+import { isBotBrief } from "@/lib/server/waitlist";
 import { site } from "@/lib/site";
 
 // Inscription à la liste d'attente (avec, si fourni, ce que la personne veut vendre).
@@ -18,8 +19,7 @@ export const POST = route(async (req) => {
   // Robots : champ caché rempli, formulaire envoyé sans passer par la page ou en moins d'une seconde,
   // ou texte au hasard (« kWQyaVDjvsHNJLWFyyMTy »). On répond « OK » sans rien enregistrer ni envoyer,
   // pour ne pas écrire à des adresses volées.
-  const gibberish = (t?: string) => !!t && /^[A-Za-z]{10,}$/.test(t) && /[a-z][A-Z]/.test(t) && /[A-Z]{2}/.test(t);
-  if (input.hp || input.ms === undefined || input.ms < 1000 || gibberish(input.brief)) return noContent();
+  if (input.hp || input.ms === undefined || input.ms < 1000 || isBotBrief(input.brief)) return noContent();
   const ref = /(?:^|;\s*)ref=([^;]+)/.exec(req.headers.get("cookie") ?? "")?.[1] ?? null;
   const { data } = await db().from("waitlist").upsert({ email: input.email, brief: input.brief || null, ref }, { onConflict: "email", ignoreDuplicates: true }).select("email");
   if (data?.length) {
