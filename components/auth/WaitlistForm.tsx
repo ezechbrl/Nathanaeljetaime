@@ -50,7 +50,7 @@ export function WaitlistForm() {
       <div className="rounded-card border border-accent/40 bg-accent-deep/25 p-4">
         <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-accent">Prix réservé aux inscrits</p>
         <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
-          <span className="text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(STARTER.monthly)}</span>
+          <span className="text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(withOffer(STARTER.monthly))}</span>
           <span className="text-[1.9rem] font-semibold leading-none tracking-[-0.03em] text-fg">{euro(WAITLIST_PRICES.pro.monthly)}</span>
           <span className="text-sm text-fg-muted">/ mois, à vie</span>
         </p>

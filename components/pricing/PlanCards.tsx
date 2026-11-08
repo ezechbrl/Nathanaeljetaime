@@ -37,7 +37,7 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
 // `waitlist` : prix réservé aux inscrits de la liste d'attente (plus bas que l'offre de lancement).
 export function planPrice(plan: Plan, interval: Interval, offer = false, waitlist = false) {
   const billed = interval === "year" ? plan.yearly : plan.monthly;
-  if (offer && waitlist && plan.id !== "free") return { billed: WAITLIST_PRICES[plan.id][interval === "year" ? "yearly" : "monthly"], was: billed };
+  if (offer && waitlist && plan.id !== "free") return { billed: WAITLIST_PRICES[plan.id][interval === "year" ? "yearly" : "monthly"], was: withOffer(billed) }; // barré : le prix des autres (offre de lancement)
   return offer ? { billed: withOffer(billed), was: billed } : { billed, was: null };
 }
 

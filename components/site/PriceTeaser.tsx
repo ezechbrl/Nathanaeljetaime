@@ -47,7 +47,7 @@ export function PriceTeaser() {
                   </div>
                   <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">{plan.tagline}</p>
                   <p className="mt-3 flex items-baseline gap-1.5">
-                    <span className="text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(plan.monthly)}</span>
+                    <span className="text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(isWaitlist ? withOffer(plan.monthly) : plan.monthly)}</span>
                     <span className="text-[2.6rem] font-semibold leading-none tracking-[-0.04em]">{euro(price(plan.id, "monthly", plan.monthly))}</span>
                     <span className="text-sm text-fg-muted">/ mois</span>
                   </p>
