@@ -1,16 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Bricolage_Grotesque, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { PageBackdrop } from "@/components/ui/PageBackdrop";
 import { site } from "@/lib/site";
 import "./globals.css";
 import { Tracker } from "@/components/Tracker";
 
-const sans = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-sans", display: "swap" });
+// Polices hébergées dans le projet (app/fonts, sous-ensemble latin de Google Fonts) : la construction du site
+// ne dépend plus du téléchargement chez Google, qui échouait parfois et bloquait la mise en ligne.
+const sans = localFont({ src: "./fonts/plus-jakarta-sans-normal.woff2", weight: "300 600", style: "normal", variable: "--font-sans", display: "swap" });
 // Titres : grotesque à caractère. Mots mis en avant : Fraunces en italique.
-const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-display", display: "swap" });
+const display = localFont({ src: "./fonts/bricolage-grotesque-normal.woff2", weight: "400 600", style: "normal", variable: "--font-display", display: "swap" });
 // Mots soulignés dans les titres : Bodoni moderne en italique.
-const accent = Bodoni_Moda({ subsets: ["latin"], weight: ["500"], style: ["italic"], variable: "--font-accent", display: "swap" });
-const serif = Fraunces({ subsets: ["latin"], style: ["italic", "normal"], axes: ["SOFT", "WONK", "opsz"], variable: "--font-serif", display: "swap" });
+const accent = localFont({ src: "./fonts/bodoni-moda-italic.woff2", weight: "500", style: "italic", variable: "--font-accent", display: "swap" });
+const serif = localFont({
+  src: [
+    { path: "./fonts/fraunces-normal.woff2", weight: "100 900", style: "normal" },
+    { path: "./fonts/fraunces-italic.woff2", weight: "100 900", style: "italic" },
+  ],
+  variable: "--font-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
