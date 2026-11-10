@@ -259,13 +259,19 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   // Le packshot compte pour une photo ; chaque mise en scène terminée fait avancer la barre.
   let done = 1;
   onProgress?.(done, shots.length + 1);
-  await Promise.all(shots.map(async ([slot, kind, ratio, prompt]) => {
-    try {
-      await save(slot, kind, await editImage(reference, prompt, ratio), prompt);
-    } catch (e) {
-      console.warn(`Image ${slot} non générée :`, errorMessage(e));
+  // 4 images à la fois au plus : fal.ai refuse au-delà de 10 demandes simultanées (plusieurs boutiques peuvent
+  // être créées en même temps), et une image refusée manquerait dans la boutique.
+  const queue = [...shots];
+  await Promise.all(Array.from({ length: Math.min(4, queue.length) }, async () => {
+    for (let shot = queue.shift(); shot; shot = queue.shift()) {
+      const [slot, kind, ratio, prompt] = shot;
+      try {
+        await save(slot, kind, await editImage(reference, prompt, ratio), prompt);
+      } catch (e) {
+        console.warn(`Image ${slot} non générée :`, errorMessage(e));
+      }
+      onProgress?.(++done, shots.length + 1);
     }
-    onProgress?.(++done, shots.length + 1);
   }));
 }
 

@@ -7,16 +7,28 @@ import { db, must } from "./supabase";
 const SIZES = { "1:1": { width: 1024, height: 1024 }, "4:5": { width: 896, height: 1120 }, "16:9": { width: 1344, height: 768 } } as const;
 export type AspectRatio = keyof typeof SIZES;
 
+// fal.ai limite le nombre d'images en cours en même temps (erreur 429) : on attend un peu et on réessaie
+// au lieu d'abandonner l'image (2 s, 5 s, 10 s).
+async function falPost(model: string, key: string, payload: unknown) {
+  const waits = [2000, 5000, 10000];
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(`https://fal.run/${model}`, {
+      method: "POST",
+      headers: { authorization: `Key ${key}`, "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (res.status !== 429 || attempt >= waits.length) return res;
+    await res.text().catch(() => "");
+    await new Promise((r) => setTimeout(r, waits[attempt]));
+  }
+}
+
 // Génère une image via fal.ai (FAL_KEY), puis la copie dans le stockage Supabase.
 export async function generateImage(prompt: string, ratio: AspectRatio) {
   const key = env.falKey();
   if (!key) throw new HttpError(503, "not_configured", "La génération d'images n'est pas encore activée (FAL_KEY manquante).");
   const size = SIZES[ratio];
-  const res = await fetch(`https://fal.run/${process.env.FAL_MODEL ?? "fal-ai/flux/dev"}`, {
-    method: "POST",
-    headers: { authorization: `Key ${key}`, "content-type": "application/json" },
-    body: JSON.stringify({ prompt, image_size: size, num_images: 1, enable_safety_checker: true }),
-  });
+  const res = await falPost(process.env.FAL_MODEL ?? "fal-ai/flux/dev", key, { prompt, image_size: size, num_images: 1, enable_safety_checker: true });
   if (!res.ok) {
     const detail = (await res.text().catch(() => "")).slice(0, 160);
     console.error("fal.ai", res.status, detail);
@@ -44,13 +56,9 @@ export async function editImage(referenceUrl: string, prompt: string, ratio: Asp
   for (const model of EDIT_MODELS) {
     try {
       const nano = model.includes("nano-banana");
-      const res = await fetch(`https://fal.run/${model}`, {
-        method: "POST",
-        headers: { authorization: `Key ${key}`, "content-type": "application/json" },
-        body: JSON.stringify(nano
-          ? { prompt, image_urls: [referenceUrl], aspect_ratio: ratio, num_images: 1, output_format: "jpeg" }
-          : { prompt, image_url: referenceUrl, aspect_ratio: KONTEXT_RATIO[ratio], num_images: 1, output_format: "jpeg" }),
-      });
+      const res = await falPost(model, key, nano
+        ? { prompt, image_urls: [referenceUrl], aspect_ratio: ratio, num_images: 1, output_format: "jpeg" }
+        : { prompt, image_url: referenceUrl, aspect_ratio: KONTEXT_RATIO[ratio], num_images: 1, output_format: "jpeg" });
       if (!res.ok) {
         const detail = (await res.text().catch(() => "")).slice(0, 200);
         console.error("fal.ai", model, res.status, detail);
