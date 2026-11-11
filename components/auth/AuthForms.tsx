@@ -155,7 +155,6 @@ export function ShopifyBag({ className }: { className?: string }) {
 // Google et e-mail : masqués par défaut (on se connecte avec Shopify), réactivables avec NEXT_PUBLIC_GOOGLE_AUTH=on / NEXT_PUBLIC_EMAIL_AUTH=on.
 // Google exige le provider activé dans Supabase ; l'e-mail, un SMTP perso (Resend) pour lever la limite de Supabase.
 const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH === "on";
-const EMAIL_ENABLED = process.env.NEXT_PUBLIC_EMAIL_AUTH === "on";
 
 function GoogleButton({ next }: { next: string }) {
   const router = useRouter();
@@ -180,9 +179,9 @@ function GoogleButton({ next }: { next: string }) {
   );
 }
 
-function EmailOption({ next }: { next: string }) {
+function EmailOption({ next, startOpen = false }: { next: string; startOpen?: boolean }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(startOpen);
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "loading" | "sent">("idle");
   const [error, setError] = useState("");
@@ -214,7 +213,7 @@ function EmailOption({ next }: { next: string }) {
         <p className="text-fg">Vérifie ta boîte mail</p>
         <p className="mt-1 text-fg-muted">On a envoyé un lien de connexion à <span className="text-fg">{email}</span>. Clique dessus pour continuer (pense aux spams).</p>
         {demo && (
-          <button type="button" onClick={() => router.push(`/connecter-shopify?next=${encodeURIComponent(next)}`)} className="mt-3 text-accent underline underline-offset-4">
+          <button type="button" onClick={() => router.push(next)} className="mt-3 text-accent underline underline-offset-4">
             Ouvrir le lien (démo)
           </button>
         )}
@@ -234,7 +233,7 @@ function EmailOption({ next }: { next: string }) {
   );
 }
 
-// Écran unique de connexion / inscription : Shopify d'abord, puis Google ou e-mail.
+// Écran unique de connexion / inscription : par e-mail (lien sans mot de passe), Google en option.
 export function AuthPanel({ mode }: { mode: "login" | "register" }) {
   const params = useSearchParams();
   const next = nextUrl(params);
@@ -249,15 +248,12 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
           <p className="mt-1 line-clamp-2 text-fg-muted">« {brief} »</p>
         </div>
       )}
-      <ShopifyForm next={next} />
-      {(GOOGLE_ENABLED || EMAIL_ENABLED) && (
+      {/* Connexion par e-mail (lien sans mot de passe). Google en option si NEXT_PUBLIC_GOOGLE_AUTH=on. */}
+      <EmailOption next={next} startOpen />
+      {GOOGLE_ENABLED && (
         <>
           <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
-          <div className="space-y-2.5">
-            {GOOGLE_ENABLED && <GoogleButton next={next} />}
-            {EMAIL_ENABLED && <EmailOption next={next} />}
-          </div>
-          <p className="mt-3 text-xs text-fg-faint">On te demandera ensuite de relier ta boutique Shopify.</p>
+          <GoogleButton next={next} />
         </>
       )}
       <p className="mt-8 text-xs leading-relaxed text-fg-faint">

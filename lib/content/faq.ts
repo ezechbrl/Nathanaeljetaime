@@ -7,7 +7,7 @@ export const HOME_FAQ = [
   },
   {
     q: "Ça prend combien de temps ?",
-    a: "Environ 5 à 10 minutes pour la création. Ensuite tu relis, tu ajustes en discutant avec l'IA si tu veux, et tu publies dans Shopify en un clic.",
+    a: "Environ 5 à 10 minutes pour la création. Ensuite tu relis, tu ajustes en discutant avec l'IA si tu veux, puis tu télécharges ta boutique et tu l'importes dans Shopify en 2 étapes guidées (environ 2 minutes).",
   },
   {
     q: "Combien ça me coûte, au total ?",
@@ -23,7 +23,7 @@ export const HOME_FAQ = [
   },
   {
     q: "Il faut déjà avoir une boutique Shopify ?",
-    a: "Il faut un compte Shopify, oui : c'est là que ta boutique vit. Si tu n'en as pas, tu le crées en quelques minutes, puis tu le relies à Vigenia en un clic.",
+    a: "Il faut un compte Shopify, oui : c'est là que ta boutique vit. Si tu n'en as pas, tu le crées en quelques minutes. Pas besoin de le relier à Vigenia : tu importes simplement les fichiers de ta boutique, avec un guide pas à pas.",
   },
   {
     q: "Je dois savoir coder ou faire du design ?",

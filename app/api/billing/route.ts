@@ -1,13 +1,13 @@
 import { requireUser } from "@/lib/server/auth";
-import { billingFor, launchOffer, syncFromShopify } from "@/lib/server/billing";
+import { billingFor, launchOffer, syncFromStripe } from "@/lib/server/billing";
 import { json, route } from "@/lib/server/http";
 import { getUsage } from "@/lib/server/quota";
 
 export const GET = route(async (req) => {
   let user = await requireUser();
-  // ?sync=1 : on relit l'abonnement chez Shopify (retour du paiement, bouton « Actualiser »).
+  // ?sync=1 : on relit l'abonnement chez Stripe (retour du paiement, bouton « Actualiser »).
   if (new URL(req.url).searchParams.get("sync")) {
-    await syncFromShopify(user.id).catch((e) => console.error("Abonnement Shopify", e));
+    await syncFromStripe(user.id).catch((e) => console.error("Abonnement Stripe", e));
     user = await requireUser();
   }
   const [{ subscription, invoices, billingUrl }, usage, offer] = await Promise.all([billingFor(user), getUsage(user.id, user.plan), launchOffer(user, req.headers.get("cookie"))]);

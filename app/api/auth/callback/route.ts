@@ -20,8 +20,5 @@ export const GET = route(async (req) => {
     await db().from("users").update({ referred_by: ref }).eq("id", user.id);
     await db().from("affiliate_events").insert({ code: ref, kind: "signup", referred_user_id: user.id });
   }
-  // La boutique Shopify est obligatoire : sans connexion active, on passe par l'étape « Connecter Shopify ».
-  const { count } = await db().from("shop_connections").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "active");
-  if (!count) return NextResponse.redirect(`${env.appUrl()}/connecter-shopify?next=${encodeURIComponent(safeNext)}`);
   return NextResponse.redirect(`${env.appUrl()}${safeNext}`);
 });

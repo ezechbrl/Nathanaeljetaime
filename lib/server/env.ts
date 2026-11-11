@@ -27,6 +27,9 @@ export const env = {
   shopifyAppId: () => process.env.SHOPIFY_APP_ID ?? null, // nombre visible dans l'URL de l'app (Partner Dashboard)
   partnerOrgId: () => process.env.SHOPIFY_PARTNER_ORG_ID ?? null,
   partnerToken: () => process.env.SHOPIFY_PARTNER_TOKEN ?? null,
+  // Paiement par carte (Stripe) : clé secrète du compte et secret du webhook (Vercel, jamais dans le code).
+  stripeKey: () => required("STRIPE_SECRET_KEY"),
+  stripeWebhookSecret: () => required("STRIPE_WEBHOOK_SECRET"),
   resendKey: () => process.env.RESEND_API_KEY ?? null,
   contactEmail: () => process.env.CONTACT_EMAIL ?? null,
   falKey: () => process.env.FAL_KEY ?? null,

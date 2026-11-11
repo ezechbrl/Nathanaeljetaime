@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ExternalLink, History, RotateCcw, Trash2 } from "lucide-react";
+import { ExternalLink, History, RotateCcw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -9,10 +9,8 @@ import { GenerationProgress } from "@/components/app/GenerationProgress";
 import { FullscreenButton } from "@/components/app/FullscreenButton";
 import { PageHeader } from "@/components/app/PageHeader";
 import { PublishButton } from "@/components/app/PublishButton";
-import { ShopifySetupCard } from "@/components/app/ShopifySetupCard";
 import { TestimonialCard } from "@/components/app/TestimonialCard";
 import { ThemeColorsCard } from "@/components/app/ThemeColorsCard";
-import { ThemeImportCard, useThemeImported } from "@/components/app/ThemeImportCard";
 import { StoreCoach } from "@/components/app/StoreCoach";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import { useStore } from "@/components/app/StoreContext";
@@ -30,14 +28,13 @@ const PAGES: { id: PreviewPage; label: string }[] = [
 ];
 
 export default function StoreDashboard() {
-  const { store, activeJob, lastError, lastPublishError, setStore, reload } = useStore();
+  const { store, activeJob, lastError, setStore } = useStore();
   const { setStores } = useApp();
   const router = useRouter();
   const toast = useToast();
   const [page, setPage] = useState<PreviewPage>("accueil");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
-  const [themeImported, markThemeImported] = useThemeImported(store);
   const versions = useApi(() => api.listVersions(store.id), [store.id, store.updatedAt]);
   const assets = useApi(() => api.listAssets(store.id), [store.id, store.status, store.updatedAt]); // rechargé quand la génération se termine
 
@@ -73,16 +70,6 @@ export default function StoreDashboard() {
           <PublishButton />
         </>}
       />
-      {lastPublishError && !activeJob && (
-        <div role="alert" className="mx-5 mt-5 flex items-start gap-3 rounded-card border border-bad/30 bg-bad/10 p-4 text-sm sm:mx-8">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-bad" />
-          <div>
-            <p className="font-medium text-fg">La dernière mise à jour sur Shopify n'est pas allée au bout.</p>
-            <p className="mt-1 text-fg-muted">Raison : {lastPublishError}</p>
-            <p className="mt-1 text-fg-faint">Ton produit est bien dans Shopify. Clique sur « Mettre à jour sur Shopify » pour réessayer.</p>
-          </div>
-        </div>
-      )}
       <div className="grid gap-6 p-5 sm:p-8 xl:grid-cols-[1fr_340px]">
         <div className="min-w-0">
           <div className="flex gap-1 overflow-x-auto">
@@ -97,8 +84,6 @@ export default function StoreDashboard() {
               <StorePreview store={store} page={page} assets={assets.data?.assets} />
             </div>
           </div>
-          {store.status === "published" && store.themeStatus === "manual" && !themeImported && <div className="-mx-5 sm:-mx-8"><ThemeImportCard store={store} onDone={markThemeImported} /></div>}
-          {store.status === "published" && <div className="mt-4"><ShopifySetupCard store={store} /></div>}
         </div>
 
         <aside className="space-y-4">
@@ -129,7 +114,6 @@ export default function StoreDashboard() {
               <button onClick={() => setConfirmDelete(true)} className="flex items-center gap-2 text-sm text-fg-faint hover:text-bad"><Trash2 className="h-4 w-4" /> Supprimer la boutique</button>
             )}
           </section>
-          <Link href={`/app/boutiques/${store.id}/pilotage`} className="block text-sm text-fg-muted hover:text-fg">Voir les statistiques →</Link>
         </aside>
       </div>
     </>

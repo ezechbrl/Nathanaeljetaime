@@ -82,7 +82,7 @@ function Billing() {
               {sub ? (
                 <>
                   <p className="mt-3 text-[clamp(2.2rem,1.6rem+2vw,3.2rem)] font-semibold leading-none tracking-[-0.03em]">Vigenia {current?.name}</p>
-                  {/* Accès donné à la main (pas d'abonnement Shopify) : rien n'est facturé. */}
+                  {/* Accès donné à la main (pas d'abonnement payé) : rien n'est facturé. */}
                   {gifted ? (
                     <p className="mt-4 text-[2.4rem] font-semibold leading-none tracking-[-0.03em]">Accès offert</p>
                   ) : (
@@ -113,13 +113,13 @@ function Billing() {
         {sub && <section className="surface rounded-card p-5">
           <h2 className="text-lg tracking-tight">{gifted ? "Changer d'offre" : "Changer ou arrêter mon abonnement"}</h2>
           <p className="mt-2 text-sm text-fg-muted">{gifted
-            ? "Ton accès est offert. Tu peux quand même choisir une offre : elle sera ajoutée à ta facture Shopify."
-            : "Ton abonnement Vigenia est ajouté à ta facture Shopify : tes factures sont dans ton admin Shopify (Paramètres → Facturation). Si tu arrêtes, tout ce qui a été créé reste dans ta boutique."}</p>
+            ? "Ton accès est offert. Tu peux quand même choisir une offre, payée par carte bancaire."
+            : "Ton abonnement est payé par carte bancaire. Tes factures, ta carte et ta résiliation sont dans ton espace de paiement sécurisé (Stripe). Si tu arrêtes, tout ce que tu as téléchargé reste à toi."}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => setChanging((v) => !v)}>Changer d'offre</Button>
-            {!gifted && <><Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Mes factures Shopify</Button>
+            {!gifted && <><Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Mes factures et ma carte</Button>
             {confirmCancel ? (
-              <span className="flex items-center gap-2 text-sm">Arrêter maintenant ?
+              <span className="flex items-center gap-2 text-sm">Arrêter à la fin de la période payée ?
                 <Button variant="danger" size="sm" onClick={cancel} disabled={busy === "cancel"}>{busy === "cancel" ? <Spinner /> : "Oui, arrêter"}</Button>
                 <Button variant="ghost" size="sm" onClick={() => setConfirmCancel(false)}>Annuler</Button>
               </span>

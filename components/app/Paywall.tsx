@@ -54,7 +54,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
     }
   }
 
-  // Page de paiement Shopify créée au clic (chaque préparation crée une demande de paiement chez Shopify).
+  // Page de paiement Stripe créée au clic.
   const sessions = useRef(new Map<string, Promise<{ url: string }>>());
   function prepare(plan: Plan["id"], iv: Interval) {
     const key = `${plan}:${iv}`;

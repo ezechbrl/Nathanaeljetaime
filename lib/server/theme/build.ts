@@ -13,6 +13,8 @@ export type ThemeContext = {
   faqHandle?: string;
   // Visuels envoyés dans les fichiers Shopify, par emplacement (hero, moment1…, story).
   files?: Record<string, { filename: string }>;
+  // Boutique téléchargée (sans app Shopify) : visuels rangés dans le dossier assets/ du thème, par emplacement.
+  assetFiles?: Record<string, string>;
 };
 
 const SERIF = /serif|fraunces|playfair|cormorant|garamond|bodoni|lora|libre baskerville|dm serif/i;
@@ -61,6 +63,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   const product = ctx.productHandle;
   const shopUrl = product ? `/products/${product}` : "/collections/all";
   const file = (slot: string) => (ctx.files?.[slot] ? `shopify://shop_images/${ctx.files[slot].filename}` : undefined);
+  const asset = (slot: string) => ctx.assetFiles?.[slot];
   const offers = plan.strategy.offers;
   const find = (re: RegExp) => offers.find((o) => re.test(o)) ?? "";
   const shipOffer = find(/livraison|shipping|envío|envio|versand|spedizione|verzending|portes/i);
@@ -144,15 +147,15 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...blocks((reviews?.items ?? []).slice(0, 4).map((r) => ({ type: "review", settings: { quote: shortReview(r.text), author: r.author || "—", country: flag(r.country), stars: Math.min(5, Math.max(1, Math.round(r.rating))) } }))),
   };
   // Moments d'usage : une scène de vie par moment (personne de la cible qui utilise le produit).
-  const moments = home.moments?.items.slice(0, 3).map((m, i) => ({ ...m, image: file(`life${i + 1}`) })) ?? [];
-  const momentsSection = moments.some((m) => m.image) && {
+  const moments = home.moments?.items.slice(0, 3).map((m, i) => ({ ...m, image: file(`life${i + 1}`), image_asset: asset(`life${i + 1}`) })) ?? [];
+  const momentsSection = moments.some((m) => m.image || m.image_asset) && {
     type: "moments",
     settings: { scheme: "base", title: home.moments!.title },
-    ...blocks(moments.filter((m) => m.image).map((m) => ({ type: "moment", settings: { image: m.image, title: m.title, text: m.text ?? "" } }))),
+    ...blocks(moments.filter((m) => m.image || m.image_asset).map((m) => ({ type: "moment", settings: { image: m.image, image_asset: m.image_asset, title: m.title, text: m.text ?? "" } }))),
   };
 
   const sections: Record<string, unknown> = {
-    hero: { type: "hero", settings: { image: file("hero"), layout: ctx.theme.heroLayout ?? "left", ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
+    hero: { type: "hero", settings: { image: file("hero"), image_asset: asset("hero"), layout: ctx.theme.heroLayout ?? "left", ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
     features: featuresSection,
     benefits: benefitsSection,
     ...(momentsSection ? { moments: momentsSection } : {}),
@@ -160,7 +163,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...(comparisonSection ? { comparison: comparisonSection } : {}),
     reviews: reviewsSection,
     ...(product ? { buy: { type: "featured-product", settings: { scheme: "tint", product, heading_tag: "h2", eyebrow: "", ...productSettings, sticky: false, bundle_label: "" }, ...productBlocks } } : {}),
-    banner: { type: "image-banner", settings: { image: file("moment3") || file("hero"), title: home.finalCta?.title ?? plan.strategy.promise, text: home.finalCta?.text ?? "", cta: home.ctaLabel, url: shopUrl } },
+    banner: { type: "image-banner", settings: { image: file("moment3") || file("hero"), image_asset: asset("moment3") || asset("hero"), title: home.finalCta?.title ?? plan.strategy.promise, text: home.finalCta?.text ?? "", cta: home.ctaLabel, url: shopUrl } },
   };
   const index = { sections, order: Object.keys(sections) };
 
@@ -177,7 +180,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   };
 
   // Réglages vides (liens, images) retirés : Shopify refuse une valeur vide pour ces types.
-  const EMPTYABLE = new Set(["image", "url", "about_url", "faq_url", "shop_url"]);
+  const EMPTYABLE = new Set(["image", "image_asset", "url", "about_url", "faq_url", "shop_url"]);
   const clean = (v: unknown): unknown => {
     if (Array.isArray(v)) return v.map(clean);
     if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).filter(([k, x]) => x !== undefined && !(EMPTYABLE.has(k) && x === "")).map(([k, x]) => [k, clean(x)]));
@@ -203,8 +206,9 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   };
 }
 
-// Archive .zip du thème complet, au format attendu par Shopify (themeCreate).
-export function buildThemeZip(ctx: ThemeContext): Uint8Array {
+// Archive .zip du thème complet, au format attendu par Shopify (themeCreate ou import manuel).
+// `binaries` : fichiers déjà prêts (photos du dossier assets/), ajoutés tels quels.
+export function buildThemeZip(ctx: ThemeContext, binaries: Record<string, Uint8Array> = {}): Uint8Array {
   const files = { ...staticThemeFiles(), ...themeContent(ctx) };
-  return zipSync(Object.fromEntries(Object.entries(files).map(([path, src]) => [path, strToU8(src)])), { level: 6 });
+  return zipSync({ ...Object.fromEntries(Object.entries(files).map(([path, src]) => [path, strToU8(src)])), ...Object.fromEntries(Object.entries(binaries).map(([p, b]) => [p, [b, { level: 0 }] as [Uint8Array, { level: 0 }]])) }, { level: 6 });
 }

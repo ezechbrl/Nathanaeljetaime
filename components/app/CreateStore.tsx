@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Check, ImagePlus, Link2, PenLine, Plus, RefreshCw, Sparkles, X } from "lucide-react";
+import { AlertCircle, Check, ImagePlus, Link2, PenLine, Plus, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +16,6 @@ import { PaywallDialog, readPendingDraft } from "./Paywall";
 const MODES: { id: CreationMode; label: string; sub: string; color: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
   { id: "link", label: "Coller un lien", sub: "Ton fournisseur, ex. AliExpress", color: "#34d399", icon: Link2, placeholder: "Facultatif : ce que tu veux préciser (cible, prix de vente, ambiance)…", hint: "Le lien du produit que tu vends chez ton fournisseur (AliExpress, CJ…) ou sur ta propre page. L'IA en relève les caractéristiques et écrit une boutique originale." },
   { id: "start", label: "Décrire", sub: "Ton idée en une phrase", color: "#a78bfa", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
-  { id: "recraft", label: "Refaire ma boutique", sub: "Améliorer l'existante", color: "#fbbf24", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "L'IA lit ta boutique connectée et propose une nouvelle version dans un thème non publié." },
 ];
 
 // Ce qui rend un brief bon : chaque critère détecté s'allume, un clic ajoute une amorce.
@@ -58,7 +57,7 @@ export function CreateStore() {
   const params = useSearchParams();
   const { user, setStores, refresh } = useApp();
   const connections = useApi(() => api.listConnections(), []);
-  const [mode, setMode] = useState<CreationMode>((params.get("mode") as CreationMode) || (params.get("brief") ? "start" : "link"));
+  const [mode, setMode] = useState<CreationMode>((["link", "start"].includes(params.get("mode") ?? "") ? params.get("mode") as CreationMode : null) || (params.get("brief") ? "start" : "link"));
   const [shots, setShots] = useState<string[]>([]);
   // Vérification du lien dès qu'il est collé (aperçu, ou demande de captures si le site bloque).
   const [link, setLink] = useState<{ state: "idle" | "checking" } | { state: "ok"; title: string; image: string | null } | { state: "blocked"; reason: string; protectedSite: boolean }>({ state: "idle" });

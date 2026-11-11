@@ -598,10 +598,12 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
 
   hero: `{%- assign p = all_products[section.settings.product] -%}
 {%- assign bgimg = section.settings.image -%}
-{%- if bgimg == blank and p -%}{%- for m in p.media -%}{%- if m.alt contains 'ambiance' -%}{%- assign bgimg = m -%}{%- endif -%}{%- endfor -%}{%- endif -%}
-{%- if bgimg != blank -%}
+{%- assign bgasset = '' -%}
+{%- if bgimg == blank and section.settings.image_asset != blank -%}{%- assign bgasset = section.settings.image_asset | asset_url -%}{%- endif -%}
+{%- if bgimg == blank and bgasset == blank and p -%}{%- for m in p.media -%}{%- if m.alt contains 'ambiance' -%}{%- assign bgimg = m -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+{%- if bgimg != blank or bgasset != blank -%}
 <section class="hero hero--{{ section.settings.layout | default: 'left' }}">
-  <div class="hero__bg">${img("bgimg", 2400, 1350, true)}</div>
+  <div class="hero__bg">{% if bgimg != blank %}${img("bgimg", 2400, 1350, true)}{% else %}<img src="{{ bgasset }}" alt="" width="2400" height="1350" loading="eager">{% endif %}</div>
   <div class="wrap"><div class="hero__c reveal">
     {% if section.settings.eyebrow != blank %}<p class="pill">{% render 'icon', name: 'sparkle' %}{{ section.settings.eyebrow }}</p>{% endif %}
     <h1>{{ section.settings.title }}</h1>
@@ -626,6 +628,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
 {%- endif -%}
 ${schema({ name: "Héros", settings: [
     { type: "image_picker", id: "image", label: "Image de fond" },
+    { type: "text", id: "image_asset", label: "Image de fond Vigenia (fichier du thème)" },
     { type: "select", id: "layout", label: "Mise en page", options: [{ value: "left", label: "Texte à gauche" }, { value: "right", label: "Texte à droite" }, { value: "center", label: "Texte centré" }], default: "left" },
     { type: "product", id: "product", label: "Produit mis en avant" },
     { type: "text", id: "eyebrow", label: "Petite étiquette" },
@@ -664,11 +667,11 @@ ${schema({ name: "Image et texte", settings: [SCHEME, { type: "image_picker", id
   <div class="wrap">
     <div class="head center reveal"><h2 class="title">{{ section.settings.title }}</h2></div>
     <div class="moments">
-      {%- for block in section.blocks -%}<div class="moment reveal" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}><div class="frame"><div class="media">{% if block.settings.image != blank %}${img("block.settings.image", 900, 1125)}{% else %}<div class="ph"></div>{% endif %}</div></div><h3>{{ block.settings.title }}</h3>{% if block.settings.text != blank %}<p class="muted" style="margin-top:6px">{{ block.settings.text }}</p>{% endif %}</div>{%- endfor -%}
+      {%- for block in section.blocks -%}<div class="moment reveal" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}><div class="frame"><div class="media">{% if block.settings.image != blank %}${img("block.settings.image", 900, 1125)}{% elsif block.settings.image_asset != blank %}<img src="{{ block.settings.image_asset | asset_url }}" alt="{{ block.settings.title | escape }}" width="900" height="1125" loading="lazy">{% else %}<div class="ph"></div>{% endif %}</div></div><h3>{{ block.settings.title }}</h3>{% if block.settings.text != blank %}<p class="muted" style="margin-top:6px">{{ block.settings.text }}</p>{% endif %}</div>{%- endfor -%}
     </div>
   </div>
 </section>
-${schema({ name: "Le produit en situation", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "moment", name: "Situation", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Le produit en situation" }] })}`,
+${schema({ name: "Le produit en situation", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "moment", name: "Situation", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Le produit en situation" }] })}`,
 
   comparison: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap vs">
@@ -713,15 +716,17 @@ ${schema({ name: "Fiche produit", settings: [SCHEME, { type: "select", id: "head
 ${schema({ name: "Avis clients", settings: [SCHEME, { type: "paragraph", content: "Uniquement de vrais avis (les tiens ou ceux des acheteurs du produit chez ton fournisseur). La section reste invisible tant qu'elle est vide." }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "note", label: "Mention sous les avis (origine des avis)" }], blocks: [{ type: "review", name: "Avis", settings: [{ type: "textarea", id: "quote", label: "Avis" }, { type: "text", id: "author", label: "Prénom et initiale" }, { type: "text", id: "country", label: "Pays (drapeau ou nom)" }, { type: "range", id: "stars", label: "Note", min: 1, max: 5, step: 1, default: 5 }, { type: "text", id: "photo", label: "Adresse de la photo du client (facultatif)" }] }], max_blocks: 12, presets: [{ name: "Avis clients" }] })}`,
 
   "image-banner": `{%- assign pic = section.settings.image -%}
-<section class="banner{% if pic == blank %} banner--plain{% endif %}">
-  {% if pic != blank %}<div class="banner__bg">${img("pic", 2400, 1200)}</div>{% endif %}
+{%- assign picasset = '' -%}
+{%- if pic == blank and section.settings.image_asset != blank -%}{%- assign picasset = section.settings.image_asset | asset_url -%}{%- endif -%}
+<section class="banner{% if pic == blank and picasset == blank %} banner--plain{% endif %}">
+  {% if pic != blank %}<div class="banner__bg">${img("pic", 2400, 1200)}</div>{% elsif picasset != blank %}<div class="banner__bg"><img src="{{ picasset }}" alt="" width="2400" height="1200" loading="lazy"></div>{% endif %}
   <div class="wrap banner__c reveal">
     <h2>{{ section.settings.title }}</h2>
     {% if section.settings.text != blank %}<p>{{ section.settings.text }}</p>{% endif %}
     {% if section.settings.cta != blank %}<a class="btn btn--light" href="{{ section.settings.url | default: routes.all_products_collection_url }}">{{ section.settings.cta }} {% render 'icon', name: 'arrow' %}</a>{% endif %}
   </div>
 </section>
-${schema({ name: "Bannière", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "title", label: "Titre" }, { type: "textarea", id: "text", label: "Texte" }, { type: "text", id: "cta", label: "Bouton" }, { type: "url", id: "url", label: "Lien" }], presets: [{ name: "Bannière" }] })}`,
+${schema({ name: "Bannière", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }, { type: "text", id: "title", label: "Titre" }, { type: "textarea", id: "text", label: "Texte" }, { type: "text", id: "cta", label: "Bouton" }, { type: "url", id: "url", label: "Lien" }], presets: [{ name: "Bannière" }] })}`,
 
   faq: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap faq">

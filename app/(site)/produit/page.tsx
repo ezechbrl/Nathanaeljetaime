@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Section";
-import { ChatMock, PilotMock, RecraftMock, StrategyMock, StudioMock } from "@/components/site/FeatureMocks";
+import { ChatMock, RecraftMock, StrategyMock, StudioMock } from "@/components/site/FeatureMocks";
 import { FeatureRow } from "@/components/site/FeatureRow";
 import { FinalCta } from "@/components/site/FinalCta";
 import { PageHero } from "@/components/site/PageHero";
@@ -45,7 +45,7 @@ export default function ProductPage() {
           reverse
           eyebrow="2 · Boutique complète"
           title="Une boutique entière, pas un modèle à remplir"
-          text="Identité de marque, page d'accueil, fiches produits, FAQ, pages À propos, Livraison et Contact, menus : tout est créé et publié dans ta boutique Shopify."
+          text="Identité de marque, page d'accueil, fiches produits, FAQ, pages À propos, Livraison et Contact, menus : tout est créé, puis importé dans ta boutique Shopify en 2 étapes guidées."
           points={["Nom, ton, couleurs et typographies", "Fiches produits avec prix conseillé", "Pages et menus configurés", "Publication en brouillon, tu valides"]}
           visual={<RecraftMock />}
         />
@@ -61,15 +61,8 @@ export default function ProductPage() {
           eyebrow="4 · Studio"
           title="Des visuels dans le style de ta marque"
           text="À partir de tes photos produit, génère des mises en scène, des bannières et des visuels pour les réseaux, aux bons formats."
-          points={["Photos d'ambiance et packshots", "Formats 1:1, 4:5 et 16:9", "Envoi direct dans Shopify"]}
+          points={["Photos d'ambiance et packshots", "Formats 1:1, 4:5 et 16:9", "Photos incluses dans ta boutique"]}
           visual={<StudioMock />}
-        />
-        <FeatureRow
-          eyebrow="5 · Pilotage"
-          title="Un expert e-commerce qui regarde tes chiffres chaque matin"
-          text="L'IA lit tes statistiques Shopify, repère ce qui freine la vente et te propose des corrections concrètes, que tu appliques en un clic."
-          points={["Avis du jour en langage clair", "3 à 5 recommandations priorisées", "Mesure de l'effet de chaque changement"]}
-          visual={<PilotMock />}
         />
       </Container>
 

@@ -15,7 +15,7 @@ const UNLOCKS = [
   { icon: Camera, title: "9 photos de pro", text: "Ton produit en studio et en situation" },
   { icon: Star, title: "Vrais avis acheteurs", text: "Importés et traduits automatiquement" },
   { icon: MessageSquare, title: "Éditeur IA", text: "Modifie tout en une phrase" },
-  { icon: Rocket, title: "Publication Shopify", text: "Produit et pages en ligne en un clic" },
+  { icon: Rocket, title: "Mise en ligne Shopify", text: "Produit et design à importer, guidé pas à pas" },
 ];
 
 const eur = (p: string) => `${Number(p).toFixed(2).replace(".", ",")} €`;

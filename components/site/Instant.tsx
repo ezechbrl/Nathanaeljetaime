@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 const TABS = [
   { id: "text", icon: MessageSquareText, title: "Des textes qui vendent", text: "Accueil, fiche produit, FAQ, offres par lot." },
   { id: "photo", icon: Camera, title: "Des photos de pro", text: "Ton produit en studio et en situation." },
-  { id: "publish", icon: Rocket, title: "Publié sur Shopify", text: "Thème, produit et pages en un clic." },
+  { id: "publish", icon: Rocket, title: "En ligne sur Shopify", text: "Thème et produit importés en 2 étapes guidées." },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 

@@ -33,7 +33,7 @@ export const LEGAL: LegalDoc[] = [
     updated: "2026-10-19",
     sections: [
       { heading: "Responsable du traitement", body: [`${COMPANY.name}, ${COMPANY.address}. Pour toute question : ${COMPANY.email}.`] },
-      { heading: "Données collectées", body: ["Compte : prénom, e-mail, mot de passe chiffré.", "Boutique : domaine Shopify, jeton d'accès chiffré, contenus générés, statistiques de vente agrégées.", "Paiement : géré par Shopify, sur ta facture Shopify ; nous n'avons jamais accès à tes moyens de paiement.", "Usage : pages consultées et actions dans l'application, pour améliorer le service."] },
+      { heading: "Données collectées", body: ["Compte : prénom, e-mail, mot de passe chiffré.", "Boutique : contenus générés (textes, images, réglages du thème).", "Paiement : géré par Stripe (paiement par carte sécurisé) ; nous n'avons jamais accès à tes numéros de carte.", "Usage : pages consultées et actions dans l'application, pour améliorer le service."] },
       { heading: "Finalités et bases légales", body: ["Fournir le service (exécution du contrat).", "Facturer l'abonnement (obligation légale).", "Améliorer le produit et prévenir la fraude (intérêt légitime).", "Envoyer la newsletter (consentement, retirable à tout moment)."] },
       { heading: "Sous-traitants", body: ["Vercel (hébergement), Supabase (base de données), Anthropic (génération de texte par IA), Resend (e-mails), Shopify (publication de ta boutique et facturation de l'abonnement). Les contenus que tu soumets à l'IA ne sont pas utilisés pour entraîner les modèles."] },
       { heading: "Durée de conservation", body: ["Les données du compte sont conservées tant que le compte est actif, puis supprimées sous 30 jours après sa clôture, sauf obligations comptables (10 ans pour les factures)."] },
@@ -62,7 +62,7 @@ export const LEGAL: LegalDoc[] = [
     updated: "2026-10-19",
     sections: [
       { heading: "Offres et prix", body: ["Les offres et prix en vigueur sont indiqués sur la page Tarifs, en euros hors taxes pour les professionnels et toutes taxes comprises pour les particuliers. L'abonnement Shopify n'est pas inclus."] },
-      { heading: "Paiement", body: ["L'abonnement est facturé par Shopify, sur la facture Shopify du marchand, à chaque période (30 jours ou un an). Il peut être changé ou arrêté à tout moment depuis la page Abonnement ; Shopify applique ses règles de facturation au prorata."] },
+      { heading: "Paiement", body: ["L'abonnement est payé par carte bancaire via Stripe, à chaque période (mois ou année). Il peut être changé ou arrêté à tout moment depuis la page Abonnement ; l'arrêt prend effet à la fin de la période déjà payée."] },
       { heading: "Renouvellement et résiliation", body: ["L'abonnement se renouvelle automatiquement. Tu peux le résilier à tout moment depuis ton espace ; il reste actif jusqu'à la fin de la période payée."] },
       { heading: "Rétractation et remboursement", body: ["Si tu es un consommateur, tu disposes d'un délai de rétractation de 14 jours. En commençant à utiliser le service pendant ce délai, tu reconnais que l'exécution a commencé. Nous remboursons néanmoins intégralement le premier paiement sur simple demande dans les 14 jours."] },
       { heading: "Factures", body: ["Les factures sont disponibles dans ton espace, rubrique Abonnement."] },

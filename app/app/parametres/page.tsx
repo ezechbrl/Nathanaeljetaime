@@ -1,6 +1,5 @@
 "use client";
 
-import { site } from "@/lib/site";
 import { ShoppingBag, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -28,8 +27,6 @@ export default function SettingsPage() {
   const toast = useToast();
   const connections = useApi(() => api.listConnections(), []);
   const [saving, setSaving] = useState(false);
-  const [shop, setShop] = useState("");
-  const [connecting, setConnecting] = useState(false);
   const [confirm, setConfirm] = useState("");
 
   async function saveProfile(e: React.FormEvent<HTMLFormElement>) {
@@ -44,23 +41,6 @@ export default function SettingsPage() {
       toast((err as Error).message, "error");
     } finally {
       setSaving(false);
-    }
-  }
-
-  async function connect(e: React.FormEvent) {
-    e.preventDefault();
-    const domain = shop.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-    if (!/^[a-z0-9][a-z0-9-]*(\.myshopify\.com)?$/.test(domain)) return toast("Saisis l'adresse en .myshopify.com de ta boutique.", "error");
-    setConnecting(true);
-    try {
-      await api.connectShop(domain.endsWith(".myshopify.com") ? domain : `${domain}.myshopify.com`);
-      setShop("");
-      connections.reload();
-      toast("Boutique connectée");
-    } catch (err) {
-      toast((err as Error).message, "error");
-    } finally {
-      setConnecting(false);
     }
   }
 
@@ -88,7 +68,8 @@ export default function SettingsPage() {
           </form>
         </Card>
 
-        <Card id="shopify" title="Boutiques Shopify" text="L'IA publie dans ces boutiques et lit leurs statistiques pour le pilotage.">
+        {connections.data && connections.data.connections.length > 0 && (
+        <Card id="shopify" title="Boutiques Shopify" text="Anciennes connexions. Tu peux les déconnecter.">
           <div className="space-y-2">
             {!connections.data ? <Skeleton className="h-16" /> : connections.data.connections.map((c) => (
               <div key={c.id} className="flex items-center justify-between gap-3 rounded-card border border-white/[0.07] p-4">
@@ -103,16 +84,9 @@ export default function SettingsPage() {
               </div>
             ))}
           </div>
-          <form onSubmit={connect} className="mt-4 flex gap-2">
-            <label htmlFor="shop" className="sr-only">Adresse de ta boutique</label>
-            <input id="shop" value={shop} onChange={(e) => setShop(e.target.value)} placeholder="ma-boutique.myshopify.com" className="field" />
-            <Button type="submit" disabled={connecting || !shop}>{connecting ? <Spinner /> : "Connecter"}</Button>
-          </form>
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-ctl border border-white/[0.08] bg-white/[0.02] px-3 py-2.5 text-sm">
-            <span className="text-fg-muted">Pas de compte Shopify ?</span>
-            <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="inline-flex items-center gap-1.5 rounded-ctl border border-white/15 px-3 py-1.5 text-[13px] font-medium hover:bg-white/5">Créer un compte Shopify</a>
-          </div>
+          <p className="mt-4 text-sm text-fg-muted">Plus besoin de connecter Shopify : sur chaque boutique, clique sur « Mettre en ligne sur Shopify » et suis les 2 étapes.</p>
         </Card>
+        )}
 
         <Card title="Supprimer le compte" text="Supprime ton compte et toutes tes données. Tes boutiques Shopify ne sont pas touchées.">
           <label className="block text-sm text-fg-muted">Tape <span className="font-mono text-fg">SUPPRIMER</span> pour confirmer<input value={confirm} onChange={(e) => setConfirm(e.target.value)} className="field mt-1.5" /></label>
