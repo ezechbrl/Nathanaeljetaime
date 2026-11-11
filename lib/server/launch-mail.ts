@@ -54,7 +54,7 @@ function launchHtml(url: string, p: { now: string; year: string; was: string; ot
 </td></tr></table>
 <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:#a7f3d0;text-align:left">Valable ${LAUNCH_OFFER.hours} h après la création de ton compte. Passe par le bouton ci-dessous pour qu'on te reconnaisse. Aperçu gratuit avant de payer.</p>
 <a href="${url}" style="display:inline-block;margin-top:22px;padding:15px 30px;border-radius:999px;background:#2ee6a6;color:#03140d;font-size:16px;font-weight:700;text-decoration:none">Créer ma boutique →</a>
-<div style="margin-top:14px;font-size:12px;color:#9ca3af">Sans engagement · Annulable en 1 clic · Payé sur ta facture Shopify</div>
+<div style="margin-top:14px;font-size:12px;color:#9ca3af">Sans engagement · Annulable en 1 clic · Paiement sécurisé par carte</div>
 </td></tr>
 <tr><td style="padding:18px 6px 0;font-size:12px;color:#6b8f82;text-align:center">Tu reçois cet e-mail car tu t'es inscrit sur la liste d'attente de Vigenia. C'est le seul, promis.</td></tr>
 </table></td></tr></table></body></html>`;
