@@ -44,7 +44,23 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
   const [shop, setShop] = useState("");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [code, setCode] = useState("");
+  const [checking, setChecking] = useState(false);
   const router = useRouter();
+
+  // Code à 6 chiffres lu sur le téléphone, tapé ici : la session s'ouvre sur cet appareil.
+  async function submitCode(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setChecking(true);
+    try {
+      await api.verifyEmailCode(email, code.replace(/\D/g, ""), normalizeShop(shop) ?? undefined);
+      window.location.href = next;
+    } catch (err) {
+      setError((err as Error).message);
+      setChecking(false);
+    }
+  }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
@@ -125,8 +141,15 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
       {open && sent && (
         <div role="status" className="rounded-card border border-accent/25 bg-accent-deep/25 p-4 text-sm">
           <p className="font-medium text-fg">Vérifie ta boîte mail</p>
-          <p className="mt-1 text-fg-muted">On a envoyé ton lien de connexion à <span className="text-fg">{email}</span>. Clique dessus pour entrer dans Vigenia (pense aux spams).</p>
-          {api.API_MODE !== "live" && <button type="button" onClick={() => router.push(next)} className="mt-3 text-accent underline underline-offset-4">Ouvrir le lien (démo)</button>}
+          <p className="mt-1 text-fg-muted">On a envoyé un e-mail à <span className="text-fg">{email}</span> (pense aux spams). Tape le code à 6 chiffres qu'il contient, ou clique sur le lien.</p>
+          <form onSubmit={submitCode} className="mt-3 flex gap-2">
+            <label htmlFor="login-code" className="sr-only">Code reçu par e-mail</label>
+            <input id="login-code" autoFocus inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => { setCode(e.target.value); setError(""); }} placeholder="123456" maxLength={10} className="field min-w-0 flex-1 text-center text-lg tracking-[0.3em]" />
+            <Button type="submit" disabled={checking || code.replace(/\D/g, "").length < 6}>{checking ? <Spinner /> : "Valider"}</Button>
+          </form>
+          {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
+          <button type="button" onClick={() => { setSent(false); setCode(""); setError(""); }} className="mt-3 text-xs text-fg-faint underline underline-offset-4 hover:text-fg">Changer d'e-mail ou renvoyer un code</button>
+          {api.API_MODE !== "live" && <button type="button" onClick={() => router.push(next)} className="mt-3 block text-accent underline underline-offset-4">Ouvrir le lien (démo)</button>}
         </div>
       )}
       {open && !sent && (
@@ -145,7 +168,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
           )}
           {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
           <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
-          <p className="mt-2 text-xs text-fg-faint">{withEmail ? "Pas de mot de passe : tu reçois un lien de connexion par e-mail." : "Tu peux coller l'adresse complète de ton admin Shopify : on s'occupe du reste."}</p>
+          <p className="mt-2 text-xs text-fg-faint">{withEmail ? "Pas de mot de passe : tu reçois un code par e-mail." : "Tu peux coller l'adresse complète de ton admin Shopify : on s'occupe du reste."}</p>
         </form>
       )}
       <p className="text-center text-xs text-fg-faint">Offre Shopify en ce moment · lien partenaire</p>

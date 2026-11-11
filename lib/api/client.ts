@@ -43,6 +43,9 @@ export const loginWithGoogleDemo = () => mock.loginWithGoogle();
 // Lien de connexion par e-mail. En démo, la session est créée directement.
 export const sendEmailLink = (email: string, next = "/app", shop?: string) =>
   live ? request<void>("/api/auth/email", { method: "POST", json: { email, next, shop } }) : mock.loginWithEmail(email).then(() => (shop ? mock.updateMe({ shopDomain: shop }) : undefined)).then(() => undefined);
+// Connexion avec le code à 6 chiffres reçu par e-mail (lu sur un autre appareil).
+export const verifyEmailCode = (email: string, code: string, shop?: string) =>
+  live ? request<void>("/api/auth/email/code", { method: "POST", json: { email, code, shop } }) : mock.loginWithEmail(email).then(() => undefined);
 export const logout = () => (live ? request<void>("/api/auth/logout", { method: "POST" }) : mock.logout());
 export const getMe = () => (live ? request<{ user: User; usage: Usage }>("/api/me") : mock.getMe());
 export const updateMe = (input: Partial<Pick<User, "firstName" | "email" | "avatarUrl" | "shopDomain">>) =>
