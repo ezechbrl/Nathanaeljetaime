@@ -47,8 +47,19 @@ export function priceFor(plan: PaidPlan, interval: "month" | "year", offer: "wai
   return base;
 }
 
+// Client Stripe introuvable avec la clé actuelle (ex. créé en mode test, puis passage en mode réel).
+const missing = (e: unknown) => (e as { code?: string })?.code === "resource_missing";
+
 async function customerFor(user: UserRow) {
-  if (user.stripe_customer_id) return user.stripe_customer_id;
+  if (user.stripe_customer_id) {
+    try {
+      const existing = await stripe().customers.retrieve(user.stripe_customer_id);
+      if (!("deleted" in existing && existing.deleted)) return existing.id;
+    } catch (e) {
+      if (!missing(e)) throw e;
+    }
+  }
+  // Pas de client valide avec cette clé : on en crée un nouveau et on remplace l'ancien identifiant.
   const c = await stripe().customers.create({ email: user.email, name: user.first_name || undefined, metadata: { user_id: user.id } });
   await db().from("users").update({ stripe_customer_id: c.id }).eq("id", user.id);
   return c.id;
@@ -83,8 +94,13 @@ export async function checkoutUrl(user: UserRow, plan: PaidPlan, interval: "mont
 
 export async function portalUrl(user: UserRow) {
   if (!user.stripe_customer_id) throw new HttpError(404, "not_found", "Aucun abonnement sur ce compte.");
-  const s = await stripe().billingPortal.sessions.create({ customer: user.stripe_customer_id, return_url: `${env.appUrl()}/app/abonnement` });
-  return s.url;
+  try {
+    const s = await stripe().billingPortal.sessions.create({ customer: user.stripe_customer_id, return_url: `${env.appUrl()}/app/abonnement` });
+    return s.url;
+  } catch (e) {
+    if (missing(e)) throw new HttpError(404, "not_found", "Aucun abonnement sur ce compte.");
+    throw e;
+  }
 }
 
 const planOf = (sub: Stripe.Subscription): PaidPlan | null => {
@@ -158,7 +174,11 @@ async function logRevenue(row: { user_id: string; kind: "new" | "payment" | "can
 export async function syncFromStripe(userId: string) {
   const user = must(await db().from("users").select("stripe_customer_id").eq("id", userId).maybeSingle()) as { stripe_customer_id: string | null } | null;
   if (!user?.stripe_customer_id) return;
-  const list = await stripe().subscriptions.list({ customer: user.stripe_customer_id, status: "all", limit: 5 });
+  const list = await stripe().subscriptions.list({ customer: user.stripe_customer_id, status: "all", limit: 5 }).catch((e) => {
+    if (missing(e)) return null;
+    throw e;
+  });
+  if (!list) return;
   const sub = list.data.find((s) => ["active", "trialing", "past_due"].includes(s.status)) ?? list.data[0];
   if (sub) await syncSubscription(sub);
 }
@@ -184,7 +204,7 @@ export async function billingFor(user: UserRow): Promise<{ subscription: Subscri
         status: i.status === "paid" ? "paid" : i.status === "void" ? "void" : "open", pdfUrl: i.invoice_pdf ?? "#", createdAt: new Date(i.created * 1000).toISOString(),
       }));
     } catch (e) {
-      console.error("Factures Stripe", e);
+      if (!missing(e)) console.error("Factures Stripe", e);
     }
   }
   return { subscription, invoices, billingUrl: null };
