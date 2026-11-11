@@ -24,7 +24,8 @@ const onList = async (email: string | null) =>
 export async function isWaitlistMember(user: UserRow, cookie?: string | null) {
   if (user.waitlist_member) return true;
   const token = new RegExp(`(?:^|;\\s*)${WL_COOKIE}=([^;]+)`).exec(cookie ?? "")?.[1];
-  const ok = (await onList(user.email)) || (await onList(emailFromToken(token ? decodeURIComponent(token) : null)));
+  const results = await Promise.all([onList(user.email), onList(emailFromToken(token ? decodeURIComponent(token) : null))]);
+  const ok = results.some(Boolean);
   if (ok) await db().from("users").update({ waitlist_member: true }).eq("id", user.id);
   return ok;
 }

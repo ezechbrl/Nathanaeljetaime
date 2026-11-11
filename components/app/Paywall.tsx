@@ -54,24 +54,27 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
     }
   }
 
-  // Page de paiement Stripe créée au clic.
-  const sessions = useRef(new Map<string, Promise<{ url: string }>>());
-  function prepare(plan: Plan["id"], iv: Interval) {
+  // Page de paiement Stripe préparée dès que la souris (ou le doigt) arrive sur le bouton : au clic, Stripe
+  // s'ouvre presque tout de suite. Une page préparée mais pas cliquée n'est pas comptée dans les stats.
+  const sessions = useRef(new Map<string, { p: Promise<{ url: string }>; prefetched: boolean }>());
+  function prepare(plan: Plan["id"], iv: Interval, prefetch: boolean) {
     const key = `${plan}:${iv}`;
-    let p = sessions.current.get(key);
-    if (!p) {
-      p = api.startCheckout(plan as "pro" | "agency", iv);
-      p.catch(() => sessions.current.delete(key));
-      sessions.current.set(key, p);
+    let s = sessions.current.get(key);
+    if (!s) {
+      s = { p: api.startCheckout(plan as "pro" | "agency", iv, prefetch), prefetched: prefetch };
+      s.p.catch(() => sessions.current.delete(key));
+      sessions.current.set(key, s);
     }
-    return p;
+    return s;
   }
 
   async function subscribe(plan: Plan, iv: Interval) {
     setBusy(plan.id);
     savePending();
     try {
-      const { url } = await prepare(plan.id, iv);
+      const s = prepare(plan.id, iv, false);
+      if (s.prefetched) api.logCheckoutOpened(plan.id as "pro" | "agency", iv);
+      const { url } = await s.p;
       window.location.href = url;
     } catch (e) {
       toast((e as Error).message, "error");
@@ -94,7 +97,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
           left={left}
           waitlist={waitlist}
           action={(plan, iv) => (
-            <button type="button" onClick={() => subscribe(plan, iv)} disabled={!!busy} className={planButtonClass(plan.featured)}>
+            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv, true)} onFocus={() => prepare(plan.id, iv, true)} disabled={!!busy} className={planButtonClass(plan.featured)}>
               {busy === plan.id ? <Spinner /> : <>{unlockStoreId ? "Débloquer" : "Payer"} {euro(planPrice(plan, iv, !!left, waitlist).billed)}{unlockStoreId ? "" : " et créer"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
           )}

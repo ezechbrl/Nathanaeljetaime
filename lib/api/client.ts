@@ -117,8 +117,17 @@ export const dismissRecommendation = (id: string) =>
 // Facturation
 export const getBilling = (sync = false) =>
   live ? request<{ subscription: Subscription; usage: Usage; invoices: Invoice[]; offerEndsAt: string | null; offerKind?: "waitlist" | "launch" | null }>(`/api/billing${sync ? "?sync=1" : ""}`) : mock.getBilling();
-export const startCheckout = (plan: "pro" | "agency", interval: "month" | "year") =>
-  live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan, interval } }) : mock.checkout(plan);
+export const startCheckout = (plan: "pro" | "agency", interval: "month" | "year", prefetch = false) =>
+  live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan, interval, prefetch } }) : mock.checkout(plan);
+// Clic sur « Payer » quand la page de paiement était déjà prête (préparée au survol) : compté dans l'entonnoir.
+export const logCheckoutOpened = (plan: "pro" | "agency", interval: "month" | "year") => {
+  if (!live) return;
+  const payload = JSON.stringify({ plan, interval, opened: true });
+  try {
+    if (navigator.sendBeacon?.("/api/billing/checkout", new Blob([payload], { type: "application/json" }))) return;
+  } catch { /* on passe à fetch */ }
+  void fetch("/api/billing/checkout", { method: "POST", body: payload, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
+};
 export const openBillingPortal = () => (live ? request<{ url: string }>("/api/billing/portal", { method: "POST" }) : Promise.resolve({ url: "/app/abonnement" }));
 export const cancelSubscription = () => (live ? request<void>("/api/billing/cancel", { method: "POST" }) : mock.ok());
 // App « Ventes » : clé de l'appareil du fondateur (gardée sur le téléphone) pour ne jamais se reconnecter.

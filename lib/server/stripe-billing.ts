@@ -50,24 +50,26 @@ export function priceFor(plan: PaidPlan, interval: "month" | "year", offer: "wai
 // Client Stripe introuvable avec la clé actuelle (ex. créé en mode test, puis passage en mode réel).
 const missing = (e: unknown) => (e as { code?: string })?.code === "resource_missing";
 
-async function customerFor(user: UserRow) {
-  if (user.stripe_customer_id) {
-    try {
-      const existing = await stripe().customers.retrieve(user.stripe_customer_id);
-      if (!("deleted" in existing && existing.deleted)) return existing.id;
-    } catch (e) {
-      if (!missing(e)) throw e;
-    }
-  }
-  // Pas de client valide avec cette clé : on en crée un nouveau et on remplace l'ancien identifiant.
+// Nouveau client Stripe (aucun, ou l'ancien n'existe plus avec cette clé) : on remplace l'identifiant enregistré.
+async function newCustomer(user: UserRow) {
   const c = await stripe().customers.create({ email: user.email, name: user.first_name || undefined, metadata: { user_id: user.id } });
   await db().from("users").update({ stripe_customer_id: c.id }).eq("id", user.id);
   return c.id;
 }
 
-// Page de paiement Stripe pour l'offre choisie.
+// Page de paiement Stripe pour l'offre choisie. Le client enregistré est utilisé tel quel (un appel Stripe de
+// moins) ; s'il n'existe plus (ex. créé en mode test), on en crée un et on recommence une seule fois.
 export async function checkoutUrl(user: UserRow, plan: PaidPlan, interval: "month" | "year", cookie?: string | null) {
-  const [{ kind: offer }, customer] = await Promise.all([launchOffer(user, cookie), customerFor(user)]);
+  const [{ kind: offer }, saved] = await Promise.all([launchOffer(user, cookie), user.stripe_customer_id ?? newCustomer(user)]);
+  try {
+    return await createSession(user, plan, interval, offer, saved);
+  } catch (e) {
+    if (!missing(e) || !user.stripe_customer_id) throw e;
+    return createSession(user, plan, interval, offer, await newCustomer(user));
+  }
+}
+
+async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | "year", offer: "waitlist" | "launch" | null, customer: string) {
   const amount = priceFor(plan, interval, offer);
   const session = await stripe().checkout.sessions.create({
     mode: "subscription",
