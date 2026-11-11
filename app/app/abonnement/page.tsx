@@ -24,8 +24,9 @@ function Billing() {
 
   useEffect(() => {
     if (params.get("checkout") === "success") {
-      toast("Abonnement activé, merci !");
-      refresh();
+      // Retour du paiement : on relit l'abonnement chez Stripe (sans attendre le webhook), puis le compte.
+      api.getBilling(true).then(() => refresh(), () => refresh());
+      toast("Paiement reçu, merci ! Ton abonnement est activé.");
       router.replace("/app/abonnement");
     }
   }, [params, refresh, router, toast]);

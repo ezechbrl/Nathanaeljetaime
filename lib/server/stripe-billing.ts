@@ -74,7 +74,7 @@ export async function checkoutUrl(user: UserRow, plan: PaidPlan, interval: "mont
     subscription_data: { metadata: { user_id: user.id, plan, interval, offer: offer ?? "none" } },
     ...(offer ? {} : { allow_promotion_codes: true }),
     locale: "fr",
-    success_url: `${env.appUrl()}/app?checkout=success`,
+    success_url: `${env.appUrl()}/app/abonnement?checkout=success`,
     cancel_url: `${env.appUrl()}/app/abonnement`,
   });
   if (!session.url) throw new HttpError(502, "billing_failed", "Le paiement n'a pas pu être préparé. Réessaie dans un instant.");
