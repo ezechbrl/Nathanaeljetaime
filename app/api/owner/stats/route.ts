@@ -42,7 +42,7 @@ export const GET = route(async () => {
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const since60 = new Date(Date.now() - 61 * DAY).toISOString(); // 30 jours + les 30 d'avant, pour comparer
   const [subs, events, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
-    db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id"),
+    db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id, stripe_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(2000),
     db().from("waitlist").select("email, ref, brief, created_at").order("created_at", { ascending: false }),
     db().from("users").select("id, email, created_at").order("created_at", { ascending: false }),
@@ -62,7 +62,7 @@ export const GET = route(async () => {
   const realWaitlist = waitlist.filter((w) => !isShopifyTester(w.email) && !isOwnerEmail(w.email));
   // Vrais visiteurs : ni robots (filtrés à l'enregistrement), ni passages venant de Shopify.
   const realVisits: Record<string, any>[] = visits.filter((v) => !v.excluded).map((v) => ({ ...v, created_at: v.first_seen as string }));
-  const active = subs.filter((s) => s.status === "active" && s.shopify_subscription_id && !s.test && s.plan !== "free");
+  const active = subs.filter((s) => s.status === "active" && (s.shopify_subscription_id || s.stripe_subscription_id) && !s.test && s.plan !== "free");
   const monthly = (s: Record<string, any>) => toEur(Number(s.amount_cents ?? 0), s.currency) / (s.interval === "year" ? 12 : 1);
   const mrr = Math.round(active.reduce((t, s) => t + monthly(s), 0));
   const sum = (rows: Record<string, any>[]) => rows.reduce((t, e) => t + toEur(Number(e.amount_cents), e.currency), 0);

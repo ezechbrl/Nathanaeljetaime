@@ -132,7 +132,8 @@ export async function syncSubscription(sub: Stripe.Subscription) {
     cancel_at_period_end: sub.cancel_at_period_end,
     amount_cents: amount,
     currency: (item?.price.currency ?? "eur").toUpperCase(),
-    test: !sub.livemode,
+    // Un abonnement marqué « test » à la main (paiement d'essai du fondateur) le reste.
+    test: !sub.livemode || (before?.test === true && before.stripe_subscription_id === sub.id),
     updated_at: new Date().toISOString(),
   });
   await db().from("users").update({ plan }).eq("id", userId);
@@ -145,7 +146,7 @@ export async function syncSubscription(sub: Stripe.Subscription) {
     if (sub.livemode && before?.stripe_subscription_id !== sub.id) await logRevenue({ user_id: userId, kind: "new", plan, amount_cents: amount ?? 0, currency: "EUR", external_id: `new:${sub.id}` });
   } else if (was !== "free" && plan === "free") {
     await notifyOwner("Abonné parti", `${user?.email ?? "Un client"} a arrêté son abonnement Vigenia.`);
-    if (sub.livemode && before?.plan && before.plan !== "free") await logRevenue({ user_id: userId, kind: "cancel", plan: before.plan, external_id: `cancel:${sub.id}` });
+    if (sub.livemode && !before?.test && before?.plan && before.plan !== "free") await logRevenue({ user_id: userId, kind: "cancel", plan: before.plan, external_id: `cancel:${sub.id}` });
   }
 }
 
