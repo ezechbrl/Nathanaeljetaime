@@ -229,6 +229,49 @@ function OfferNote({ offer }: { offer: Offer }) {
   return <> · {offer.lastCallAt ? "2 mails envoyés (12 h + dernière heure)" : offer.reminderAt ? "mail de 12 h envoyé · dernier à 23 h" : "mail de rappel à 12 h"}</>;
 }
 
+// Paliers de revenu mensuel à atteindre (en euros), pour voir le prochain objectif.
+const MILESTONES = [100, 500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000];
+
+const ago = (iso: string) => {
+  const min = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60_000));
+  if (min < 60) return `il y a ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `il y a ${h} h`;
+  const d = Math.round(h / 24);
+  return `il y a ${d} jour${d > 1 ? "s" : ""}`;
+};
+
+// En haut de la page : le revenu mensuel (MRR) en gros, l'année au même rythme, et le prochain palier.
+function MoneyHero({ s }: { s: OwnerStats }) {
+  const mrrEuros = s.mrr / 100;
+  const next = MILESTONES.find((m) => m > mrrEuros) ?? MILESTONES[MILESTONES.length - 1];
+  const prevStep = [...MILESTONES].reverse().find((m) => m <= mrrEuros) ?? 0;
+  const progress = Math.min(1, mrrEuros / next);
+  const lastSale = s.recent.find((r) => r.kind === "new" || r.kind === "payment");
+  return (
+    <Card className="relative overflow-hidden bg-[linear-gradient(160deg,#ffffff,#effcf5)]">
+      <div className="flex items-start justify-between gap-3">
+        <span className="text-[13px] font-medium text-[#0a8f5f]">Revenu mensuel (MRR)</span>
+        <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", TONES.green)}>{s.subscribers.total} abonné{s.subscribers.total > 1 ? "s" : ""}</span>
+      </div>
+      <p className="mt-1 text-[2.4rem] font-bold leading-none tracking-[-0.03em] tabular-nums">{eur(s.mrr)}</p>
+      <p className="mt-1.5 text-[13px] text-[#616161]">
+        soit <b className="text-[#111]">{eur(s.arr)}</b> sur un an · {lastSale ? <>dernière vente {ago(lastSale.at)}</> : "pas encore de vente"}
+      </p>
+      <div className="mt-4">
+        <div className="flex justify-between text-[11.5px] text-[#616161]">
+          <span>{prevStep ? `Palier ${eur(prevStep * 100)} atteint ✓` : "Premier palier"}</span>
+          <span className="font-semibold text-[#111]">Objectif {eur(next * 100)} / mois</span>
+        </div>
+        <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-[#e6f4ec]">
+          <div className="h-full rounded-full bg-[linear-gradient(90deg,#10b981,#0a8f5f)] transition-[width] duration-700" style={{ width: `${Math.max(2, progress * 100)}%` }} />
+        </div>
+        <p className="mt-1.5 text-[11.5px] text-[#8a8a8a]">Encore {eur(Math.max(0, next * 100 - s.mrr))} par mois pour l'atteindre</p>
+      </div>
+    </Card>
+  );
+}
+
 function Dashboard({ s }: { s: OwnerStats }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -236,7 +279,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
     return () => window.clearInterval(t);
   }, []);
   const [period, setPeriod] = useState<PeriodId>("today");
-  const [metric, setMetric] = useState<"signups" | "revenue" | "visits">("signups");
+  const [metric, setMetric] = useState<"signups" | "revenue" | "visits">("revenue");
   const p = s.periods[period];
   const q = p.prev;
   const vs = PERIODS.find((x) => x.id === period)!.vs;
@@ -256,9 +299,12 @@ function Dashboard({ s }: { s: OwnerStats }) {
           </button>
         ))}
       </div>
-      {/* Le graphique en premier : Inscrits, Revenus ou Visites */}
+      {/* L'argent d'abord : revenu mensuel et prochain palier */}
+      <MoneyHero s={s} />
+
+      {/* Puis le graphique : Revenus (par défaut), Inscrits ou Visites */}
       <div className="grid grid-cols-3 rounded-full bg-black/25 p-1">
-        {([["signups", "Inscrits"], ["revenue", "Revenus"], ["visits", "Visites"]] as const).map(([k, l]) => (
+        {([["revenue", "Revenus"], ["signups", "Inscrits"], ["visits", "Visites"]] as const).map(([k, l]) => (
           <button key={k} type="button" onClick={() => setMetric(k)} className={cn("rounded-full py-1.5 text-[13px] font-medium", metric === k ? "bg-white text-[#111]" : "text-white/75")}>{l}</button>
         ))}
       </div>
@@ -269,20 +315,21 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
       {/* Les chiffres clés de la période, tous à la même taille */}
       <div className="grid grid-cols-2 gap-3">
+        {/* Argent de la période d'abord */}
+        <Metric icon={Wallet} color="green" label="Encaissé" value={eur(p.revenue)} hint={plural(p.sales, "paiement")} cur={p.revenue} prev={q.revenue} />
+        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} hint="Premiers abonnements" cur={p.newSubs} prev={q.newSubs} />
+        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" cur={p.sales} prev={q.sales} />
+        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} hint={`Taux sur 30 j : ${pct(s.churn)}`} cur={p.cancels} prev={q.cancels} inverse />
+        <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
+        <Metric icon={Gauge} color="violet" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
+        {/* Puis le trafic */}
         <Live count={s.liveNow} />
         <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={q.visits} />
         <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint={`${p.waitlist} attente · ${p.accounts} comptes`} cur={p.signups} prev={q.signups} />
         <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={Math.round(conv(q) * 1000)} />
-        <Metric icon={Wallet} color="green" label="Encaissé" value={eur(p.revenue)} hint={plural(p.sales, "paiement")} cur={p.revenue} prev={q.revenue} />
-        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" cur={p.sales} prev={q.sales} />
-        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} hint="Premiers abonnements" cur={p.newSubs} prev={q.newSubs} />
-        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} hint={`Taux sur 30 j : ${pct(s.churn)}`} cur={p.cancels} prev={q.cancels} inverse />
         <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={q.stores} />
-        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page Shopify" cur={p.checkouts} prev={q.checkouts} />
-        <Metric icon={Wallet} color="green" label="MRR" value={eur(s.mrr)} hint="Revenu mensuel récurrent" />
+        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page de paiement" cur={p.checkouts} prev={q.checkouts} />
         <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
-        <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
-        <Metric icon={Gauge} color="violet" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
         <Metric icon={Hourglass} color="pink" label="Liste d'attente" value={String(s.totals.waitlist)} hint="Inscrits au total" />
         <Metric icon={UserPlus} color="blue" label="Comptes" value={String(s.totals.accounts)} hint={`${pct(s.conversion)} devenus payants`} />
       </div>
@@ -381,7 +428,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
                     <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && <OfferNote offer={u.offer} />}</span>
                     {u.kind === "account" && (
                       <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
-                        <ShoppingBag className="h-3 w-3" /> {u.shop ? `Shopify : ${u.shop.plan ?? "forfait inconnu"}` : "Pas de boutique Shopify connectée"}
+                        <ShoppingBag className="h-3 w-3" /> {u.shop ? (u.shop.plan ? `Shopify : ${u.shop.plan}` : u.shop.domain) : "Boutique Shopify non indiquée"}
                       </span>
                     )}
                   </span>
@@ -431,7 +478,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
         ) : <p className="mt-2 text-sm text-[#8a8a8a]">Pas encore de vente. Elles apparaîtront ici dès le premier abonné.</p>}
       </Card>
 
-      <p className="px-1 text-xs text-white/50">En euros, hors paiements de test. L'argent viré sur ton compte : Shopify Partners → Versements.</p>
+      <p className="px-1 text-xs text-white/50">En euros, hors paiements de test. L'argent viré sur ton compte : Stripe → Soldes → Virements.</p>
     </div>
   );
 }

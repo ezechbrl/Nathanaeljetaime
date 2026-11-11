@@ -41,11 +41,11 @@ export const GET = route(async () => {
   }
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const since60 = new Date(Date.now() - 61 * DAY).toISOString(); // 30 jours + les 30 d'avant, pour comparer
-  const [subs, events, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
-    db().from("subscriptions").select("plan, status, interval, amount_cents, currency, test, shopify_subscription_id, stripe_subscription_id"),
+  const [subs, eventsAll, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
+    db().from("subscriptions").select("user_id, plan, status, interval, amount_cents, currency, test, shopify_subscription_id, stripe_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(2000),
     db().from("waitlist").select("email, ref, brief, created_at").order("created_at", { ascending: false }),
-    db().from("users").select("id, email, created_at").order("created_at", { ascending: false }),
+    db().from("users").select("id, email, created_at, shop_domain").order("created_at", { ascending: false }),
     db().from("stores").select("user_id, status, created_at").gte("created_at", since60),
     db().from("affiliates").select("code, commission_rate, users(email, first_name)"),
     db().from("affiliate_events").select("code, kind, amount_cents, referred_user_id, created_at"),
@@ -56,6 +56,9 @@ export const GET = route(async () => {
     db().from("impact_actions").select("tracker, state, payout_cents, currency, event_at").order("event_at", { ascending: false }).limit(500),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
+  // Paiements d'essai (abonnement marqué « test ») et ceux du fondateur : hors des chiffres d'argent.
+  const testUsers = new Set([...subs.filter((x) => x.test).map((x) => x.user_id), ...users.filter((u) => isOwnerEmail(u.email)).map((u) => u.id)]);
+  const events = eventsAll.filter((e) => !testUsers.has(e.user_id));
   // Les comptes des évaluateurs Shopify, le fondateur et les robots ne comptent pas dans les chiffres.
   const waitlist = waitlistAll.filter((w) => !isBotBrief(w.brief));
   const realUsers = users.filter((u) => !isShopifyTester(u.email) && !isOwnerEmail(u.email));
@@ -155,7 +158,12 @@ export const GET = route(async () => {
       const sub = events.filter((e) => e.kind === "new" && e.user_id === u.id).at(-1);
       return {
         email: u.email as string, kind: "account" as const, ref: null, at: u.created_at as string, tester: isShopifyTester(u.email),
-        shop: (() => { const c = conns.find((x) => x.user_id === u.id); return c ? { domain: c.shop_domain as string, plan: (c.shopify_plan as string | null) ?? null } : null; })(),
+        shop: (() => {
+          // Boutique tapée à l'inscription (depuis le passage à Stripe), sinon ancienne connexion Shopify.
+          if (u.shop_domain) return { domain: u.shop_domain as string, plan: null };
+          const c = conns.find((x) => x.user_id === u.id);
+          return c ? { domain: c.shop_domain as string, plan: (c.shopify_plan as string | null) ?? null } : null;
+        })(),
         offer: {
           endsAt: new Date(new Date(u.created_at).getTime() + LAUNCH_OFFER.hours * 3_600_000).toISOString(),
           reminderAt: (reminders.find((r) => r.id === `offer-reminder:${u.id}`)?.created_at as string | undefined) ?? null,
