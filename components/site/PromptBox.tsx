@@ -1,13 +1,25 @@
 "use client";
 
-import { ArrowUp, Link2, PenLine, Plus, Sparkles } from "lucide-react";
+import { ArrowUp, ImagePlus, Link2, PenLine, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
+import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
+// Chaque façon de commencer a sa couleur (assortie au vert et au noir du site).
 export const MODES = [
-  { id: "start", label: "Décrire", icon: PenLine, placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…" },
-  { id: "link", label: "Coller un lien", icon: Link2, placeholder: "Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…) ou ta propre page" },
+  {
+    id: "start", label: "Décrire", icon: PenLine,
+    placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…",
+    on: "border-[#d9f99d]/70 bg-[linear-gradient(180deg,#e5ff9a,#a3e635)] text-[#132600] shadow-[0_0_22px_rgb(163_230_53/0.45),inset_0_1px_0_rgb(255_255_255/0.5)]",
+    off: "border-[#a3e635]/35 bg-[#a3e635]/[0.08] text-[#d9f99d] hover:bg-[#a3e635]/[0.15]",
+  },
+  {
+    id: "link", label: "Coller un lien", icon: Link2,
+    placeholder: "Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…) ou ta propre page",
+    on: "border-[#a5f3fc]/70 bg-[linear-gradient(180deg,#67e8f9,#14b8a6)] text-[#022c2c] shadow-[0_0_22px_rgb(45_212_191/0.5),inset_0_1px_0_rgb(255_255_255/0.5)]",
+    off: "border-[#5eead4]/35 bg-[#2dd4bf]/[0.08] text-[#99f6e4] hover:bg-[#2dd4bf]/[0.15]",
+  },
 ] as const;
 
 const EXAMPLES = [
@@ -15,12 +27,16 @@ const EXAMPLES = [
   "Harnais pour chien, coloris pastel",
   "Sac à dos cabine pour l'Espagne",
 ];
+const MAX_PHOTOS = 3;
 
 export function PromptBox({ target = "/inscription", className, align = "center", inputId = "prompt" }: { target?: string; className?: string; align?: "center" | "left"; inputId?: string }) {
   const router = useRouter();
   const [mode, setMode] = useState<(typeof MODES)[number]["id"]>("start");
   const [value, setValue] = useState("");
   const [placeholder, setPlaceholder] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [photoError, setPhotoError] = useState("");
+  const fileInput = useRef<HTMLInputElement>(null);
   const current = MODES.find((m) => m.id === mode)!;
 
   // Placeholder qui s'écrit lettre par lettre.
@@ -39,6 +55,20 @@ export function PromptBox({ target = "/inscription", className, align = "center"
     return () => clearInterval(id);
   }, [current.placeholder]);
 
+  // Photos du produit : réduites dans le navigateur, gardées jusqu'à la création de la boutique.
+  async function addPhotos(files: FileList | null) {
+    if (!files?.length) return;
+    setPhotoError("");
+    try {
+      const images = [...files].filter((f) => f.type.startsWith("image/")).slice(0, MAX_PHOTOS - photos.length);
+      if (!images.length) return setPhotoError("Choisis une image (photo du produit).");
+      const added = await Promise.all(images.map((f) => compressImage(f, 1280, 0.8)));
+      setPhotos((p) => [...p, ...added].slice(0, MAX_PHOTOS));
+    } catch {
+      setPhotoError("Cette image n'a pas pu être lue. Essaie une autre photo.");
+    }
+  }
+
   function submit(e?: React.FormEvent) {
     e?.preventDefault();
     // Un lien collé passe en import par lien, quel que soit l'onglet choisi.
@@ -46,11 +76,28 @@ export function PromptBox({ target = "/inscription", className, align = "center"
     const m = isLink ? "link" : mode;
     const params = new URLSearchParams({ mode: m });
     if (value.trim()) params.set(m === "link" ? "url" : "brief", value.trim());
+    saveLandingPhotos(photos);
     router.push(`${target}?${params}`);
   }
 
   return (
     <div className={cn("w-full max-w-2xl", align === "center" && "mx-auto", className)}>
+      {/* Les 2 façons de commencer, en gros et en couleur, au-dessus du champ. */}
+      <div role="tablist" aria-label="Mode de création" className={cn("mb-4 grid w-full grid-cols-2 gap-2.5 sm:gap-3", align === "center" && "mx-auto")}>
+        {MODES.map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            role="tab"
+            aria-selected={mode === m.id}
+            onClick={() => setMode(m.id)}
+            className={cn("flex h-14 items-center justify-center gap-2.5 rounded-[16px] border px-3 text-[16px] font-semibold transition-all hover:-translate-y-0.5 sm:h-16 sm:text-[18px]", mode === m.id ? m.on : m.off)}
+          >
+            <m.icon className="h-5 w-5 shrink-0" /> {m.label}
+          </button>
+        ))}
+      </div>
+
       <form onSubmit={submit} className="glow-frame group relative rounded-[16px] p-[1.5px]">
         <div className="rounded-[14.5px] bg-[linear-gradient(180deg,#123d35,#0b2823)] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
           <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
@@ -63,9 +110,28 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             placeholder={placeholder}
             className="block w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[15px] leading-relaxed text-fg placeholder:text-fg-faint focus:outline-none sm:text-base"
           />
-          <div className="flex items-center justify-between px-3 pb-3">
-            <button type="button" aria-label="Ajouter une image" className="grid h-8 w-8 place-items-center rounded-ctl text-fg-faint transition-colors hover:bg-white/5 hover:text-fg">
-              <Plus className="h-4 w-4" />
+          {photos.length > 0 && (
+            <div className="flex flex-wrap gap-2 px-4 pb-2">
+              {photos.map((src, i) => (
+                <div key={i} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt={`Photo du produit ${i + 1}`} className="h-14 w-14 rounded-[10px] border border-white/15 object-cover" />
+                  <button type="button" aria-label="Retirer la photo" onClick={() => setPhotos((p) => p.filter((_, k) => k !== i))} className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-black/80 text-white ring-1 ring-white/30 hover:bg-black">
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-2 px-3 pb-3">
+            <input ref={fileInput} type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} />
+            <button
+              type="button"
+              onClick={() => fileInput.current?.click()}
+              disabled={photos.length >= MAX_PHOTOS}
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/12 px-3 text-[13px] font-medium text-fg-muted transition-colors hover:border-white/25 hover:bg-white/5 hover:text-fg disabled:opacity-40"
+            >
+              <ImagePlus className="h-4 w-4" /> {photos.length ? `Photo ${photos.length}/${MAX_PHOTOS}` : "Photo du produit"}
             </button>
             <button type="submit" className="inline-flex h-9 items-center gap-2 rounded-full border border-[#6ee7b7]/50 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_0_18px_rgb(46_230_166/0.55)] transition-all hover:-translate-y-px hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_0_28px_rgb(46_230_166/0.8)]">
               <Sparkles className="h-4 w-4" /> Générer
@@ -73,20 +139,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
           </div>
         </div>
       </form>
-
-      <div role="tablist" aria-label="Mode de création" className={cn("mt-5 grid w-full grid-cols-3 gap-1 rounded-[18px] border border-white/10 bg-black/25 p-1 backdrop-blur sm:flex sm:w-fit sm:max-w-full sm:gap-1.5 sm:rounded-full sm:p-1.5", align === "center" && "mx-auto")}>
-        {MODES.map((m) => (
-          <button
-            key={m.id}
-            role="tab"
-            aria-selected={mode === m.id}
-            onClick={() => setMode(m.id)}
-            className={cn("flex items-center justify-center gap-2 rounded-[14px] px-2 py-2.5 text-center text-[13px] font-medium leading-tight transition-all sm:shrink-0 sm:rounded-full sm:px-5 sm:text-[15.5px]", mode === m.id ? "border border-[#6ee7b7]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_rgb(46_230_166/0.45),inset_0_0_10px_rgb(46_230_166/0.15)]" : "border border-transparent text-fg-muted hover:text-fg")}
-          >
-            <m.icon className="hidden h-4 w-4 sm:block" /> {m.label}
-          </button>
-        ))}
-      </div>
+      {photoError && <p role="alert" className={cn("mt-2 text-sm text-red-300", align === "center" && "text-center")}>{photoError}</p>}
 
       {mode === "start" && (
         <div className={cn("mt-4 hidden flex-wrap gap-2 sm:flex", align === "center" && "justify-center")}>

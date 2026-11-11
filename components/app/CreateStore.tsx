@@ -10,6 +10,7 @@ import { ApiClientError } from "@/lib/api/errors";
 import { useApi } from "@/lib/api/hooks";
 import type { CreationMode, GenerateStoreInput } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { compressImage, takeLandingPhotos } from "@/lib/compress-image";
 import { useApp } from "./AppContext";
 import { PaywallDialog, readPendingDraft } from "./Paywall";
 
@@ -31,24 +32,6 @@ const EXAMPLES = [
   "Sneakers éco-conçues en matières recyclées, pour les actifs urbains de 20-35 ans, prix autour de 120 €, style minimal et moderne.",
   "Bijoux minimalistes en acier doré, pour les femmes de 25-35 ans, prix entre 20 et 50 €, ton chic et accessible.",
 ];
-
-// Capture d'écran réduite dans le navigateur (1600 px, JPEG) avant l'envoi.
-function compressImage(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * k);
-      canvas.height = Math.round(img.height * k);
-      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(img.src);
-      resolve(canvas.toDataURL("image/jpeg", 0.82));
-    };
-    img.onerror = () => reject(new Error("Image illisible."));
-    img.src = URL.createObjectURL(file);
-  });
-}
 
 export const LANGUAGES = ["français", "anglais", "espagnol", "allemand", "italien", "néerlandais", "portugais", "polonais", "suédois", "danois", "tchèque", "roumain"];
 
@@ -80,6 +63,9 @@ export function CreateStore() {
 
   // Projet saisi avant l'activation de l'abonnement : on le remet en place, et on le lance s'il était validé.
   useEffect(() => {
+    // Photos du produit ajoutées sur la page d'accueil avant la connexion.
+    const fromLanding = takeLandingPhotos();
+    if (fromLanding.length) setShots(fromLanding);
     const pending = readPendingDraft();
     if (!pending) return;
     setMode(pending.mode);
@@ -155,7 +141,7 @@ export function CreateStore() {
   async function addShots(files: FileList | null) {
     if (!files) return;
     try {
-      const list = await Promise.all([...files].filter((f) => f.type.startsWith("image/")).slice(0, 3 - shots.length).map(compressImage));
+      const list = await Promise.all([...files].filter((f) => f.type.startsWith("image/")).slice(0, 3 - shots.length).map((f) => compressImage(f)));
       setShots((s) => [...s, ...list].slice(0, 3));
     } catch (e) {
       setError(new ApiClientError(400, "invalid_input", (e as Error).message));
