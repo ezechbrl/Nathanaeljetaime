@@ -15,6 +15,7 @@ const Patch = z.object({
   firstName: z.string().trim().min(1).max(60).optional(),
   email: z.string().trim().email().optional(),
   avatarUrl: z.string().url().nullable().optional(),
+  shopDomain: z.string().trim().toLowerCase().regex(/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/, "Adresse de boutique invalide.").nullable().optional(),
 });
 
 export const PATCH = route(async (req) => {
@@ -28,6 +29,7 @@ export const PATCH = route(async (req) => {
   const row: UserRow = must(await db().from("users").update({
     ...(input.firstName !== undefined && { first_name: input.firstName }),
     ...(input.avatarUrl !== undefined && { avatar_url: input.avatarUrl }),
+    ...(input.shopDomain !== undefined && { shop_domain: input.shopDomain }),
     updated_at: new Date().toISOString(),
   }).eq("id", user.id).select("*").single());
   return json({ user: toUser({ ...row, email_verified: user.email_verified }) });

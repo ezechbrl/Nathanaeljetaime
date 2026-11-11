@@ -15,6 +15,7 @@ export const toUser = (u: UserRow & { email_verified?: boolean }): User => ({
   emailVerified: u.email_verified ?? true,
   plan: u.plan,
   createdAt: u.created_at,
+  shopDomain: u.shop_domain ?? null,
   isOwner: isOwnerEmail(u.email),
 });
 

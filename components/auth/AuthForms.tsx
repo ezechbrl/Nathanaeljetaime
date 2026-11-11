@@ -39,8 +39,12 @@ export function normalizeShop(input: string) {
   return /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(full) ? full : null;
 }
 
-export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { next: string; cta?: string; onBeforeRedirect?: (autostart: boolean) => void }) {
+// withEmail : connexion à Vigenia avec le nom de la boutique + un lien reçu par e-mail (sans app Shopify).
+export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEmail = false }: { next: string; cta?: string; onBeforeRedirect?: (autostart: boolean) => void; withEmail?: boolean }) {
   const [shop, setShop] = useState("");
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
@@ -69,6 +73,17 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
     if (!domain) return setError("Saisis l'adresse de ta boutique, par exemple ma-boutique.myshopify.com");
     setError("");
     setLoading(true);
+    if (withEmail) {
+      try {
+        await api.sendEmailLink(email, next, domain);
+        setSent(true);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
     onBeforeRedirect?.(false);
     // Si Shopify ne s'ouvre pas, on ne laisse jamais le bouton tourner indéfiniment.
     window.clearTimeout(slow.current);
@@ -89,8 +104,8 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
             <span className="absolute inset-x-0 top-0 bg-[linear-gradient(90deg,#10b981,#2ee6a6)] py-1.5 text-center text-[11px] font-bold leading-tight text-[#03140d] sm:text-[12px]">−50 % à vie · offre 24 h</span>
             <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#2ee6a6]/25 blur-2xl transition-opacity group-hover:opacity-100" />
             <ShopifyBag className="relative h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
-            <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">Connecter mon compte Shopify</span>
-            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[0_8px_24px_-6px_rgb(46_230_166/0.8)]">Connexion <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
+            <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">{withEmail ? "J'ai déjà un compte Shopify" : "Connecter mon compte Shopify"}</span>
+            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[0_8px_24px_-6px_rgb(46_230_166/0.8)]">{withEmail ? "Continuer" : "Connexion"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
           </span>
         </button>
         <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" onClick={() => { setCreated(true); setOpen(true); }} className="glow-frame glow-frame-lime group rounded-[22px] p-[1.5px] transition-transform hover:-translate-y-1">
@@ -107,7 +122,14 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
         </a>
       </div>
 
-      {open && (
+      {open && sent && (
+        <div role="status" className="rounded-card border border-accent/25 bg-accent-deep/25 p-4 text-sm">
+          <p className="font-medium text-fg">Vérifie ta boîte mail</p>
+          <p className="mt-1 text-fg-muted">On a envoyé ton lien de connexion à <span className="text-fg">{email}</span>. Clique dessus pour entrer dans Vigenia (pense aux spams).</p>
+          {api.API_MODE !== "live" && <button type="button" onClick={() => router.push(next)} className="mt-3 text-accent underline underline-offset-4">Ouvrir le lien (démo)</button>}
+        </div>
+      )}
+      {open && !sent && (
         <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-3">
           {created && <ReturnSteps className="mb-4" />}
           <label htmlFor="shop" className="text-sm font-medium">{created ? "Colle l'adresse de ta boutique" : "Adresse de ta boutique"}</label>
@@ -115,9 +137,15 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect }: { nex
             <input ref={input} id="shop" autoFocus={!created} value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder={created ? "admin.shopify.com/store/…" : "ma-boutique"} className="min-w-0 flex-1 bg-transparent px-3 py-3 text-[15px] focus:outline-none" />
             <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
           </div>
+          {withEmail && (
+            <>
+              <label htmlFor="shop-email" className="mt-3 block text-sm font-medium">Ton e-mail</label>
+              <input id="shop-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.com" className="field mt-2" />
+            </>
+          )}
           {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
           <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
-          <p className="mt-2 text-xs text-fg-faint">Tu peux coller l'adresse complète de ton admin Shopify : on s'occupe du reste.</p>
+          <p className="mt-2 text-xs text-fg-faint">{withEmail ? "Pas de mot de passe : tu reçois un lien de connexion par e-mail." : "Tu peux coller l'adresse complète de ton admin Shopify : on s'occupe du reste."}</p>
         </form>
       )}
       <p className="text-center text-xs text-fg-faint">Offre Shopify en ce moment · lien partenaire</p>
@@ -248,8 +276,8 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
           <p className="mt-1 line-clamp-2 text-fg-muted">« {brief} »</p>
         </div>
       )}
-      {/* Connexion par e-mail (lien sans mot de passe). Google en option si NEXT_PUBLIC_GOOGLE_AUTH=on. */}
-      <EmailOption next={next} startOpen />
+      {/* Les 2 grands boutons Shopify (j'ai déjà Shopify / créer mon compte), puis nom de boutique + e-mail. */}
+      <ShopifyForm next={next} withEmail cta={mode === "login" ? "Me connecter" : "Recevoir mon lien"} />
       {GOOGLE_ENABLED && (
         <>
           <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>

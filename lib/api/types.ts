@@ -16,6 +16,7 @@ export type User = {
   emailVerified: boolean;
   plan: PlanId;
   createdAt: string;
+  shopDomain?: string | null; // boutique Shopify du client (ma-boutique.myshopify.com), saisie à l'inscription
   isOwner?: boolean; // fondateur de Vigenia : accès au tableau de bord des ventes
 };
 

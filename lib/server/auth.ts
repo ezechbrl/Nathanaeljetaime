@@ -12,6 +12,7 @@ export type UserRow = {
   referred_by: string | null;
   free_store_used?: boolean;
   waitlist_member?: boolean;
+  shop_domain?: string | null;
   created_at: string;
 };
 

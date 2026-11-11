@@ -11,7 +11,7 @@ import { site } from "@/lib/site";
 // nous-mêmes (Resend) un lien à usage unique valable une heure. Le lien ouvre /api/auth/email/verify.
 export const POST = route(async (req) => {
   await rateLimit(`email-link:${clientIp(req)}`, 5, 3600);
-  const input = await body(req, z.object({ email: z.string().trim().toLowerCase().email("Adresse e-mail invalide."), next: z.string().optional() }));
+  const input = await body(req, z.object({ email: z.string().trim().toLowerCase().email("Adresse e-mail invalide."), next: z.string().optional(), shop: z.string().trim().toLowerCase().regex(/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/, "Adresse de boutique invalide.").optional() }));
   await rateLimit(`email-link-to:${input.email}`, 4, 3600);
   const next = input.next?.startsWith("/") && !input.next.startsWith("//") ? input.next : "/app";
   const ref = (await cookies()).get("ref")?.value;
@@ -29,7 +29,7 @@ export const POST = route(async (req) => {
     console.error("Lien de connexion", error?.message);
     throw new HttpError(502, "upstream_error", "Le lien n'a pas pu être créé. Réessaie dans un instant.");
   }
-  const link = `${env.appUrl()}/api/auth/email/verify?token=${encodeURIComponent(hash)}&next=${encodeURIComponent(next)}`;
+  const link = `${env.appUrl()}/api/auth/email/verify?token=${encodeURIComponent(hash)}&next=${encodeURIComponent(next)}${input.shop ? `&shop=${encodeURIComponent(input.shop)}` : ""}`;
   const text = `Bonjour,\n\nClique sur ce lien pour te connecter à ${site.name} (valable une heure) :\n${link}\n\nSi tu n'as rien demandé, ignore simplement ce message.\n\nL'équipe ${site.name}`;
   const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">
 <p>Bonjour,</p>

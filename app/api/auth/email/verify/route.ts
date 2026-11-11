@@ -18,6 +18,9 @@ export const GET = route(async (req) => {
 
   // Parrainage : code gardé dans le cookie « ref » depuis le lien d'affiliation.
   const user = await requireUser();
+  // Boutique Shopify tapée à l'inscription : sert à ouvrir directement les bonnes pages de son admin.
+  const shop = url.searchParams.get("shop")?.toLowerCase();
+  if (shop && /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(shop)) await db().from("users").update({ shop_domain: shop }).eq("id", user.id);
   const ref = req.headers.get("cookie")?.match(/(?:^|; )ref=([^;]+)/)?.[1];
   if (ref && !user.referred_by && /^[a-z0-9-]{2,40}$/i.test(ref)) {
     await db().from("users").update({ referred_by: ref }).eq("id", user.id);
