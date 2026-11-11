@@ -6,19 +6,20 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
-// Chaque façon de commencer a sa couleur (assortie au vert et au noir du site).
+// Mêmes couleurs que les 2 cartes Shopify de la connexion : « Décrire » = vert de « Connecter mon compte
+// Shopify », « Coller un lien » = vert clair de « Créer mon compte Shopify ».
 export const MODES = [
   {
     id: "start", label: "Décrire", icon: PenLine,
     placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…",
-    on: "border-[#d9f99d]/70 bg-[linear-gradient(180deg,#e5ff9a,#a3e635)] text-[#132600] shadow-[0_0_22px_rgb(163_230_53/0.45),inset_0_1px_0_rgb(255_255_255/0.5)]",
-    off: "border-[#a3e635]/35 bg-[#a3e635]/[0.08] text-[#d9f99d] hover:bg-[#a3e635]/[0.15]",
+    on: "border-[#6ee7b7]/60 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_18px_rgb(46_230_166/0.55),inset_0_1px_0_rgb(255_255_255/0.45)]",
+    off: "border-[#34f0b0]/30 text-[#86efc9] hover:bg-[#34f0b0]/10",
   },
   {
     id: "link", label: "Coller un lien", icon: Link2,
     placeholder: "Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…) ou ta propre page",
-    on: "border-[#a5f3fc]/70 bg-[linear-gradient(180deg,#67e8f9,#14b8a6)] text-[#022c2c] shadow-[0_0_22px_rgb(45_212_191/0.5),inset_0_1px_0_rgb(255_255_255/0.5)]",
-    off: "border-[#5eead4]/35 bg-[#2dd4bf]/[0.08] text-[#99f6e4] hover:bg-[#2dd4bf]/[0.15]",
+    on: "border-[#bbf7d0]/60 bg-[linear-gradient(180deg,#6ee7a0,#22c55e)] text-[#052e16] shadow-[0_0_18px_rgb(74_222_128/0.5),inset_0_1px_0_rgb(255_255_255/0.45)]",
+    off: "border-[#4ade80]/30 text-[#a7f3c0] hover:bg-[#4ade80]/10",
   },
 ] as const;
 
@@ -82,22 +83,6 @@ export function PromptBox({ target = "/inscription", className, align = "center"
 
   return (
     <div className={cn("w-full max-w-2xl", align === "center" && "mx-auto", className)}>
-      {/* Les 2 façons de commencer, en gros et en couleur, au-dessus du champ. */}
-      <div role="tablist" aria-label="Mode de création" className={cn("mb-4 grid w-full grid-cols-2 gap-2.5 sm:gap-3", align === "center" && "mx-auto")}>
-        {MODES.map((m) => (
-          <button
-            key={m.id}
-            type="button"
-            role="tab"
-            aria-selected={mode === m.id}
-            onClick={() => setMode(m.id)}
-            className={cn("flex h-14 items-center justify-center gap-2.5 rounded-[16px] border px-3 text-[16px] font-semibold transition-all hover:-translate-y-0.5 sm:h-16 sm:text-[18px]", mode === m.id ? m.on : m.off)}
-          >
-            <m.icon className="h-5 w-5 shrink-0" /> {m.label}
-          </button>
-        ))}
-      </div>
-
       <form onSubmit={submit} className="glow-frame group relative rounded-[16px] p-[1.5px]">
         <div className="rounded-[14.5px] bg-[linear-gradient(180deg,#123d35,#0b2823)] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
           <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
@@ -140,6 +125,22 @@ export function PromptBox({ target = "/inscription", className, align = "center"
         </div>
       </form>
       {photoError && <p role="alert" className={cn("mt-2 text-sm text-red-300", align === "center" && "text-center")}>{photoError}</p>}
+
+      {/* Les 2 façons de commencer, sous le champ, aux couleurs des cartes Shopify. */}
+      <div role="tablist" aria-label="Mode de création" className={cn("mt-5 grid w-full grid-cols-2 gap-1.5 rounded-[18px] border border-white/10 bg-black/25 p-1.5 backdrop-blur sm:flex sm:w-fit sm:max-w-full sm:gap-2 sm:rounded-full", align === "center" && "mx-auto")}>
+        {MODES.map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            role="tab"
+            aria-selected={mode === m.id}
+            onClick={() => setMode(m.id)}
+            className={cn("flex items-center justify-center gap-2 rounded-[14px] border px-3 py-3 text-[15px] font-semibold leading-tight transition-all sm:shrink-0 sm:rounded-full sm:px-6 sm:text-[16.5px]", mode === m.id ? m.on : m.off)}
+          >
+            <m.icon className="h-[18px] w-[18px] shrink-0" /> {m.label}
+          </button>
+        ))}
+      </div>
 
       {mode === "start" && (
         <div className={cn("mt-4 hidden flex-wrap gap-2 sm:flex", align === "center" && "justify-center")}>
