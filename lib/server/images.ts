@@ -10,16 +10,25 @@ export type AspectRatio = keyof typeof SIZES;
 // fal.ai limite le nombre d'images en cours en même temps (erreur 429) : on attend un peu et on réessaie
 // au lieu d'abandonner l'image (2 s, 5 s, 10 s).
 async function falPost(model: string, key: string, payload: unknown) {
-  const waits = [2000, 5000, 10000];
+  // fal.ai limite à 10 images en même temps pour tout le compte : si plusieurs boutiques sont créées
+  // au même moment, on attend et on réessaie (jusqu'à ~1 min) au lieu de perdre l'image.
+  // Même chose pour une panne passagère (erreur 5xx ou réseau).
+  const waits = [2000, 4000, 8000, 15000, 25000];
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(`https://fal.run/${model}`, {
-      method: "POST",
-      headers: { authorization: `Key ${key}`, "content-type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (res.status !== 429 || attempt >= waits.length) return res;
-    await res.text().catch(() => "");
-    await new Promise((r) => setTimeout(r, waits[attempt]));
+    let res: Response | null = null;
+    try {
+      res = await fetch(`https://fal.run/${model}`, {
+        method: "POST",
+        headers: { authorization: `Key ${key}`, "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch (e) {
+      if (attempt >= waits.length) throw e;
+    }
+    const retry = !res || res.status === 429 || res.status >= 500;
+    if (res && (!retry || attempt >= waits.length)) return res;
+    if (res) await res.text().catch(() => "");
+    await new Promise((r) => setTimeout(r, waits[attempt] + Math.random() * 2000));
   }
 }
 
