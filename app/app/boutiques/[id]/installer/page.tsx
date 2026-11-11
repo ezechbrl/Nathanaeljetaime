@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Download, ExternalLink, Lock, Package, Palette, Store as StoreIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp, Check, ExternalLink, Lock, PartyPopper, Play, Store } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
@@ -13,15 +13,17 @@ import { site } from "@/lib/site";
 
 const HANDLE_KEY = "vigenia-shop-handle";
 
-// Mise en ligne sans app Shopify : le marchand télécharge 2 fichiers et les importe dans son admin Shopify.
-// 1. Le produit (fichier CSV) → Produits → Importer. 2. Le thème (.zip, photos comprises) → Thèmes → Importer.
+// Mise en ligne sans app Shopify, en 3 temps très simples :
+// 0. Ton Shopify (j'en ai un / je le crée), 1. un clic = le produit se télécharge + Shopify s'ouvre au bon endroit,
+// 2. pareil pour le design. Chaque étape dit exactement sur quel bouton cliquer dans Shopify.
 export default function InstallPage() {
   const { store } = useStore();
   const { user } = useApp();
   const paid = user.plan !== "free";
-  const [shop, setShop] = useState("");
+  const live = API_MODE === "live";
   const [saved, setSaved] = useState<string | null>(null);
   const [done, setDone] = useState<string[]>([]);
+  const [ready, setReady] = useState(false);
   const doneKey = `vigenia-install-${store.id}`;
 
   useEffect(() => {
@@ -29,105 +31,147 @@ export default function InstallPage() {
       setSaved(localStorage.getItem(HANDLE_KEY));
       setDone(JSON.parse(localStorage.getItem(doneKey) ?? "[]"));
     } catch { /* stockage indisponible */ }
+    setReady(true);
   }, [doneKey]);
 
   const domain = saved ? `${saved}.myshopify.com` : null;
   const links = shopifyLinks(domain ? `https://${domain}` : null);
   const admin = links?.admin ?? "https://admin.shopify.com";
-  const live = API_MODE === "live";
 
-  function saveShop(e: React.FormEvent) {
-    e.preventDefault();
-    const d = normalizeShop(shop);
-    if (!d) return;
-    const handle = d.replace(/\.myshopify\.com$/, "");
-    try { localStorage.setItem(HANDLE_KEY, handle); } catch { /* stockage indisponible */ }
-    setSaved(handle);
-  }
-  const toggle = (id: string) => setDone((d) => {
-    const next = d.includes(id) ? d.filter((x) => x !== id) : [...d, id];
+  const markDone = (id: string, value = true) => setDone((d) => {
+    const next = value ? [...new Set([...d, id])] : d.filter((x) => x !== id);
     try { localStorage.setItem(doneKey, JSON.stringify(next)); } catch { /* stockage indisponible */ }
     return next;
   });
 
+  function saveShop(handle: string | null) {
+    try { handle ? localStorage.setItem(HANDLE_KEY, handle) : localStorage.removeItem(HANDLE_KEY); } catch { /* stockage indisponible */ }
+    setSaved(handle);
+  }
+
+  // Un seul clic : le fichier se télécharge et Shopify s'ouvre dans un nouvel onglet, à la bonne page.
+  function sendTo(file: string, open: string) {
+    const a = document.createElement("a");
+    a.href = file;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.open(open, "_blank", "noopener");
+  }
+
   const steps = [
     {
-      id: "products", icon: Package, title: "Ajoute ton produit",
-      text: <>Télécharge le fichier, puis dans Shopify : <b className="text-fg">Produits</b> → <b className="text-fg">Importer</b> → choisis le fichier → <b className="text-fg">Importer les produits</b>.</>,
-      file: `/api/stores/${store.id}/download/products`, fileLabel: "Télécharger le produit",
-      open: `${admin}/products`, openLabel: "Ouvrir mes produits Shopify",
+      id: "products",
+      title: "Ajoute ton produit",
+      button: "Envoyer mon produit dans Shopify",
+      file: `/api/stores/${store.id}/download/products`,
+      open: `${admin}/products`,
+      how: ["Clique sur « Importer » (en haut à droite)", "Choisis le fichier qui vient de se télécharger", "Clique sur « Importer les produits »"],
     },
     {
-      id: "theme", icon: Palette, title: "Installe ton design",
-      text: <>Télécharge le thème, puis dans Shopify : <b className="text-fg">Thèmes</b> → <b className="text-fg">Ajouter un thème</b> → <b className="text-fg">Importer un fichier zip</b> → choisis le fichier (sans le décompresser). Ensuite, sur le thème importé : <b className="text-fg">Publier</b>.</>,
-      file: `/api/stores/${store.id}/download/theme`, fileLabel: "Télécharger le thème",
-      open: links?.themes ?? `${admin}/themes`, openLabel: "Ouvrir mes thèmes Shopify",
+      id: "theme",
+      title: "Installe ton design",
+      button: "Envoyer mon design dans Shopify",
+      file: `/api/stores/${store.id}/download/theme`,
+      open: links?.themes ?? `${admin}/themes`,
+      how: ["Clique sur « Ajouter un thème » → « Importer un fichier zip »", "Choisis le fichier qui vient de se télécharger", "Sur ton nouveau thème, clique sur « Publier »"],
     },
   ];
+  const current = !saved ? "shop" : steps.find((s) => !done.includes(s.id))?.id ?? "finished";
+  const position = current === "shop" ? 0 : current === "products" ? 1 : current === "theme" ? 2 : 3;
 
   return (
     <div className="mx-auto max-w-3xl p-5 sm:p-8">
       <Link href={`/app/boutiques/${store.id}`} className="inline-flex items-center gap-2 text-sm text-fg-muted hover:text-fg"><ArrowLeft className="h-4 w-4" /> {store.name}</Link>
-      <h1 className="mt-4 text-[clamp(1.7rem,1.3rem+1.5vw,2.3rem)] font-semibold tracking-[-0.03em]">Mettre ta boutique en ligne sur Shopify</h1>
-      <p className="mt-2 text-fg-muted">2 fichiers à importer dans ton Shopify, environ 2 minutes. Fais-le sur un ordinateur, c'est plus simple.</p>
+      <h1 className="mt-4 text-[clamp(1.8rem,1.3rem+1.8vw,2.5rem)] font-semibold tracking-[-0.03em]">Mets ta boutique en ligne</h1>
+      <p className="mt-2 text-fg-muted">3 étapes, environ 2 minutes. On te dit exactement où cliquer. Fais-le sur un ordinateur.</p>
+
+      {/* Avancement */}
+      <div className="mt-6 flex items-center gap-2" aria-label={`Étape ${Math.min(position + 1, 3)} sur 3`}>
+        {[0, 1, 2].map((i) => (
+          <span key={i} className={cn("h-2 flex-1 rounded-full transition-colors", i < position ? "bg-accent" : i === position ? "bg-accent/50" : "bg-white/10")} />
+        ))}
+      </div>
 
       {!paid && (
         <div className="mt-6 flex flex-col gap-3 rounded-card border border-accent/30 bg-accent-deep/25 p-5 sm:flex-row sm:items-center">
           <Lock className="h-5 w-5 shrink-0 text-accent" />
-          <p className="flex-1 text-sm text-fg-muted">Choisis ton offre pour télécharger ta boutique et la mettre en ligne.</p>
-          <Link href="/app/abonnement" className="inline-flex h-10 items-center justify-center rounded-ctl bg-accent px-4 text-sm font-medium text-[#03140d]">Voir les offres</Link>
+          <p className="flex-1 text-sm text-fg-muted">Choisis ton offre pour envoyer ta boutique dans Shopify.</p>
+          <Link href="/app/abonnement" className="inline-flex h-11 items-center justify-center rounded-ctl bg-accent px-5 text-sm font-semibold text-[#03140d]">Voir les offres</Link>
         </div>
       )}
 
-      {/* Adresse de la boutique : sert seulement à ouvrir directement les bonnes pages de l'admin Shopify. */}
-      <section className="mt-6 rounded-card border border-white/10 bg-white/[0.03] p-4 sm:p-5">
-        <p className="flex items-center gap-2 text-sm font-medium"><ShopifyBag className="h-5 w-5" /> Ta boutique Shopify</p>
-        {saved ? (
-          <p className="mt-2 text-sm text-fg-muted"><span className="text-fg">{domain}</span> · <button type="button" onClick={() => { setSaved(null); setShop(saved); }} className="underline underline-offset-4 hover:text-fg">changer</button></p>
-        ) : (
-          <form onSubmit={saveShop} className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <div className="flex flex-1 items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent">
-              <input value={shop} onChange={(e) => setShop(e.target.value)} placeholder="ma-boutique" autoComplete="off" spellCheck={false} className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-[15px] focus:outline-none" aria-label="Adresse de ta boutique Shopify" />
-              <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
-            </div>
-            <button type="submit" className="h-11 rounded-ctl border border-white/15 px-4 text-sm hover:bg-white/5">Enregistrer</button>
-          </form>
-        )}
-        <p className="mt-2 text-xs text-fg-faint">Pas encore de compte Shopify ? <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" className="underline underline-offset-4 hover:text-fg">Crée-le ici</a> ({site.shopifyOffer}), puis reviens sur cette page.</p>
-      </section>
-
       <ol className="mt-6 space-y-4">
+        {/* Étape 1 : le compte Shopify */}
+        <li className={cn("rounded-card border p-5 sm:p-6", current === "shop" ? "border-accent/40 bg-white/[0.04]" : "border-white/10 bg-white/[0.02]")}>
+          <StepTitle n={1} ok={!!saved} title={saved ? "Ton Shopify" : "Tu as déjà une boutique Shopify ?"} />
+          {!ready ? null : saved ? (
+            <p className="mt-2 pl-12 text-sm text-fg-muted"><span className="text-fg">{domain}</span> · <button type="button" onClick={() => saveShop(null)} className="underline underline-offset-4 hover:text-fg">changer</button></p>
+          ) : (
+            <ShopChoice onSave={saveShop} />
+          )}
+        </li>
+
         {steps.map((s, i) => {
           const ok = done.includes(s.id);
+          const active = current === s.id;
           return (
-            <li key={s.id} className={cn("rounded-card border p-5", ok ? "border-accent/30 bg-accent-deep/15" : "border-white/10 bg-white/[0.03]")}>
-              <div className="flex items-start gap-3">
-                <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold", ok ? "bg-accent text-[#03140d]" : "bg-accent/15 text-accent")}>{ok ? <Check className="h-4 w-4" /> : i + 1}</span>
-                <div className="min-w-0 flex-1">
-                  <h2 className="flex items-center gap-2 text-lg font-medium tracking-tight"><s.icon className="h-4 w-4 text-fg-muted" /> {s.title}</h2>
-                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">{s.text}</p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {paid && live ? (
-                      <a href={s.file} download className="inline-flex h-10 items-center gap-2 rounded-ctl bg-[linear-gradient(180deg,#10b07f,#00876a)] px-4 text-sm font-medium text-white"><Download className="h-4 w-4" /> {s.fileLabel}</a>
-                    ) : (
-                      <span className="inline-flex h-10 items-center gap-2 rounded-ctl border border-white/10 px-4 text-sm text-fg-faint"><Lock className="h-4 w-4" /> {s.fileLabel}</span>
-                    )}
-                    <a href={s.open} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-2 rounded-ctl border border-white/15 px-4 text-sm text-fg hover:bg-white/5">{s.openLabel} <ExternalLink className="h-4 w-4" /></a>
-                    <button type="button" onClick={() => toggle(s.id)} aria-pressed={ok} className="inline-flex h-10 items-center gap-2 rounded-ctl px-3 text-sm text-fg-muted hover:text-fg"><Check className="h-4 w-4" /> {ok ? "Fait" : "C'est fait"}</button>
-                  </div>
-                  {s.id === "theme" && (
-                    <video src="/videos/tuto-theme.mp4" poster="/videos/tuto-theme.jpg" controls muted loop playsInline preload="none"
-                      className="mt-4 aspect-video w-full rounded-[14px] border border-white/10 bg-black" aria-label="Vidéo : importer et publier ton thème Vigenia" />
+            <li key={s.id} className={cn("rounded-card border p-5 sm:p-6 transition-opacity", active ? "border-accent/40 bg-white/[0.04]" : ok ? "border-accent/20 bg-accent-deep/10" : "border-white/10 bg-white/[0.02] opacity-60")}>
+              <StepTitle n={i + 2} ok={ok} title={s.title} />
+              {ok && !active ? (
+                <p className="mt-2 pl-12 text-sm text-fg-muted">Fait. <button type="button" onClick={() => markDone(s.id, false)} className="underline underline-offset-4 hover:text-fg">Refaire cette étape</button></p>
+              ) : active ? (
+                <div className="mt-4 sm:pl-12">
+                  {paid && live ? (
+                    <button type="button" onClick={() => sendTo(s.file, s.open)} className="group flex w-full items-center justify-center gap-3 rounded-[16px] bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-5 py-4 text-base font-semibold text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_10px_30px_-8px_rgb(46_230_166/0.7)] transition-transform hover:-translate-y-0.5 sm:text-lg">
+                      <ShopifyBag className="h-7 w-7" /> {s.button} <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    </button>
+                  ) : (
+                    <span className="flex w-full items-center justify-center gap-3 rounded-[16px] border border-white/10 px-5 py-4 text-base text-fg-faint"><Lock className="h-5 w-5" /> {s.button}</span>
                   )}
+                  <p className="mt-3 text-center text-xs text-fg-faint">Le fichier se télécharge et Shopify s'ouvre au bon endroit.</p>
+
+                  <p className="mt-5 text-sm font-medium">Puis dans Shopify :</p>
+                  <ol className="mt-2 space-y-2">
+                    {s.how.map((h, k) => (
+                      <li key={h} className="flex items-center gap-3 rounded-ctl border border-white/[0.08] bg-black/20 px-3 py-2.5 text-sm">
+                        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/15 text-xs font-semibold text-accent">{k + 1}</span>
+                        <span className="text-fg">{h}</span>
+                      </li>
+                    ))}
+                  </ol>
+
+                  {s.id === "theme" && (
+                    <details className="group mt-3">
+                      <summary className="inline-flex cursor-pointer list-none items-center gap-2 text-sm text-fg-muted hover:text-fg"><Play className="h-4 w-4" /> Voir comment faire en vidéo</summary>
+                      <video src="/videos/tuto-theme.mp4" poster="/videos/tuto-theme.jpg" controls muted loop playsInline preload="none"
+                        className="mt-3 aspect-video w-full rounded-[14px] border border-white/10 bg-black" aria-label="Vidéo : importer et publier ton design" />
+                    </details>
+                  )}
+
+                  <button type="button" onClick={() => markDone(s.id)} className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-ctl border border-white/15 text-sm font-medium hover:bg-white/5 sm:w-auto sm:px-5">
+                    <Check className="h-4 w-4" /> C'est fait, étape suivante
+                  </button>
                 </div>
-              </div>
+              ) : null}
             </li>
           );
         })}
       </ol>
 
+      {current === "finished" && (
+        <section className="mt-6 rounded-card border border-accent/40 bg-accent-deep/25 p-6 text-center">
+          <PartyPopper className="mx-auto h-8 w-8 text-accent" />
+          <h2 className="mt-3 text-xl font-semibold">Ta boutique est dans ton Shopify</h2>
+          {domain && (
+            <a href={`https://${domain}`} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-11 items-center gap-2 rounded-ctl bg-accent px-5 text-sm font-semibold text-[#03140d]">Voir ma boutique <ExternalLink className="h-4 w-4" /></a>
+          )}
+        </section>
+      )}
+
       <section className="mt-6 rounded-card border border-[#95bf47]/30 bg-[#95bf47]/[0.06] p-5">
-        <p className="flex items-center gap-2 font-medium"><StoreIcon className="h-4 w-4 text-[#b5d96b]" /> Avant d'ouvrir la vente, dans Shopify</p>
+        <p className="flex items-center gap-2 font-medium"><Store className="h-4 w-4 text-[#b5d96b]" /> Avant d'ouvrir la vente, dans Shopify</p>
         <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
           {[
             ["Activer les paiements", links?.payments ?? `${admin}/settings/payments`],
@@ -139,6 +183,69 @@ export default function InstallPage() {
           ))}
         </ul>
       </section>
+    </div>
+  );
+}
+
+function StepTitle({ n, ok, title }: { n: number; ok: boolean; title: string }) {
+  return (
+    <h2 className="flex items-center gap-3 text-lg font-semibold tracking-tight sm:text-xl">
+      <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold", ok ? "bg-accent text-[#03140d]" : "bg-accent/15 text-accent")}>{ok ? <Check className="h-4 w-4" /> : n}</span>
+      {title}
+    </h2>
+  );
+}
+
+// Les 2 grands boutons : « J'ai déjà Shopify » ou « Créer mon compte Shopify » (lien partenaire), puis l'adresse.
+function ShopChoice({ onSave }: { onSave: (handle: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [created, setCreated] = useState(false);
+  const [shop, setShop] = useState("");
+  const [error, setError] = useState("");
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const d = normalizeShop(shop);
+    if (!d) return setError("Tape l'adresse de ta boutique, par exemple ma-boutique");
+    onSave(d.replace(/\.myshopify\.com$/, ""));
+  }
+
+  const inner = "relative flex h-full min-h-[190px] flex-col items-center justify-center gap-3 overflow-hidden rounded-[21px] p-4 text-center sm:min-h-[210px] sm:gap-4 sm:p-5";
+  return (
+    <div className="mt-4 space-y-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <button type="button" onClick={() => { setOpen(true); setCreated(false); }} aria-expanded={open && !created} className="glow-frame group rounded-[22px] p-[1.5px] transition-transform hover:-translate-y-1">
+          <span className={`${inner} bg-[linear-gradient(180deg,rgb(10_58_43/0.97),rgb(4_24_18/0.98))]`}>
+            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#2ee6a6]/25 blur-2xl" />
+            <ShopifyBag className="relative h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
+            <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">J'ai déjà Shopify</span>
+            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[0_8px_24px_-6px_rgb(46_230_166/0.8)]">Continuer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
+          </span>
+        </button>
+        <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" onClick={() => { setOpen(true); setCreated(true); }} className="glow-frame glow-frame-lime group rounded-[22px] p-[1.5px] transition-transform hover:-translate-y-1">
+          <span className={`${inner} pt-9 bg-[linear-gradient(180deg,rgb(12_60_32/0.96),rgb(4_26_14/0.98))] sm:pt-10`}>
+            <span className="absolute inset-x-0 top-0 bg-[linear-gradient(90deg,#22c55e,#4ade80)] py-1.5 text-center text-[11px] font-bold leading-tight text-[#052e16] sm:text-[12px]">{site.shopifyOffer}</span>
+            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#4ade80]/20 blur-2xl" />
+            <ShopifyBag className="relative h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
+            <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">Créer mon compte Shopify</span>
+            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#6ee7a0,#22c55e)] px-4 text-sm font-semibold text-[#052e16] shadow-[0_8px_24px_-6px_rgb(74_222_128/0.7)]">Créer <ArrowUp className="h-4 w-4 rotate-45" /></span>
+          </span>
+        </a>
+      </div>
+
+      {open && (
+        <form onSubmit={submit} className="rounded-card border border-accent/25 bg-accent-deep/20 p-4">
+          <label htmlFor="shop-handle" className="text-sm font-medium">{created ? "Ton compte est créé ? Tape l'adresse de ta boutique :" : "L'adresse de ta boutique :"}</label>
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+            <div className="flex flex-1 items-center rounded-ctl border border-line/15 bg-white/[0.03] focus-within:border-accent">
+              <input id="shop-handle" autoFocus value={shop} onChange={(e) => { setShop(e.target.value); setError(""); }} placeholder="ma-boutique" autoComplete="off" spellCheck={false} className="min-w-0 flex-1 bg-transparent px-3 py-3 text-[15px] focus:outline-none" />
+              <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
+            </div>
+            <button type="submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-ctl bg-accent px-5 text-sm font-semibold text-[#03140d]">Continuer <ArrowRight className="h-4 w-4" /></button>
+          </div>
+          {error ? <p className="mt-2 text-xs text-red-300">{error}</p> : <p className="mt-2 text-xs text-fg-faint">Astuce : tu peux aussi coller le lien de ton admin Shopify (admin.shopify.com/store/…).</p>}
+        </form>
+      )}
     </div>
   );
 }
