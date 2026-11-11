@@ -265,12 +265,12 @@ export function CreateStore() {
         </div>
       )}
 
-      <div role="tablist" aria-label="Mode de création" className="mx-auto mt-6 grid max-w-[720px] grid-cols-3 gap-2 sm:gap-3">
+      <div role="tablist" aria-label="Mode de création" className="mx-auto mt-6 grid max-w-[560px] grid-cols-2 items-stretch gap-2 sm:gap-3">
         {MODES.map((m) => {
           const on = mode === m.id;
           return (
             <button key={m.id} role="tab" aria-selected={on} onClick={() => setMode(m.id)}
-              className={cn("group flex flex-col items-center gap-2 rounded-[14px] border px-2 py-3 text-center transition-all duration-200 sm:flex-row sm:gap-3 sm:px-4 sm:py-3.5 sm:text-left", on ? "-translate-y-0.5 shadow-[0_14px_30px_-14px_var(--c)]" : "border-white/[0.08] bg-white/[0.02] hover:-translate-y-0.5 hover:border-white/20")}
+              className={cn("group flex flex-col items-center gap-2 rounded-[14px] border px-2 py-3 text-center transition-all duration-200 sm:flex-row sm:gap-3 sm:px-4 sm:py-3.5 sm:text-left", on ? "shadow-[0_14px_30px_-14px_var(--c)]" : "border-white/[0.08] bg-white/[0.02] hover:border-white/20")}
               style={{ ["--c" as string]: m.color, ...(on ? { borderColor: `${m.color}99`, background: `${m.color}1f` } : {}) }}>
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full transition-transform group-hover:scale-105" style={{ background: `${m.color}${on ? "33" : "1f"}`, color: m.color }}>
                 <m.icon className="h-5 w-5" />
