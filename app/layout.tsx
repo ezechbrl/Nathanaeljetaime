@@ -40,6 +40,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Vérification du site pour le programme d'affiliation Shopify (impact.com). */}
         {/* @ts-expect-error -- impact.com lit l'attribut « value » */}
         <meta name="impact-site-verification" value="c74c98d0-75c9-4b7f-ba43-fd910cf5cbb8" content="c74c98d0-75c9-4b7f-ba43-fd910cf5cbb8" />
+        {/* Fiche « organisation » pour Google et Bing : nom, site et logo affichés dans les résultats. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Organization", name: site.name, url: "https://vigenia.com", logo: "https://vigenia.com/brand/icon-512.png" }) }}
+        />
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important;filter:none!important}`}</style>
         </noscript>

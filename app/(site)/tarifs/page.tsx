@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Tarifs", description: "Vigenia Start
 
 const PRICING_FAQ = [
   { q: "Comment je paie ?", a: "Par carte bancaire, sur une page de paiement sécurisée (Stripe). Tes factures sont disponibles dans ton espace Abonnement, et tu peux arrêter quand tu veux." },
-  { q: "Y a-t-il une version gratuite ?", a: "Non. Pour garder un outil rapide et de qualité, Vigenia fonctionne uniquement par abonnement. Il est sans engagement : tu peux arrêter en un clic." },
+  { q: "Y a-t-il une version gratuite ?", a: "Tu peux voir gratuitement un aperçu de ta boutique (nom, couleurs, accroche) avant de payer. La boutique complète (textes, photos et design à installer dans ton Shopify) demande un abonnement, sans engagement : tu peux arrêter en un clic." },
   { q: "Starter ou Pro ?", a: "Starter est fait pour débuter : 1 boutique Shopify, avec un produit que tu peux changer quand tu veux. Pro est fait pour les vendeurs déjà lancés : jusqu'à 3 boutiques pour tester plusieurs produits en même temps, et 2× plus de crédit IA. Tu peux changer d'offre à tout moment." },
   { q: "Puis-je arrêter à tout moment ?", a: "Oui. Si tu arrêtes, ta boutique et tout son contenu restent sur ton compte Shopify." },
   { q: "Que se passe-t-il si j'utilise beaucoup l'IA ?", a: "L'IA fonctionne avec un crédit qui se recharge toutes les 5 heures, et une limite par semaine. Tu vois ton crédit restant en permanence dans ton espace, et on te prévient avant la limite. Si tu l'atteins, l'IA se met en pause quelques heures (24 h pour la limite de la semaine), puis repart. Un usage normal ne l'atteint pas. Tu as un besoin plus important (agence, nombreuses boutiques) ? Écris-nous." },

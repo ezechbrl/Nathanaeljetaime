@@ -1,7 +1,7 @@
 // Nom et coordonnées de la marque : change-les ici, ils sont repris partout.
 export const site = {
   name: "Vigenia",
-  description: "Ta boutique Shopify prête à vendre en 10 minutes, pas en 3 semaines : Vigenia étudie ton marché, écrit, illustre et met en ligne ta boutique, puis la fait progresser chaque jour.",
+  description: "Ta boutique Shopify prête à vendre en 10 minutes, pas en 3 semaines : Vigenia étudie ton marché, écrit les textes, crée les photos et le design de ta boutique, à installer dans ton Shopify en 2 étapes guidées.",
   email: "contact@vigenia.com",
   whatsapp: "", // ex. "33600000000" pour afficher le lien WhatsApp
   legalEntity: "Vigenia (à compléter)",
