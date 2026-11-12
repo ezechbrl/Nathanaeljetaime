@@ -65,7 +65,7 @@ export default function InstallPage() {
       button: "Envoyer mon produit dans Shopify",
       file: `/api/stores/${store.id}/download/products`,
       open: `${admin}/products`,
-      how: ["Clique sur « Importer » (en haut à droite)", "Choisis le fichier qui vient de se télécharger", "Clique sur « Importer les produits »"],
+      how: ["Clique sur « Importer » (en haut à droite)", "Choisis le fichier qui vient de se télécharger, et coche la case qui remplace les produits ayant la même ancre (utile si tu l'avais déjà importé)", "Clique sur « Importer les produits »"],
     },
     {
       id: "theme",
