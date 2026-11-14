@@ -168,34 +168,52 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
 
 // Aperçu gratuit : nom, couleurs, accroche et photo du fournisseur. La boutique complète est créée
 // après l'abonnement (runGeneration), à partir du même brief et du même lien.
+// Contenu de l'aperçu (nom, couleurs, accroche, photo du fournisseur), commun à l'aperçu d'un compte
+// et à l'aperçu créé sans compte depuis la page d'accueil.
+export async function buildTeaser(input: { mode: string; sourceUrl: string | null; brief: string; language: string; screenshots?: string[] }, onStep?: (k: "brand" | "pages") => Promise<void>) {
+  let sourceText: string | undefined;
+  let image: string | null = null;
+  if (input.mode === "link" && input.sourceUrl) {
+    try {
+      const page = await cachedProductPage(input.sourceUrl);
+      sourceText = page.text;
+      image = page.images[0] ?? null;
+    } catch (e) {
+      console.warn("Lien illisible pour l'aperçu :", (e as Error).message);
+    }
+  }
+  image ??= input.screenshots?.[0] ?? null;
+  await onStep?.("brand");
+  const t = await generateTeaser({ brief: input.brief, language: input.language, sourceText });
+  await onStep?.("pages");
+  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), image };
+  return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, t.brand.colors) };
+}
+
 export async function runTeaser(job: Record<string, any>, store: StoreRow) {
   const steps: Step[] = job.steps;
   const step = tracker(job.id, steps);
   try {
     await step("strategy");
-    let sourceText: string | undefined;
-    let image: string | null = null;
-    if (store.mode === "link" && store.source_url) {
-      try {
-        const page = await cachedProductPage(store.source_url);
-        sourceText = page.text;
-        image = page.images[0] ?? null;
-      } catch (e) {
-        console.warn("Lien illisible pour l'aperçu :", (e as Error).message);
-      }
-    }
-    image ??= ((job.input as { screenshots?: string[] } | null)?.screenshots ?? [])[0] ?? null;
-    await step("brand");
-    const t = await generateTeaser({ brief: store.brief, language: store.language, sourceText });
-    await step("pages");
-    const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), image };
-    await db().from("stores").update({ name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, t.brand.colors), status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
+    const out = await buildTeaser({ mode: store.mode, sourceUrl: store.source_url, brief: store.brief, language: store.language, screenshots: (job.input as { screenshots?: string[] } | null)?.screenshots }, (k) => step(k));
+    await db().from("stores").update({ ...out, status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
     await finish(job.id, steps);
   } catch (e) {
     console.error("Aperçu échoué", e);
     await db().from("stores").update({ status: "failed", updated_at: new Date().toISOString() }).eq("id", store.id);
     await db().from("users").update({ free_store_used: false }).eq("id", store.user_id); // il pourra réessayer
     await finish(job.id, steps, errorMessage(e));
+  }
+}
+
+// Aperçu sans compte (table previews).
+export async function runAnonymousPreview(previewId: string, input: Parameters<typeof buildTeaser>[0]) {
+  try {
+    const out = await buildTeaser(input);
+    await db().from("previews").update({ ...out, status: "ready" }).eq("id", previewId);
+  } catch (e) {
+    console.error("Aperçu sans compte échoué", e);
+    await db().from("previews").update({ status: "failed", error: errorMessage(e) }).eq("id", previewId);
   }
 }
 

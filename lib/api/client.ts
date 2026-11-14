@@ -4,7 +4,7 @@
 import { ApiClientError } from "./errors";
 import * as mock from "./mock";
 import type {
-  Affiliate, ApiError, Asset, ChatMessage, GenerateStoreInput, Insight, Invoice, Job,
+  Affiliate, ApiError, Asset, ChatMessage, GenerateStoreInput, Insight, Invoice, Job, Preview,
   Recommendation, ShopConnection, Store, StoreMetrics, StoreVersion, Subscription, Usage, User,
 } from "./types";
 
@@ -77,6 +77,13 @@ export const listVersions = (id: string) =>
   live ? request<{ versions: StoreVersion[] }>(`/api/stores/${id}/versions`) : mock.listVersions(id);
 export const restoreVersion = (id: string, versionId: string) =>
   live ? request<{ store: Store }>(`/api/stores/${id}/versions/${versionId}/restore`, { method: "POST" }) : mock.restoreVersion(id, versionId);
+// Aperçu sans compte (page d'accueil), puis rattachement au compte au moment de débloquer.
+export type PreviewInput = { mode: "start" | "link"; brief?: string; productUrl?: string; screenshots?: string[]; language?: string };
+export const createPreview = (input: PreviewInput) =>
+  live ? request<{ id: string }>("/api/preview", { method: "POST", json: input }) : mock.createPreview(input);
+export const getPreview = (id: string) => (live ? request<{ preview: Preview }>(`/api/preview/${id}`) : mock.getPreview(id));
+export const claimPreview = (id: string) =>
+  live ? request<{ store: Store }>(`/api/preview/${id}/claim`, { method: "POST" }) : mock.claimPreview(id);
 export const getJob = (id: string) => (live ? request<{ job: Job }>(`/api/jobs/${id}`) : mock.getJob(id));
 
 // Chat

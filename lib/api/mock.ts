@@ -4,7 +4,7 @@
 import type { StorePlan } from "@/lib/store-schema";
 import { samplePlan, seedAssets, seedMetrics, seedRecommendations, seedStores } from "./fixtures";
 import type {
-  Affiliate, Asset, ChatChange, ChatMessage, GenerateStoreInput, Invoice, Job, JobStepKey,
+  Affiliate, Asset, ChatChange, ChatMessage, GenerateStoreInput, Invoice, Job, JobStepKey, Preview,
   Recommendation, ShopConnection, Store, StoreMetrics, StoreVersion, Subscription, Usage, User,
 } from "./types";
 import { ApiClientError } from "./errors";
@@ -613,4 +613,54 @@ export async function runTool<T>(tool: string, input: Record<string, string>): P
   };
   if (!(tool in results)) throw new ApiClientError(404, "not_found", "Outil inconnu.");
   return { result: results[tool] as T };
+}
+
+// Aperçu sans compte (démo) : prêt au bout de 4 secondes.
+const PREVIEWS_KEY = "vg-demo-previews";
+type DemoPreview = { id: string; brief: string; at: number; storeId?: string };
+const loadPreviews = (): DemoPreview[] => { try { return JSON.parse(localStorage.getItem(PREVIEWS_KEY) ?? "[]"); } catch { return []; } };
+const savePreviews = (l: DemoPreview[]) => { try { localStorage.setItem(PREVIEWS_KEY, JSON.stringify(l)); } catch { /* stockage indisponible */ } };
+
+export async function createPreview(input: { mode: "start" | "link"; brief?: string; productUrl?: string }) {
+  await wait(400);
+  const p = { id: crypto.randomUUID(), brief: input.brief || input.productUrl || "Mon produit", at: Date.now() };
+  savePreviews([p, ...loadPreviews()].slice(0, 10));
+  return { id: p.id };
+}
+
+function demoPreview(p: DemoPreview): Preview {
+  const ready = Date.now() - p.at > 4000;
+  return {
+    id: p.id, status: ready ? "ready" : "generating", name: ready ? guessName(p.brief) : null, error: null, claimed: !!p.storeId,
+    theme: ready ? { colors: { primary: "#2a2117", accent: "#d2553b", background: "#fbf6ee" }, headingFont: "Fraunces", bodyFont: "DM Sans", heroLayout: "left", style: "lifestyle" } : null,
+    teaser: ready ? { tagline: "Pensé pour ton quotidien", heroTitle: "Le confort, sans compromis.", heroSubtitle: "Un produit simple, beau et bien fait.", productTitle: guessName(p.brief), price: "29.90", benefits: [{ title: "Livré vite", text: "Expédié sous 48 h." }, { title: "Retours faciles", text: "30 jours pour changer d'avis." }, { title: "Bien fait", text: "Des matériaux choisis." }], image: null } : null,
+  };
+}
+
+export async function getPreview(id: string) {
+  await wait(200);
+  const p = loadPreviews().find((x) => x.id === id);
+  if (!p) notFound();
+  return { preview: demoPreview(p) };
+}
+
+export async function claimPreview(id: string) {
+  await wait(300);
+  requireUser();
+  const list = loadPreviews();
+  const p = list.find((x) => x.id === id);
+  if (!p) notFound();
+  const s = load();
+  const existing = p.storeId && s.stores.find((x) => x.id === p.storeId);
+  if (existing) return { store: clone(existing) };
+  const d = demoPreview(p);
+  const store: Store = {
+    id: uid("store"), name: d.name ?? "Ma boutique", niche: p.brief.slice(0, 60), language: "français", mode: "start", status: "locked",
+    shopConnectionId: null, theme: d.theme!, teaser: d.teaser, plan: null, previewUrl: null, liveUrl: null, createdAt: iso(), updatedAt: iso(),
+  };
+  s.stores.unshift(store);
+  save();
+  p.storeId = store.id;
+  savePreviews(list);
+  return { store: clone(store) };
 }

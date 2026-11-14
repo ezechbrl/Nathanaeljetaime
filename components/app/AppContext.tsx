@@ -35,7 +35,9 @@ export function AppProvider({ children, fallback }: { children: React.ReactNode;
       setStores(list.stores);
     } catch (e) {
       if (e instanceof ApiClientError && e.status === 401) {
-        router.replace(`/connexion?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+        // Débloquer un aperçu créé sans compte : c'est une inscription (e-mail + code), pas une connexion.
+        const claiming = new URLSearchParams(window.location.search).has("claim");
+        router.replace(`/${claiming ? "inscription" : "connexion"}?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
       } else {
         throw e;
       }

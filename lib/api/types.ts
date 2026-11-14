@@ -204,3 +204,14 @@ export type OwnerStats = {
   errors: { day: number; month: number; recent: { path: string; status: number; message: string | null; at: string }[] };
   recent: { kind: "new" | "payment" | "cancel"; plan: string | null; amount: number; email: string | null; at: string }[];
 };
+
+// Aperçu créé sans compte depuis la page d'accueil.
+export type Preview = {
+  id: string;
+  status: "generating" | "ready" | "failed";
+  name: string | null;
+  teaser: StoreTeaser | null;
+  theme: StoreTheme | null;
+  error: string | null;
+  claimed: boolean;
+};

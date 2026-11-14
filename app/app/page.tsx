@@ -3,8 +3,9 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useApp } from "@/components/app/AppContext";
+import * as api from "@/lib/api/client";
 import { CreateStore } from "@/components/app/CreateStore";
 import { UNLOCK_KEY } from "@/components/app/Paywall";
 import { StoreCard } from "@/components/app/StoreCard";
@@ -22,6 +23,16 @@ function Welcome() {
   const router = useRouter();
   const toast = useToast();
   const { refresh } = useApp();
+  // Aperçu créé sans compte depuis la page d'accueil : rattaché au compte, puis on ouvre la boutique.
+  const claim = params.get("claim");
+  const claimed = useRef(false);
+  useEffect(() => {
+    if (!claim || claimed.current) return;
+    claimed.current = true;
+    api.claimPreview(claim)
+      .then(({ store }) => { refresh(); router.replace(`/app/boutiques/${store.id}#debloquer`); })
+      .catch(() => { toast("Cet aperçu n'a pas pu être retrouvé. Crée ta boutique ici."); router.replace("/app"); });
+  }, [claim, refresh, router, toast]);
   useEffect(() => {
     if (params.get("checkout") !== "success") return;
     refresh();

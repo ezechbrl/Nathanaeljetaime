@@ -11,7 +11,7 @@ import { onColor } from "@/lib/store-style";
 import { useApp } from "./AppContext";
 import { Paywall } from "./Paywall";
 
-const UNLOCKS = [
+export const UNLOCKS = [
   { icon: PenLine, title: "Tous les textes", text: "Accueil, fiche produit, FAQ, offres par lot" },
   { icon: Camera, title: "9 photos de pro", text: "Ton produit en studio et en situation" },
   { icon: Star, title: "Vrais avis acheteurs", text: "Importés et traduits automatiquement" },
@@ -22,7 +22,7 @@ const UNLOCKS = [
 const eur = (p: string) => `${Number(p).toFixed(2).replace(".", ",")} €`;
 
 // Aperçu de la vraie boutique : en-tête et accroche lisibles, le reste flouté jusqu'au déblocage.
-function TeaserPreview({ store }: { store: Store }) {
+export function TeaserPreview({ store }: { store: Store }) {
   const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
   const layout = store.theme.heroLayout ?? "left";
@@ -105,7 +105,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
     <div className="px-5 pb-16 pt-8 sm:px-8">
       <div className="mx-auto max-w-[1200px]">
         <div className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 px-3 py-1 text-xs font-medium text-[#a7f3d0]"><Lock className="h-3.5 w-3.5" /> Aperçu gratuit</span>
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 px-3 py-1 text-xs font-medium text-[#a7f3d0]"><Lock className="h-3.5 w-3.5" /> Ton aperçu</span>
           <h1 className="mt-4 text-[clamp(1.9rem,1.3rem+2vw,3rem)] font-semibold leading-tight tracking-[-0.035em]">
             Ta boutique <span className="serif-accent">{store.name}</span> t'attend
           </h1>

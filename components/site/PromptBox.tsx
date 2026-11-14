@@ -4,7 +4,9 @@ import { ArrowUp, ImagePlus, Link2, PenLine, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
+import * as api from "@/lib/api/client";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
+import { isWaitlist } from "@/lib/launch";
 
 // Mêmes couleurs que les 2 cartes Shopify de la connexion : « Décrire » = vert de « Connecter mon compte
 // Shopify », « Coller un lien » = vert clair de « Créer mon compte Shopify ».
@@ -37,6 +39,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
   const [placeholder, setPlaceholder] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [photoError, setPhotoError] = useState("");
+  const [busy, setBusy] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const current = MODES.find((m) => m.id === mode)!;
 
@@ -70,15 +73,31 @@ export function PromptBox({ target = "/inscription", className, align = "center"
     }
   }
 
-  function submit(e?: React.FormEvent) {
+  async function submit(e?: React.FormEvent) {
     e?.preventDefault();
+    if (busy) return;
     // Un lien collé passe en import par lien, quel que soit l'onglet choisi.
-    const isLink = /^https?:\/\/\S+$/.test(value.trim());
+    const text = value.trim();
+    const isLink = /^https?:\/\/\S+$/.test(text);
     const m = isLink ? "link" : mode;
-    const params = new URLSearchParams({ mode: m });
-    if (value.trim()) params.set(m === "link" ? "url" : "brief", value.trim());
-    saveLandingPhotos(photos);
-    router.push(`${target}?${params}`);
+    if (isWaitlist) {
+      const params = new URLSearchParams({ mode: m });
+      if (text) params.set(m === "link" ? "url" : "brief", text);
+      saveLandingPhotos(photos);
+      return router.push(`${target}?${params}`);
+    }
+    // Site ouvert : l'aperçu se crée tout de suite, sans compte. Le compte est demandé pour le débloquer.
+    if (!text && !photos.length) return setPhotoError(m === "link" ? "Colle le lien de ton produit, ou ajoute une photo." : "Décris ton produit en une phrase, ou ajoute une photo.");
+    if (m === "link" && !isLink && !photos.length) return setPhotoError("Ce lien ne semble pas valide. Copie l'adresse complète de la page produit (elle commence par https://).");
+    setBusy(true);
+    setPhotoError("");
+    try {
+      const { id } = await api.createPreview(m === "link" ? { mode: "link", productUrl: isLink ? text : undefined, screenshots: photos } : { mode: "start", brief: text, screenshots: photos });
+      router.push(`/apercu/${id}`);
+    } catch (err) {
+      setBusy(false);
+      setPhotoError(err instanceof api.ApiClientError ? err.message : "Une erreur est survenue. Réessaie.");
+    }
   }
 
   return (
@@ -118,8 +137,8 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             >
               <ImagePlus className="h-4 w-4" /> {photos.length ? `Photo ${photos.length}/${MAX_PHOTOS}` : "Photo du produit"}
             </button>
-            <button type="submit" className="inline-flex h-9 items-center gap-2 rounded-full border border-[#6ee7b7]/50 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_0_18px_rgb(46_230_166/0.55)] transition-all hover:-translate-y-px hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_0_28px_rgb(46_230_166/0.8)]">
-              <Sparkles className="h-4 w-4" /> Générer
+            <button type="submit" disabled={busy} className="inline-flex h-9 items-center gap-2 rounded-full border border-[#6ee7b7]/50 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_0_18px_rgb(46_230_166/0.55)] transition-all hover:-translate-y-px hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_0_28px_rgb(46_230_166/0.8)]">
+              {busy ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#03140d]/30 border-t-[#03140d]" /> : <Sparkles className="h-4 w-4" />} Générer
             </button>
           </div>
         </div>

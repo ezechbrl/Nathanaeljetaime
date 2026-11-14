@@ -41,7 +41,7 @@ export const GET = route(async () => {
   }
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const since60 = new Date(Date.now() - 61 * DAY).toISOString(); // 30 jours + les 30 d'avant, pour comparer
-  const [subs, eventsAll, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, emailEvents, impact] = await Promise.all([
+  const [subs, eventsAll, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, emailEvents, impact, previews] = await Promise.all([
     db().from("subscriptions").select("user_id, plan, status, interval, amount_cents, currency, test, shopify_subscription_id, stripe_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(2000),
     db().from("waitlist").select("email, ref, brief, created_at").order("created_at", { ascending: false }),
@@ -55,6 +55,7 @@ export const GET = route(async () => {
     db().from("shop_connections").select("user_id, shop_domain, shopify_plan").eq("status", "active"),
     db().from("email_events").select("user_id, email, kind, last_event, sent_at").gte("sent_at", since),
     db().from("impact_actions").select("tracker, state, payout_cents, currency, event_at").order("event_at", { ascending: false }).limit(500),
+    db().from("previews").select("visitor, status, store_id, created_at").gte("created_at", since60),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
   // Paiements d'essai (abonnement marqué « test ») et ceux du fondateur : hors des chiffres d'argent.
@@ -147,6 +148,7 @@ export const GET = route(async () => {
   const uniq = (rows: Record<string, any>[]) => new Set(rows.map((r) => r.user_id)).size;
   const funnel = [
     { step: "Visiteurs du site", count: visits30.length },
+    { step: "Aperçu créé (sans compte)", count: new Set(previews.filter((x) => last30(x as Dated)).map((x) => x.visitor)).size },
     { step: "Comptes créés", count: realUsers.filter((u) => last30(u as Dated)).length },
     { step: "Aperçu de boutique créé", count: uniq(stores.filter((x) => last30(x as Dated))) },
     { step: "Page de paiement ouverte", count: uniq(events.filter((e) => e.kind === "checkout" && last30(e as Dated))) },
