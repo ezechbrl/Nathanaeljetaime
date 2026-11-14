@@ -30,7 +30,7 @@ function Welcome() {
     if (!claim || claimed.current) return;
     claimed.current = true;
     api.claimPreview(claim)
-      .then(({ store }) => { refresh(); router.replace(`/app/boutiques/${store.id}#debloquer`); })
+      .then(({ store }) => { refresh(); router.replace(`/app/boutiques/${store.id}`); })
       .catch(() => { toast("Cet aperçu n'a pas pu être retrouvé. Crée ta boutique ici."); router.replace("/app"); });
   }, [claim, refresh, router, toast]);
   useEffect(() => {

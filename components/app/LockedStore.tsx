@@ -22,7 +22,9 @@ export const UNLOCKS = [
 const eur = (p: string) => `${Number(p).toFixed(2).replace(".", ",")} €`;
 
 // Aperçu de la vraie boutique : en-tête et accroche lisibles, le reste flouté jusqu'au déblocage.
-export function TeaserPreview({ store }: { store: Store }) {
+// Sans compte (`loginHref`) : la photo et la suite sont floutées, il faut se connecter pour les voir.
+// Connecté : photo et atouts visibles, seule la boutique complète reste à débloquer.
+export function TeaserPreview({ store, loginHref }: { store: Store; loginHref?: string }) {
   const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
   const layout = store.theme.heroLayout ?? "left";
@@ -45,19 +47,30 @@ export function TeaserPreview({ store }: { store: Store }) {
           <span className="mt-5 inline-flex rounded-full px-5 py-2.5 text-sm font-semibold" style={{ background: accent, color: onColor(accent) }}>Acheter · {eur(t.price)}</span>
         </div>
         <div className={cn("aspect-[4/3] overflow-hidden rounded-[16px]", layout === "right" && "sm:-order-1", layout === "center" && "mx-auto w-full max-w-[520px]")} style={{ background: `linear-gradient(150deg, ${accent}33, ${accent}88)` }}>
-          {t.image && <img src={t.image} alt="" className="h-full w-full object-cover" />}
+          {t.image && <img src={t.image} alt="" className={cn("h-full w-full object-cover", loginHref && "scale-110 blur-[14px]")} />}
         </div>
       </div>
       {/* Le reste de la boutique : flouté (les atouts sont réels, les blocs gris arrivent au déblocage). */}
+      {!loginHref && (
+        <div className="grid gap-4 px-5 pb-2 sm:grid-cols-3 sm:px-8">
+          {t.benefits.map((b) => (
+            <div key={b.title} className="rounded-[14px] p-4" style={{ background: `${accent}14` }}>
+              <p className="font-semibold">{b.title}</p><p className="mt-1 text-sm opacity-70">{b.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="relative">
         <div aria-hidden className="pointer-events-none select-none space-y-6 p-5 blur-[7px] sm:p-8">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {t.benefits.map((b) => (
-              <div key={b.title} className="rounded-[14px] p-4" style={{ background: `${accent}14` }}>
-                <p className="font-semibold">{b.title}</p><p className="mt-1 text-sm opacity-70">{b.text}</p>
-              </div>
-            ))}
-          </div>
+          {loginHref && (
+            <div className="grid gap-4 sm:grid-cols-3">
+              {t.benefits.map((b) => (
+                <div key={b.title} className="rounded-[14px] p-4" style={{ background: `${accent}14` }}>
+                  <p className="font-semibold">{b.title}</p><p className="mt-1 text-sm opacity-70">{b.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="aspect-square rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}55, ${primary}55)` }} />
             <div className="space-y-3">
@@ -69,8 +82,8 @@ export function TeaserPreview({ store }: { store: Store }) {
           </div>
         </div>
         <div className="absolute inset-0 grid place-items-center bg-gradient-to-b from-transparent via-black/10 to-black/30 p-4">
-          <a href="#debloquer" className="flex items-center gap-2 rounded-full bg-[#0b1f1b]/90 px-5 py-3 text-sm font-semibold text-white shadow-2xl backdrop-blur">
-            <Lock className="h-4 w-4 text-[#2ee6a6]" /> Débloque ta boutique complète
+          <a href={loginHref ?? "#debloquer"} className="flex items-center gap-2 rounded-full bg-[#0b1f1b]/90 px-5 py-3 text-sm font-semibold text-white shadow-2xl backdrop-blur">
+            <Lock className="h-4 w-4 text-[#2ee6a6]" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque ta boutique complète"}
           </a>
         </div>
       </div>
@@ -109,7 +122,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
           <h1 className="mt-4 text-[clamp(1.9rem,1.3rem+2vw,3rem)] font-semibold leading-tight tracking-[-0.035em]">
             Ta boutique <span className="serif-accent">{store.name}</span> t'attend
           </h1>
-          <p className="mx-auto mt-2 max-w-xl text-fg-muted">Ton nom de marque, tes couleurs et ton accroche sont prêts. Débloque-la : tout le reste se crée en quelques minutes.</p>
+          <p className="mx-auto mt-2 max-w-xl text-fg-muted">Ton nom, tes couleurs, ton accroche et tes atouts sont prêts et gardés dans ton compte. Quand tu veux, débloque-la : textes, photos et design se créent en quelques minutes.</p>
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">

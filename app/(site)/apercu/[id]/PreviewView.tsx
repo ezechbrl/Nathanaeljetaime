@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowRight, Check, Lock, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { TeaserPreview, UNLOCKS } from "@/components/app/LockedStore";
+import { TeaserPreview } from "@/components/app/LockedStore";
 import * as api from "@/lib/api/client";
 import type { Preview, Store } from "@/lib/api/types";
 
@@ -67,19 +67,15 @@ export function PreviewView({ id }: { id: string }) {
         <h1 className="mt-5 text-[clamp(2rem,1.4rem+2.2vw,3.2rem)] leading-tight tracking-tight">Voici <span className="serif-accent">{store.name}</span></h1>
       </div>
       <div className="mt-8 rounded-[16px] border border-white/10 p-1.5 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.8)]">
-        <TeaserPreview store={store} />
+        <TeaserPreview store={store} loginHref={unlockUrl} />
       </div>
-      <div id="debloquer" className="mx-auto mt-12 max-w-2xl scroll-mt-28 rounded-[22px] border border-accent/25 bg-accent-deep/20 p-6 sm:p-8">
-        <h2 className="text-center text-[1.6rem] leading-tight tracking-tight">Débloque ta boutique complète</h2>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-          {UNLOCKS.map((u) => (
-            <li key={u.title} className="flex gap-3 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" /><span><strong className="text-fg">{u.title}</strong><span className="block text-fg-muted">{u.text}</span></span></li>
-          ))}
-        </ul>
-        <Link href={unlockUrl} className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-8px_rgb(46_230_166/0.6)]">
-          <Lock className="h-4 w-4" /> Débloquer ma boutique <ArrowRight className="h-4 w-4" />
+      <div id="debloquer" className="mx-auto mt-12 max-w-xl scroll-mt-28 rounded-[22px] border border-accent/25 bg-accent-deep/20 p-6 text-center sm:p-8">
+        <h2 className="text-[1.6rem] leading-tight tracking-tight">Ta boutique t'attend</h2>
+        <p className="mt-2 text-fg-muted">Connecte-toi pour voir sa photo et ses atouts. Elle est gardée dans ton compte.</p>
+        <Link href={unlockUrl} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-8px_rgb(46_230_166/0.6)]">
+          Connecte-toi pour voir ta boutique <ArrowRight className="h-4 w-4" />
         </Link>
-        <p className="mt-3 text-center text-xs text-fg-faint">Ton aperçu est gardé : tu le retrouves dans ton compte. Sans engagement.</p>
+        <p className="mt-3 text-xs text-fg-faint">Juste ton e-mail et un code à 6 chiffres. Pas de mot de passe.</p>
       </div>
     </section>
   );
