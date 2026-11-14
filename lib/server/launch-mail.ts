@@ -1,5 +1,6 @@
 import "server-only";
 import { sendEmail } from "./email";
+import { trackEmail } from "./email-tracking";
 import { env } from "./env";
 import { LAUNCH_MODE } from "@/lib/launch";
 import { LAUNCH_OFFER, PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
@@ -30,7 +31,10 @@ export async function sendLaunchEmails() {
       undefined,
       launchHtml(url, p),
     );
-    if (ok) sent++;
+    if (ok) {
+      sent++;
+      await trackEmail(ok, "launch", email);
+    }
     else { await db().from("webhook_events").delete().eq("id", `launch:${email}`); break; } // réessai au prochain passage
     await new Promise((r) => setTimeout(r, 600));
   }

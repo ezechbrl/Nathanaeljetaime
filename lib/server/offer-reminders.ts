@@ -1,5 +1,6 @@
 import "server-only";
 import { sendEmail } from "./email";
+import { trackEmail } from "./email-tracking";
 import { env } from "./env";
 import { LAUNCH_OFFER } from "@/lib/content/pricing";
 import { db, must } from "./supabase";
@@ -35,7 +36,10 @@ export async function sendOfferReminders() {
         undefined,
         reminderHtml(name, left, url, last),
       );
-      if (ok) reminders++;
+      if (ok) {
+        reminders++;
+        await trackEmail(ok, r.key, u.email, u.id);
+      }
       else await db().from("webhook_events").delete().eq("id", `${r.key}:${u.id}`); // réessai au prochain passage si encore dans la fenêtre
     }
   }

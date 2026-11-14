@@ -221,6 +221,32 @@ function OfferBadge({ offer, now }: { offer: Offer; now: number }) {
   return <span className={cn("shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold tabular-nums", TONES.amber)}>⏳ {h} h {String(m).padStart(2, "0")}</span>;
 }
 
+// État de chaque mail envoyé à la personne : ouvert, cliqué, délivré, non délivré…
+const MAIL_NAME: Record<string, string> = { "offer-reminder": "Mail 12 h", "offer-last": "Mail dernière heure", launch: "Mail « C'est ouvert »" };
+const MAIL_STATUS: Record<string, { label: string; tone: keyof typeof TONES | "grey" }> = {
+  clicked: { label: "cliqué ✓", tone: "green" },
+  opened: { label: "ouvert ✓", tone: "green" },
+  delivered: { label: "reçu, pas ouvert", tone: "amber" },
+  sent: { label: "envoyé", tone: "grey" },
+  delivery_delayed: { label: "en retard", tone: "amber" },
+  bounced: { label: "non délivré", tone: "red" },
+  complained: { label: "signalé spam", tone: "red" },
+};
+function MailBadges({ mails }: { mails: { kind: string; status: string }[] }) {
+  return (
+    <span className="mt-1 flex flex-wrap gap-1">
+      {mails.map((m, i) => {
+        const st = MAIL_STATUS[m.status] ?? { label: m.status, tone: "grey" as const };
+        return (
+          <span key={i} className={cn("rounded-full px-2 py-0.5 text-[11px]", st.tone === "grey" ? "bg-[#f1f1f1] text-[#616161]" : TONES[st.tone])}>
+            {MAIL_NAME[m.kind] ?? "Mail"} : {st.label}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 function OfferNote({ offer }: { offer: Offer }) {
   if (offer.subscribedAt) {
     const after = offer.lastCallAt && offer.subscribedAt > offer.lastCallAt ? "après le mail « dernière heure » ✓" : offer.reminderAt && offer.subscribedAt > offer.reminderAt ? "après le mail de 12 h ✓" : "avant les mails";
@@ -315,24 +341,49 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
       {/* Les chiffres clés de la période, tous à la même taille */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Argent de la période d'abord */}
+        {/* Visites et inscrits d'abord */}
+        <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={q.visits} />
+        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint={`${p.waitlist} attente · ${p.accounts} comptes`} cur={p.signups} prev={q.signups} />
+        <Live count={s.liveNow} />
+        <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={Math.round(conv(q) * 1000)} />
+        <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={q.stores} />
+        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page de paiement" cur={p.checkouts} prev={q.checkouts} />
+        {/* Puis l'argent de la période */}
         <Metric icon={Wallet} color="green" label="Encaissé" value={eur(p.revenue)} hint={plural(p.sales, "paiement")} cur={p.revenue} prev={q.revenue} />
         <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} hint="Premiers abonnements" cur={p.newSubs} prev={q.newSubs} />
         <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" cur={p.sales} prev={q.sales} />
         <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} hint={`Taux sur 30 j : ${pct(s.churn)}`} cur={p.cancels} prev={q.cancels} inverse />
         <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
         <Metric icon={Gauge} color="violet" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
-        {/* Puis le trafic */}
-        <Live count={s.liveNow} />
-        <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={q.visits} />
-        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint={`${p.waitlist} attente · ${p.accounts} comptes`} cur={p.signups} prev={q.signups} />
-        <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={Math.round(conv(q) * 1000)} />
-        <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={q.stores} />
-        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page de paiement" cur={p.checkouts} prev={q.checkouts} />
         <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
         <Metric icon={Hourglass} color="pink" label="Liste d'attente" value={String(s.totals.waitlist)} hint="Inscrits au total" />
         <Metric icon={UserPlus} color="blue" label="Comptes" value={String(s.totals.accounts)} hint={`${pct(s.conversion)} devenus payants`} />
       </div>
+
+      {/* Derniers inscrits juste sous les chiffres : les 6 plus récents, avec leurs mails ouverts ou non */}
+      <Card>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Derniers inscrits</h2>
+        {s.signups.length ? (
+          <ul className="mt-1 divide-y divide-[#eee] text-sm">
+            {s.signups.map((u, i) => (
+              <li key={i} className="flex items-center gap-3 py-2.5">
+                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.tester ? "bg-[#f1f1f1] text-[#616161]" : u.kind === "account" ? TONES.blue : TONES.pink)}>{u.tester ? "Test Shopify" : u.kind === "account" ? "Compte" : "Attente"}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
+                  <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && !u.mails?.length && <OfferNote offer={u.offer} />}</span>
+                  {!!u.mails?.length && <MailBadges mails={u.mails} />}
+                  {u.kind === "account" && (
+                    <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
+                      <ShoppingBag className="h-3 w-3" /> {u.shop ? (u.shop.plan ? `Shopify : ${u.shop.plan}` : u.shop.domain) : "Boutique Shopify non indiquée"}
+                    </span>
+                  )}
+                </span>
+                {u.offer && !u.tester && <OfferBadge offer={u.offer} now={now} />}
+              </li>
+            ))}
+          </ul>
+        ) : <p className="mt-2 text-sm text-[#8a8a8a]">Personne pour l'instant.</p>}
+      </Card>
 
       <div className="grid grid-cols-1 gap-3">
         <Card>
@@ -416,28 +467,6 @@ function Dashboard({ s }: { s: OwnerStats }) {
           <p className="mt-3 text-xs text-[#8a8a8a]">Le plus gros pourcentage rouge = l'étape où tu perds le plus de monde.</p>
         </Card>
 
-        <Card>
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Derniers inscrits</h2>
-          {s.signups.length ? (
-            <ul className="mt-1 divide-y divide-[#eee] text-sm">
-              {s.signups.map((u, i) => (
-                <li key={i} className="flex items-center gap-3 py-2.5">
-                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.tester ? "bg-[#f1f1f1] text-[#616161]" : u.kind === "account" ? TONES.blue : TONES.pink)}>{u.tester ? "Test Shopify" : u.kind === "account" ? "Compte" : "Attente"}</span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
-                    <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && <OfferNote offer={u.offer} />}</span>
-                    {u.kind === "account" && (
-                      <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
-                        <ShoppingBag className="h-3 w-3" /> {u.shop ? (u.shop.plan ? `Shopify : ${u.shop.plan}` : u.shop.domain) : "Boutique Shopify non indiquée"}
-                      </span>
-                    )}
-                  </span>
-                  {u.offer && !u.tester && <OfferBadge offer={u.offer} now={now} />}
-                </li>
-              ))}
-            </ul>
-          ) : <p className="mt-2 text-sm text-[#8a8a8a]">Personne pour l'instant.</p>}
-        </Card>
       </div>
 
       <Card>

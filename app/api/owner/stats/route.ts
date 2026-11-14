@@ -41,7 +41,7 @@ export const GET = route(async () => {
   }
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const since60 = new Date(Date.now() - 61 * DAY).toISOString(); // 30 jours + les 30 d'avant, pour comparer
-  const [subs, eventsAll, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, impact] = await Promise.all([
+  const [subs, eventsAll, waitlistAll, users, stores, affiliates, affEvents, errors, visits, reminders, conns, emailEvents, impact] = await Promise.all([
     db().from("subscriptions").select("user_id, plan, status, interval, amount_cents, currency, test, shopify_subscription_id, stripe_subscription_id"),
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(2000),
     db().from("waitlist").select("email, ref, brief, created_at").order("created_at", { ascending: false }),
@@ -49,10 +49,11 @@ export const GET = route(async () => {
     db().from("stores").select("user_id, status, created_at").gte("created_at", since60),
     db().from("affiliates").select("code, commission_rate, users(email, first_name)"),
     db().from("affiliate_events").select("code, kind, amount_cents, referred_user_id, created_at"),
-    db().from("app_errors").select("path, status, message, created_at").gte("created_at", since).order("created_at", { ascending: false }).limit(200),
+    db().from("app_errors").select("path, status, message, created_at").eq("resolved", false).gte("created_at", since).order("created_at", { ascending: false }).limit(200),
     allSessions(since60),
     db().from("webhook_events").select("id, created_at").like("id", "offer-%").gte("created_at", since),
     db().from("shop_connections").select("user_id, shop_domain, shopify_plan").eq("status", "active"),
+    db().from("email_events").select("user_id, email, kind, last_event, sent_at").gte("sent_at", since),
     db().from("impact_actions").select("tracker, state, payout_cents, currency, event_at").order("event_at", { ascending: false }).limit(500),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
 
@@ -152,7 +153,12 @@ export const GET = route(async () => {
     { step: "Abonnés", count: uniq(events.filter((e) => e.kind === "new" && last30(e as Dated))) },
   ];
   const signups = [
-    ...waitlist.slice(0, 15).map((w) => ({ email: w.email as string, kind: "waitlist" as const, ref: (w.ref as string | null) ?? null, at: w.created_at as string })),
+    ...waitlist.slice(0, 15).map((w) => ({
+      email: w.email as string, kind: "waitlist" as const, ref: (w.ref as string | null) ?? null, at: w.created_at as string,
+      // Mail « C'est ouvert » envoyé à cet inscrit de la liste d'attente, et son état.
+      mails: emailEvents.filter((m) => m.kind === "launch" && String(m.email).toLowerCase() === String(w.email).toLowerCase())
+        .map((m) => ({ kind: m.kind as string, status: (m.last_event as string | null) ?? "sent", at: m.sent_at as string })),
+    })),
     ...users.filter((u) => !isOwnerEmail(u.email)).slice(0, 15).map((u) => {
       // Offre de lancement (−50 %, 24 h) : temps restant, rappel de 12 h envoyé, abonnement pris ou non.
       const sub = events.filter((e) => e.kind === "new" && e.user_id === u.id).at(-1);
@@ -171,9 +177,12 @@ export const GET = route(async () => {
           subscribedAt: (sub?.created_at as string | undefined) ?? null,
           amount: sub ? toEur(Number(sub.amount_cents), sub.currency) : null,
         },
+        // Mails de rappel envoyés et leur état chez Resend (ouvert, délivré…).
+        mails: emailEvents.filter((m) => m.user_id === u.id).sort((a, b) => String(a.sent_at).localeCompare(String(b.sent_at)))
+          .map((m) => ({ kind: m.kind as string, status: (m.last_event as string | null) ?? "sent", at: m.sent_at as string })),
       };
     }),
-  ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 12);
+  ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 6);
   const monthCancels = events.filter((e) => e.kind === "cancel" && inLast(30)(e as Dated)).length;
 
   const sources = Object.entries(waitlist.reduce<Record<string, number>>((m, w) => ((m[w.ref || "direct"] = (m[w.ref || "direct"] ?? 0) + 1), m), {}))
