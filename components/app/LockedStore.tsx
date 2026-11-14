@@ -24,7 +24,7 @@ const eur = (p: string) => `${Number(p).toFixed(2).replace(".", ",")} €`;
 // Aperçu de la vraie boutique : en-tête et accroche lisibles, le reste flouté jusqu'au déblocage.
 // Sans compte (`loginHref`) : la photo et la suite sont floutées, il faut se connecter pour les voir.
 // Connecté : photo et atouts visibles, seule la boutique complète reste à débloquer.
-export function TeaserPreview({ store, loginHref }: { store: Store; loginHref?: string }) {
+export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; loginHref?: string; onUnlock?: () => void }) {
   const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
   const layout = store.theme.heroLayout ?? "left";
@@ -82,7 +82,7 @@ export function TeaserPreview({ store, loginHref }: { store: Store; loginHref?: 
           </div>
         </div>
         <div className="absolute inset-0 grid place-items-center bg-gradient-to-b from-transparent via-black/10 to-black/30 p-4">
-          <a href={loginHref ?? "#debloquer"} className="flex items-center gap-2 rounded-full bg-[#0b1f1b]/90 px-5 py-3 text-sm font-semibold text-white shadow-2xl backdrop-blur">
+          <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[#0b1f1b]/90 px-5 py-3 text-sm font-semibold text-white shadow-2xl backdrop-blur">
             <Lock className="h-4 w-4 text-[#2ee6a6]" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque ta boutique complète"}
           </a>
         </div>
@@ -96,6 +96,10 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const tried = useRef(false);
+  // Étape intermédiaire : d'abord la boutique, l'offre ne s'affiche qu'après « Débloquer ».
+  const [showPay, setShowPay] = useState(false);
+  useEffect(() => { if (window.location.hash === "#debloquer") setShowPay(true); }, []);
+  const openPay = () => setShowPay(true);
   const paid = user.plan !== "free";
 
   // Abonnement actif : on lance tout de suite la vraie génération.
@@ -126,7 +130,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-          <div className="glow-frame rounded-[14px] p-[1.5px]"><TeaserPreview store={store} /></div>
+          <div className="glow-frame rounded-[14px] p-[1.5px]"><TeaserPreview store={store} onUnlock={openPay} /></div>
           <div className="flex flex-col gap-2.5">
             {UNLOCKS.map(({ icon: I, title, text }) => (
               <div key={title} className="flex items-center gap-3 rounded-[16px] border border-white/10 bg-white/[0.04] p-3.5">
@@ -135,13 +139,13 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
                 <Lock className="h-4 w-4 shrink-0 text-fg-faint" />
               </div>
             ))}
-            <a href="#debloquer" className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.8)]">
-              {busy ? <><Spinner /> Déblocage…</> : <>Débloquer ma boutique <ArrowDown className="h-4 w-4" /></>}
+            <a href="#debloquer" onClick={openPay} className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.8)]">
+              {busy ? <><Spinner /> Déblocage…</> : <>Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></>}
             </a>
           </div>
         </div>
 
-        {!paid && <div id="debloquer" className="mt-12 scroll-mt-6"><Paywall unlockStoreId={store.id} /></div>}
+        <div id="debloquer" className="scroll-mt-6">{!paid && showPay && <div className="mt-12 [animation:fade-in_.4s_ease-out_both]"><Paywall unlockStoreId={store.id} /></div>}</div>
       </div>
     </div>
   );

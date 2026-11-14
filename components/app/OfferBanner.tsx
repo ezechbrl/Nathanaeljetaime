@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCountdown } from "@/components/pricing/PlanCards";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
@@ -11,9 +12,11 @@ import { useApp } from "./AppContext";
 // Grand bandeau en haut de l'espace client : compte à rebours de l'offre de lancement tant qu'on n'est pas abonné.
 export function OfferBanner() {
   const { user } = useApp();
+  // Page d'une boutique à débloquer : l'offre apparaît seulement quand il clique sur « Débloquer ».
+  const onStorePage = usePathname().startsWith("/app/boutiques/");
   const billing = useApi(() => (user.plan === "free" ? api.getBilling() : Promise.resolve(null)), [user.plan]);
   const left = useCountdown(billing.data?.offerEndsAt);
-  if (user.plan !== "free" || !left) return null;
+  if (user.plan !== "free" || !left || onStorePage) return null;
   const waitlist = billing.data?.offerKind === "waitlist";
   const starter = PLANS.find((p) => p.id === "pro")!;
   const now = waitlist ? WAITLIST_PRICES.pro.monthly : withOffer(starter.monthly);
