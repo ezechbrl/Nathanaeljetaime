@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, ExternalLink, Lock, PartyPopper, Play, Store } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ExternalLink, Lock, PartyPopper, Store } from "lucide-react";
+import { InstallAnimation } from "@/components/app/InstallAnimation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
@@ -83,7 +84,8 @@ export default function InstallPage() {
     <div className="mx-auto max-w-3xl p-5 sm:p-8">
       <Link href={`/app/boutiques/${store.id}`} className="inline-flex items-center gap-2 text-sm text-fg-muted hover:text-fg"><ArrowLeft className="h-4 w-4" /> {store.name}</Link>
       <h1 className="mt-4 text-[clamp(1.8rem,1.3rem+1.8vw,2.5rem)] font-semibold tracking-[-0.03em]">Mets ta boutique en ligne</h1>
-      <p className="mt-2 text-fg-muted">2 étapes, environ 2 minutes. On te dit exactement où cliquer. Fais-le sur un ordinateur.</p>
+      <p className="mt-2 text-fg-muted">2 étapes identiques, environ 2 minutes. Fais-le sur un ordinateur.</p>
+      <div className="mt-5"><InstallAnimation /></div>
 
       {/* Avancement */}
       <div className="mt-6 flex items-center gap-2" aria-label={`Étape ${Math.min(position + 1, 2)} sur 2`}>
@@ -141,14 +143,6 @@ export default function InstallPage() {
                     ))}
                   </ol>
 
-                  {s.id === "theme" && (
-                    <details className="group mt-3">
-                      <summary className="inline-flex cursor-pointer list-none items-center gap-2 text-sm text-fg-muted hover:text-fg"><Play className="h-4 w-4" /> Voir comment faire en vidéo</summary>
-                      <video src="/videos/tuto-theme.mp4" poster="/videos/tuto-theme.jpg" controls muted loop playsInline preload="none"
-                        className="mt-3 aspect-video w-full rounded-[14px] border border-white/10 bg-black" aria-label="Vidéo : importer et publier ton design" />
-                    </details>
-                  )}
-
                   <button type="button" onClick={() => markDone(s.id)} className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-ctl border border-white/15 text-sm font-medium hover:bg-white/5 sm:w-auto sm:px-5">
                     <Check className="h-4 w-4" /> C'est fait, étape suivante
                   </button>
@@ -160,6 +154,7 @@ export default function InstallPage() {
       </ol>
 
       {current === "finished" && (
+        <>
         <section className="mt-6 rounded-card border border-accent/40 bg-accent-deep/25 p-6 text-center">
           <PartyPopper className="mx-auto h-8 w-8 text-accent" />
           <h2 className="mt-3 text-xl font-semibold">Ta boutique est dans ton Shopify</h2>
@@ -167,21 +162,22 @@ export default function InstallPage() {
             <a href={`https://${domain}`} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-11 items-center gap-2 rounded-ctl bg-accent px-5 text-sm font-semibold text-[#03140d]">Voir ma boutique <ExternalLink className="h-4 w-4" /></a>
           )}
         </section>
+        <section className="mt-4 rounded-card border border-[#95bf47]/30 bg-[#95bf47]/[0.06] p-5">
+          <p className="flex items-center gap-2 font-medium"><Store className="h-4 w-4 text-[#b5d96b]" /> Dernière chose avant de vendre, dans Shopify</p>
+          <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+            {[
+              ["Activer les paiements", links?.payments ?? `${admin}/settings/payments`],
+              ["Régler la livraison", links?.shipping ?? `${admin}/settings/shipping`],
+              ["Ajouter les pages légales (CGV, retours)", links?.policies ?? `${admin}/settings/legal`],
+              ["Retirer le mot de passe de la boutique", links?.password ?? `${admin}/online_store/preferences`],
+            ].map(([label, href]) => (
+              <li key={label}><a href={href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-fg-muted hover:text-[#b5d96b]">{label} <ExternalLink className="h-3.5 w-3.5 opacity-60" /></a></li>
+            ))}
+          </ul>
+        </section>
+        </>
       )}
 
-      <section className="mt-6 rounded-card border border-[#95bf47]/30 bg-[#95bf47]/[0.06] p-5">
-        <p className="flex items-center gap-2 font-medium"><Store className="h-4 w-4 text-[#b5d96b]" /> Avant d'ouvrir la vente, dans Shopify</p>
-        <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-          {[
-            ["Activer les paiements", links?.payments ?? `${admin}/settings/payments`],
-            ["Régler la livraison", links?.shipping ?? `${admin}/settings/shipping`],
-            ["Ajouter les pages légales (CGV, retours)", links?.policies ?? `${admin}/settings/legal`],
-            ["Retirer le mot de passe de la boutique", links?.password ?? `${admin}/online_store/preferences`],
-          ].map(([label, href]) => (
-            <li key={label}><a href={href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-fg-muted hover:text-[#b5d96b]">{label} <ExternalLink className="h-3.5 w-3.5 opacity-60" /></a></li>
-          ))}
-        </ul>
-      </section>
     </div>
   );
 }

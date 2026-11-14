@@ -120,6 +120,9 @@
 @keyframes travel { 0% { offset-distance: 0%; opacity: 0; transform: scale(.6); } 12% { opacity: 1; transform: none; } 88% { opacity: 1; transform: none; } 100% { offset-distance: 100%; opacity: 0; transform: scale(.6); } }
 @keyframes flash { 0% { opacity: .85; } 100% { opacity: 0; } }
 @keyframes focus { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .9; } 50% { transform: translate(-50%, -50%) scale(.82); opacity: 1; } }
+@keyframes press { 0%, 45%, 100% { transform: none; } 55% { transform: scale(.94); } 65% { transform: none; } }
+@keyframes cursor { 0% { transform: translate(30px, 24px); opacity: 0; } 30% { opacity: 1; } 50%, 100% { transform: none; opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: scale(.4); } 70% { transform: scale(1.12); } to { opacity: 1; transform: none; } }
 @keyframes develop { from { filter: blur(10px) grayscale(1) brightness(1.6); opacity: .2; } to { filter: none; opacity: 1; } }
 /* Aperçu de boutique en plein écran : défilement libre, sans cadre. */
 .preview-fs:fullscreen { max-height: none; overflow-y: auto; border: 0; border-radius: 0; background: #fff; scroll-behavior: smooth; }

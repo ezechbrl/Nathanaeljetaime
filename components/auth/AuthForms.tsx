@@ -91,7 +91,8 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
     setLoading(true);
     if (withEmail) {
       try {
-        await api.sendEmailLink(email, next, domain);
+        const { loggedIn } = await api.sendEmailLink(email, next, domain);
+        if (loggedIn) { window.location.href = next; return; } // nouveau compte : connecté, sans code
         setSent(true);
       } catch (err) {
         setError((err as Error).message);
@@ -243,7 +244,8 @@ function EmailOption({ next, startOpen = false }: { next: string; startOpen?: bo
     setError("");
     setState("loading");
     try {
-      await api.sendEmailLink(email, next);
+      const { loggedIn } = await api.sendEmailLink(email, next);
+      if (loggedIn) { window.location.href = next; return; }
       setState("sent");
     } catch (err) {
       setError((err as Error).message);
