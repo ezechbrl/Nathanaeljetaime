@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import type { Job, Store } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { onColor } from "@/lib/store-style";
 import { useApp } from "./AppContext";
 import { Paywall } from "./Paywall";
 
@@ -25,19 +26,23 @@ function TeaserPreview({ store }: { store: Store }) {
   const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
   const layout = store.theme.heroLayout ?? "left";
+  const { headingFont, bodyFont } = store.theme;
+  const serif = /serif|fraunces|playfair|cormorant|garamond|bodoni|lora/i.test(headingFont);
+  const heading = { fontFamily: `'${headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}`, fontWeight: serif ? 400 : 700 };
   return (
-    <div className="relative overflow-hidden rounded-[13px] text-left" style={{ background, color: primary }}>
+    <div className="relative overflow-hidden rounded-[13px] text-left" style={{ background, color: primary, fontFamily: `'${bodyFont}', system-ui, sans-serif` }}>
+      <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${encodeURIComponent(headingFont)}${serif ? ":ital@0;1" : ":wght@500;600;700"}&family=${encodeURIComponent(bodyFont)}:wght@400;500;600;700&display=swap`} precedence="default" />
       <div className="py-2 text-center text-[11px]" style={{ background: primary, color: background }}>Livraison offerte · Retours 30 jours</div>
       <div className="flex items-center justify-between border-b px-5 py-3" style={{ borderColor: `${primary}1a` }}>
-        <span className="font-serif text-xl">{store.name}</span>
+        <span className="text-xl" style={heading}>{store.name}</span>
         <span className="text-xs opacity-60">Boutique · À propos · FAQ</span>
       </div>
       <div className={cn("grid items-center gap-6 p-5 sm:p-8", layout === "center" ? "text-center" : "sm:grid-cols-2")}>
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs" style={{ background: `${accent}22` }}><Sparkles className="h-3 w-3" />{t.tagline}</span>
-          <h3 className="mt-4 font-serif text-[clamp(1.6rem,1.1rem+1.6vw,2.4rem)] leading-tight">{t.heroTitle}</h3>
+          <h3 className="mt-4 text-[clamp(1.6rem,1.1rem+1.6vw,2.4rem)] leading-tight" style={heading}>{t.heroTitle}</h3>
           <p className="mt-3 text-sm opacity-70">{t.heroSubtitle}</p>
-          <span className="mt-5 inline-flex rounded-full px-5 py-2.5 text-sm font-semibold text-white" style={{ background: accent }}>Acheter · {eur(t.price)}</span>
+          <span className="mt-5 inline-flex rounded-full px-5 py-2.5 text-sm font-semibold" style={{ background: accent, color: onColor(accent) }}>Acheter · {eur(t.price)}</span>
         </div>
         <div className={cn("aspect-[4/3] overflow-hidden rounded-[16px]", layout === "right" && "sm:-order-1", layout === "center" && "mx-auto w-full max-w-[520px]")} style={{ background: `linear-gradient(150deg, ${accent}33, ${accent}88)` }}>
           {t.image && <img src={t.image} alt="" className="h-full w-full object-cover" />}

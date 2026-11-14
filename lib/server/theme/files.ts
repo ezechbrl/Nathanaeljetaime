@@ -44,7 +44,7 @@ const LAYOUT = `<!doctype html>
   {{ 'vitrio.css' | asset_url | stylesheet_tag }}
   {{ content_for_header }}
 </head>
-<body class="template-{{ template.name }}">
+<body class="template-{{ template.name }} st-{{ settings.store_style | default: 'classic' }}">
   <a class="skip" href="#main">{{ settings.label_menu }}</a>
   {% section 'announcement' %}
   {% section 'header' %}
@@ -158,6 +158,27 @@ p{margin:0}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);font-size:13px;margin-bottom:22px;border:1px solid rgba(255,255,255,.22)}
 .hero--split .pill{background:color-mix(in srgb,var(--c-accent) 14%,transparent);border-color:color-mix(in srgb,var(--c-accent) 30%,transparent)}
 @media (max-width:860px){.hero{display:block;min-height:auto;padding:0 0 52px;background:var(--c-primary)}.hero__bg{position:relative;inset:auto;aspect-ratio:4/3.3}.hero__bg img{object-position:74% center;transform:none}.hero__bg::after{background:linear-gradient(0deg,var(--c-primary) 0%,transparent 38%)}.hero .wrap{margin-top:-36px}.hero h1{font-size:clamp(34px,9.5vw,44px)}.hero__sub{font-size:17px;margin-top:14px}.hero .btn{margin-top:24px}.hero__trust{margin-top:22px;font-size:14px}.hero--split .hero__grid{grid-template-columns:1fr;gap:32px}.hero--split{padding:48px 0}}
+.sec.marquee{padding:20px 0;overflow:hidden;border-block:1px solid color-mix(in srgb,var(--fgc) 10%,transparent)}
+.marquee__track{display:flex;width:max-content;animation:mq var(--dur,30s) linear infinite}
+.marquee--right .marquee__track{animation-direction:reverse}
+.marquee:hover .marquee__track{animation-play-state:paused}
+.marquee__group{display:flex;align-items:center;gap:36px;padding-right:36px}
+.marquee__item{display:inline-flex;align-items:center;gap:14px;white-space:nowrap;font:600 16px/1.1 var(--f-body)}
+.marquee__item img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none;border:2px solid color-mix(in srgb,var(--fgc) 18%,transparent)}
+.marquee__sep{color:var(--c-accent);font-size:14px}
+.s-accent .marquee__sep,.s-dark .marquee__sep{color:inherit;opacity:.7}
+.marquee--big .marquee__item{font-family:var(--f-heading);font-weight:var(--h-weight);letter-spacing:var(--h-track);font-size:clamp(26px,3.6vw,44px)}
+.marquee--big .marquee__item img{width:58px;height:58px}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.marquee__track{animation:none}}
+.st-premium .btn{border-radius:4px;text-transform:uppercase;letter-spacing:.14em;font-size:13.5px}
+.st-premium .eyebrow{letter-spacing:.24em}
+.st-premium .frame,.st-premium .frame>.media{border-radius:6px}
+.st-direct .btn{text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.st-tech .btn{border-radius:12px;box-shadow:0 0 0 1px color-mix(in srgb,var(--c-accent) 60%,transparent),0 14px 40px -12px var(--c-accent)}
+.st-tech .frame{border-radius:18px}.st-tech .frame>.media{border-radius:13px}
+.st-tech h1,.st-tech h2{text-transform:uppercase;letter-spacing:-.01em}
+.st-lifestyle .frame{border-radius:32px}.st-lifestyle .frame>.media{border-radius:27px}
 .feats{display:grid;grid-template-columns:repeat(var(--n,4),1fr);gap:28px}
 .feat{text-align:center;padding:8px}
 .feat .ico{font-size:34px;color:var(--c-accent);margin:0 auto 14px;display:block;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
@@ -637,6 +658,21 @@ ${schema({ name: "Héros", settings: [
     { type: "text", id: "cta", label: "Bouton", default: "Découvrir" },
   ], blocks: [{ type: "trust", name: "Argument", settings: [ICON_SETTING("icon", "check"), { type: "text", id: "text", label: "Texte" }] }], max_blocks: 3, presets: [{ name: "Héros" }] })}`,
 
+  marquee: `{%- if section.blocks.size > 0 -%}
+<section class="sec marquee s-{{ section.settings.scheme }} marquee--{{ section.settings.direction }} marquee--{{ section.settings.size }}" style="--dur:{{ section.settings.speed }}s">
+  <div class="marquee__track">
+    {%- for g in (1..2) -%}
+    <div class="marquee__group"{% if g == 2 %} aria-hidden="true"{% endif %}>
+      {%- for r in (1..3) -%}{%- for block in section.blocks -%}
+      <span class="marquee__item"{% if g == 1 and r == 1 %} {{ block.shopify_attributes }}{% endif %}>{% if block.settings.image != blank %}<img src="{{ block.settings.image | image_url: width: 160 }}" alt="" width="80" height="80" loading="lazy">{% elsif block.settings.image_asset != blank %}<img src="{{ block.settings.image_asset | asset_url }}" alt="" width="80" height="80" loading="lazy">{% endif %}{{ block.settings.text }}</span><span class="marquee__sep" aria-hidden="true">✦</span>
+      {%- endfor -%}{%- endfor -%}
+    </div>
+    {%- endfor -%}
+  </div>
+</section>
+{%- endif -%}
+${schema({ name: "Bandeau défilant", settings: [SCHEME, { type: "select", id: "direction", label: "Sens", options: [{ value: "left", label: "Vers la gauche" }, { value: "right", label: "Vers la droite" }], default: "left" }, { type: "select", id: "size", label: "Taille du texte", options: [{ value: "small", label: "Petit" }, { value: "big", label: "Grand" }], default: "small" }, { type: "range", id: "speed", label: "Durée d'un tour (secondes)", min: 10, max: 80, step: 2, default: 30 }], blocks: [{ type: "item", name: "Texte", settings: [{ type: "text", id: "text", label: "Texte court" }, { type: "image_picker", id: "image", label: "Petite image (facultatif)" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }] }], max_blocks: 8, presets: [{ name: "Bandeau défilant" }] })}`,
+
   features: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap">
     {% if section.settings.title != blank %}<div class="head center reveal"><h2 class="title">{{ section.settings.title }}</h2>{% if section.settings.subtitle != blank %}<p class="muted">{{ section.settings.subtitle }}</p>{% endif %}</div>{% endif %}
@@ -837,6 +873,7 @@ export const SETTINGS_SCHEMA = [
     { type: "text", id: "heading_font", label: "Police des titres (Google Fonts)", default: "Instrument Serif" },
     { type: "select", id: "heading_style", label: "Style des titres", options: [{ value: "serif", label: "Serif" }, { value: "sans", label: "Sans serif" }], default: "serif" },
     { type: "text", id: "body_font", label: "Police du texte (Google Fonts)", default: "DM Sans" },
+    { type: "select", id: "store_style", label: "Style de la boutique", options: [{ value: "classic", label: "Classique" }, { value: "premium", label: "Premium minimal" }, { value: "direct", label: "Vente directe" }, { value: "lifestyle", label: "Lifestyle" }, { value: "tech", label: "Sport / tech" }], default: "classic" },
   ] },
   { name: "Panier", settings: [
     { type: "number", id: "free_shipping_threshold", label: "Livraison offerte à partir de (0 = pas de barre)", default: 0 },

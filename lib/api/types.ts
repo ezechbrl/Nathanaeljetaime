@@ -1,3 +1,4 @@
+import type { StoreStyle } from "@/lib/store-style";
 // Contrat d'API entre le frontend et le backend.
 // Toute réponse JSON du backend doit respecter ces types (dates en ISO 8601, montants en centimes).
 // Voir docs/BACKEND.md pour la liste des routes.
@@ -60,6 +61,7 @@ export type StoreTheme = {
   headingFont: string;
   bodyFont: string;
   heroLayout?: "left" | "right" | "center"; // varie d'une boutique à l'autre
+  style?: StoreStyle; // style choisi selon la niche (polices, ordre des sections, bandeaux)
 };
 
 export type Store = {

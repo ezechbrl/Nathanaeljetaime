@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   ArrowRight, Award, Check, ChevronLeft, ChevronRight, Clock, Droplet, Feather, Flame, Gift, Hand, Heart, Home, Leaf, Lock, Moon,
   RefreshCw, RotateCcw, ShieldCheck, ShoppingBag, Smile, Sparkles, Star, Sun, Truck, X, Zap, type LucideIcon,
@@ -12,6 +12,7 @@ import { cn } from "@/lib/cn";
 import { shortReview } from "@/lib/format";
 import { sanitizeHtml } from "@/lib/sanitize";
 import type { IconName } from "@/lib/store-schema";
+import { marqueeFor, marqueeTexts, onColor, orderFor } from "@/lib/store-style";
 
 export type PreviewPage = "accueil" | "produit" | "faq" | "a-propos";
 
@@ -64,7 +65,12 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
   const layout = store.theme.heroLayout ?? "left";
   const tint = mix(background, accent, 0.14);
   const serif = SERIF.test(store.theme.headingFont);
-  const H = serif ? "font-serif" : "font-sans font-bold";
+  const style = store.theme.style;
+  // Polices de la boutique (Google Fonts), comme dans le thème installé.
+  const fontsUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(store.theme.headingFont)}${serif ? ":ital@0;1" : ":wght@500;600;700"}&family=${encodeURIComponent(store.theme.bodyFont)}:wght@400;500;600;700&display=swap`;
+  const H = cn(serif ? "font-normal" : "font-bold", "[font-family:var(--sp-h)]", style === "tech" && "uppercase");
+  const onAccent = onColor(accent);
+  const mq = marqueeFor(style);
   const mobile = device === "mobile" || (device === "auto" && narrow);
   const home = plan.homepage;
   const prod = plan.product;
@@ -87,7 +93,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
     <div className="rounded-[22px] border p-1.5" style={{ borderColor: light ? "rgb(255 255 255 / .2)" : `${primary}1f`, background: light ? "rgb(255 255 255 / .06)" : `${primary}0a` }}><Img a={a} ratio={ratio} /></div>
   );
   const Btn = ({ children, light = false }: { children: React.ReactNode; light?: boolean }) => (
-    <span className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-lg" style={light ? { background, color: primary } : { background: accent, color: "#fff" }}>{children} <ArrowRight className="h-4 w-4" /></span>
+    <span className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-lg" style={light ? { background, color: primary } : { background: accent, color: onAccent }}>{children} <ArrowRight className="h-4 w-4" /></span>
   );
   const Eyebrow = ({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) => (
     <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: dark ? `${background}b3` : accent }}>{children}</p>
@@ -126,6 +132,33 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
     </section>
   ) : null;
 
+  // Bandeau défilant (mêmes textes et photos que dans le thème).
+  const mqTexts = marqueeTexts(home, [shipOffer, returnOffer].filter((t): t is string => !!t && t.length <= 40));
+  const mqPics = [imgs.moments[0], imgs.life[0], imgs.moments[1], imgs.life[1], imgs.life[2]].filter((a): a is Asset => !!a);
+  const SCHEMES = { base: { background, color: primary }, tint: { background: tint, color: primary }, dark: { background: primary, color: background }, accent: { background: accent, color: onAccent } };
+  const marquee = (scheme: keyof typeof SCHEMES, reverse: boolean, big: boolean, withImages: boolean) => mqTexts.length >= 2 ? (
+    <div className="overflow-hidden border-y py-4" style={{ ...SCHEMES[scheme], borderColor: `${primary}1a` }}>
+      <div className="flex w-max" style={{ animation: `sp-mq ${big ? 38 : 30}s linear infinite${reverse ? " reverse" : ""}` }}>
+        {[0, 1].map((g) => (
+          <div key={g} aria-hidden={g === 1} className="flex items-center gap-8 pr-8">
+            {[0, 1, 2].flatMap((r) => mqTexts.map((t, i) => {
+              const pic = withImages && mqPics.length ? mqPics[i % mqPics.length] : undefined;
+              return (
+                <span key={`${r}-${i}`} className="flex items-center gap-8 whitespace-nowrap">
+                  <span className={cn("flex items-center gap-3", big ? cn("text-[2rem] leading-none", H) : "text-[15px] font-semibold")}>
+                    {pic && <img src={pic.url} alt="" className={cn("rounded-full border-2 object-cover", big ? "h-12 w-12" : "h-10 w-10")} style={{ borderColor: `${primary}2e` }} />}
+                    {t}
+                  </span>
+                  <span className="text-sm" style={{ color: scheme === "accent" || scheme === "dark" ? undefined : accent, opacity: scheme === "accent" || scheme === "dark" ? 0.7 : 1 }}>✦</span>
+                </span>
+              );
+            }))}
+          </div>
+        ))}
+      </div>
+    </div>
+  ) : null;
+
   const productBlock = (
     <div className={cn("grid gap-8", !mobile && "grid-cols-[1.08fr_1fr] gap-12")}>
       <div className="space-y-3">
@@ -154,7 +187,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
         <p className="mt-2 text-[15px] opacity-70">{prod.subtitle}</p>
         <p className="mt-4 flex items-center gap-3 text-2xl font-bold">
           {eur(bundles.length ? price * bundles[bundle].quantity * (1 - bundles[bundle].discountPercent / 100) : price)}
-          {!bundles.length && cmp > price && <><s className="text-base font-normal opacity-50">{eur(cmp)}</s><span className="rounded-full px-2.5 py-1 text-[11px] font-bold text-white" style={{ background: accent }}>-{Math.round((1 - price / cmp) * 100)} %</span></>}
+          {!bundles.length && cmp > price && <><s className="text-base font-normal opacity-50">{eur(cmp)}</s><span className="rounded-full px-2.5 py-1 text-[11px] font-bold" style={{ background: accent, color: onAccent }}>-{Math.round((1 - price / cmp) * 100)} %</span></>}
         </p>
         <hr className="my-5" style={{ borderColor: `${primary}24` }} />
         <ul className="space-y-2.5 text-[15px]">{prod.bulletPoints.map((b) => <li key={b} className="flex gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: accent }} />{b}</li>)}</ul>
@@ -175,7 +208,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             })}
           </div>
         )}
-        <span className="mt-5 flex items-center justify-center rounded-full py-4 text-sm font-semibold text-white shadow-lg" style={{ background: accent }}>
+        <span className="mt-5 flex items-center justify-center rounded-full py-4 text-sm font-semibold shadow-lg" style={{ background: accent, color: onAccent }}>
           Ajouter au panier{bundles.length ? ` — ${eur(price * bundles[bundle].quantity * (1 - bundles[bundle].discountPercent / 100))}` : ""}
         </span>
         {prod.guarantee && <p className="mt-4 flex gap-2 border-t pt-4 text-sm" style={{ borderColor: `${primary}1f` }}><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" style={{ color: accent }} />{prod.guarantee}</p>}
@@ -200,26 +233,29 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
   const faq = [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))];
 
   return (
-    <div ref={rootRef} className={cn("overflow-hidden text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary }}>
+    <div ref={rootRef} className={cn("overflow-hidden text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif`, ["--sp-h" as string]: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}` }}>
+      <link rel="stylesheet" href={fontsUrl} precedence="default" />
+      <style>{"@keyframes sp-mq{to{transform:translateX(-50%)}}@media (prefers-reduced-motion:reduce){[style*=sp-mq]{animation:none!important}}"}</style>
       <div className="flex h-9 items-center justify-center gap-2 px-4 text-center text-[11.5px]" style={{ background: primary, color: background }}>
         <Truck className="h-3.5 w-3.5" />{home.announcements?.[0] ?? offers[0] ?? plan.brand.tagline}
       </div>
       <div className={cn("grid grid-cols-[1fr_auto_1fr] items-center border-b py-4", pad)} style={{ borderColor: `${primary}1a` }}>
         <span className={cn("text-xl tracking-tight", H)}>{plan.brand.name}</span>
         {!mobile ? <nav className="flex gap-7 text-[13px] opacity-80"><span>Boutique</span></nav> : <span />}
-        <span className="relative justify-self-end"><ShoppingBag className="h-5 w-5" /><span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] font-bold text-white" style={{ background: accent }}>0</span></span>
+        <span className="relative justify-self-end"><ShoppingBag className="h-5 w-5" /><span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] font-bold" style={{ background: accent, color: onAccent }}>0</span></span>
       </div>
 
-      {page === "accueil" && (
-        <>
-          {imgs.hero ? (
+      {page === "accueil" && orderFor(store.theme.style).map((key) => {
+        const node = {
+          hero: (
+            <>{imgs.hero ? (
             <section className="relative flex min-h-[460px] items-end overflow-hidden text-white sm:items-center" style={{ minHeight: mobile ? 520 : 520 }}>
               <img decoding="async" src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : layout === "center" ? "rgba(0,0,0,.48)" : `linear-gradient(${layout === "right" ? 270 : 90}deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)` }} />
               <div className={cn("relative w-full pb-10 pt-24", pad, !mobile && layout === "right" && "flex justify-end text-right", !mobile && layout === "center" && "flex justify-center text-center")}><div className={cn(layout === "center" && !mobile ? "max-w-[720px]" : "max-w-[560px]")}>
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs backdrop-blur"><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
                 <h2 className={cn("text-[2.9rem] leading-[1.02]", H, mobile && "text-[2.2rem]")}>{home.heroTitle}</h2>
-                <p className="mt-4 max-w-[36ch] text-[16px] opacity-90">{home.heroSubtitle}</p>
+                <p className={cn("mt-4 max-w-[36ch] text-[16px] opacity-90", !mobile && layout === "center" && "mx-auto", !mobile && layout === "right" && "ml-auto")}>{home.heroSubtitle}</p>
                 <div className="mt-7"><Btn light>{home.ctaLabel}</Btn></div>
                 <div className={cn("mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[13px] opacity-95", !mobile && layout === "right" && "justify-end", !mobile && layout === "center" && "justify-center")}>{[shipOffer, returnOffer].filter(Boolean).map((t) => <span key={t} className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5" />{t}</span>)}</div>
               </div></div>
@@ -234,17 +270,20 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
               </div>
               <Frame a={imgs.gallery[0]} ratio="4/4.3" />
             </section>
-          )}
-
-          <section className={cn("text-center", pad, sec)} style={{ background: tint }}>
+          )}</>
+          ),
+          marquee: marquee(mq.first, false, false, true),
+          features: (
+            <section className={cn("text-center", pad, sec)} style={{ background: tint }}>
             <h3 className={cn("text-[2rem] tracking-tight", H)}>{home.featuresTitle ?? plan.brand.tagline}</h3>
             {home.featuresSubtitle && <p className="mt-2 text-sm opacity-70">{home.featuresSubtitle}</p>}
             <div className={cn("mt-10 grid gap-6", mobile ? "grid-cols-2" : "grid-cols-5")}>
               {features.slice(0, mobile ? 4 : 5).map((f) => { const I = ICON[f.icon as IconName] ?? Check; return <div key={f.title}><I className="mx-auto h-7 w-7" style={{ color: accent }} /><p className="mt-3 text-sm font-semibold">{f.title}</p><p className="mt-1 text-xs opacity-65">{f.text}</p></div>; })}
             </div>
           </section>
-
-          <section className={cn("grid items-center gap-10", pad, sec, !mobile && "grid-cols-2 gap-14")}>
+          ),
+          benefits: (
+            <section className={cn("grid items-center gap-10", pad, sec, !mobile && "grid-cols-2 gap-14")}>
             <Frame a={imgs.inuse} ratio="4/4.6" />
             <div>
               {home.benefitsEyebrow && <Eyebrow>{home.benefitsEyebrow}</Eyebrow>}
@@ -253,10 +292,9 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
               <div className="mt-7"><Btn>{home.ctaLabel}</Btn></div>
             </div>
           </section>
-
-          {momentsSection}
-
-          {home.extraSections?.map((x, n) => (
+          ),
+          moments: momentsSection,
+          extras: <>{home.extraSections?.map((x, n) => (
             <section key={`${x.title}-${n}`} className={cn(pad, sec, "text-center")} style={n % 2 ? { background: tint } : undefined}>
               <h3 className={cn("text-[2rem] tracking-tight", H)}>{x.title}</h3>
               {x.subtitle && <p className="mt-2 text-sm opacity-70">{x.subtitle}</p>}
@@ -269,9 +307,8 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
                 ))}
               </div>
             </section>
-          ))}
-
-          {home.comparison && (
+          ))}</>,
+          comparison: <>{home.comparison && (
             <section className={cn("grid items-center gap-8", pad, sec, !mobile && "grid-cols-2 gap-14")} style={{ background: primary, color: background }}>
               <div>
                 <h3 className={cn("text-[2rem] leading-tight tracking-tight", H)}>{home.comparison.title}</h3>
@@ -287,13 +324,23 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
                 ))}
               </div>
             </section>
-          )}
-
-          {reviewsSection}
-
-          <section className={cn(pad, sec)} style={{ background: tint }}>{productBlock}</section>
-
-          <section className="relative grid min-h-[340px] place-items-center overflow-hidden px-6 py-16 text-center text-white" style={{ background: primary }}>
+          )}</>,
+          reviews: reviewsSection,
+          buy: <section className={cn(pad, sec)} style={{ background: tint }}>{productBlock}</section>,
+          faq: faq.length ? (
+            <section className={cn(pad, sec)} style={{ background: tint }}>
+              <h3 className={cn("text-center text-[2rem] tracking-tight", H)}>Questions fréquentes</h3>
+              <div className="mx-auto mt-6 max-w-2xl">{faq.slice(0, 6).map((f) => (
+                <div key={f.question} className="border-b py-4" style={{ borderColor: `${primary}24` }}>
+                  <p className="font-semibold">{f.question}</p>
+                  <p className="mt-1 text-sm opacity-70">{f.answer}</p>
+                </div>
+              ))}</div>
+            </section>
+          ) : null,
+          marquee2: marquee(mq.second, true, mq.big, false),
+          banner: (
+            <section className="relative grid min-h-[340px] place-items-center overflow-hidden px-6 py-16 text-center text-white" style={{ background: primary }}>
             {(imgs.moments[2] ?? imgs.hero) && <><img loading="lazy" decoding="async" src={(imgs.moments[2] ?? imgs.hero)!.url} alt="" className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-black/45" /></>}
             <div className="relative max-w-lg">
               <h3 className={cn("text-[2.2rem] leading-tight", H)}>{home.finalCta?.title ?? plan.strategy.promise}</h3>
@@ -301,8 +348,10 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
               <div className="mt-6"><Btn light>{home.ctaLabel}</Btn></div>
             </div>
           </section>
-        </>
-      )}
+          ),
+        }[key];
+        return node ? <Fragment key={key}>{node}</Fragment> : null;
+      })}
 
       {page === "produit" && <><section className={cn(pad, "py-10")}>{productBlock}</section>{reviewsSection}{momentsSection}</>}
 

@@ -13,6 +13,7 @@ import { themeZipUrl } from "./theme/link";
 import { db, must } from "./supabase";
 import type { StoreRow } from "./auth";
 import { env } from "./env";
+import { fixPalette, isStyle, STYLE_FONTS, STYLE_LAYOUTS, type StoreStyle } from "@/lib/store-style";
 
 type Step = { key: JobStepKey; label: string; status: "pending" | "running" | "done" | "failed" };
 
@@ -89,10 +90,14 @@ const errorMessage = (e: unknown) => {
   return e instanceof Error && e.message ? e.message : "Erreur inattendue.";
 };
 
-const FONTS = { serif: "Instrument Serif", sans: "DM Sans" } as const;
-// Mise en page de l'accroche tirée au hasard : toutes les boutiques ne se ressemblent pas.
-const LAYOUTS = ["left", "right", "center"] as const;
-const pickLayout = (prev?: unknown) => (LAYOUTS.includes(prev as never) ? prev : LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)]) as (typeof LAYOUTS)[number];
+// Thème d'une boutique selon son style : polices, mise en page de l'accroche (tirée au hasard parmi
+// celles du style, pour que deux boutiques ne se ressemblent pas) et palette rendue lisible.
+type Layout = "left" | "right" | "center";
+function styledTheme(style: StoreStyle, colors: { primary: string; accent: string; background: string }, prevLayout?: unknown) {
+  const layouts = STYLE_LAYOUTS[style];
+  const heroLayout: Layout = layouts.includes(prevLayout as Layout) ? (prevLayout as Layout) : layouts[Math.floor(Math.random() * layouts.length)];
+  return { colors: fixPalette(colors, style), headingFont: STYLE_FONTS[style].heading, bodyFont: STYLE_FONTS[style].body, heroLayout, style };
+}
 
 // Génération complète d'une boutique. Exécutée après la réponse HTTP (voir `after()` dans la route).
 export async function runGeneration(job: Record<string, any>, store: StoreRow) {
@@ -123,11 +128,15 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
       const conn = await connectionFor(store.user_id, store.shop_connection_id);
       existingStore = await readStoreContent(conn.shop, conn.token);
     }
-    const strategy = await generateStrategy({ brief: store.brief, language: store.language, sourceText, screenshots, existingStore, userId: store.user_id });
+    // Aperçu déjà vu (style et couleurs) : la boutique complète le respecte.
+    const prev = store.theme as { style?: string; heroLayout?: string; colors?: { primary: string; accent: string; background: string } } | null;
+    const previous = store.teaser && isStyle(prev?.style) && prev?.colors ? { style: prev.style, name: store.name, colors: prev.colors } : undefined;
+    const strategy = await generateStrategy({ brief: store.brief, language: store.language, sourceText, screenshots, existingStore, previous, userId: store.user_id });
 
     await step("brand");
-    const heroLayout = pickLayout((store.theme as { heroLayout?: string } | null)?.heroLayout);
-    await db().from("stores").update({ name: strategy.brand.name, theme: { colors: strategy.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans", heroLayout } }).eq("id", store.id);
+    const theme = styledTheme(strategy.storeStyle, strategy.brand.colors, prev?.heroLayout);
+    strategy.brand.colors = theme.colors;
+    await db().from("stores").update({ name: strategy.brand.name, theme }).eq("id", store.id);
 
     await step("pages");
     const plan: StorePlan = await generatePages({ brief: store.brief, language: store.language, strategy, sourceText, screenshots, userId: store.user_id }, (d, t) => void step.sub(d / t));
@@ -146,7 +155,6 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     if (reviews) plan.reviews = reviews;
 
     await step("theme");
-    const theme = { colors: plan.brand.colors, headingFont: FONTS[strategy.headingStyle], bodyFont: "DM Sans", heroLayout };
     await db().from("stores").update({ plan, theme, name: plan.brand.name, status: "ready", updated_at: new Date().toISOString() }).eq("id", store.id);
     await db().from("store_versions").insert({ store_id: store.id, label: "Version initiale", snapshot: { plan, theme } });
     await db().from("users").update({ free_store_used: true }).eq("id", store.user_id); // boutique offerte utilisée (une seule fois)
@@ -181,7 +189,7 @@ export async function runTeaser(job: Record<string, any>, store: StoreRow) {
     const t = await generateTeaser({ brief: store.brief, language: store.language, sourceText });
     await step("pages");
     const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), image };
-    await db().from("stores").update({ name: t.brand.name, teaser, theme: { colors: t.brand.colors, headingFont: "Instrument Serif", bodyFont: "DM Sans", heroLayout: pickLayout() }, status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
+    await db().from("stores").update({ name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, t.brand.colors), status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
     await finish(job.id, steps);
   } catch (e) {
     console.error("Aperçu échoué", e);
@@ -203,7 +211,7 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   const PEOPLE = /\b(people|person|persons|man|men|woman|women|girl|boy|kid|kids|child|children|friends?|family|couple|gamers?|players?|users?|customers?|hands?|face|faces|someone|teen|teens|student|students|athlete|athletes|crowd|he|she|they)\b/i;
   const noPeople = (t: string) => t.split(/[.;,]/).map((x) => x.trim()).filter((x) => x && !PEOPLE.test(x)).join(", ");
   const scene = noPeople(plan.visual?.scene ?? "") || `${plan.brand.tone}, soft natural light`;
-  const CLEAN = "photorealistic high-end commercial product photography, the product is the only subject, no people, no hands, no faces, no added text, no logos, no watermark";
+  const CLEAN = "photorealistic high-end commercial product photography, the product is the only subject, no people, no hands, no faces, no added text, no logos, no brand names, no trademarks (no Apple, Nike or other brand logo), no watermark";
   const save = async (slot: Slot, kind: string, img: { bytes: Uint8Array; contentType: string; width: number; height: number }, prompt: string) => {
     const saved = await storeImage(storeId, img.bytes, img.contentType, slot);
     await db().from("assets").insert({ store_id: storeId, kind, storage_path: saved.path, url: saved.url, width: img.width, height: img.height, prompt });

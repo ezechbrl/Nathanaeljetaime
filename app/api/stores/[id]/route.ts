@@ -4,6 +4,7 @@ import { body, json, noContent, route } from "@/lib/server/http";
 import { toJob, toStore } from "@/lib/server/mappers";
 import { db, must } from "@/lib/server/supabase";
 import { StorePlanSchema } from "@/lib/store-schema";
+import { STORE_STYLES } from "@/lib/store-style";
 
 type Ctx = { params: Promise<{ id: string }> };
 const HEX = z.string().regex(/^#[0-9a-f]{6}$/i);
@@ -30,7 +31,7 @@ export const GET = route<Ctx>(async (_req, { params }) => {
 
 const Patch = z.object({
   name: z.string().trim().min(1).max(80).optional(),
-  theme: z.object({ colors: z.object({ primary: HEX, accent: HEX, background: HEX }), headingFont: z.string().max(60), bodyFont: z.string().max(60) }).optional(),
+  theme: z.object({ colors: z.object({ primary: HEX, accent: HEX, background: HEX }), headingFont: z.string().max(60), bodyFont: z.string().max(60), heroLayout: z.enum(["left", "right", "center"]).optional(), style: z.enum(STORE_STYLES).optional() }).optional(),
   plan: StorePlanSchema.optional(),
 });
 

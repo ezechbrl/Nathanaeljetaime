@@ -3,10 +3,11 @@ import { toIcon, type IconName, type StorePlan } from "@/lib/store-schema";
 import { shortReview } from "@/lib/format";
 import { staticThemeFiles } from "./files";
 import { labelsFor } from "./labels";
+import { marqueeFor, marqueeTexts, orderFor, type StoreStyle } from "@/lib/store-style";
 
 export type ThemeContext = {
   plan: StorePlan;
-  theme: { colors: { primary: string; accent: string; background: string }; headingFont: string; bodyFont: string; heroLayout?: "left" | "right" | "center" };
+  theme: { colors: { primary: string; accent: string; background: string }; headingFont: string; bodyFont: string; heroLayout?: "left" | "right" | "center"; style?: StoreStyle };
   language?: string;
   productHandle?: string;
   aboutHandle?: string;
@@ -84,6 +85,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
       color_tint: mix(theme.colors.background, theme.colors.accent, 0.14),
       heading_font: theme.headingFont,
       heading_style: SERIF.test(theme.headingFont) ? "serif" : "sans",
+      store_style: theme.style ?? "classic",
       body_font: theme.bodyFont,
       free_shipping_threshold: freeShippingThreshold,
       ...(reviews && reviews.average >= 1 ? { rating: reviews.average.toFixed(1), rating_count: reviews.total } : {}),
@@ -154,17 +156,34 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...blocks(moments.filter((m) => m.image || m.image_asset).map((m) => ({ type: "moment", settings: { image: m.image, image_asset: m.image_asset, title: m.title, text: m.text ?? "" } }))),
   };
 
-  const sections: Record<string, unknown> = {
+  // Bandeaux défilants : textes courts (atouts) entre de petites photos de la boutique.
+  const mq = marqueeFor(theme.style);
+  const texts = marqueeTexts(home, [shipOffer, returnOffer].filter((t) => t && t.length <= 40));
+  const pics = ["moment1", "life1", "moment2", "life2", "life3"].map((s) => ({ image: file(s), image_asset: asset(s) })).filter((p) => p.image || p.image_asset);
+  const marquee = (scheme: string, direction: "left" | "right", big: boolean, withImages: boolean) => texts.length >= 2 && {
+    type: "marquee",
+    settings: { scheme, direction, size: big ? "big" : "small", speed: big ? 38 : 30 },
+    ...blocks(texts.map((text, i) => ({ type: "item", settings: { text, ...(withImages && pics.length ? pics[i % pics.length] : {}) } }))),
+  };
+  const all: Record<string, unknown> = {
     hero: { type: "hero", settings: { image: file("hero"), image_asset: asset("hero"), layout: ctx.theme.heroLayout ?? "left", ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
     features: featuresSection,
     benefits: benefitsSection,
     ...(momentsSection ? { moments: momentsSection } : {}),
-    ...extras,
     ...(comparisonSection ? { comparison: comparisonSection } : {}),
     reviews: reviewsSection,
     ...(product ? { buy: { type: "featured-product", settings: { scheme: "tint", product, heading_tag: "h2", eyebrow: "", ...productSettings, sticky: false, bundle_label: "" }, ...productBlocks } } : {}),
     banner: { type: "image-banner", settings: { image: file("moment3") || file("hero"), image_asset: asset("moment3") || asset("hero"), title: home.finalCta?.title ?? plan.strategy.promise, text: home.finalCta?.text ?? "", cta: home.ctaLabel, url: shopUrl } },
+    marquee: marquee(mq.first, "left", false, true),
+    marquee2: marquee(mq.second, "right", mq.big, false),
+    faq: faqItems.length ? faqSection(L.faq) : undefined,
   };
+  // Ordre des sections propre au style de la boutique.
+  const sections: Record<string, unknown> = {};
+  for (const key of orderFor(theme.style)) {
+    if (key === "extras") Object.assign(sections, extras);
+    else if (all[key]) sections[key] = all[key];
+  }
   const index = { sections, order: Object.keys(sections) };
 
   const productTpl = {
