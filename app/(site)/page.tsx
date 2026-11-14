@@ -7,6 +7,7 @@ import { Instant } from "@/components/site/Instant";
 import { PriceTeaser } from "@/components/site/PriceTeaser";
 import { Reviews } from "@/components/site/Reviews";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
+import { StickyCta } from "@/components/site/StickyCta";
 import { HOME_FAQ } from "@/lib/content/faq";
 
 // Les avis approuvés sont relus toutes les 10 minutes.
@@ -16,10 +17,10 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <Compare />
       <ShowcaseGrid />
       <Instant />
       <BuyerReviews />
-      <Compare />
       <PriceTeaser />
       <Reviews />
       <div className="hidden sm:block"><FinalCta /></div>
@@ -29,6 +30,7 @@ export default function HomePage() {
         items={HOME_FAQ.slice(0, 5)}
         mobileCount={3}
       />
+      <StickyCta />
     </>
   );
 }

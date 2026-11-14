@@ -15,14 +15,14 @@ export function Hero() {
           </span>
         </Reveal>
         <Reveal delay={80} as="h1" className="mx-auto mt-7 max-w-4xl text-[clamp(2.6rem,1.4rem+3.8vw,4.8rem)] leading-[1.02] tracking-[-0.045em] [text-shadow:0_4px_40px_rgb(0_0_0/0.35)]">
-          Ta boutique Shopify qui <span className="serif-accent pr-1">vend</span>, prête en 10 minutes avec l'IA
+          Ta boutique Shopify qui <span className="serif-accent pr-1">vend</span>, en 10 minutes
         </Reveal>
         <Reveal delay={180} as="p" className="mx-auto mt-5 max-w-2xl text-[16px] font-medium leading-relaxed text-fg-muted sm:mt-6 sm:text-lg">
           <span className="sm:hidden">La qualité d'une agence, pour le prix d'un resto.</span>
           <span className="hidden sm:inline">Textes, photos, vrais avis et design à ta marque : la qualité d'une agence, pour le prix d'un resto. Toi, tu valides et tu vends.</span>
         </Reveal>
         <Reveal delay={260} className="mt-9">
-          <PromptBox align="center" />
+          <div id="creer" className="scroll-mt-28"><PromptBox align="center" /></div>
         </Reveal>
         {/* Petites preuves prix / qualité, vérifiables (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
         <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap justify-center gap-2 text-[13px] sm:text-sm">
