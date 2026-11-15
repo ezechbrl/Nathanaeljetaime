@@ -3,6 +3,7 @@
 import { ExternalLink } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { UNLOCK_KEY } from "@/components/app/Paywall";
 import { useApp } from "@/components/app/AppContext";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Paywall } from "@/components/app/Paywall";
@@ -25,9 +26,12 @@ function Billing() {
   useEffect(() => {
     if (params.get("checkout") === "success") {
       // Retour du paiement : on relit l'abonnement chez Stripe (sans attendre le webhook), puis le compte.
-      api.getBilling(true).then(() => refresh(), () => refresh());
-      toast("Paiement reçu, merci ! Ton abonnement est activé.");
-      router.replace("/app/abonnement");
+      // Paiement lancé depuis une boutique à débloquer : on y retourne, elle se crée en entier.
+      let unlock: string | null = null;
+      try { unlock = localStorage.getItem(UNLOCK_KEY); localStorage.removeItem(UNLOCK_KEY); } catch { /* stockage indisponible */ }
+      api.getBilling(true).then(() => refresh(), () => refresh()).then(() => { if (unlock) router.replace(`/app/boutiques/${unlock}`); });
+      toast(unlock ? "Paiement reçu, merci ! Ta boutique complète se crée." : "Paiement reçu, merci ! Ton abonnement est activé.");
+      if (!unlock) router.replace("/app/abonnement");
     }
   }, [params, refresh, router, toast]);
 
