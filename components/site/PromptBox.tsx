@@ -144,9 +144,10 @@ export function PromptBox({ target = "/inscription", className, align = "center"
         ))}
       </div>
 
-      {/* Pas encore d'idée : quiz en 5 questions juste après la création du compte. */}
-      <a href={`${target}?${new URLSearchParams({ next: "/app/quiz" })}`} className={cn("mt-4 flex w-fit items-center gap-2 rounded-full border border-dashed border-[#34f0b0]/40 px-4 py-2 text-sm font-medium text-[#86efc9] transition-colors hover:border-[#34f0b0]/70 hover:bg-[#34f0b0]/10", align === "center" && "mx-auto")}>
-        <Sparkles className="h-4 w-4" /> Pas d'idée de produit ? Fais le quiz
+      {/* Pas encore d'idée : quiz en 5 questions, avant la création du compte. */}
+      <a href="/quiz" className={cn("group mt-4 flex w-fit items-center gap-2.5 rounded-full border border-[#bef264]/40 bg-[linear-gradient(90deg,rgb(190_242_100/0.16),rgb(52_240_176/0.16),rgb(94_234_212/0.16))] py-1.5 pl-1.5 pr-4 text-sm font-semibold text-[#d9f99d] transition-all hover:-translate-y-0.5 hover:border-[#bef264]/70", align === "center" && "mx-auto")}>
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-[linear-gradient(160deg,#bef264,#34f0b0)] text-[#03140d]"><Sparkles className="h-4 w-4" /></span>
+        Pas d'idée de produit ? Fais le quiz en 5 questions
       </a>
 
       {mode === "start" && (
