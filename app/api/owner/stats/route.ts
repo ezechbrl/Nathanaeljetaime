@@ -155,12 +155,6 @@ export const GET = route(async () => {
     { step: "Abonnés", count: uniq(events.filter((e) => e.kind === "new" && last30(e as Dated))) },
   ];
   const signups = [
-    ...waitlist.slice(0, 15).map((w) => ({
-      email: w.email as string, kind: "waitlist" as const, ref: (w.ref as string | null) ?? null, at: w.created_at as string,
-      // Mail « C'est ouvert » envoyé à cet inscrit de la liste d'attente, et son état.
-      mails: emailEvents.filter((m) => m.kind === "launch" && String(m.email).toLowerCase() === String(w.email).toLowerCase())
-        .map((m) => ({ kind: m.kind as string, status: (m.last_event as string | null) ?? "sent", at: m.sent_at as string })),
-    })),
     ...users.filter((u) => !isOwnerEmail(u.email)).slice(0, 15).map((u) => {
       // Offre de lancement (−50 %, 24 h) : temps restant, rappel de 12 h envoyé, abonnement pris ou non.
       const sub = events.filter((e) => e.kind === "new" && e.user_id === u.id).at(-1);
@@ -184,7 +178,7 @@ export const GET = route(async () => {
           .map((m) => ({ kind: m.kind as string, status: (m.last_event as string | null) ?? "sent", at: m.sent_at as string })),
       };
     }),
-  ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 6);
+  ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 5); // les 5 derniers comptes (plus de liste d'attente)
   const monthCancels = events.filter((e) => e.kind === "cancel" && inLast(30)(e as Dated)).length;
 
   const sources = Object.entries(waitlist.reduce<Record<string, number>>((m, w) => ((m[w.ref || "direct"] = (m[w.ref || "direct"] ?? 0) + 1), m), {}))

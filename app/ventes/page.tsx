@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Hourglass, Percent, Receipt, RefreshCw,
+  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Percent, Receipt, RefreshCw,
   ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
 } from "lucide-react";
 import Link from "next/link";
@@ -343,7 +343,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
       <div className="grid grid-cols-2 gap-3">
         {/* Visites et inscrits d'abord */}
         <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={q.visits} />
-        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint={`${p.waitlist} attente · ${p.accounts} comptes`} cur={p.signups} prev={q.signups} />
+        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint="Comptes créés" cur={p.signups} prev={q.signups} />
         <Live count={s.liveNow} />
         <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={Math.round(conv(q) * 1000)} />
         <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={q.stores} />
@@ -356,21 +356,20 @@ function Dashboard({ s }: { s: OwnerStats }) {
         <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
         <Metric icon={Gauge} color="violet" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
         <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
-        <Metric icon={Hourglass} color="pink" label="Liste d'attente" value={String(s.totals.waitlist)} hint="Inscrits au total" />
         <Metric icon={UserPlus} color="blue" label="Comptes" value={String(s.totals.accounts)} hint={`${pct(s.conversion)} devenus payants`} />
       </div>
 
-      {/* Derniers inscrits juste sous les chiffres : les 6 plus récents, avec leurs mails ouverts ou non */}
+      {/* Derniers inscrits juste sous les chiffres : les 5 plus récents, avec l'heure exacte d'inscription */}
       <Card>
         <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Derniers inscrits</h2>
         {s.signups.length ? (
           <ul className="mt-1 divide-y divide-[#eee] text-sm">
             {s.signups.map((u, i) => (
               <li key={i} className="flex items-center gap-3 py-2.5">
-                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.tester ? "bg-[#f1f1f1] text-[#616161]" : u.kind === "account" ? TONES.blue : TONES.pink)}>{u.tester ? "Test Shopify" : u.kind === "account" ? "Compte" : "Attente"}</span>
+                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.tester ? "bg-[#f1f1f1] text-[#616161]" : TONES.blue)}>{u.tester ? "Test Shopify" : "Compte"}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
-                  <span className="block text-xs text-[#8a8a8a]">{formatShortDate(u.at)}{u.offer && !u.mails?.length && <OfferNote offer={u.offer} />}</span>
+                  <span className="block text-xs text-[#8a8a8a]">{signupTime(u.at)}{u.offer && !u.mails?.length && <OfferNote offer={u.offer} />}</span>
                   {!!u.mails?.length && <MailBadges mails={u.mails} />}
                   {u.kind === "account" && (
                     <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
@@ -595,4 +594,12 @@ export default function SalesApp() {
         : <div className="space-y-3 pt-4">{[0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-[18px] bg-white/10" />)}</div>}
     </main>
   );
+}
+
+// Date et heure exactes d'inscription, à l'heure de Paris (ex. « dim. 15 nov. à 21 h 37 »).
+function signupTime(iso: string) {
+  const d = new Date(iso);
+  const day = d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Paris" });
+  const [h, m] = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" }).split(":");
+  return `${day} à ${Number(h)} h ${m}`;
 }
