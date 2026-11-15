@@ -169,7 +169,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
           )}
           {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
           <Button type="submit" size="lg" className="mt-3 w-full" disabled={loading}>{loading ? <Spinner /> : <>{cta} <ArrowRight className="h-4 w-4" /></>}</Button>
-          <p className="mt-2 text-xs text-fg-faint">{withEmail ? "Pas de mot de passe : tu reçois un code par e-mail." : "Tu peux coller l'adresse complète de ton admin Shopify : on s'occupe du reste."}</p>
+          <p className="mt-2 text-xs text-fg-faint">{withEmail ? "Pas de mot de passe." : "Tu peux coller l'adresse complète de ton admin Shopify : on s'occupe du reste."}</p>
         </form>
       )}
       <p className="text-center text-xs text-fg-faint">Offre Shopify en ce moment · lien partenaire</p>
@@ -235,10 +235,12 @@ function EmailOption({ next, startOpen = false }: { next: string; startOpen?: bo
   const router = useRouter();
   const [open, setOpen] = useState(startOpen);
   const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "loading" | "sent">("idle");
+  const [code, setCode] = useState("");
+  const [state, setState] = useState<"idle" | "loading" | "sent" | "checking">("idle");
   const [error, setError] = useState("");
   const demo = api.API_MODE !== "live";
 
+  // Nouvelle adresse : connecté tout de suite. Adresse déjà inscrite : code à 6 chiffres par e-mail.
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -253,6 +255,19 @@ function EmailOption({ next, startOpen = false }: { next: string; startOpen?: bo
     }
   }
 
+  async function submitCode(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setState("checking");
+    try {
+      await api.verifyEmailCode(email, code.replace(/\D/g, ""));
+      window.location.href = next;
+    } catch (err) {
+      setError((err as Error).message);
+      setState("sent");
+    }
+  }
+
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="flex h-14 w-full items-center justify-center gap-2.5 rounded-[16px] border border-white/15 bg-white/[0.05] text-base font-medium backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#2ee6a6]/50 hover:bg-white/[0.08]">
@@ -260,16 +275,18 @@ function EmailOption({ next, startOpen = false }: { next: string; startOpen?: bo
       </button>
     );
   }
-  if (state === "sent") {
+  if (state === "sent" || state === "checking") {
     return (
       <div role="status" className="rounded-card border border-accent/25 bg-accent-deep/25 p-4 text-sm">
-        <p className="text-fg">Vérifie ta boîte mail</p>
-        <p className="mt-1 text-fg-muted">On a envoyé un lien de connexion à <span className="text-fg">{email}</span>. Clique dessus pour continuer (pense aux spams).</p>
-        {demo && (
-          <button type="button" onClick={() => router.push(next)} className="mt-3 text-accent underline underline-offset-4">
-            Ouvrir le lien (démo)
-          </button>
-        )}
+        <p className="font-medium text-fg">Tu as déjà un compte</p>
+        <p className="mt-1 text-fg-muted">Pour vérifier que c'est bien toi, on a envoyé un code à <span className="text-fg">{email}</span> (pense aux spams).</p>
+        <form onSubmit={submitCode} className="mt-3 flex gap-2">
+          <label htmlFor="email-code" className="sr-only">Code reçu par e-mail</label>
+          <input id="email-code" autoFocus inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => { setCode(e.target.value); setError(""); }} placeholder="123456" maxLength={10} className="field min-w-0 flex-1 text-center text-lg tracking-[0.3em]" />
+          <Button type="submit" disabled={state === "checking" || code.replace(/\D/g, "").length < 6}>{state === "checking" ? <Spinner /> : "Valider"}</Button>
+        </form>
+        {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
+        {demo && <button type="button" onClick={() => router.push(next)} className="mt-3 text-accent underline underline-offset-4">Continuer (démo)</button>}
       </div>
     );
   }
@@ -279,9 +296,9 @@ function EmailOption({ next, startOpen = false }: { next: string; startOpen?: bo
       <input id="email" type="email" required autoFocus autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.com" className="field" />
       {error && <p role="alert" className="text-sm text-bad">{error}</p>}
       <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={state === "loading"}>
-        {state === "loading" ? <Spinner /> : "Recevoir mon lien de connexion"}
+        {state === "loading" ? <Spinner /> : "Continuer"}
       </Button>
-      <p className="text-xs text-fg-faint">Pas de mot de passe : tu reçois un lien valable une heure.</p>
+      <p className="text-xs text-fg-faint">Pas de mot de passe.</p>
     </form>
   );
 }
@@ -302,13 +319,13 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
         </div>
       )}
       {/* Les 2 grands boutons Shopify (j'ai déjà Shopify / créer mon compte), puis nom de boutique + e-mail. */}
-      <ShopifyForm next={next} withEmail cta={mode === "login" ? "Me connecter" : "Recevoir mon lien"} />
-      {GOOGLE_ENABLED && (
-        <>
-          <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
-          <GoogleButton next={next} />
-        </>
-      )}
+      <ShopifyForm next={next} withEmail cta={mode === "login" ? "Me connecter" : "Continuer"} />
+      {/* Sans Shopify pour l'instant : Google (s'il est activé) ou e-mail seul. */}
+      <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
+      <div className="space-y-3">
+        {GOOGLE_ENABLED && <GoogleButton next={next} />}
+        <EmailOption next={next} />
+      </div>
       <p className="mt-8 text-xs leading-relaxed text-fg-faint">
         En continuant, tu acceptes les <Link href="/legal/cgu" className="underline">CGU</Link> et la <Link href="/legal/confidentialite" className="underline">politique de confidentialité</Link>.
       </p>

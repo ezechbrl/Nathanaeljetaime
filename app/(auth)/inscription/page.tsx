@@ -28,7 +28,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     );
   }
   return (
-    <AuthShell title="Crée ta boutique" subtitle="Indique ta boutique Shopify (ou crée-la), puis choisis ton offre (dès 39 €/mois avec l'offre de lancement, sans engagement).">
+    <AuthShell title="Crée ton compte" subtitle="Avec ta boutique Shopify, ton compte Google ou ton e-mail. Pas de mot de passe. Ta boutique se prépare juste après.">
       <Suspense><AuthPanel mode="register" /></Suspense>
     </AuthShell>
   );
