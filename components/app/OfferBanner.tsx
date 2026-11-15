@@ -13,7 +13,8 @@ import { useApp } from "./AppContext";
 export function OfferBanner() {
   const { user } = useApp();
   // Page d'une boutique à débloquer : l'offre apparaît seulement quand il clique sur « Débloquer ».
-  const onStorePage = usePathname().startsWith("/app/boutiques/");
+  const path = usePathname();
+  const onStorePage = path.startsWith("/app/boutiques/") || path === "/app/quiz";
   const billing = useApi(() => (user.plan === "free" ? api.getBilling() : Promise.resolve(null)), [user.plan]);
   const left = useCountdown(billing.data?.offerEndsAt);
   if (user.plan !== "free" || !left || onStorePage) return null;

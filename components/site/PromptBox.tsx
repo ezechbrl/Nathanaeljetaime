@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
-import { NichePicker } from "./NichePicker";
 
 // Mêmes couleurs que les 2 cartes Shopify de la connexion : « Décrire » = vert de « Connecter mon compte
 // Shopify », « Coller un lien » = vert clair de « Créer mon compte Shopify ».
@@ -38,7 +37,6 @@ export function PromptBox({ target = "/inscription", className, align = "center"
   const [placeholder, setPlaceholder] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [photoError, setPhotoError] = useState("");
-  const [ideas, setIdeas] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const current = MODES.find((m) => m.id === mode)!;
 
@@ -146,19 +144,12 @@ export function PromptBox({ target = "/inscription", className, align = "center"
         ))}
       </div>
 
-      {/* Pas encore d'idée : choisir une niche puis un produit. */}
-      {ideas ? (
-        <NichePicker onClose={() => setIdeas(false)} onPick={(brief) => {
-          saveLandingPhotos([]);
-          router.push(`${target}?${new URLSearchParams({ mode: "start", brief })}`);
-        }} />
-      ) : (
-        <button type="button" onClick={() => setIdeas(true)} className={cn("mt-4 flex items-center gap-2 rounded-full border border-dashed border-[#34f0b0]/40 px-4 py-2 text-sm font-medium text-[#86efc9] transition-colors hover:border-[#34f0b0]/70 hover:bg-[#34f0b0]/10", align === "center" && "mx-auto")}>
-          <Sparkles className="h-4 w-4" /> Pas d'idée de produit ? Choisis ta niche
-        </button>
-      )}
+      {/* Pas encore d'idée : quiz en 5 questions juste après la création du compte. */}
+      <a href={`${target}?${new URLSearchParams({ next: "/app/quiz" })}`} className={cn("mt-4 flex w-fit items-center gap-2 rounded-full border border-dashed border-[#34f0b0]/40 px-4 py-2 text-sm font-medium text-[#86efc9] transition-colors hover:border-[#34f0b0]/70 hover:bg-[#34f0b0]/10", align === "center" && "mx-auto")}>
+        <Sparkles className="h-4 w-4" /> Pas d'idée de produit ? Fais le quiz
+      </a>
 
-      {mode === "start" && !ideas && (
+      {mode === "start" && (
         <div className={cn("mt-4 hidden flex-wrap gap-2 sm:flex", align === "center" && "justify-center")}>
           {EXAMPLES.map((ex) => (
             <button key={ex} type="button" onClick={() => setValue(ex)} className="flex items-center gap-1.5 rounded-full border border-white/[0.07] px-3 py-1 text-xs text-fg-faint transition-colors hover:border-white/15 hover:text-fg-muted">
