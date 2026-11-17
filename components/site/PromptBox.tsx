@@ -3,6 +3,7 @@
 import { ArrowUp, ImagePlus, Link2, PenLine, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
@@ -39,6 +40,22 @@ export function PromptBox({ target = "/inscription", className, align = "center"
   const [photoError, setPhotoError] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const current = MODES.find((m) => m.id === mode)!;
+  const linkMode = /^https?:\/\/\S+$/.test(value.trim());
+  const [link, setLink] = useState<{ state: "idle" | "checking" | "fail" } | { state: "ok"; title: string; image: string | null }>({ state: "idle" });
+
+  // Lien collé : passe en mode « lien » et on lit la page produit pour l'afficher (titre, photo).
+  useEffect(() => {
+    if (!linkMode) { setLink({ state: "idle" }); return; }
+    setMode("link");
+    let live = true;
+    setLink({ state: "checking" });
+    const t = setTimeout(() => {
+      api.checkLink(value.trim())
+        .then((r) => { if (live) setLink(r.ok ? { state: "ok", title: r.title, image: r.image } : { state: "fail" }); })
+        .catch(() => { if (live) setLink({ state: "fail" }); });
+    }, 400);
+    return () => { live = false; clearTimeout(t); };
+  }, [linkMode, value]);
 
   // Placeholder qui s'écrit lettre par lettre.
   useEffect(() => {
@@ -88,6 +105,22 @@ export function PromptBox({ target = "/inscription", className, align = "center"
       <form onSubmit={submit} className="glow-frame group relative rounded-[16px] p-[1.5px]">
         <div className="rounded-[14.5px] bg-[linear-gradient(180deg,#123d35,#0b2823)] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
           <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
+          {linkMode ? (
+            // Lien collé : affiché en une ligne courte, avec le produit reconnu (photo + nom) si la page se lit.
+            <div className="flex min-h-[92px] items-center gap-3 px-4 pb-2 pt-4 text-left">
+              {link.state === "ok" && link.image
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={link.image} alt="" className="h-14 w-14 shrink-0 rounded-[10px] border border-white/15 object-cover" />
+                : <span className="grid h-14 w-14 shrink-0 place-items-center rounded-[10px] bg-[#34f0b0]/10 text-[#86efc9]">{link.state === "checking" ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#86efc9]/30 border-t-[#86efc9]" /> : <Link2 className="h-6 w-6" />}</span>}
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15px] font-medium text-fg">{link.state === "ok" && link.title ? link.title : shortLink(value)}</span>
+                <span className="mt-0.5 block truncate text-xs text-fg-muted">
+                  {link.state === "checking" ? "Lecture du produit…" : link.state === "ok" ? <span className="text-[#86efc9]">Produit trouvé ✓ · {hostOf(value)}</span> : `Lien produit · ${hostOf(value)}`}
+                </span>
+              </span>
+              <button type="button" onClick={() => setValue("")} aria-label="Retirer le lien" className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-fg-faint hover:bg-white/5 hover:text-fg"><X className="h-4 w-4" /></button>
+            </div>
+          ) : (
           <textarea
             id={inputId}
             rows={3}
@@ -97,6 +130,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             placeholder={placeholder}
             className="block w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[15px] leading-relaxed text-fg placeholder:text-fg-faint focus:outline-none sm:text-base"
           />
+          )}
           {photos.length > 0 && (
             <div className="flex flex-wrap gap-2 px-4 pb-2">
               {photos.map((src, i) => (
@@ -145,10 +179,16 @@ export function PromptBox({ target = "/inscription", className, align = "center"
       </div>
 
       {/* Pas encore d'idée : quiz en 5 questions, avant la création du compte. */}
-      <a href="/quiz" className={cn("group mt-4 flex w-fit items-center gap-2.5 rounded-full border border-[#bef264]/40 bg-[linear-gradient(90deg,rgb(190_242_100/0.16),rgb(52_240_176/0.16),rgb(94_234_212/0.16))] py-1.5 pl-1.5 pr-4 text-sm font-semibold text-[#d9f99d] transition-all hover:-translate-y-0.5 hover:border-[#bef264]/70", align === "center" && "mx-auto")}>
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-[linear-gradient(160deg,#bef264,#34f0b0)] text-[#03140d]"><Sparkles className="h-4 w-4" /></span>
-        Pas d'idée de produit ? Fais le quiz en 5 questions
-      </a>
+      {!value.trim() && (
+        <a href="/quiz" className={cn("group mt-5 flex w-full max-w-xl items-center gap-4 rounded-[20px] border border-[#bef264]/45 bg-[linear-gradient(110deg,rgb(190_242_100/0.18),rgb(52_240_176/0.16),rgb(94_234_212/0.14))] p-3.5 text-left shadow-[0_0_30px_-10px_rgb(190_242_100/0.6)] transition-all hover:-translate-y-0.5 hover:border-[#bef264]/80 sm:p-4", align === "center" && "mx-auto")}>
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[14px] bg-[linear-gradient(160deg,#bef264,#34f0b0)] text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.5)]"><Sparkles className="h-6 w-6" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[16px] font-semibold text-[#ecfccb] sm:text-[17px]">Pas d'idée de produit ?</span>
+            <span className="block text-sm text-[#d9f99d]/80">Fais le quiz en 5 questions : on te trouve un produit et on crée ta boutique.</span>
+          </span>
+          <ArrowUp className="h-5 w-5 shrink-0 rotate-90 text-[#d9f99d] transition-transform group-hover:translate-x-1" />
+        </a>
+      )}
 
       {mode === "start" && (
         <div className={cn("mt-4 hidden flex-wrap gap-2 sm:flex", align === "center" && "justify-center")}>
@@ -161,4 +201,15 @@ export function PromptBox({ target = "/inscription", className, align = "center"
       )}
     </div>
   );
+}
+
+const hostOf = (u: string) => { try { return new URL(u.trim()).hostname.replace(/^(www|fr|m)\./, ""); } catch { return "lien"; } };
+// Version courte d'un lien pour l'affichage : site + identifiant du produit, sans les paramètres de suivi.
+function shortLink(u: string) {
+  try {
+    const url = new URL(u.trim());
+    const id = url.pathname.match(/(\d{6,})/)?.[1];
+    const host = url.hostname.replace(/^(www|fr|m)\./, "");
+    return id ? `${host} · produit ${id}` : `${host}${url.pathname.length > 1 ? url.pathname.slice(0, 40) : ""}`;
+  } catch { return u.slice(0, 60); }
 }

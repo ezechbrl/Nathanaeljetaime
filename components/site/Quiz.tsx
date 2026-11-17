@@ -41,7 +41,7 @@ const STEPS = ["Ta niche", "Ton produit", "Tes clients", "Ton style", "Ton prix"
 
 // Quiz en 5 questions pour ceux qui n'ont pas d'idée précise : il construit la description
 // de la boutique, puis la crée (comme « Générer »).
-export function Quiz({ onFinish }: { onFinish: (brief: string) => Promise<void> }) {
+export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Promise<void>; skipHref?: string }) {
   const [step, setStep] = useState(0);
   const [niche, setNiche] = useState<string | null>(null);
   const [product, setProduct] = useState<string | null>(null);
@@ -90,7 +90,7 @@ export function Quiz({ onFinish }: { onFinish: (brief: string) => Promise<void> 
         {STEPS.map((s, i) => <span key={s} className={cn("h-1.5 flex-1 rounded-full transition-colors", i <= step ? "bg-[linear-gradient(90deg,#34f0b0,#0fae7c)]" : "bg-white/10")} />)}
       </div>
       <div className="mt-4 flex items-center justify-between text-sm text-fg-muted">
-        {step > 0 ? <button type="button" onClick={() => setStep(step - 1)} className="inline-flex items-center gap-1.5 hover:text-fg"><ArrowLeft className="h-4 w-4" /> Retour</button> : <span />}
+        {step > 0 ? <button type="button" onClick={() => setStep(step - 1)} className="inline-flex items-center gap-1.5 hover:text-fg"><ArrowLeft className="h-4 w-4" /> Retour</button> : skipHref ? <a href={skipHref} className="underline underline-offset-4 hover:text-fg">J'ai déjà mon produit</a> : <span />}
         <span>Question {step + 1} sur 5</span>
       </div>
 

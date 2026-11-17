@@ -2,7 +2,7 @@ import { z } from "zod";
 import { UnreadablePageError } from "@/lib/fetch-product-page";
 import { cachedProductPage } from "@/lib/server/link-cache";
 import { requireUser } from "@/lib/server/auth";
-import { body, json, route } from "@/lib/server/http";
+import { body, clientIp, json, route } from "@/lib/server/http";
 import { rateLimit } from "@/lib/server/quota";
 
 export const maxDuration = 90;
@@ -10,9 +10,14 @@ export const maxDuration = 90;
 // Vérifie un lien produit dès qu'il est collé : aperçu (titre, photo) si la page se lit,
 // sinon on demande tout de suite des captures, avant de lancer une génération qui échouerait.
 export const POST = route(async (req) => {
-  const user = await requireUser();
+  // Aussi depuis la page d'accueil, sans compte : limité par adresse IP (lecture ≈ 0,5 centime).
+  const user = await requireUser().catch(() => null);
   const { url } = await body(req, z.object({ url: z.string().trim().url() }));
-  await rateLimit(`link-check:${user.id}`, 20, 600);
+  if (user) await rateLimit(`link-check:${user.id}`, 20, 600);
+  else {
+    await rateLimit(`link-check-ip:${clientIp(req)}`, 6, 3600);
+    await rateLimit("link-check-anon", 300, 86_400);
+  }
   try {
     const page = await cachedProductPage(url);
     return json({ ok: true, title: page.title, image: page.images[0] ?? null });

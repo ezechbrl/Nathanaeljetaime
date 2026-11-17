@@ -23,6 +23,14 @@ function Welcome() {
   const router = useRouter();
   const toast = useToast();
   const { refresh } = useApp();
+  // Nouveau compte sans produit (aucune boutique, rien de collé avant) : on ouvre le quiz, une fois.
+  const autoQuiz = useRef(false);
+  useEffect(() => {
+    if (autoQuiz.current || ["claim", "checkout", "brief", "url", "mode", "skipquiz"].some((k) => params.has(k))) return;
+    autoQuiz.current = true;
+    try { if (sessionStorage.getItem("vg-quiz-auto")) return; sessionStorage.setItem("vg-quiz-auto", "1"); } catch { return; }
+    api.listStores().then(({ stores }) => { if (!stores.length) router.replace("/app/quiz"); }).catch(() => {});
+  }, [params, router]);
   // Aperçu créé sans compte depuis la page d'accueil : rattaché au compte, puis on ouvre la boutique.
   const claim = params.get("claim");
   const claimed = useRef(false);

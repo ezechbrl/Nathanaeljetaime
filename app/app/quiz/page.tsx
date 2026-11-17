@@ -38,7 +38,7 @@ function QuizInApp() {
   }, [finishing]);
 
   if (finishing) return <div className="grid min-h-[60vh] place-items-center text-fg-muted"><span className="flex items-center gap-3"><Spinner /> Ta boutique se prépare…</span></div>;
-  return <Quiz onFinish={create} />;
+  return <Quiz onFinish={create} skipHref="/app?skipquiz=1" />;
 }
 
 export default function Page() {

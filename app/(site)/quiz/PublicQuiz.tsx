@@ -9,7 +9,7 @@ import * as api from "@/lib/api/client";
 export function PublicQuiz() {
   const router = useRouter();
   return (
-    <Quiz onFinish={async (brief) => {
+    <Quiz skipHref="/#creer" onFinish={async (brief) => {
       saveQuizBrief(brief);
       const logged = await api.getMe().then(() => true, () => false);
       router.push(logged ? "/app/quiz?finish=1" : `/inscription?${new URLSearchParams({ next: "/app/quiz?finish=1" })}`);
