@@ -38,6 +38,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
   const [placeholder, setPlaceholder] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [photoError, setPhotoError] = useState("");
+  const [pending, setPending] = useState<string[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
   const current = MODES.find((m) => m.id === mode)!;
   const linkMode = /^https?:\/\/\S+$/.test(value.trim());
@@ -80,8 +81,16 @@ export function PromptBox({ target = "/inscription", className, align = "center"
     try {
       const images = [...files].filter((f) => f.type.startsWith("image/")).slice(0, MAX_PHOTOS - photos.length);
       if (!images.length) return setPhotoError("Choisis une image (photo du produit).");
-      const added = await Promise.all(images.map((f) => compressImage(f, 1280, 0.8)));
-      setPhotos((p) => [...p, ...added].slice(0, MAX_PHOTOS));
+      // Aperçu immédiat (fichier local), puis version réduite pour l'envoi : aucune attente à l'écran.
+      const previews = images.map((f) => URL.createObjectURL(f));
+      setPending(previews);
+      try {
+        const added = await Promise.all(images.map((f) => compressImage(f, 1280, 0.8)));
+        setPhotos((p) => [...p, ...added].slice(0, MAX_PHOTOS));
+      } finally {
+        setPending([]);
+        previews.forEach((u) => URL.revokeObjectURL(u));
+      }
     } catch {
       setPhotoError("Cette image n'a pas pu être lue. Essaie une autre photo.");
     }
@@ -89,6 +98,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
 
   function submit(e?: React.FormEvent) {
     e?.preventDefault();
+    if (pending.length) return; // photo encore en préparation
     // Un lien collé passe en import par lien, quel que soit l'onglet choisi.
     const text = value.trim();
     const isLink = /^https?:\/\/\S+$/.test(text);
@@ -107,14 +117,14 @@ export function PromptBox({ target = "/inscription", className, align = "center"
           <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
           {linkMode ? (
             // Lien collé : affiché en une ligne courte, avec le produit reconnu (photo + nom) si la page se lit.
-            <div className="flex min-h-[92px] items-center gap-3 px-4 pb-2 pt-4 text-left">
+            <div className="flex items-center gap-4 px-4 pb-3 pt-4 text-left">
               {link.state === "ok" && link.image
                 // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={link.image} alt="" className="h-14 w-14 shrink-0 rounded-[10px] border border-white/15 object-cover" />
-                : <span className="grid h-14 w-14 shrink-0 place-items-center rounded-[10px] bg-[#34f0b0]/10 text-[#86efc9]">{link.state === "checking" ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#86efc9]/30 border-t-[#86efc9]" /> : <Link2 className="h-6 w-6" />}</span>}
+                ? <img src={link.image} alt="" className="h-28 w-28 shrink-0 rounded-[14px] border border-white/20 bg-white object-cover shadow-[0_8px_24px_-10px_rgb(0_0_0/0.6)] sm:h-32 sm:w-32" />
+                : <span className="grid h-28 w-28 shrink-0 place-items-center rounded-[14px] bg-[#34f0b0]/10 text-[#86efc9] sm:h-32 sm:w-32">{link.state === "checking" ? <span className="h-7 w-7 animate-spin rounded-full border-2 border-[#86efc9]/30 border-t-[#86efc9]" /> : <Link2 className="h-8 w-8" />}</span>}
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[15px] font-medium text-fg">{link.state === "ok" && link.title ? link.title : shortLink(value)}</span>
-                <span className="mt-0.5 block truncate text-xs text-fg-muted">
+                <span className="line-clamp-2 text-[16px] font-semibold leading-snug text-fg sm:text-[17px]">{link.state === "ok" && link.title ? link.title : shortLink(value)}</span>
+                <span className="mt-1.5 block truncate text-[13px] text-fg-muted">
                   {link.state === "checking" ? "Lecture du produit…" : link.state === "ok" ? <span className="text-[#86efc9]">Produit trouvé ✓ · {hostOf(value)}</span> : `Lien produit · ${hostOf(value)}`}
                 </span>
               </span>
@@ -131,15 +141,20 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             className="block w-full resize-none bg-transparent px-4 pb-2 pt-4 text-[15px] leading-relaxed text-fg placeholder:text-fg-faint focus:outline-none sm:text-base"
           />
           )}
-          {photos.length > 0 && (
-            <div className="flex flex-wrap gap-2 px-4 pb-2">
-              {photos.map((src, i) => (
-                <div key={i} className="relative">
+          {(photos.length > 0 || pending.length > 0) && (
+            // Grandes vignettes, comme une vraie pièce jointe.
+            <div className="flex flex-wrap gap-3 px-4 pb-3 pt-1 text-left">
+              {[...photos.map((src) => ({ src, loading: false })), ...pending.map((src) => ({ src, loading: true }))].map(({ src, loading }, i) => (
+                <div key={src} className="relative h-28 w-28 overflow-hidden rounded-[14px] border border-white/20 bg-black/30 shadow-[0_8px_24px_-10px_rgb(0_0_0/0.6)] [animation:fade-in_.2s_ease-out_both] sm:h-32 sm:w-32">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={`Photo du produit ${i + 1}`} className="h-14 w-14 rounded-[10px] border border-white/15 object-cover" />
-                  <button type="button" aria-label="Retirer la photo" onClick={() => setPhotos((p) => p.filter((_, k) => k !== i))} className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-black/80 text-white ring-1 ring-white/30 hover:bg-black">
-                    <X className="h-3 w-3" />
-                  </button>
+                  <img src={src} alt={`Photo du produit ${i + 1}`} className="h-full w-full object-cover" />
+                  {loading ? (
+                    <span className="absolute inset-0 grid place-items-center bg-black/25"><span className="h-6 w-6 animate-spin rounded-full border-2 border-white/40 border-t-white" /></span>
+                  ) : (
+                    <button type="button" aria-label="Retirer la photo" onClick={() => setPhotos((p) => p.filter((x) => x !== src))} className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-black/75 text-white ring-1 ring-white/30 backdrop-blur hover:bg-black">
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

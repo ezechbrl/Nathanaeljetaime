@@ -164,9 +164,9 @@ export function CreateStore() {
   const shotsRow = (
     <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
       {shots.map((src, i) => (
-        <span key={i} className="relative h-12 w-12 overflow-hidden rounded-[8px] border border-white/15">
+        <span key={i} className="relative h-28 w-28 overflow-hidden rounded-[14px] border border-white/20 shadow-[0_8px_24px_-10px_rgb(0_0_0/0.6)] sm:h-32 sm:w-32">
           <img src={src} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
-          <button type="button" onClick={() => setShots((s) => s.filter((_, j) => j !== i))} aria-label="Retirer la photo" className="absolute right-0.5 top-0.5 grid h-4 w-4 place-items-center rounded-full bg-black/70 text-white"><X className="h-3 w-3" /></button>
+          <button type="button" onClick={() => setShots((s) => s.filter((_, j) => j !== i))} aria-label="Retirer la photo" className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-black/75 text-white ring-1 ring-white/30"><X className="h-4 w-4" /></button>
         </span>
       ))}
       {shots.length < 3 && (
@@ -196,8 +196,8 @@ export function CreateStore() {
               {link.state === "checking" && <p className="flex items-center gap-2 px-4 pb-2 text-xs text-fg-muted"><Spinner /> Lecture du lien…</p>}
               {link.state === "ok" && (
                 <p className="mx-4 mb-2 flex items-center gap-2.5 rounded-ctl border border-accent/25 bg-accent-deep/25 px-2.5 py-2 text-sm [animation:fade-in_.3s_ease-out]">
-                  {link.image ? <img src={link.image} alt="" className="h-9 w-9 shrink-0 rounded-[6px] object-cover" /> : <Check className="h-4 w-4 shrink-0 text-accent" />}
-                  <span className="min-w-0 flex-1 truncate">{link.title || "Produit trouvé"}</span>
+                  {link.image ? <img src={link.image} alt="" className="h-24 w-24 shrink-0 rounded-[12px] border border-white/20 bg-white object-cover sm:h-28 sm:w-28" /> : <Check className="h-4 w-4 shrink-0 text-accent" />}
+                  <span className="line-clamp-2 min-w-0 flex-1 text-[15px] font-medium leading-snug">{link.title || "Produit trouvé"}</span>
                   <span className="shrink-0 text-xs text-accent">Produit trouvé ✓</span>
                 </p>
               )}
