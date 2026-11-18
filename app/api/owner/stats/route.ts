@@ -148,7 +148,6 @@ export const GET = route(async () => {
   const uniq = (rows: Record<string, any>[]) => new Set(rows.map((r) => r.user_id)).size;
   const funnel = [
     { step: "Visiteurs du site", count: visits30.length },
-    { step: "Aperçu créé (sans compte)", count: new Set(previews.filter((x) => last30(x as Dated)).map((x) => x.visitor)).size },
     { step: "Comptes créés", count: realUsers.filter((u) => last30(u as Dated)).length },
     { step: "Aperçu de boutique créé", count: uniq(stores.filter((x) => last30(x as Dated))) },
     { step: "Page de paiement ouverte", count: uniq(events.filter((e) => e.kind === "checkout" && last30(e as Dated))) },
