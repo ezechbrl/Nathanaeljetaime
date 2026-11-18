@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
 import { shortReview } from "@/lib/format";
 import { sanitizeHtml } from "@/lib/sanitize";
 import type { IconName } from "@/lib/store-schema";
-import { marqueeFor, marqueeTexts, onColor, orderFor } from "@/lib/store-style";
+import { marqueeFor, marqueeStyle, marqueeTexts, onColor, orderFor } from "@/lib/store-style";
 
 export type PreviewPage = "accueil" | "produit" | "faq" | "a-propos";
 
@@ -46,8 +46,23 @@ function pickImages(assets: Asset[]) {
 }
 
 // Rendu de la boutique générée, fidèle au thème Vigenia installé dans Shopify.
-export function StorePreview({ store, page = "accueil", device = "auto", assets = [], className }: { store: Store; page?: PreviewPage; device?: "desktop" | "mobile" | "auto"; assets?: Asset[]; className?: string }) {
+export function StorePreview({ store, page = "accueil", device = "auto", assets = [], className, animate = true }: { store: Store; page?: PreviewPage; device?: "desktop" | "mobile" | "auto"; assets?: Asset[]; className?: string; animate?: boolean }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  // Comme dans la vraie boutique : titres, textes et images apparaissent quand on descend.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!animate || !root || !("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const els = [...root.querySelectorAll<HTMLElement>("section h2, section h3, section p, section img, section blockquote, section li")]
+      .filter((el) => !el.closest("[data-no-reveal]") && el.getBoundingClientRect().top > window.innerHeight * 0.6);
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("sp-in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+    els.forEach((el) => {
+      el.classList.add("sp-rv");
+      const i = el.parentElement ? [...el.parentElement.children].indexOf(el) : 0;
+      el.style.transitionDelay = `${Math.min(i, 6) * 70}ms`;
+      io.observe(el);
+    });
+    return () => { io.disconnect(); els.forEach((el) => el.classList.remove("sp-rv", "sp-in")); };
+  }, [animate, page, store.updatedAt]);
   const [narrow, setNarrow] = useState(false);
   const [shot, setShot] = useState(0);
   const [bundle, setBundle] = useState(0);
@@ -147,7 +162,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
                 <span key={`${r}-${i}`} className="flex items-center gap-8 whitespace-nowrap">
                   <span className={cn("flex items-center gap-3", big ? cn("text-[2rem] leading-none", H) : "text-[15px] font-semibold")}>
                     {pic && <img src={pic.url} alt="" className={cn("rounded-full border-2 object-cover", big ? "h-12 w-12" : "h-10 w-10")} style={{ borderColor: `${primary}2e` }} />}
-                    {t}
+                    <MarqueeText text={t} kind={marqueeStyle(i + (reverse ? 1 : 0))} fg={SCHEMES[scheme].color} accent={scheme === "accent" ? undefined : accent} heading={store.theme.headingFont} />
                   </span>
                   <span className="text-sm" style={{ color: scheme === "accent" || scheme === "dark" ? undefined : accent, opacity: scheme === "accent" || scheme === "dark" ? 0.7 : 1 }}>✦</span>
                 </span>
@@ -235,7 +250,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
   return (
     <div ref={rootRef} className={cn("overflow-hidden text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif`, ["--sp-h" as string]: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}` }}>
       <link rel="stylesheet" href={fontsUrl} precedence="default" />
-      <style>{"@keyframes sp-mq{to{transform:translateX(-50%)}}@media (prefers-reduced-motion:reduce){[style*=sp-mq]{animation:none!important}}"}</style>
+      <style>{"@keyframes sp-mq{to{transform:translateX(-50%)}}.sp-rv{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}.sp-rv.sp-in{opacity:1;transform:none}@media (prefers-reduced-motion:reduce){[style*=sp-mq]{animation:none!important}.sp-rv{opacity:1;transform:none}}"}</style>
       <div className="flex h-9 items-center justify-center gap-2 px-4 text-center text-[11.5px]" style={{ background: primary, color: background }}>
         <Truck className="h-3.5 w-3.5" />{home.announcements?.[0] ?? offers[0] ?? plan.brand.tagline}
       </div>
@@ -398,7 +413,7 @@ export function StoreThumb({ store, className }: { store: Store; className?: str
     <div ref={ref} className={cn("relative aspect-[16/10] overflow-hidden rounded-[10px] border border-white/[0.08]", className)} style={{ background: store.theme.colors.background }}>
       {store.plan ? (
         <div className="pointer-events-none absolute left-0 top-0 w-[1000px] origin-top-left" style={{ transform: "scale(var(--thumb-scale, 0.3))" }}>
-          <StorePreview store={store} device="desktop" assets={assets.data?.assets} />
+          <StorePreview store={store} device="desktop" assets={assets.data?.assets} animate={false} />
         </div>
       ) : (
         <div className="grid h-full place-items-center bg-bg-3">
@@ -407,4 +422,16 @@ export function StoreThumb({ store, className }: { store: Store; className?: str
       )}
     </div>
   );
+}
+
+// Même rendu que les bandeaux du thème Shopify : un style d'écriture différent par texte.
+function MarqueeText({ text, kind, fg, accent, heading }: { text: string; kind: string; fg: string; accent?: string; heading: string }) {
+  const style: React.CSSProperties =
+    kind === "italic" ? { fontFamily: `'${heading}', Georgia, serif`, fontStyle: "italic", fontWeight: 400, fontSize: "1.22em" }
+    : kind === "outline" ? { color: "transparent", WebkitTextStroke: `1.2px ${fg}`, fontFamily: `'${heading}', system-ui, sans-serif`, fontWeight: 700, fontSize: "1.12em" }
+    : kind === "accent" ? (accent ? { color: accent, fontWeight: 800 } : { textDecoration: "underline", textUnderlineOffset: 4 })
+    : kind === "caps" ? { textTransform: "uppercase", letterSpacing: ".14em", fontSize: ".84em", fontWeight: 700 }
+    : kind === "pill" ? { padding: "6px 14px", borderRadius: 999, background: `${fg}1a` }
+    : {};
+  return <span style={style}>{text}</span>;
 }

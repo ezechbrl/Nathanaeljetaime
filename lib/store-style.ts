@@ -50,6 +50,10 @@ export const orderFor = (s: unknown) => STYLE_ORDER[isStyle(s) ? s : "legacy"];
 export const marqueeFor = (s: unknown) => STYLE_MARQUEE[isStyle(s) ? s : "legacy"];
 
 // Textes courts du bandeau : atouts et bénéfices de la boutique (2 à 5 mots), sans doublon.
+// Styles d'écriture qui alternent dans les bandeaux défilants (normal, italique, contour…).
+export const MARQUEE_STYLES = ["plain", "italic", "accent", "outline", "caps", "pill"] as const;
+export const marqueeStyle = (i: number) => MARQUEE_STYLES[i % MARQUEE_STYLES.length];
+
 export function marqueeTexts(home: { features?: { title: string }[]; benefits: { title: string }[] }, extra: string[] = []) {
   const seen = new Set<string>();
   return [...(home.features ?? []).map((f) => f.title), ...home.benefits.map((b) => b.title), ...extra]

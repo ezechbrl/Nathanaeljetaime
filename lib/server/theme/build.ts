@@ -3,7 +3,7 @@ import { toIcon, type IconName, type StorePlan } from "@/lib/store-schema";
 import { shortReview } from "@/lib/format";
 import { staticThemeFiles } from "./files";
 import { labelsFor } from "./labels";
-import { marqueeFor, marqueeTexts, orderFor, type StoreStyle } from "@/lib/store-style";
+import { marqueeFor, marqueeStyle, marqueeTexts, orderFor, type StoreStyle } from "@/lib/store-style";
 
 export type ThemeContext = {
   plan: StorePlan;
@@ -163,7 +163,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
   const marquee = (scheme: string, direction: "left" | "right", big: boolean, withImages: boolean) => texts.length >= 2 && {
     type: "marquee",
     settings: { scheme, direction, size: big ? "big" : "small", speed: big ? 38 : 30 },
-    ...blocks(texts.map((text, i) => ({ type: "item", settings: { text, ...(withImages && pics.length ? pics[i % pics.length] : {}) } }))),
+    ...blocks(texts.map((text, i) => ({ type: "item", settings: { text, style: marqueeStyle(i + (direction === "right" ? 1 : 0)), ...(withImages && pics.length ? pics[i % pics.length] : {}) } }))),
   };
   const all: Record<string, unknown> = {
     hero: { type: "hero", settings: { image: file("hero"), image_asset: asset("hero"), layout: ctx.theme.heroLayout ?? "left", ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },

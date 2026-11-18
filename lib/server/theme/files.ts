@@ -169,6 +169,13 @@ p{margin:0}
 .s-accent .marquee__sep,.s-dark .marquee__sep{color:inherit;opacity:.7}
 .marquee--big .marquee__item{font-family:var(--f-heading);font-weight:var(--h-weight);letter-spacing:var(--h-track);font-size:clamp(26px,3.6vw,44px)}
 .marquee--big .marquee__item img{width:58px;height:58px}
+/* Styles d'écriture variés dans les bandeaux (modifiables texte par texte dans l'éditeur Shopify) */
+.marquee__item--italic{font-family:var(--f-heading);font-style:italic;font-weight:400;font-size:1.22em;letter-spacing:0}
+.marquee__item--outline{color:transparent;-webkit-text-stroke:1.2px var(--fgc);font-family:var(--f-heading);font-weight:700;font-size:1.12em}
+.marquee__item--accent{color:var(--c-accent);font-weight:800}
+.s-accent .marquee__item--accent{color:inherit;text-decoration:underline;text-underline-offset:4px}
+.marquee__item--caps{text-transform:uppercase;letter-spacing:.14em;font-size:.84em;font-weight:700}
+.marquee__item--pill{padding:7px 16px;border-radius:999px;background:color-mix(in srgb,var(--fgc) 10%,transparent)}
 @keyframes mq{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.marquee__track{animation:none}}
 .st-premium .btn{border-radius:4px;text-transform:uppercase;letter-spacing:.14em;font-size:13.5px}
@@ -354,9 +361,22 @@ p{margin:0}
 .sticky-atc__t{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sticky-atc .btn{min-height:48px}
 @media (max-width:600px){.sticky-atc img,.sticky-atc .line__ph{display:none}.sticky-atc .btn{padding:0 18px}}
-.reveal{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
 .reveal.is-in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.ph::before,.hero__bg img{animation:none}}
+/* Variantes : glisse depuis le côté, zoom doux des images */
+.reveal--left{transform:translateX(-34px)}.reveal--right{transform:translateX(34px)}
+.reveal--zoom{transform:scale(.94)}
+.reveal .media img,.reveal img.zoom{transform:scale(1.08);transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.reveal.is-in .media img,.reveal.is-in img.zoom{transform:none}
+/* Titres : les mots apparaissent un par un quand on descend */
+.words .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em}
+.words .w>span{display:inline-block;transform:translateY(105%);transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.words.is-in .w>span{transform:none}
+/* Haut de page : le texte du héros arrive dès l'ouverture */
+@keyframes vg-rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.hero__c>*{animation:vg-rise .9s cubic-bezier(.2,.8,.2,1) both}
+.hero__c>*:nth-child(2){animation-delay:.12s}.hero__c>*:nth-child(3){animation-delay:.24s}.hero__c>*:nth-child(4){animation-delay:.36s}.hero__c>*:nth-child(5){animation-delay:.48s}
+@media (prefers-reduced-motion:reduce){.reveal,.reveal--left,.reveal--right,.reveal--zoom{opacity:1;transform:none}.words .w>span,.reveal .media img{transform:none}.hero__c>*{animation:none}.ph::before,.hero__bg img{animation:none}}
 @media (max-width:900px){.sec{padding:60px 0}.head{margin-bottom:32px}}
 .form input[type=email],.form input[type=password],.form input[type=text]{width:100%;min-height:52px;border:1.5px solid color-mix(in srgb,var(--c-primary) 18%,transparent);border-radius:14px;background:transparent;color:inherit;font:inherit;padding:0 14px;margin-bottom:12px}
 `;
@@ -451,8 +471,28 @@ const JS = `(function(){
   var hd = document.querySelector('.header'); if (hd) addEventListener('scroll', function(){ hd.classList.toggle('is-stuck', scrollY > 10) }, { passive: true });
   var b = document.querySelector('.burger'), n = document.querySelector('.nav');
   if (b && n) b.addEventListener('click', function(){ var o = n.classList.toggle('is-open'); b.setAttribute('aria-expanded', o) });
+  // Animations au défilement : titres mot par mot, textes et cartes qui apparaissent en cascade.
+  var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var editor = window.Shopify && Shopify.designMode;
+  if (!calm && !editor) {
+    document.querySelectorAll('.sec:not(.hero):not(.marquee) h2, .sec:not(.hero) .title').forEach(function(h){
+      if (h.closest('.hero') || h.classList.contains('words') || h.children.length) return;
+      var words = h.textContent.trim().split(/\\s+/);
+      if (!words.length || words.length > 24) return;
+      h.innerHTML = words.map(function(w, i){ return '<span class="w"><span style="transition-delay:' + (i * 55) + 'ms">' + esc(w) + '</span></span>' }).join(' ');
+      h.classList.add('words');
+    });
+    var auto = '.sec:not(.hero):not(.marquee) p, .sec:not(.hero) .muted, .sec:not(.hero) .btn, .sec:not(.hero) .link, .sec:not(.hero) li, .sec:not(.hero) img, .sec:not(.hero) .card, .sec:not(.hero) blockquote, .sec:not(.hero) .stars';
+    document.querySelectorAll(auto).forEach(function(el){
+      if (el.closest('.reveal, .words, .marquee, .drawer, form, .header, .footer, details')) return;
+      el.classList.add('reveal');
+      var i = Array.prototype.indexOf.call(el.parentNode.children, el);
+      if (!el.style.transitionDelay) el.style.transitionDelay = Math.min(i, 6) * 70 + 'ms';
+    });
+    document.querySelectorAll('.split .frame.reveal').forEach(function(f){ f.classList.add(f.closest('.split--rev') ? 'reveal--right' : 'reveal--left') });
+  }
   var io = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'}) : null;
-  document.querySelectorAll('.reveal').forEach(function(el){io ? io.observe(el) : el.classList.add('is-in')});
+  document.querySelectorAll('.reveal, .words').forEach(function(el){io && !editor ? io.observe(el) : el.classList.add('is-in')});
 })();
 `;
 
@@ -664,14 +704,14 @@ ${schema({ name: "Héros", settings: [
     {%- for g in (1..2) -%}
     <div class="marquee__group"{% if g == 2 %} aria-hidden="true"{% endif %}>
       {%- for r in (1..3) -%}{%- for block in section.blocks -%}
-      <span class="marquee__item"{% if g == 1 and r == 1 %} {{ block.shopify_attributes }}{% endif %}>{% if block.settings.image != blank %}<img src="{{ block.settings.image | image_url: width: 160 }}" alt="" width="80" height="80" loading="lazy">{% elsif block.settings.image_asset != blank %}<img src="{{ block.settings.image_asset | asset_url }}" alt="" width="80" height="80" loading="lazy">{% endif %}{{ block.settings.text }}</span><span class="marquee__sep" aria-hidden="true">✦</span>
+      <span class="marquee__item marquee__item--{{ block.settings.style | default: 'plain' }}"{% if g == 1 and r == 1 %} {{ block.shopify_attributes }}{% endif %}>{% if block.settings.image != blank %}<img src="{{ block.settings.image | image_url: width: 160 }}" alt="" width="80" height="80" loading="lazy">{% elsif block.settings.image_asset != blank %}<img src="{{ block.settings.image_asset | asset_url }}" alt="" width="80" height="80" loading="lazy">{% endif %}{{ block.settings.text }}</span><span class="marquee__sep" aria-hidden="true">✦</span>
       {%- endfor -%}{%- endfor -%}
     </div>
     {%- endfor -%}
   </div>
 </section>
 {%- endif -%}
-${schema({ name: "Bandeau défilant", settings: [SCHEME, { type: "select", id: "direction", label: "Sens", options: [{ value: "left", label: "Vers la gauche" }, { value: "right", label: "Vers la droite" }], default: "left" }, { type: "select", id: "size", label: "Taille du texte", options: [{ value: "small", label: "Petit" }, { value: "big", label: "Grand" }], default: "small" }, { type: "range", id: "speed", label: "Durée d'un tour (secondes)", min: 10, max: 80, step: 2, default: 30 }], blocks: [{ type: "item", name: "Texte", settings: [{ type: "text", id: "text", label: "Texte court" }, { type: "image_picker", id: "image", label: "Petite image (facultatif)" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }] }], max_blocks: 8, presets: [{ name: "Bandeau défilant" }] })}`,
+${schema({ name: "Bandeau défilant", settings: [SCHEME, { type: "select", id: "direction", label: "Sens", options: [{ value: "left", label: "Vers la gauche" }, { value: "right", label: "Vers la droite" }], default: "left" }, { type: "select", id: "size", label: "Taille du texte", options: [{ value: "small", label: "Petit" }, { value: "big", label: "Grand" }], default: "small" }, { type: "range", id: "speed", label: "Durée d'un tour (secondes)", min: 10, max: 80, step: 2, default: 30 }], blocks: [{ type: "item", name: "Texte", settings: [{ type: "text", id: "text", label: "Texte court" }, { type: "select", id: "style", label: "Style d'écriture", options: [{ value: "plain", label: "Normal" }, { value: "italic", label: "Italique élégant" }, { value: "outline", label: "Contour" }, { value: "accent", label: "Couleur d'accent" }, { value: "caps", label: "Majuscules espacées" }, { value: "pill", label: "Pastille" }], default: "plain" }, { type: "image_picker", id: "image", label: "Petite image (facultatif)" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }] }], max_blocks: 8, presets: [{ name: "Bandeau défilant" }] })}`,
 
   features: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap">
