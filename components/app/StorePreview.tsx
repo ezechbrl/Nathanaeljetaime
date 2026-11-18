@@ -54,11 +54,11 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
     if (!animate || !root || !("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const els = [...root.querySelectorAll<HTMLElement>("section h2, section h3, section p, section img, section blockquote, section li")]
       .filter((el) => !el.closest("[data-no-reveal]") && el.getBoundingClientRect().top > window.innerHeight * 0.6);
-    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("sp-in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("sp-in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px 6% 0px", threshold: 0 });
     els.forEach((el) => {
       el.classList.add("sp-rv");
       const i = el.parentElement ? [...el.parentElement.children].indexOf(el) : 0;
-      el.style.transitionDelay = `${Math.min(i, 6) * 70}ms`;
+      el.style.transitionDelay = el.tagName === "IMG" ? "0ms" : `${Math.min(i, 3) * 40}ms`;
       io.observe(el);
     });
     return () => { io.disconnect(); els.forEach((el) => el.classList.remove("sp-rv", "sp-in")); };
@@ -250,7 +250,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
   return (
     <div ref={rootRef} className={cn("overflow-hidden text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif`, ["--sp-h" as string]: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}` }}>
       <link rel="stylesheet" href={fontsUrl} precedence="default" />
-      <style>{"@keyframes sp-mq{to{transform:translateX(-50%)}}.sp-rv{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}.sp-rv.sp-in{opacity:1;transform:none}@media (prefers-reduced-motion:reduce){[style*=sp-mq]{animation:none!important}.sp-rv{opacity:1;transform:none}}"}</style>
+      <style>{"@keyframes sp-mq{to{transform:translateX(-50%)}}.sp-rv{opacity:0;transform:translateY(16px);transition:opacity .5s ease-out,transform .55s cubic-bezier(.2,.8,.2,1)}img.sp-rv{transform:scale(1.04);transition:opacity .5s ease-out,transform .8s cubic-bezier(.2,.8,.2,1)}.sp-rv.sp-in{opacity:1;transform:none}@media (prefers-reduced-motion:reduce){[style*=sp-mq]{animation:none!important}.sp-rv{opacity:1;transform:none}}"}</style>
       <div className="flex h-9 items-center justify-center gap-2 px-4 text-center text-[11.5px]" style={{ background: primary, color: background }}>
         <Truck className="h-3.5 w-3.5" />{home.announcements?.[0] ?? offers[0] ?? plan.brand.tagline}
       </div>

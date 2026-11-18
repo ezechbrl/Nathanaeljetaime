@@ -361,21 +361,22 @@ p{margin:0}
 .sticky-atc__t{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sticky-atc .btn{min-height:48px}
 @media (max-width:600px){.sticky-atc img,.sticky-atc .line__ph{display:none}.sticky-atc .btn{padding:0 18px}}
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease-out,transform .55s cubic-bezier(.2,.8,.2,1)}
 .reveal.is-in{opacity:1;transform:none}
 /* Variantes : glisse depuis le côté, zoom doux des images */
-.reveal--left{transform:translateX(-34px)}.reveal--right{transform:translateX(34px)}
-.reveal--zoom{transform:scale(.94)}
-.reveal .media img,.reveal img.zoom{transform:scale(1.08);transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.reveal--left{transform:translateX(-20px)}.reveal--right{transform:translateX(20px)}
+.reveal--zoom{transform:scale(.97)}
+.reveal .media img,.reveal img.zoom,img.reveal{transform:scale(1.04);transition:opacity .5s ease-out,transform .8s cubic-bezier(.2,.8,.2,1)}
+img.reveal{transform:scale(1.04)}
 .reveal.is-in .media img,.reveal.is-in img.zoom{transform:none}
 /* Titres : les mots apparaissent un par un quand on descend */
 .words .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em}
-.words .w>span{display:inline-block;transform:translateY(105%);transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.words .w>span{display:inline-block;transform:translateY(105%);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .words.is-in .w>span{transform:none}
 /* Haut de page : le texte du héros arrive dès l'ouverture */
 @keyframes vg-rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
-.hero__c>*{animation:vg-rise .9s cubic-bezier(.2,.8,.2,1) both}
-.hero__c>*:nth-child(2){animation-delay:.12s}.hero__c>*:nth-child(3){animation-delay:.24s}.hero__c>*:nth-child(4){animation-delay:.36s}.hero__c>*:nth-child(5){animation-delay:.48s}
+.hero__c>*{animation:vg-rise .55s cubic-bezier(.2,.8,.2,1) both}
+.hero__c>*:nth-child(2){animation-delay:.06s}.hero__c>*:nth-child(3){animation-delay:.12s}.hero__c>*:nth-child(4){animation-delay:.18s}.hero__c>*:nth-child(5){animation-delay:.24s}
 @media (prefers-reduced-motion:reduce){.reveal,.reveal--left,.reveal--right,.reveal--zoom{opacity:1;transform:none}.words .w>span,.reveal .media img{transform:none}.hero__c>*{animation:none}.ph::before,.hero__bg img{animation:none}}
 @media (max-width:900px){.sec{padding:60px 0}.head{margin-bottom:32px}}
 .form input[type=email],.form input[type=password],.form input[type=text]{width:100%;min-height:52px;border:1.5px solid color-mix(in srgb,var(--c-primary) 18%,transparent);border-radius:14px;background:transparent;color:inherit;font:inherit;padding:0 14px;margin-bottom:12px}
@@ -479,7 +480,7 @@ const JS = `(function(){
       if (h.closest('.hero') || h.classList.contains('words') || h.children.length) return;
       var words = h.textContent.trim().split(/\\s+/);
       if (!words.length || words.length > 24) return;
-      h.innerHTML = words.map(function(w, i){ return '<span class="w"><span style="transition-delay:' + (i * 55) + 'ms">' + esc(w) + '</span></span>' }).join(' ');
+      h.innerHTML = words.map(function(w, i){ return '<span class="w"><span style="transition-delay:' + Math.min(i * 25, 250) + 'ms">' + esc(w) + '</span></span>' }).join(' ');
       h.classList.add('words');
     });
     var auto = '.sec:not(.hero):not(.marquee) p, .sec:not(.hero) .muted, .sec:not(.hero) .btn, .sec:not(.hero) .link, .sec:not(.hero) li, .sec:not(.hero) img, .sec:not(.hero) .card, .sec:not(.hero) blockquote, .sec:not(.hero) .stars';
@@ -487,11 +488,11 @@ const JS = `(function(){
       if (el.closest('.reveal, .words, .marquee, .drawer, form, .header, .footer, details')) return;
       el.classList.add('reveal');
       var i = Array.prototype.indexOf.call(el.parentNode.children, el);
-      if (!el.style.transitionDelay) el.style.transitionDelay = Math.min(i, 6) * 70 + 'ms';
+      if (!el.style.transitionDelay && el.tagName !== 'IMG') el.style.transitionDelay = Math.min(i, 3) * 40 + 'ms';
     });
     document.querySelectorAll('.split .frame.reveal').forEach(function(f){ f.classList.add(f.closest('.split--rev') ? 'reveal--right' : 'reveal--left') });
   }
-  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'}) : null;
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target)}})},{rootMargin:'0px 0px 6% 0px',threshold:0}) : null;
   document.querySelectorAll('.reveal, .words').forEach(function(el){io && !editor ? io.observe(el) : el.classList.add('is-in')});
 })();
 `;
@@ -717,7 +718,7 @@ ${schema({ name: "Bandeau défilant", settings: [SCHEME, { type: "select", id: "
   <div class="wrap">
     {% if section.settings.title != blank %}<div class="head center reveal"><h2 class="title">{{ section.settings.title }}</h2>{% if section.settings.subtitle != blank %}<p class="muted">{{ section.settings.subtitle }}</p>{% endif %}</div>{% endif %}
     <div class="feats" style="--n:{{ section.blocks.size | at_most: 6 }}">
-      {%- for block in section.blocks -%}<div class="feat reveal" style="transition-delay:{{ forloop.index0 | times: 70 }}ms" {{ block.shopify_attributes }}>{% render 'icon', name: block.settings.icon %}<strong>{{ block.settings.title }}</strong><span class="muted">{{ block.settings.text }}</span></div>{%- endfor -%}
+      {%- for block in section.blocks -%}<div class="feat reveal" style="transition-delay:{{ forloop.index0 | times: 40 }}ms" {{ block.shopify_attributes }}>{% render 'icon', name: block.settings.icon %}<strong>{{ block.settings.title }}</strong><span class="muted">{{ block.settings.text }}</span></div>{%- endfor -%}
     </div>
   </div>
 </section>
