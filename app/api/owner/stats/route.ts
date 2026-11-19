@@ -46,7 +46,7 @@ export const GET = route(async () => {
     db().from("revenue_events").select("kind, plan, amount_cents, currency, user_id, created_at, users(email)").order("created_at", { ascending: false }).limit(2000),
     db().from("waitlist").select("email, ref, brief, created_at").order("created_at", { ascending: false }),
     db().from("users").select("id, email, created_at, shop_domain").order("created_at", { ascending: false }),
-    db().from("stores").select("user_id, status, created_at").gte("created_at", since60),
+    db().from("stores").select("id, name, user_id, status, created_at").gte("created_at", since60),
     db().from("affiliates").select("code, commission_rate, users(email, first_name)"),
     db().from("affiliate_events").select("code, kind, amount_cents, referred_user_id, created_at"),
     db().from("app_errors").select("path, status, message, created_at").eq("resolved", false).gte("created_at", since).order("created_at", { ascending: false }).limit(200),
@@ -159,6 +159,8 @@ export const GET = route(async () => {
       const sub = events.filter((e) => e.kind === "new" && e.user_id === u.id).at(-1);
       return {
         email: u.email as string, kind: "account" as const, ref: null, at: u.created_at as string, tester: isShopifyTester(u.email),
+        // Ses boutiques, pour les ouvrir depuis Ventes (support).
+        stores: stores.filter((x) => x.user_id === u.id).map((x) => ({ id: x.id as string, name: x.name as string, status: x.status as string })),
         shop: (() => {
           // Boutique tapée à l'inscription (depuis le passage à Stripe), sinon ancienne connexion Shopify.
           if (u.shop_domain) return { domain: u.shop_domain as string, plan: null };

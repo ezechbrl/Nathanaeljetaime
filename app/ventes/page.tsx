@@ -371,6 +371,15 @@ function Dashboard({ s }: { s: OwnerStats }) {
                   <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
                   <span className="block text-xs text-[#8a8a8a]">{signupTime(u.at)}{u.offer && !u.mails?.length && <OfferNote offer={u.offer} />}</span>
                   {!!u.mails?.length && <MailBadges mails={u.mails} />}
+                  {!!u.stores?.length && (
+                    <span className="mt-1 flex flex-wrap gap-1.5">
+                      {u.stores.map((st) => (
+                        <Link key={st.id} href={`/ventes/boutique/${st.id}`} className="inline-flex items-center gap-1 rounded-full bg-[#e8f7f0] px-2 py-0.5 text-[11px] font-medium text-[#0a6e4a] hover:bg-[#d3f0e3]">
+                          Voir « {st.name} » · {st.status === "ready" ? "complète" : st.status === "locked" ? "aperçu" : st.status === "failed" ? "échec" : "en cours"} →
+                        </Link>
+                      ))}
+                    </span>
+                  )}
                   {u.kind === "account" && (
                     <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
                       <ShoppingBag className="h-3 w-3" /> {u.shop ? (u.shop.plan ? `Shopify : ${u.shop.plan}` : u.shop.domain) : "Boutique Shopify non indiquée"}
