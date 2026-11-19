@@ -2,6 +2,7 @@
 
 import { AlertCircle, Check, ImagePlus, Link2, PenLine, Plus, Sparkles, X } from "lucide-react";
 import Link from "next/link";
+import { QuizCard } from "@/components/site/QuizCard";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
@@ -283,7 +284,7 @@ export function CreateStore() {
           );
         })}
       </div>
-      <Link href="/app/quiz" className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full border border-dashed border-[#34f0b0]/40 px-4 py-2 text-sm font-medium text-[#86efc9] transition-colors hover:border-[#34f0b0]/70 hover:bg-[#34f0b0]/10"><Sparkles className="h-4 w-4" /> Pas d'idée de produit ? Fais le quiz</Link>
+      <QuizCard href="/app/quiz" className="mx-auto mt-5" />
       <p className="mt-3 text-center text-xs text-fg-faint">{current.hint}</p>
 
       {paywall && <PaywallDialog draft={paywall} onClose={() => setPaywall(null)} />}

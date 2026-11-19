@@ -88,7 +88,7 @@ export function BeforeAfter() {
         <div className="h-full rounded-[21px] bg-[#05261d]/90 p-3">
           <div className="flex items-center justify-between px-2 pb-3 pt-1">
             <p className="text-[15px] font-semibold">Maintenant · avec Vigenia</p>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2ee6a6]/15 px-3 py-1 text-[12px] font-semibold text-[#a7f3d0]"><Sparkles className="h-3.5 w-3.5" /> 10 minutes</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#2ee6a6]/15 px-3 py-1 text-[12px] font-semibold text-[#a7f3d0]"><Sparkles className="h-3.5 w-3.5" /> 3 minutes</span>
           </div>
           <div className="hidden aspect-video sm:block"><VigeniaLoop name="demo-link" /></div>
           {/* Sur téléphone, la vidéo est déjà en haut de la page : ici, juste les 3 étapes. */}

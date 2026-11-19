@@ -65,4 +65,20 @@ export const SHOWCASE: ShowcaseStore[] = [
     highlights: ["Scène produit créée par l'IA", "Usages concrets en cuisine", "Lot cadeau de 2"],
     image: "/showcase/pincee.jpg",
   },
+  {
+    slug: "nido", name: "Nido", category: "Maison connectée", language: "français",
+    brief: "Station de recharge sans fil 3 en 1 pour téléphone, montre et écouteurs.",
+    headline: "Un seul nid pour tout recharger.", sub: "Téléphone, montre et écouteurs se rechargent ensemble, sans un câble qui traîne.", product: "Station de recharge Nido 3 en 1", price: "59,90 €",
+    palette: { bg: "#fbf6ef", ink: "#2b1e16", accent: "#a85a24", soft: "#f1dfcb" }, font: "serif", layout: "split",
+    highlights: ["Packshot studio créé par l'IA", "Style lifestyle chaleureux", "Bandeaux défilants aux styles variés"],
+    image: "/showcase/nido.jpg",
+  },
+  {
+    slug: "maison-ouate", name: "Maison Ouate", category: "Maroquinerie", language: "français",
+    brief: "Sac doux et bien pensé pour le travail, les courses et le week-end.",
+    headline: "Tout emporter, l'épaule légère.", sub: "Un sac doux et bien pensé pour le travail, les courses et le week-end.", product: "Sac Ouate Quotidien", price: "49,90 €",
+    palette: { bg: "#f7efe4", ink: "#3b2a1e", accent: "#c8553d", soft: "#f0d9c8" }, font: "serif", layout: "center",
+    highlights: ["Packshot sur fond uni créé par l'IA", "Palette douce assortie au produit", "Textes courts et chaleureux"],
+    image: "/showcase/ouate.jpg",
+  },
 ];

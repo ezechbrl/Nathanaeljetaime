@@ -235,7 +235,7 @@ export function TrustRow() {
     <>
     {/* Le prix remis en perspective : ordres de grandeur pour une boutique complète. */}
     <div className="mx-auto mt-6 grid max-w-[640px] grid-cols-3 overflow-hidden rounded-[16px] border border-white/10 text-center">
-      {[["Une agence", "≈ 2 000 €", "et 3 semaines"], ["Un freelance", "≈ 500 €", "et 1 à 2 semaines"], ["Vigenia", "39 €/mois", "et 10 minutes"]].map(([who, price, time], i) => (
+      {[["Une agence", "≈ 2 000 €", "et 3 semaines"], ["Un freelance", "≈ 500 €", "et 1 à 2 semaines"], ["Vigenia", "39 €/mois", "et 3 minutes"]].map(([who, price, time], i) => (
         <div key={who} className={cn("px-2 py-3", i === 2 ? "bg-[#2ee6a6]/12 shadow-[inset_0_0_30px_-10px_rgb(46_230_166/0.5)]" : "bg-black/20", i > 0 && "border-l border-white/10")}>
           <p className={cn("text-[11.5px] font-semibold uppercase tracking-[0.08em]", i === 2 ? "text-[#6ee7b7]" : "text-fg-faint")}>{who}</p>
           <p className={cn("mt-1 whitespace-nowrap text-[16px] font-bold tabular-nums sm:text-[20px]", i === 2 ? "text-white" : "text-fg-muted line-through decoration-[#ef4444]/70")}>{price}</p>

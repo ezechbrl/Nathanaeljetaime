@@ -9,8 +9,8 @@
   --bg-2: 19 59 53;         /* #133b35 */
   --bg-3: 26 72 64;         /* #1a4840 */
   --fg: 238 248 245;
-  --fg-muted: 172 208 199;
-  --fg-faint: 124 164 154;
+  --fg-muted: 208 232 225;  /* plus clair : textes secondaires bien lisibles */
+  --fg-faint: 160 196 186;
   --line: 255 255 255;      /* utilisé avec une opacité faible */
   --accent: 104 230 176;    /* #68e6b0, menthe lisible sur fond sombre */
   --accent-strong: 0 150 110;/* #00966e, boutons */
@@ -70,6 +70,11 @@
     background: linear-gradient(transparent 83%, rgb(var(--brand-leaf) / 0.45) 83%, rgb(var(--brand-leaf) / 0.45) 89%, transparent 89%);
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
+  /* Autres façons de mettre un mot en avant, pour varier (toujours dans les verts Vigenia). */
+  .ink-green { background: linear-gradient(100deg, #d9fbe9 0%, #6ee7b7 45%, #2ee6a6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 600; }
+  .mark-green { color: #fff; background: linear-gradient(transparent 58%, rgb(46 230 166 / 0.38) 58%, rgb(46 230 166 / 0.38) 92%, transparent 92%); padding: 0 0.08em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .serif-white { font-family: var(--font-serif), Georgia, serif; font-style: italic; font-weight: 400; color: #fff; letter-spacing: -0.02em; }
+  .underline-green { text-decoration: underline; text-decoration-color: #2ee6a6; text-decoration-thickness: 0.09em; text-underline-offset: 0.16em; }
   .prose-store p { @apply mb-2; }
   .prose-store h3 { @apply mb-1 mt-3 font-medium; }
   .prose-store ul { @apply mb-2 list-disc pl-5; }
@@ -91,8 +96,15 @@
   transition-delay: var(--reveal-delay, 0ms);
 }
 
+@keyframes quiz-glow { 0%, 100% { opacity: .55; transform: scale(.98); } 50% { opacity: 1; transform: scale(1.02); } }
+/* Titres mot par mot (voir splitWords dans Reveal.tsx). */
+[data-words] .rw { display: inline-block; overflow: hidden; vertical-align: bottom; padding: 0.06em 0.02em 0.12em; margin: -0.06em -0.02em -0.12em; }
+[data-words] .rw > span { display: inline-block; transform: translateY(110%); transition: transform .55s cubic-bezier(.2,.8,.2,1); }
+[data-words="in"] .rw > span { transform: none; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  [data-words] .rw > span { transform: none; }
   [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; animation: none; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
 }

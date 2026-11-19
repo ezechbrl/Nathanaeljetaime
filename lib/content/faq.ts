@@ -7,7 +7,7 @@ export const HOME_FAQ = [
   },
   {
     q: "Ça prend combien de temps ?",
-    a: "Environ 5 à 10 minutes pour la création. Ensuite tu relis, tu ajustes en discutant avec l'IA si tu veux, puis tu télécharges ta boutique et tu l'importes dans Shopify en 2 étapes guidées (environ 2 minutes).",
+    a: "Environ 1 à 3 minutes pour la création. Ensuite tu relis, tu ajustes en discutant avec l'IA si tu veux, puis tu télécharges ta boutique et tu l'importes dans Shopify en 2 étapes guidées (environ 2 minutes).",
   },
   {
     q: "Combien ça me coûte, au total ?",

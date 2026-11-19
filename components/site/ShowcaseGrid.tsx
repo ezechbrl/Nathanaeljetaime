@@ -10,7 +10,7 @@ export function ShowcaseGrid() {
     <section className="py-16">
       <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
         <div className="text-center">
-          <Reveal as="h2" className="text-h2">Un produit, une boutique. <span className="serif-accent">Aucun</span> modèle.</Reveal>
+          <Reveal as="h2" className="text-h2">Un produit, une boutique. <span className="underline-green">Aucun</span> modèle.</Reveal>
           <Reveal delay={80} as="p" className="mx-auto mt-4 max-w-xl text-fg-muted">Chaque boutique part d'un lien ou d'une phrase. Clique pour voir ce que l'IA en a fait.<span className="mt-1 block text-[13px] text-fg-faint sm:hidden">← Fais glisser pour voir les autres →</span></Reveal>
         </div>
         <div className="-mx-4 mt-10 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">

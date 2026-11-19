@@ -25,9 +25,9 @@ export const PLANS: Plan[] = [
     features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
-    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en moins de 10 minutes, sans rien connaître à Shopify.", monthly: 78, yearly: 398,
+    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 78, yearly: 398,
     features: [
-      "Ta boutique prête à vendre en 10 minutes, à partir d'un simple lien",
+      "Ta boutique prête à vendre en 3 minutes, à partir d'un simple lien",
       { text: "Des photos dignes d'une grande marque, créées par l'IA", preview: "photos" },
       { text: "Des textes qui donnent envie d'acheter, écrits pour ton produit", preview: "texts" },
       { text: "Les vrais avis clients du produit, importés et traduits", preview: "reviews" },

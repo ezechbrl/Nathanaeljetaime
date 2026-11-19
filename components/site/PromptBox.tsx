@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
+import { QuizCard } from "./QuizCard";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
 // Mêmes couleurs que les 2 cartes Shopify de la connexion : « Décrire » = vert de « Connecter mon compte
@@ -195,14 +196,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
 
       {/* Pas encore d'idée : quiz en 5 questions, avant la création du compte. */}
       {!value.trim() && (
-        <a href="/quiz" className={cn("group mt-5 flex w-full max-w-xl items-center gap-4 rounded-[20px] border border-[#bef264]/45 bg-[linear-gradient(110deg,rgb(190_242_100/0.18),rgb(52_240_176/0.16),rgb(94_234_212/0.14))] p-3.5 text-left shadow-[0_0_30px_-10px_rgb(190_242_100/0.6)] transition-all hover:-translate-y-0.5 hover:border-[#bef264]/80 sm:p-4", align === "center" && "mx-auto")}>
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[14px] bg-[linear-gradient(160deg,#bef264,#34f0b0)] text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.5)]"><Sparkles className="h-6 w-6" /></span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[16px] font-semibold text-[#ecfccb] sm:text-[17px]">Pas d'idée de produit ?</span>
-            <span className="block text-sm text-[#d9f99d]/80">Fais le quiz en 5 questions : on te trouve un produit et on crée ta boutique.</span>
-          </span>
-          <ArrowUp className="h-5 w-5 shrink-0 rotate-90 text-[#d9f99d] transition-transform group-hover:translate-x-1" />
-        </a>
+        <QuizCard href="/quiz" className={cn("mt-6", align === "center" && "mx-auto")} />
       )}
 
       {mode === "start" && (

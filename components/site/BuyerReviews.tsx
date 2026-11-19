@@ -13,7 +13,7 @@ export function BuyerReviews() {
         <Reveal as="p" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[13px] text-fg-muted">
           <span className="flex gap-0.5">{[0, 1, 2, 3, 4].map((k) => <Star key={k} className="h-3.5 w-3.5 fill-[#f5b301] text-[#f5b301]" />)}</span> Avis importés automatiquement
         </Reveal>
-        <Reveal delay={60} as="h2" className="mt-5 text-h2">Tes clients voient de <span className="serif-accent">vrais</span> avis</Reveal>
+        <Reveal delay={60} as="h2" className="mt-5 text-h2">Tes clients voient de <span className="ink-green">vrais</span> avis</Reveal>
         <Reveal delay={100} as="p" className="mx-auto mt-4 max-w-xl text-fg-muted">Vigenia récupère les avis des acheteurs de ton produit chez le fournisseur, les traduit et les affiche sur ta boutique. Exemples tirés de boutiques créées avec Vigenia.</Reveal>
       </div>
       {/* Bande d'avis qui défile en continu (s'arrête au survol). */}

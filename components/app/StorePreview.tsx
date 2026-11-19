@@ -62,7 +62,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
       io.observe(el);
     });
     return () => { io.disconnect(); els.forEach((el) => el.classList.remove("sp-rv", "sp-in")); };
-  }, [animate, page, store.updatedAt]);
+  }, [animate, page, store.updatedAt, assets.length, device]);
   const [narrow, setNarrow] = useState(false);
   const [shot, setShot] = useState(0);
   const [bundle, setBundle] = useState(0);

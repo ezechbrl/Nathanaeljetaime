@@ -89,7 +89,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
       {left && <div className="mb-6"><OfferBanner left={left} waitlist={waitlist} /></div>}
       {text && !unlockStoreId && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{unlockStoreId ? "Débloque ta boutique" : draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
-      <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 10 minutes.</p>
+      <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 3 minutes.</p>
       <div className="mt-6"><IntervalToggle value={interval} onChange={setPeriod} /></div>
       <div className="mx-auto mt-7 max-w-[760px]">
         <PlanCards

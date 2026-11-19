@@ -18,7 +18,7 @@ export function AuthShell({ title, subtitle, children }: { title: React.ReactNod
       <div className="relative hidden overflow-hidden border-l border-white/[0.06] lg:block">
         <LightRays />
         <div className="absolute inset-0 flex flex-col justify-center px-16">
-          <p className="max-w-md text-h2">Ta vitrine Shopify, prête en <span className="serif-accent">10 minutes</span>.</p>
+          <p className="max-w-md text-h2">Ta vitrine Shopify, prête en <span className="serif-accent">3 minutes</span>.</p>
           {/* Deux vraies boutiques créées par Vigenia (photos produit générées par l'IA). */}
           <div className="relative mt-12 h-[360px]">
             <div className="absolute left-0 top-16 w-[58%] -rotate-3 transition-transform duration-500 hover:rotate-0"><StoreFrame s={SHOWCASE.find((x) => x.slug === "macho")!} phone={false} /></div>

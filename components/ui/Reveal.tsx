@@ -24,6 +24,15 @@ export function Reveal({
   useIsoLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Titres : les mots montent un par un (comme dans les boutiques), dès qu'on arrive dessus.
+    if ((Tag === "h1" || Tag === "h2") && !window.matchMedia("(prefers-reduced-motion: reduce)").matches && !el.dataset.words) {
+      splitWords(el, Math.min(delay, MAX_DELAY));
+      const show = () => { el.dataset.words = "in"; };
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.95) { requestAnimationFrame(() => requestAnimationFrame(show)); return; }
+      const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { show(); io.disconnect(); } }, { rootMargin: "0px 0px 6% 0px", threshold: 0 });
+      io.observe(el);
+      return () => io.disconnect();
+    }
     if (el.getBoundingClientRect().top < window.innerHeight * 0.92) return; // déjà à l'écran : rien à attendre
     el.dataset.reveal = "";
     const io = new IntersectionObserver(
@@ -50,6 +59,44 @@ export function Reveal({
       {children}
     </Tag>
   );
+}
+
+// Découpe le titre en mots (les mots mis en avant restent d'un seul bloc) pour les faire monter un par un.
+function splitWords(el: HTMLElement, base: number) {
+  el.dataset.words = "";
+  el.removeAttribute("data-reveal");
+  let i = 0;
+  const wrap = (node: Node): HTMLSpanElement => {
+    const outer = document.createElement("span");
+    outer.className = "rw";
+    const inner = document.createElement("span");
+    inner.style.transitionDelay = `${base + Math.min(i++, 12) * 45}ms`;
+    inner.appendChild(node);
+    outer.appendChild(inner);
+    return outer;
+  };
+  let last: HTMLSpanElement | null = null; // dernier mot posé (pour y coller « , » ou « ? » sans retour à la ligne)
+  [...el.childNodes].forEach((n) => {
+    if (n.nodeType === Node.TEXT_NODE) {
+      const parts = (n.textContent ?? "").split(/(\s+)/);
+      const frag = document.createDocumentFragment();
+      parts.forEach((p, k) => {
+        if (!p) return;
+        if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(p)); last = null; return; }
+        if (k === 0 && last) { last.firstElementChild!.appendChild(document.createTextNode(p)); return; } // collé au mot d'avant
+        const w = wrap(document.createTextNode(p));
+        frag.appendChild(w);
+        last = w;
+      });
+      el.replaceChild(frag, n);
+    } else if (n.nodeType === Node.ELEMENT_NODE && (n as HTMLElement).tagName !== "BR") {
+      const ph = document.createComment("");
+      el.replaceChild(ph, n);
+      const w = wrap(n);
+      el.replaceChild(w, ph);
+      last = w;
+    } else last = null;
+  });
 }
 
 // Titre qui apparaît mot par mot.

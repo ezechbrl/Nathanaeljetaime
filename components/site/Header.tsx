@@ -52,7 +52,7 @@ export function Header() {
 
         <nav aria-label="Navigation principale" className="hidden items-center gap-2 lg:flex">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className={cn("rounded-full border px-4 py-2 text-[14.5px] font-medium backdrop-blur transition-all", active(n.href) ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_-2px_rgb(46_230_166/0.45)]" : "border-white/12 bg-white/[0.04] text-fg/85 hover:border-[#2ee6a6]/40 hover:text-white")}>
+            <Link key={n.href} href={n.href} className={cn("rounded-full border px-4 py-2 text-[14.5px] font-medium backdrop-blur transition-all", active(n.href) ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_-2px_rgb(46_230_166/0.45)]" : "border-white/12 bg-white/[0.04] text-white hover:border-[#2ee6a6]/40")}>
               {n.label}
             </Link>
           ))}

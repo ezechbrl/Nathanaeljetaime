@@ -25,7 +25,7 @@ export default function HomePage() {
       <Reviews />
       <div className="hidden sm:block"><FinalCta /></div>
       <FaqSection
-        title={<>Les questions qu'on nous <span className="serif-accent">pose vraiment</span></>}
+        title={<>Les questions qu'on nous <span className="serif-white">pose vraiment</span></>}
         subtitle="Prix, Shopify, résultat : on répond franchement."
         items={HOME_FAQ.slice(0, 5)}
         mobileCount={3}

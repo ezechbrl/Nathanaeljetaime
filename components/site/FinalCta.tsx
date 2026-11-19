@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/Section";
 import { CTA } from "@/lib/launch";
 
 // Dernier appel : la promesse et un seul bouton (le générateur est déjà en haut de page).
-export function FinalCta({ title = <>Ta boutique Shopify, prête en <span className="serif-accent">10 minutes</span>.</> }: { title?: React.ReactNode }) {
+export function FinalCta({ title = <>Ta boutique Shopify, prête en <span className="serif-accent">3 minutes</span>.</> }: { title?: React.ReactNode }) {
   return (
     <section className="py-20">
       <Container>
@@ -16,7 +16,7 @@ export function FinalCta({ title = <>Ta boutique Shopify, prête en <span classN
             <div>
               <Reveal as="h2" className="text-h1">{title}</Reveal>
               <Reveal delay={80} as="p" className="mt-5 max-w-md text-[17px] leading-relaxed text-fg-muted">
-                Colle le lien de ton produit : en 10 minutes, ta boutique est prête, avec photos, textes et avis. Tu relis, tu publies, tu vends.
+                Colle le lien de ton produit : en 3 minutes, ta boutique est prête, avec photos, textes et avis. Tu relis, tu publies, tu vends.
               </Reveal>
               <Reveal delay={140} className="mt-6">
                 <ul className="space-y-2 text-sm text-fg-muted">

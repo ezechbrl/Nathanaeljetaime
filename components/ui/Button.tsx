@@ -11,7 +11,7 @@ const variants: Record<Variant, string> = {
   primary:
     "border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_0_0_1px_rgb(0_0_0/0.25),0_8px_24px_-8px_rgb(0_166_118/0.5)] hover:border-accent/70 hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_0_0_1px_rgb(0_0_0/0.25),0_10px_32px_-8px_rgb(0_166_118/0.65)]",
   secondary: "border border-white/10 bg-white/[0.04] text-fg hover:border-white/20 hover:bg-white/[0.07]",
-  ghost: "text-fg-muted hover:bg-white/[0.05] hover:text-fg",
+  ghost: "text-white hover:bg-white/[0.06]",
   danger: "border border-bad/30 bg-bad/10 text-bad hover:bg-bad/15",
 };
 

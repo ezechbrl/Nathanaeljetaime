@@ -14,7 +14,7 @@ const price = (id: string, k: "monthly" | "yearly", base: number) => (isWaitlist
 // Les prix sur l'accueil : un bandeau court pour l'offre, puis les deux offres en version compacte
 // (sur téléphone, seulement le Starter, avec un lien vers le Pro).
 const KEY_FEATURES: Record<string, string[]> = {
-  pro: ["Ta boutique complète en 10 minutes", "Photos pro et textes créés par l'IA", "Vrais avis clients importés et traduits"],
+  pro: ["Ta boutique complète en 3 minutes", "Photos pro et textes créés par l'IA", "Vrais avis clients importés et traduits"],
   agency: ["3 boutiques Shopify connectées", "2× plus de crédit IA", "Optimisation chaque jour"],
 };
 
@@ -22,7 +22,7 @@ export function PriceTeaser() {
   return (
     <section id="tarifs" className="py-16 sm:py-20">
       <div className="mx-auto max-w-[860px] px-4 sm:px-6">
-        <Reveal as="h2" className="text-center text-h2">Un prix <span className="serif-accent">simple</span></Reveal>
+        <Reveal as="h2" className="text-center text-h2">Un prix <span className="serif-white">simple</span></Reveal>
         <Reveal delay={60} className="mx-auto mt-6 flex max-w-[640px] items-center justify-between gap-3 rounded-[16px] border border-[#2ee6a6]/45 bg-[linear-gradient(90deg,rgb(16_176_127/0.28),rgb(163_230_53/0.14))] px-4 py-3 shadow-[0_0_36px_-14px_rgb(46_230_166/0.7)] sm:px-5">
           {isWaitlist ? (
             <>
