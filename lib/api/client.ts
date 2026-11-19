@@ -153,7 +153,7 @@ export async function getOwnerStats() {
   return s;
 }
 export const getOwnerStore = (id: string) =>
-  request<{ store: Store; email: string | null; assets: Asset[]; jobs: { kind: string; status: string; error: string | null; created_at: string; updated_at: string }[] }>(`/api/owner/stores/${id}`, { headers: ownerHeaders() });
+  request<{ store: Store; email: string | null; assets: Asset[]; jobs: { kind: string; status: string; error: string | null; created_at: string; finished_at: string | null }[] }>(`/api/owner/stores/${id}`, { headers: ownerHeaders() });
 export const savePushSubscription = (sub: PushSubscriptionJSON) => request<void>("/api/owner/push", { method: "POST", json: sub, headers: ownerHeaders() });
 
 // Affiliation

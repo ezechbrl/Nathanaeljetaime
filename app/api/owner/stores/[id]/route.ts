@@ -13,12 +13,12 @@ export const GET = route<{ params: Promise<{ id: string }> }>(async (_req, { par
   if (!row) throw notFound();
   const [assets, jobs] = await Promise.all([
     db().from("assets").select("*").eq("store_id", id).order("created_at"),
-    db().from("jobs").select("kind, status, error, created_at, updated_at").eq("store_id", id).order("created_at"),
+    db().from("jobs").select("kind, status, error, created_at, finished_at").eq("store_id", id).order("created_at"),
   ]);
   return json({
     store: toStore(row as never),
     email: row.users?.email ?? null,
     assets: (must(assets) as Record<string, any>[]).map(toAsset),
-    jobs: must(jobs) as { kind: string; status: string; error: string | null; created_at: string; updated_at: string }[],
+    jobs: must(jobs) as { kind: string; status: string; error: string | null; created_at: string; finished_at: string | null }[],
   });
 });

@@ -371,7 +371,8 @@ function Dashboard({ s }: { s: OwnerStats }) {
                   <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
                   <span className="block text-xs text-[#8a8a8a]">{signupTime(u.at)}{u.offer && !u.mails?.length && <OfferNote offer={u.offer} />}</span>
                   {!!u.mails?.length && <MailBadges mails={u.mails} />}
-                  {!!u.stores?.length && (
+                  {/* Boutiques visibles seulement pour les abonnés et ceux dont l'offre de 24 h court encore. */}
+                  {!!u.stores?.length && u.offer && (u.offer.subscribedAt || new Date(u.offer.endsAt).getTime() > now) && (
                     <span className="mt-1 flex flex-wrap gap-1.5">
                       {u.stores.map((st) => (
                         <Link key={st.id} href={`/ventes/boutique/${st.id}`} className="inline-flex items-center gap-1 rounded-full bg-[#e8f7f0] px-2 py-0.5 text-[11px] font-medium text-[#0a6e4a] hover:bg-[#d3f0e3]">
