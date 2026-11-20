@@ -6,7 +6,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SHOWCASE } from "@/lib/content/showcase";
 import { StoreFrame } from "./StoreFrame";
 
-const STORE = SHOWCASE.find((s) => s.slug === "kordo") ?? SHOWCASE[0];
+const STORE = SHOWCASE.find((s) => s.slug === "silencio") ?? SHOWCASE[0];
 
 // La page brute d'un fournisseur (dessinée, aucun vrai site copié) : ce que le client colle dans Vigenia.
 function SupplierPage() {
@@ -21,11 +21,11 @@ function SupplierPage() {
           <span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[6px] text-white">HOT SALE</span>
         </div>
         <div className="text-[7.5px] leading-tight">
-          <p className="font-bold">2026 NEW Hot Sale 4 in 1 Keychain Cable Fast Charging USB C Type C Data Line Portable Mini For Phone Tablet</p>
-          <p className="mt-1.5 text-[11px] font-bold text-[#e62e04]">€3,47 <span className="text-[7px] font-normal text-black/40 line-through">€12,85</span></p>
+          <p className="font-bold">2026 NEW Gaming Headset Wired Over Ear Headphones With Mic RGB Light Noise Cancelling For PC PS4 PS5 Xbox Laptop</p>
+          <p className="mt-1.5 text-[11px] font-bold text-[#e62e04]">€11,92 <span className="text-[7px] font-normal text-black/40 line-through">€44,15</span></p>
           <p className="mt-1 text-black/50">4.6 ★ | 2000+ sold | Free shipping over €10</p>
           <div className="mt-1.5 flex gap-1">{["Black", "White", "Pink", "Blue"].map((c) => <span key={c} className="rounded border border-black/15 px-1 text-[6px]">{c}</span>)}</div>
-          <p className="mt-1.5 text-black/45">Specification: Material: TPE+Zinc alloy. Length: 0.15m. Package include: 1pc cable. Note: due to the light and screen difference, the item's color may be slightly different…</p>
+          <p className="mt-1.5 text-black/45">Specification: Driver: 50mm. Cable length: 2.1m. Package include: 1pc headset, 1pc adapter. Note: due to the light and screen difference, the item's color may be slightly different…</p>
           <span className="mt-2 inline-block rounded bg-[#e62e04] px-3 py-1 text-[7px] font-bold text-white">Buy Now</span>
         </div>
       </div>
