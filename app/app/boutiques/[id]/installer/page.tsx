@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Check, ExternalLink, Lock, PartyPopper, Store } from "lucide-react";
 import { InstallAnimation } from "@/components/app/InstallAnimation";
+import { LegalTemplates } from "@/components/app/LegalTemplates";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
@@ -175,6 +176,7 @@ export default function InstallPage() {
             ))}
           </ul>
         </section>
+        <LegalTemplates shopName={store.name} policiesUrl={links?.policies ?? `${admin}/settings/legal`} />
         </>
       )}
 
