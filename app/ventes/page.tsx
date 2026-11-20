@@ -359,6 +359,27 @@ function Dashboard({ s }: { s: OwnerStats }) {
         <Metric icon={UserPlus} color="blue" label="Comptes" value={String(s.totals.accounts)} hint={`${pct(s.conversion)} devenus payants`} />
       </div>
 
+      {/* Clients qui paient : toujours visibles, avec leurs boutiques. */}
+      {!!s.customers?.length && (
+        <Card>
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><Wallet className="h-3.5 w-3.5" /></span>Tes clients</h2>
+          <ul className="mt-1 divide-y divide-[#eee] text-sm">
+            {s.customers.map((c) => (
+              <li key={c.email} className="py-2.5">
+                <span className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate font-medium">{c.email}</span><span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", TONES.green)}>{c.plan === "agency" ? "Pro" : "Starter"}</span></span>
+                <span className="mt-1.5 flex flex-wrap gap-1.5">
+                  {c.stores.length ? c.stores.map((st) => (
+                    <Link key={st.id} href={`/ventes/boutique/${st.id}`} className="inline-flex items-center gap-1 rounded-full bg-[#e8f7f0] px-2 py-0.5 text-[11px] font-medium text-[#0a6e4a] hover:bg-[#d3f0e3]">
+                      Voir « {st.name} » · {st.status === "ready" ? "complète" : st.status === "locked" ? "aperçu" : st.status === "failed" ? "échec" : "en cours"} →
+                    </Link>
+                  )) : <span className="text-xs text-[#8a8a8a]">Aucune boutique pour l'instant</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
       {/* Derniers inscrits juste sous les chiffres : les 5 plus récents, avec l'heure exacte d'inscription */}
       <Card>
         <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Derniers inscrits</h2>

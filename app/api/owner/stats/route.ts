@@ -210,8 +210,19 @@ export const GET = route(async () => {
     recent: impact.slice(0, 5).map((a) => ({ label: trackerLabel(a.tracker), state: a.state as string | null, payout: Number(a.payout_cents), at: a.event_at as string | null })),
   };
 
+  // Clients qui paient : leurs boutiques, pour les ouvrir depuis Ventes (support), même s'ils sont anciens.
+  const customerStores = active.length
+    ? (must(await db().from("stores").select("id, name, status, user_id").in("user_id", active.map((a) => a.user_id)).order("created_at", { ascending: false })) as Record<string, any>[])
+    : [];
+  const customers = active.map((a) => ({
+    email: (users.find((u) => u.id === a.user_id)?.email as string | undefined) ?? "",
+    plan: a.plan as string,
+    stores: customerStores.filter((x) => x.user_id === a.user_id).map((x) => ({ id: x.id as string, name: x.name as string, status: x.status as string })),
+  }));
+
   return json({
     shopifyAffiliation,
+    customers,
     deviceToken: owner.newDeviceToken ?? null,
     mrr,
     arr: mrr * 12,
