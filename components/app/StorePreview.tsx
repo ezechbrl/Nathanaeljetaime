@@ -77,6 +77,9 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
   const plan = store.plan;
   if (!plan) return null;
   const { primary, accent, background } = store.theme.colors;
+  // Fond du haut de page sur téléphone : la plus foncée des deux couleurs (texte blanc toujours lisible).
+  const lum = (h: string) => { const x = h.replace("#", "").padEnd(6, "0"); return 0.299 * parseInt(x.slice(0, 2), 16) + 0.587 * parseInt(x.slice(2, 4), 16) + 0.114 * parseInt(x.slice(4, 6), 16); };
+  const heroDark = lum(primary) < lum(background) ? primary : background;
   const layout = store.theme.heroLayout ?? "left";
   const tint = mix(background, accent, 0.14);
   const serif = SERIF.test(store.theme.headingFont);
@@ -263,7 +266,22 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
       {page === "accueil" && orderFor(store.theme.style).map((key) => {
         const node = {
           hero: (
-            <>{imgs.hero ? (
+            <>{imgs.hero && mobile ? (
+            // Téléphone : la photo en entier en haut (le produit bien visible), le texte en dessous.
+            <section className="overflow-hidden text-white" style={{ background: heroDark }}>
+              <div className="relative aspect-[4/3.4] w-full">
+                <img decoding="async" src={imgs.hero.url} alt="" className="h-full w-full object-cover" style={{ objectPosition: layout === "right" ? "28% center" : layout === "center" ? "50% center" : "72% center" }} />
+                <div className="absolute inset-0" style={{ background: `linear-gradient(0deg, ${heroDark} 0%, transparent 35%)` }} />
+              </div>
+              <div className={cn("relative -mt-6 pb-10", pad)}>
+                <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs"><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
+                <h2 className={cn("text-[2.1rem] leading-[1.04]", H)}>{home.heroTitle}</h2>
+                <p className="mt-3 text-[15px] opacity-85">{home.heroSubtitle}</p>
+                <div className="mt-6"><Btn light>{home.ctaLabel}</Btn></div>
+                <div className="mt-5 flex flex-col gap-2 text-[13px] opacity-90">{[shipOffer, returnOffer].filter(Boolean).map((t) => <span key={t} className="flex items-start gap-1.5"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0" />{t}</span>)}</div>
+              </div>
+            </section>
+          ) : imgs.hero ? (
             <section className="relative flex min-h-[460px] items-end overflow-hidden text-white sm:items-center" style={{ minHeight: mobile ? 520 : 520 }}>
               <img decoding="async" src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : layout === "center" ? "rgba(0,0,0,.48)" : `linear-gradient(${layout === "right" ? 270 : 90}deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)` }} />

@@ -28,8 +28,10 @@ const LAYOUT = `<!doctype html>
     <link href="https://fonts.googleapis.com/css2?family={{ heading_family }}:wght@500;600;700&display=swap" rel="stylesheet">
   {%- endif -%}
   <link href="https://fonts.googleapis.com/css2?family={{ body_family }}:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {%- assign lum_p = settings.color_primary | color_brightness -%}{%- assign lum_b = settings.color_background | color_brightness -%}
   <style>
     :root {
+      --c-dark: {% if lum_p < lum_b %}{{ settings.color_primary }}{% else %}{{ settings.color_background }}{% endif %};
       --c-primary: {{ settings.color_primary }};
       --c-accent: {{ settings.color_accent }};
       --c-on-accent: {{ settings.color_on_accent }};
@@ -157,7 +159,7 @@ p{margin:0}
 .hero--split .media{aspect-ratio:4/4.4}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);font-size:13px;margin-bottom:22px;border:1px solid rgba(255,255,255,.22)}
 .hero--split .pill{background:color-mix(in srgb,var(--c-accent) 14%,transparent);border-color:color-mix(in srgb,var(--c-accent) 30%,transparent)}
-@media (max-width:860px){.hero{display:block;min-height:auto;padding:0 0 52px;background:var(--c-primary)}.hero__bg{position:relative;inset:auto;aspect-ratio:4/3.3}.hero__bg img{object-position:74% center;transform:none}.hero__bg::after{background:linear-gradient(0deg,var(--c-primary) 0%,transparent 38%)}.hero .wrap{margin-top:-36px}.hero h1{font-size:clamp(34px,9.5vw,44px)}.hero__sub{font-size:17px;margin-top:14px}.hero .btn{margin-top:24px}.hero__trust{margin-top:22px;font-size:14px}.hero--split .hero__grid{grid-template-columns:1fr;gap:32px}.hero--split{padding:48px 0}}
+@media (max-width:860px){.hero{display:block;min-height:auto;padding:0 0 52px;background:var(--c-dark,var(--c-primary))}.hero__bg{position:relative;inset:auto;aspect-ratio:4/3.3}.hero__bg img{object-position:72% center;transform:none}.hero--right .hero__bg img{object-position:28% center}.hero--center .hero__bg img{object-position:50% center}.hero__bg::after{background:linear-gradient(0deg,var(--c-dark,var(--c-primary)) 0%,transparent 38%)}.hero .wrap{margin-top:-36px}.hero h1{font-size:clamp(34px,9.5vw,44px)}.hero__sub{font-size:17px;margin-top:14px}.hero .btn{margin-top:24px}.hero__trust{margin-top:22px;font-size:14px}.hero--split .hero__grid{grid-template-columns:1fr;gap:32px}.hero--split{padding:48px 0}}
 .sec.marquee{padding:20px 0;overflow:hidden;border-block:1px solid color-mix(in srgb,var(--fgc) 10%,transparent)}
 .marquee__track{display:flex;width:max-content;animation:mq var(--dur,30s) linear infinite}
 .marquee--right .marquee__track{animation-direction:reverse}
