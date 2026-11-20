@@ -67,10 +67,10 @@ export const HomeBaseSchema = z.object({
   });
 
 export const ProductBaseSchema = z.object({
-    title: z.string(),
+    title: z.string().describe("OBLIGATOIRE. Vrai nom commercial du produit, 2 à 6 mots, ex. « Canapé Nido 3 places »"),
     subtitle: z.string(),
-    price: z.string().describe("Prix conseillé, nombre décimal sans devise, ex. 29.90"),
-    compareAtPrice: z.string().describe("Prix barré conseillé, ou chaîne vide"),
+    price: z.string().describe("OBLIGATOIRE. Prix de vente conseillé, réaliste pour ce produit sur le marché français, nombre décimal sans devise, ex. 29.90 ou 649.00"),
+    compareAtPrice: z.string().describe("Prix barré conseillé (nombre décimal plus élevé que le prix), ou chaîne vide"),
     descriptionHtml: z.string().describe("Description produit courte en HTML simple (p, ul, li, strong) : 2-3 phrases puis 3 à 5 puces"),
     bulletPoints: z.array(z.string()),
     seoTitle: z.string(),

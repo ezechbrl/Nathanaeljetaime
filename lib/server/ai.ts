@@ -42,7 +42,8 @@ const HUMAN_VOICE = `Écris comme une vraie personne qui a créé cette marque, 
 - Mots et tournures interdits : « Découvrez », « Plongez », « Sublimez », « Révolutionnez », « Élevez », « Libérez », « ultime », « incontournable », « indispensable », « révolutionnaire », « l'alliance parfaite », « l'élégance intemporelle », « conçu pour sublimer », « au quotidien » répété, « que vous soyez… ou… », « bien plus qu'un simple… », « n'attendez plus », « offrez-vous ».
 - Pas de tiret long (—), pas d'émojis dans les textes de la boutique, pas de points d'exclamation en série.
 - Les titres sont des phrases qu'une personne dirait vraiment (« Le sac qu'on ne quitte plus »), pas des slogans creux.
-- La page « À propos » parle simplement de pourquoi la marque existe et pour qui, sans inventer d'histoire, de date, de prénom ni de chiffre.`;
+- La page « À propos » parle simplement de pourquoi la marque existe et pour qui, sans inventer d'histoire, de date ni de prénom.
+- Le nom du produit et son prix de vente sont toujours remplis (le prix est une estimation réaliste, le marchand pourra le changer).`;
 
 const BASE_RULES = `Règles :
 - Écris tout le contenu destiné aux clients dans la langue demandée, directement (pas de traduction mot à mot).
@@ -91,9 +92,10 @@ const data = (label: string, text: string) => `<donnees type="${label}">\n${text
 const STYLE_GUIDE = `Style de boutique (storeStyle), à choisir selon la niche :
 - premium : beauté, soin, bijoux, parfum, déco haut de gamme. Calme, raffiné, beaucoup d'espace. Palette douce et chic : background clair légèrement teinté (crème, rose poudré, sauge très pâle, sable, gris perle), primary très foncé et chaud (brun noir, prune, vert nuit, bleu nuit), accent élégant et assez soutenu pour les boutons (terracotta, vieux rose, bordeaux, bronze, émeraude, bleu canard).
 - direct : gadget, produit qui résout un problème précis, objet malin. Énergique, démonstratif, objections levées. Palette franche : background blanc ou presque, primary quasi-noir, accent très vif (orange, rouge, bleu électrique, vert vif, fuchsia, violet).
-- lifestyle : mode, maison, cuisine, animaux, accessoires du quotidien. Chaleureux et aspirationnel. Palette chaude et actuelle : background clair et chaud (ivoire, pêche pâle, lin, bleu ciel pâle), primary foncé (brun, marine, olive foncé), accent vivant (corail, moutarde, bleu profond, rouge brique, vert sauge foncé).
+- lifestyle : mode, maison, cuisine, animaux, accessoires du quotidien. Chaleureux et aspirationnel. Palette actuelle et contrastée : background soit sombre et chaud (brun très foncé, vert forêt, bleu nuit), soit clair et net (blanc cassé), primary très contrasté avec le fond, accent vivant (orange, corail, moutarde, rouge brique, bleu profond).
 - tech : électronique, sport, fitness, gaming, outdoor, auto. Sombre, dynamique, contrasté. Palette sombre : background quasi-noir légèrement teinté (ex. #0b0d12, #0a0f0d, #120b16), primary blanc cassé (texte), accent néon lumineux (vert citron, cyan, orange vif, violet électrique, rose néon, jaune).
-Couleurs harmonieuses, actuelles et différentes d'une boutique à l'autre : jamais de couleurs ternes ou délavées, et toujours un texte bien lisible sur le fond.`;
+Couleurs harmonieuses, actuelles et différentes d'une boutique à l'autre : jamais de couleurs ternes ou délavées, et toujours un texte bien lisible sur le fond.
+Priorité au contraste, façon marque moderne : un fond franc (presque noir, anthracite, bleu nuit, vert forêt profond, ou au contraire blanc net) et UNE couleur vive pour l'accent (jaune, orange, citron vert, rouge, bleu électrique, corail). Exemples qui marchent : noir + jaune, noir + orange, anthracite + citron vert, bleu nuit + corail, blanc + noir + rouge. Évite les fonds beiges ou crème fades et les palettes pastel sans contraste. Moderne mais pas criard : l'accent sert aux boutons et aux détails, pas partout.`;
 const HUES = ["corail", "bleu électrique", "émeraude", "violet", "terracotta", "turquoise", "fuchsia", "orange", "bleu canard", "rouge cerise", "jaune moutarde", "vert citron", "bordeaux", "bleu ciel profond", "rose", "cuivre"];
 // Teinte suggérée au hasard : deux boutiques d'une même niche n'ont pas la même palette.
 const hueHint = () => `Pour varier, oriente l'accent vers la famille « ${HUES[Math.floor(Math.random() * HUES.length)]} » si elle convient au produit et au style ; sinon choisis mieux.`;
@@ -192,6 +194,20 @@ export async function generatePages(input: { brief: string; language: string; st
     call(HomeExtrasSchema, `Écris les sections visuelles de l'accueil : un bandeau de 4 à 6 atouts de 2 à 4 mots avec icônes, un titre et un sous-titre courts pour ce bandeau, un sur-titre et un titre pour la section bénéfices avec 3 icônes, une section qui montre le produit utilisé par 3 personnes différentes dans 3 contextes différents propres à la niche (ex. pour un produit de sport : une personne en salle de gym, une autre au tennis, une autre en course à pied ; profils variés en âge, genre et style ; un titre de section, puis pour chaque contexte un titre de 2 à 4 mots, une phrase courte et une scène photo en anglais), une comparaison honnête avec l'alternative habituelle (catégorie générique, jamais une marque ; lignes de 2 à 6 mots), un appel final court et 2 à 3 messages d'annonce courts.`),
     call(ProductExtrasSchema, `Écris les compléments de la fiche produit : 3 points forts de 2 à 3 mots avec icônes, 3 rubriques dépliables brèves (matières ou composition, utilisation ou entretien, livraison et retours), une garantie en une phrase, et 1 à 3 offres par quantité (la première = 1 unité à 0 %, remises réalistes de 5 à 25 % pour les lots, cohérentes avec les offres de la stratégie). Puis la direction artistique (visual) : description visuelle précise du produit et univers photo, en anglais, pour des photos cohérentes et esthétiques.`),
   ]);
+  // Nom et prix toujours présents : si l'IA a laissé un champ vide ou un « x », on les redemande seuls.
+  const okPrice = (p: string) => /^\d{1,6}([.,]\d{1,2})?$/.test(p.trim()) && parseFloat(p.replace(",", ".")) > 0;
+  const okTitle = (t: string) => t.trim().length >= 3 && /[a-zà-ÿ]{3}/i.test(t);
+  if (!okPrice(core.product.price) || !okTitle(core.product.title)) {
+    const fix = await structured({
+      schema: z.object({ title: z.string(), price: z.string() }),
+      effort: "low", userId: input.userId, maxTokens: 800,
+      system: `Donne le vrai nom commercial du produit (2 à 6 mots, sans marque déposée) et un prix de vente réaliste sur le marché français, en nombre décimal sans devise (ex. 39.90). Réponds toujours, sans laisser de champ vide.\n\n${BASE_RULES}`,
+      user,
+    });
+    if (!okTitle(core.product.title)) core.product.title = fix.title.trim();
+    if (!okPrice(core.product.price)) core.product.price = fix.price.trim().replace(",", ".");
+  }
+  if (core.product.compareAtPrice && (!okPrice(core.product.compareAtPrice) || parseFloat(core.product.compareAtPrice.replace(",", ".")) <= parseFloat(core.product.price.replace(",", ".")))) core.product.compareAtPrice = "";
   const pages = {
     homepage: { ...core.homepage, ...homeExtras.homepage },
     product: { ...core.product, ...productExtras.product },
