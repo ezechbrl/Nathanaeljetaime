@@ -81,4 +81,12 @@ export const SHOWCASE: ShowcaseStore[] = [
     highlights: ["Packshot sur fond uni créé par l'IA", "Palette douce assortie au produit", "Textes courts et chaleureux"],
     image: "/showcase/ouate.jpg",
   },
+  {
+    slug: "velaro", name: "Vélaro", category: "Sport", language: "français",
+    brief: "Vélo de triathlon aérodynamique, livré pré-monté, avec une aide au choix de la taille.",
+    headline: "Passez enfin au vrai vélo de triathlon.", sub: "Aérodynamique, livré pré-monté, avec une aide au choix de taille.", product: "Vélo de triathlon Vélaro Aéro", price: "2 490 €",
+    palette: { bg: "#0c0d10", ink: "#f2f0ea", accent: "#f2c230", soft: "#1c1e24" }, font: "sans", layout: "split",
+    highlights: ["Style sport et tech, fond sombre", "Photos studio créées par l'IA", "Aide au choix de la taille"],
+    image: "/showcase/velaro.jpg",
+  },
 ];
