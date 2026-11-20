@@ -220,9 +220,14 @@ export const GET = route(async () => {
     stores: customerStores.filter((x) => x.user_id === a.user_id).map((x) => ({ id: x.id as string, name: x.name as string, status: x.status as string })),
   }));
 
+  // Réponses au questionnaire de départ (les 10 dernières).
+  const departures = ((await db().from("cancel_feedback").select("email, reason, wish, details, created_at").order("created_at", { ascending: false }).limit(10)).data ?? [])
+    .map((d) => ({ email: d.email as string, reason: d.reason as string | null, wish: d.wish as string | null, details: d.details as string | null, at: d.created_at as string }));
+
   return json({
     shopifyAffiliation,
     customers,
+    departures,
     deviceToken: owner.newDeviceToken ?? null,
     mrr,
     arr: mrr * 12,

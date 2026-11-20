@@ -191,6 +191,7 @@ export type OwnerStats = {
   arr: number;
   subscribers: { total: number; starter: number; pro: number };
   customers?: { email: string; plan: string; stores: { id: string; name: string; status: string }[] }[];
+  departures?: { email: string; reason: string | null; wish: string | null; details: string | null; at: string }[];
   arpu: number; // revenu mensuel moyen par abonné (centimes)
   churn: number; // part des abonnés partis sur 30 jours (0 à 1)
   conversion: number; // abonnés payants / comptes créés (0 à 1)

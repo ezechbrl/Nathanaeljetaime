@@ -136,7 +136,7 @@ export const logCheckoutOpened = (plan: "pro" | "agency", interval: "month" | "y
   void fetch("/api/billing/checkout", { method: "POST", body: payload, headers: { "content-type": "application/json" }, keepalive: true }).catch(() => {});
 };
 export const openBillingPortal = () => (live ? request<{ url: string }>("/api/billing/portal", { method: "POST" }) : Promise.resolve({ url: "/app/abonnement" }));
-export const cancelSubscription = () => (live ? request<void>("/api/billing/cancel", { method: "POST" }) : mock.ok());
+export const cancelSubscription = (feedback: { reason?: string; wish?: string; details?: string } = {}) => (live ? request<void>("/api/billing/cancel", { method: "POST", json: feedback }) : mock.ok());
 // App « Ventes » : clé de l'appareil du fondateur (gardée sur le téléphone) pour ne jamais se reconnecter.
 const DEVICE_KEY = "vg-device";
 export const ownerHeaders = (): Record<string, string> => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { CANCEL_REASONS, CANCEL_WISHES, cancelLabel } from "@/lib/content/cancel";
 import {
   AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Percent, Receipt, RefreshCw,
   ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
@@ -374,6 +375,22 @@ function Dashboard({ s }: { s: OwnerStats }) {
                     </Link>
                   )) : <span className="text-xs text-[#8a8a8a]">Aucune boutique pour l'instant</span>}
                 </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {/* Pourquoi des clients arrêtent : réponses au petit questionnaire de départ. */}
+      {!!s.departures?.length && (
+        <Card>
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Pourquoi ils arrêtent</h2>
+          <ul className="mt-1 divide-y divide-[#eee] text-sm">
+            {s.departures.map((d) => (
+              <li key={d.email + d.at} className="py-2.5">
+                <span className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate font-medium">{d.email}</span><span className="text-xs text-[#8a8a8a]">{signupTime(d.at)}</span></span>
+                <span className="mt-1 block text-[13px]">{cancelLabel(CANCEL_REASONS, d.reason) || "Pas de raison donnée"}{d.wish ? ` · aurait aimé : ${cancelLabel(CANCEL_WISHES, d.wish)}` : ""}</span>
+                {d.details && <span className="mt-0.5 block text-xs text-[#555]">« {d.details} »</span>}
               </li>
             ))}
           </ul>

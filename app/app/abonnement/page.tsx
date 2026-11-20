@@ -7,6 +7,7 @@ import { UNLOCK_KEY } from "@/components/app/Paywall";
 import { useApp } from "@/components/app/AppContext";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Paywall } from "@/components/app/Paywall";
+import { CancelSurvey } from "@/components/app/CancelSurvey";
 import { Button, Spinner } from "@/components/ui/Button";
 import { Skeleton, UsagePercent } from "@/components/ui/Feedback";
 import { useToast } from "@/components/ui/Toast";
@@ -37,10 +38,10 @@ function Billing() {
 
   const [changing, setChanging] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
-  async function cancel() {
+  async function cancel(feedback: { reason?: string; wish?: string; details?: string } = {}) {
     setBusy("cancel");
     try {
-      await api.cancelSubscription();
+      await api.cancelSubscription(feedback);
       toast("Abonnement arrêté. Tout ce qui a été créé reste dans ta boutique.");
       refresh();
       billing.reload?.();
@@ -119,17 +120,13 @@ function Billing() {
           <h2 className="text-lg tracking-tight">{gifted ? "Changer d'offre" : "Changer ou arrêter mon abonnement"}</h2>
           <p className="mt-2 text-sm text-fg-muted">{gifted
             ? "Ton accès est offert. Tu peux quand même choisir une offre, payée par carte bancaire."
-            : "Ton abonnement est payé par carte bancaire. Tes factures, ta carte et ta résiliation sont dans ton espace de paiement sécurisé (Stripe). Si tu arrêtes, tout ce que tu as téléchargé reste à toi."}</p>
+            : "Ton abonnement est payé par carte bancaire. Tes factures et ta carte sont dans ton espace de paiement sécurisé (Stripe). Si tu arrêtes, tout ce que tu as téléchargé reste à toi."}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => setChanging((v) => !v)}>Changer d'offre</Button>
             {!gifted && <><Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Mes factures et ma carte</Button>
-            {confirmCancel ? (
-              <span className="flex items-center gap-2 text-sm">Arrêter à la fin de la période payée ?
-                <Button variant="danger" size="sm" onClick={cancel} disabled={busy === "cancel"}>{busy === "cancel" ? <Spinner /> : "Oui, arrêter"}</Button>
-                <Button variant="ghost" size="sm" onClick={() => setConfirmCancel(false)}>Annuler</Button>
-              </span>
-            ) : <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Arrêter mon abonnement</Button>}</>}
+            {!confirmCancel && !sub.cancelAtPeriodEnd && <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Arrêter mon abonnement</Button>}</>}
           </div>
+          {confirmCancel && !gifted && <CancelSurvey busy={busy === "cancel"} onConfirm={cancel} onKeep={() => setConfirmCancel(false)} />}
         </section>}
         {changing && <Paywall initialInterval={sub?.interval === "year" ? "year" : "month"} />}
       </div>
