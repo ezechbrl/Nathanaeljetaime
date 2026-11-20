@@ -1,4 +1,5 @@
 import "server-only";
+import { CANCEL_REASONS, cancelLabel } from "@/lib/content/cancel";
 import Stripe from "stripe";
 import type { Invoice, PlanId, Subscription } from "@/lib/api/types";
 import { formatMoney } from "@/lib/format";
@@ -20,9 +21,9 @@ const NAMES: Record<PaidPlan, string> = { pro: "Vigenia Starter", agency: "Vigen
 let client: Stripe | null = null;
 export const stripe = () => (client ??= new Stripe(env.stripeKey()));
 
-type SubRow = { stripe_subscription_id: string | null; current_period_end: string | null; plan: PlanId; test: boolean } | null;
+type SubRow = { stripe_subscription_id: string | null; current_period_end: string | null; plan: PlanId; test: boolean; cancel_at_period_end: boolean | null } | null;
 const subRow = async (userId: string) =>
-  must(await db().from("subscriptions").select("stripe_subscription_id, current_period_end, plan, test").eq("user_id", userId).maybeSingle()) as SubRow;
+  must(await db().from("subscriptions").select("stripe_subscription_id, current_period_end, plan, test, cancel_at_period_end").eq("user_id", userId).maybeSingle()) as SubRow;
 
 // Fin de l'offre (24 h après l'inscription, premier abonnement seulement), ou null.
 export async function launchOfferEndsAt(user: UserRow) {
@@ -139,6 +140,17 @@ export async function syncSubscription(sub: Stripe.Subscription) {
     updated_at: new Date().toISOString(),
   });
   await db().from("users").update({ plan }).eq("id", userId);
+
+  // Arrêt programmé depuis l'espace Stripe : on garde la réponse à l'enquête de résiliation de Stripe.
+  const why = sub.cancellation_details;
+  if (sub.cancel_at_period_end && !before?.cancel_at_period_end && (why?.feedback || why?.comment)) {
+    try {
+      await db().from("cancel_feedback").insert({ user_id: userId, email: user?.email ?? null, plan: before?.plan ?? plan, reason: why.feedback ? `stripe:${why.feedback}` : null, wish: null, details: why.comment || null });
+      await notifyOwner("👋 Un client arrête son abonnement", `${user?.email ?? "Un client"} (via Stripe) : ${cancelLabel(CANCEL_REASONS, why.feedback ? `stripe:${why.feedback}` : null) || "—"}${why.comment ? ` · « ${why.comment.slice(0, 200)} »` : ""}`);
+    } catch (e) {
+      console.warn("cancel_feedback stripe", e);
+    }
+  }
 
   const was = user?.plan ?? "free";
   const info = PLANS.find((p) => p.id === plan);

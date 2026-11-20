@@ -19,7 +19,7 @@ export function CancelSurvey({ busy, onConfirm, onKeep }: { busy: boolean; onCon
 
       <p className="mt-4 text-sm font-medium">1. Pourquoi tu veux arrêter ?</p>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
-        {CANCEL_REASONS.map((r) => <button key={r.id} type="button" onClick={() => setReason(r.id)} className={chip(reason === r.id)}>{r.label}</button>)}
+        {CANCEL_REASONS.filter((r) => !r.id.startsWith("stripe:")).map((r) => <button key={r.id} type="button" onClick={() => setReason(r.id)} className={chip(reason === r.id)}>{r.label}</button>)}
       </div>
       {reason === "shopify" && (
         <p className="mt-2 rounded-[12px] bg-[#34d399]/10 px-3 py-2 text-sm text-[#a7f3d0]">On peut t'aider gratuitement à la mettre en ligne. Écris-nous depuis la page <Link href="/contact" className="underline">contact</Link>, on te répond vite.</p>

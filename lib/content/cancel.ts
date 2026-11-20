@@ -6,6 +6,15 @@ export const CANCEL_REASONS = [
   { id: "sales", label: "Je n'ai pas eu de ventes" },
   { id: "done", label: "J'ai déjà tout ce qu'il me faut" },
   { id: "other", label: "Autre raison" },
+  // Réponses à l'enquête de résiliation de Stripe (quand le client arrête depuis l'espace Stripe).
+  { id: "stripe:too_expensive", label: "Trop cher (Stripe)" },
+  { id: "stripe:missing_features", label: "Il manque des fonctionnalités (Stripe)" },
+  { id: "stripe:switched_service", label: "Est passé à un autre service (Stripe)" },
+  { id: "stripe:unused", label: "Ne l'utilise pas assez (Stripe)" },
+  { id: "stripe:customer_service", label: "Pas content du service client (Stripe)" },
+  { id: "stripe:too_complex", label: "Trop compliqué (Stripe)" },
+  { id: "stripe:low_quality", label: "Qualité pas assez bonne (Stripe)" },
+  { id: "stripe:other", label: "Autre raison (Stripe)" },
 ] as const;
 
 export const CANCEL_WISHES = [
