@@ -229,7 +229,9 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   const PEOPLE = /\b(people|person|persons|man|men|woman|women|girl|boy|kid|kids|child|children|friends?|family|couple|gamers?|players?|users?|customers?|hands?|face|faces|someone|teen|teens|student|students|athlete|athletes|crowd|he|she|they)\b/i;
   const noPeople = (t: string) => t.split(/[.;,]/).map((x) => x.trim()).filter((x) => x && !PEOPLE.test(x)).join(", ");
   const scene = noPeople(plan.visual?.scene ?? "") || `${plan.brand.tone}, soft natural light`;
-  const CLEAN = "photorealistic high-end commercial product photography, the product is the only subject, no people, no hands, no faces, no added text, no logos, no brand names, no trademarks (no Apple, Nike or other brand logo), no watermark";
+  // Photos crédibles, comme prises par une vraie marque : lumière naturelle, vraies matières, pas d'effet « image IA »
+  // (pas de rendu 3D, de paillettes, de produit qui flotte ni de rayons de lumière).
+  const CLEAN = "real photograph, natural and believable, true-to-life colors and materials, subtle real-world imperfections, not a 3D render, not CGI, no glow effects, no sparkles, no floating objects, the product is the only subject, no people, no hands, no faces, no added text, no logos, no brand names, no trademarks (no Apple, Nike or other brand logo), no watermark";
   const save = async (slot: Slot, kind: string, img: { bytes: Uint8Array; contentType: string; width: number; height: number }, prompt: string) => {
     const saved = await storeImage(storeId, img.bytes, img.contentType, slot);
     await db().from("assets").insert({ store_id: storeId, kind, storage_path: saved.path, url: saved.url, width: img.width, height: img.height, prompt });
@@ -262,14 +264,14 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   // Chaque photo montre le produit sous un angle franchement différent (le produit tourne, pas seulement le décor),
   // et dans un décor différent : pas tout sur un bureau.
   const shots: [Slot, string, AspectRatio, string][] = [
-    ["white", "product", "1:1", `Rotate the product so it faces the camera straight on (front view). Place it on a clean pure white seamless background. Behind it, small blurred glowing LED light dots and sparkles in the brand color ${c.accent}, soft colored glow on the white surface, bright modern premium look. ${keep} ${CLEAN}`],
-    ["studio", "product", "1:1", `Rotate the product to a strict side profile view (90 degrees from the front). It stands upright on a glossy pure black surface, pure black background, dramatic studio rim lighting outlining its silhouette, subtle reflection. ${keep} ${CLEAN}`],
+    ["white", "product", "1:1", `Rotate the product so it faces the camera straight on (front view). Place it on a clean off-white background, lit by soft daylight from a nearby window, with a natural soft shadow, simple and honest product photo. ${keep} ${CLEAN}`],
+    ["studio", "product", "1:1", `Rotate the product to a strict side profile view (90 degrees from the front). It stands on a matte surface in a muted tone close to ${c.background}, plain wall behind, soft natural side light, gentle realistic shadow. ${keep} ${CLEAN}`],
     ["detail", "product", "1:1", `Extreme macro close-up on one characteristic part of this product, showing its materials, texture and finish, shallow depth of field, soft light. ${keep} ${CLEAN}`],
     ["inuse", "lifestyle", "4:5", `Top-down flat lay, camera directly above: the product lying flat on a textured surface (linen, slate or light wood) with a few tasteful related accessories around it, styled editorial composition, soft natural light. ${keep} ${CLEAN}`],
-    ["hero", "banner", "16:9", `Wide cinematic shot: the product seen from a low angle, floating slightly above a minimal pedestal, abstract background with soft gradients in ${c.background} and ${c.accent}, light beams, product on the right third, generous empty space on the left. ${keep} ${CLEAN}`],
+    ["hero", "banner", "16:9", `Wide real-life photo: the product placed on a table, shelf or floor in a real, lived-in setting that fits the brand (home, workshop, café or outdoors), daylight, colors of the room in harmony with ${c.background} and a touch of ${c.accent}, product on the right third, calm empty space on the left. ${keep} ${CLEAN}`],
     ["moment1", "product", "1:1", `Rotate the product to show it from behind (rear three-quarter view), resting on a rough natural stone block, warm soft side light, neutral beige background. ${keep} ${CLEAN}`],
     ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a muted tone close to ${c.background}, gentle window light. ${keep} ${CLEAN}`],
-    ["moment3", "lifestyle", "16:9", `Wide atmospheric shot, ${scene}: the product seen from a slightly high front three-quarter angle, placed in an empty, tidy setting that fits the brand, warm evening light with subtle ${c.accent} accent lights, lots of space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
+    ["moment3", "lifestyle", "16:9", `Wide atmospheric shot, ${scene}: the product seen from a slightly high front three-quarter angle, placed in an empty, tidy setting that fits the brand, warm natural evening light, lots of space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
   ];
   // Scènes de vie : 3 personnes différentes utilisent le produit, chacune dans un contexte différent.
   // Profils variés d'une photo à l'autre, même si la scène décrite par l'IA ne le précise pas.
@@ -278,7 +280,7 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
     "If the scene does not specify the person, show a person in their thirties or forties, of a different gender than a typical first photo.",
     "If the scene does not specify the person, show a person in their fifties, with a different style and background.",
   ];
-  const life = "Candid, natural lifestyle photo as if shot by a professional photographer on a 35mm camera: realistic people with natural skin texture and correct anatomy, natural hands, authentic everyday setting, soft natural light, shallow depth of field. The product is clearly visible and is the exact same product as in the reference image: same design, shape, proportions, colors, materials and details. No added logo, text, watermark or brand name.";
+  const life = "Candid, spontaneous photo that looks like a real moment caught by a friend with a good phone camera, not a staged advert: relaxed natural pose, real people with natural skin texture and correct anatomy, natural hands, real everyday place with a bit of normal mess, natural light. The product is clearly visible and is the exact same product as in the reference image: same design, shape, proportions, colors, materials and details. No added logo, text, watermark or brand name.";
   (plan.homepage.moments?.items ?? []).slice(0, 3).forEach((m, i) => {
     shots.push([`life${i + 1}` as Slot, "lifestyle", "4:5", `${m.imagePrompt}. ${PERSONAS[i]} ${life}`]);
   });

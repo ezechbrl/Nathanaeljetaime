@@ -669,7 +669,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
 <section class="hero hero--{{ section.settings.layout | default: 'left' }}">
   <div class="hero__bg">{% if bgimg != blank %}${img("bgimg", 2400, 1350, true)}{% else %}<img src="{{ bgasset }}" alt="" width="2400" height="1350" loading="eager">{% endif %}</div>
   <div class="wrap"><div class="hero__c reveal">
-    {% if section.settings.eyebrow != blank %}<p class="pill">{% render 'icon', name: 'sparkle' %}{{ section.settings.eyebrow }}</p>{% endif %}
+    {% if section.settings.eyebrow != blank %}<p class="pill">{{ section.settings.eyebrow }}</p>{% endif %}
     <h1>{{ section.settings.title }}</h1>
     <p class="hero__sub">{{ section.settings.subtitle }}</p>
     <a class="btn btn--light" href="{% if p %}{{ p.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}">{{ section.settings.cta }} {% render 'icon', name: 'arrow' %}</a>
@@ -680,7 +680,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
 <section class="hero hero--split hero--{{ section.settings.layout | default: 'left' }}">
   <div class="wrap hero__grid">
     <div class="reveal">
-      {% if section.settings.eyebrow != blank %}<p class="pill">{% render 'icon', name: 'sparkle' %}{{ section.settings.eyebrow }}</p>{% endif %}
+      {% if section.settings.eyebrow != blank %}<p class="pill">{{ section.settings.eyebrow }}</p>{% endif %}
       <h1>{{ section.settings.title }}</h1>
       <p class="hero__sub muted">{{ section.settings.subtitle }}</p>
       <a class="btn" href="{% if p %}{{ p.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}">{{ section.settings.cta }} {% render 'icon', name: 'arrow' %}</a>

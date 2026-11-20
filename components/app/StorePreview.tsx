@@ -274,7 +274,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
                 <div className="absolute inset-0" style={{ background: `linear-gradient(0deg, ${heroDark} 0%, transparent 35%)` }} />
               </div>
               <div className={cn("relative -mt-6 pb-10", pad)}>
-                <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs"><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
+                <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs"><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{plan.brand.tagline}</span>
                 <h2 className={cn("text-[2.1rem] leading-[1.04]", H)}>{home.heroTitle}</h2>
                 <p className="mt-3 text-[15px] opacity-85">{home.heroSubtitle}</p>
                 <div className="mt-6"><Btn light>{home.ctaLabel}</Btn></div>
@@ -286,7 +286,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
               <img decoding="async" src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : layout === "center" ? "rgba(0,0,0,.48)" : `linear-gradient(${layout === "right" ? 270 : 90}deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)` }} />
               <div className={cn("relative w-full pb-10 pt-24", pad, !mobile && layout === "right" && "flex justify-end text-right", !mobile && layout === "center" && "flex justify-center text-center")}><div className={cn(layout === "center" && !mobile ? "max-w-[720px]" : "max-w-[560px]")}>
-                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs backdrop-blur"><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
+                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs backdrop-blur"><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{plan.brand.tagline}</span>
                 <h2 className={cn("text-[2.9rem] leading-[1.02]", H, mobile && "text-[2.2rem]")}>{home.heroTitle}</h2>
                 <p className={cn("mt-4 max-w-[36ch] text-[16px] opacity-90", !mobile && layout === "center" && "mx-auto", !mobile && layout === "right" && "ml-auto")}>{home.heroSubtitle}</p>
                 <div className="mt-7"><Btn light>{home.ctaLabel}</Btn></div>
@@ -296,7 +296,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
           ) : (
             <section className={cn("grid items-center gap-8", pad, sec, !mobile && layout !== "center" && "grid-cols-2", layout === "center" && "text-center")} style={{ background: tint }}>
               <div className={cn(!mobile && layout === "right" && "order-2", layout === "center" && "mx-auto max-w-[640px]")}>
-                <span className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs" style={{ background: `${accent}24` }}><Sparkles className="h-3.5 w-3.5" />{plan.brand.tagline}</span>
+                <span className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs" style={{ background: `${accent}24` }}><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{plan.brand.tagline}</span>
                 <h2 className={cn("text-[2.6rem] leading-[1.02]", H, mobile && "text-[2rem]")}>{home.heroTitle}</h2>
                 <p className="mt-4 text-[15px] opacity-70">{home.heroSubtitle}</p>
                 <div className="mt-7"><Btn>{home.ctaLabel}</Btn></div>

@@ -41,7 +41,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
       </div>
       <div className={cn("grid items-center gap-6 p-5 sm:p-8", layout === "center" ? "text-center" : "sm:grid-cols-2")}>
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs" style={{ background: `${accent}22` }}><Sparkles className="h-3 w-3" />{t.tagline}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs" style={{ background: `${accent}22` }}><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{t.tagline}</span>
           <h3 className="mt-4 text-[clamp(1.6rem,1.1rem+1.6vw,2.4rem)] leading-tight" style={heading}>{t.heroTitle}</h3>
           <p className="mt-3 text-sm opacity-70">{t.heroSubtitle}</p>
           <span className="mt-5 inline-flex rounded-full px-5 py-2.5 text-sm font-semibold" style={{ background: accent, color: onColor(accent) }}>Acheter · {eur(t.price)}</span>
