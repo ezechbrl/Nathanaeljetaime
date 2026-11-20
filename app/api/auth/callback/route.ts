@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/server/auth";
 import { env } from "@/lib/server/env";
 import { route } from "@/lib/server/http";
+import { rememberDevice } from "@/lib/server/login";
 import { authClient, db } from "@/lib/server/supabase";
 
 // Retour de Google, des liens de confirmation d'e-mail et de réinitialisation du mot de passe.
@@ -15,6 +16,7 @@ export const GET = route(async (req) => {
   const { error } = await supa.auth.exchangeCodeForSession(code);
   if (error) return NextResponse.redirect(`${env.appUrl()}/connexion?error=lien`);
   const user = await requireUser();
+  await rememberDevice(user.id);
   const ref = url.searchParams.get("ref") ?? req.headers.get("cookie")?.match(/(?:^|; )ref=([^;]+)/)?.[1];
   if (ref && !user.referred_by && /^[a-z0-9-]{2,40}$/i.test(ref)) {
     await db().from("users").update({ referred_by: ref }).eq("id", user.id);

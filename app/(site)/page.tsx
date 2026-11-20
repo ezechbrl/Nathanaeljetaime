@@ -4,7 +4,6 @@ import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Hero } from "@/components/site/Hero";
 import { Instant } from "@/components/site/Instant";
-import { LandingSwipe } from "@/components/site/LandingSwipe";
 import { PriceTeaser } from "@/components/site/PriceTeaser";
 import { Reviews } from "@/components/site/Reviews";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
@@ -18,7 +17,6 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <LandingSwipe />
       <Compare />
       <ShowcaseGrid />
       <Instant />

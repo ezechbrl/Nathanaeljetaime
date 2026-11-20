@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { env } from "@/lib/server/env";
 import { sendEmail } from "@/lib/server/email";
 import { body, clientIp, HttpError, json, route } from "@/lib/server/http";
-import { afterEmailLogin } from "@/lib/server/login";
+import { afterEmailLogin, isKnownDevice } from "@/lib/server/login";
 import { rateLimit } from "@/lib/server/quota";
 import { authClient, db } from "@/lib/server/supabase";
 import { site } from "@/lib/site";
@@ -33,7 +33,13 @@ export const POST = route(async (req) => {
     console.error("Lien de connexion", error?.message);
     throw new HttpError(502, "upstream_error", "Le lien n'a pas pu être créé. Réessaie dans un instant.");
   }
-  if (!created.error) {
+  // Nouveau compte, ou compte déjà connecté sur cet appareil : connexion directe, sans code.
+  let known = false;
+  if (created.error) {
+    const row = (await db().from("users").select("id").eq("email", input.email).maybeSingle()).data as { id: string } | null;
+    known = !!row && (await isKnownDevice(row.id));
+  }
+  if (!created.error || known) {
     const { error: loginError } = await (await authClient()).auth.verifyOtp({ token_hash: hash, type: "magiclink" });
     if (!loginError) {
       await afterEmailLogin(req.headers.get("cookie"), input.shop);

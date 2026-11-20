@@ -231,7 +231,7 @@ function GoogleButton({ next }: { next: string }) {
   );
 }
 
-function EmailOption({ next, startOpen = false }: { next: string; startOpen?: boolean }) {
+function EmailOption({ next, startOpen = false, primary = false }: { next: string; startOpen?: boolean; primary?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(startOpen);
   const [email, setEmail] = useState("");
@@ -292,13 +292,12 @@ function EmailOption({ next, startOpen = false }: { next: string; startOpen?: bo
   }
   return (
     <form onSubmit={submit} className="space-y-3">
-      <label htmlFor="email" className="block text-sm text-fg-muted">Ton adresse e-mail</label>
-      <input id="email" type="email" required autoFocus autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.com" className="field" />
+      <label htmlFor="email" className="block text-sm font-medium text-white">Ton adresse e-mail</label>
+      <input id="email" type="email" required autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.com" className="field h-14 text-[16px]" />
       {error && <p role="alert" className="text-sm text-bad">{error}</p>}
-      <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={state === "loading"}>
-        {state === "loading" ? <Spinner /> : "Continuer"}
+      <Button type="submit" variant={primary ? "primary" : "secondary"} size="lg" className="h-14 w-full text-[16px]" disabled={state === "loading"}>
+        {state === "loading" ? <Spinner /> : <>Continuer <ArrowRight className="h-4 w-4" /></>}
       </Button>
-      <p className="text-xs text-fg-faint">Pas de mot de passe.</p>
     </form>
   );
 }
@@ -318,14 +317,14 @@ export function AuthPanel({ mode }: { mode: "login" | "register" }) {
           <p className="mt-1 line-clamp-2 text-fg-muted">« {brief} »</p>
         </div>
       )}
-      {/* Les 2 grands boutons Shopify (j'ai déjà Shopify / créer mon compte), puis nom de boutique + e-mail. */}
+      {/* En premier : l'e-mail (le plus simple), puis Google. Shopify vient après, pour ceux qui l'ont déjà. */}
+      <EmailOption next={next} startOpen primary />
+      {GOOGLE_ENABLED && <div className="mt-3"><GoogleButton next={next} /></div>}
+      <ul className="mx-auto mt-4 grid max-w-sm grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-fg-muted">
+        {["Sans mot de passe", "Sans carte bancaire", "Ta boutique est gardée", "Prête en 3 minutes"].map((t) => <li key={t} className="flex items-center gap-1.5"><span className="text-accent">✓</span>{t}</li>)}
+      </ul>
+      <div className="my-7 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou avec Shopify<span className="h-px flex-1 bg-line/10" /></div>
       <ShopifyForm next={next} withEmail cta={mode === "login" ? "Me connecter" : "Continuer"} />
-      {/* Sans Shopify pour l'instant : Google (s'il est activé) ou e-mail seul. */}
-      <div className="my-6 flex items-center gap-3 text-xs text-fg-faint"><span className="h-px flex-1 bg-line/10" />ou<span className="h-px flex-1 bg-line/10" /></div>
-      <div className="space-y-3">
-        {GOOGLE_ENABLED && <GoogleButton next={next} />}
-        <EmailOption next={next} />
-      </div>
       <p className="mt-8 text-xs leading-relaxed text-fg-faint">
         En continuant, tu acceptes les <Link href="/legal/cgu" className="underline">CGU</Link> et la <Link href="/legal/confidentialite" className="underline">politique de confidentialité</Link>.
       </p>

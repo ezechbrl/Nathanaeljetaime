@@ -24,11 +24,11 @@ export function Hero() {
         <Reveal delay={260} className="mt-9">
           <div id="creer" className="scroll-mt-28"><PromptBox align="center" /></div>
         </Reveal>
-        {/* Petites preuves prix / qualité, vérifiables (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
+        {/* Petits arguments vérifiables (pas de prix ici : il vient plus tard) (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
         <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap justify-center gap-2 text-[13px] sm:text-sm">
           {[
-            { t: "Dès 39 €/mois", mobile: true },
-            { t: "50× moins cher qu'une agence", mobile: true },
+            { t: "Prête en 3 minutes", mobile: true },
+            { t: "Aucune compétence", mobile: true },
             { t: "Photos de pro incluses", mobile: false },
             { t: "Annulable en un clic", mobile: false },
           ].map(({ t, mobile }) => (

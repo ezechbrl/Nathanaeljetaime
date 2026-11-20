@@ -10,8 +10,11 @@ export const metadata: Metadata = { title: isWaitlist ? "Réserve ta place" : "C
 
 export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   // Venu d'un aperçu créé depuis la page d'accueil : mêmes boutons Shopify, sans parler du prix.
-  const next = (await searchParams).next;
+  const sp = await searchParams;
+  const next = sp.next;
   const claiming = typeof next === "string" && next.includes("claim=");
+  // Déjà un projet en cours (produit décrit, lien collé ou quiz fait) : il ne reste que le compte.
+  const started = !!(sp.brief || sp.url || (typeof next === "string" && next.includes("quiz")));
   if (isWaitlist) {
     return (
       <AuthShell title="Réserve ta place" subtitle="Vigenia ouvre très bientôt. Inscris-toi maintenant : tu seras prévenu en premier, avec un prix réservé à vie.">
@@ -28,7 +31,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     );
   }
   return (
-    <AuthShell title="Crée ton compte" subtitle="Avec ta boutique Shopify, ton compte Google ou ton e-mail. Pas de mot de passe. Ta boutique se prépare juste après.">
+    <AuthShell title={started ? "Plus qu'une étape" : "Crée ton compte"} subtitle={started ? "Entre ton e-mail pour enregistrer ta boutique. Elle se prépare juste après, en quelques minutes." : "Entre ton e-mail, et ta première boutique est prête en quelques minutes."}>
       <Suspense><AuthPanel mode="register" /></Suspense>
     </AuthShell>
   );

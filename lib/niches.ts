@@ -100,3 +100,13 @@ export const NICHES = [
     ["Balance à bagages", "Balance à bagages numérique pour éviter les frais de surpoids"],
   ] },
 ] as const;
+
+// Grandes catégories du quiz : chacune regroupe 2 univers plus précis.
+export const BIG_NICHES = [
+  { id: "maison", icon: Lamp, label: "Maison & cuisine", hint: "Déco, rangement, ustensiles malins", subs: ["maison", "cuisine"] },
+  { id: "beaute", icon: Sparkles, label: "Beauté & mode", hint: "Soins, bijoux, accessoires", subs: ["beaute", "mode"] },
+  { id: "sport", icon: Dumbbell, label: "Sport & plein air", hint: "Bien-être, jardin, randonnée", subs: ["sport", "jardin"] },
+  { id: "famille", icon: PawPrint, label: "Famille & animaux", hint: "Bébé, parents, chiens et chats", subs: ["bebe", "animaux"] },
+  { id: "tech", icon: Headphones, label: "Tech & gaming", hint: "Gadgets, setup, accessoires", subs: ["tech", "gaming"] },
+  { id: "evasion", icon: Car, label: "Auto & voyage", hint: "Voiture, valise, road trip", subs: ["auto", "voyage"] },
+] as const;
