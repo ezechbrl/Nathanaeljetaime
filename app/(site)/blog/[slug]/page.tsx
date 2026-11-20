@@ -16,7 +16,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const p = POSTS.find((x) => x.slug === slug);
-  return p ? { title: p.title, description: p.excerpt, openGraph: { type: "article", title: p.title, description: p.excerpt } } : {};
+  return p ? { title: p.title, description: p.excerpt, alternates: { canonical: `/blog/${p.slug}` }, openGraph: { type: "article", title: p.title, description: p.excerpt, publishedTime: p.date } } : {};
 }
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,8 +25,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   if (!post) notFound();
   const others = POSTS.filter((p) => p.slug !== slug).slice(0, 2);
 
+  // Données structurées lues par Google (titre, date, auteur) pour mieux présenter l'article.
+  const ld = { "@context": "https://schema.org", "@type": "BlogPosting", headline: post.title, description: post.excerpt, datePublished: post.date, dateModified: post.date, inLanguage: "fr-FR", author: { "@type": "Organization", name: "Vigenia", url: "https://vigenia.com" }, publisher: { "@type": "Organization", name: "Vigenia", logo: { "@type": "ImageObject", url: "https://vigenia.com/brand/icon-512.png" } }, mainEntityOfPage: `https://vigenia.com/blog/${post.slug}` };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <article>
         <header className="relative pb-12 pt-36 sm:pt-44">
           <LightRays />
