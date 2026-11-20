@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { PublicQuiz } from "./PublicQuiz";
 
-export const metadata: Metadata = { title: "Trouve ton produit en 5 questions", description: "Niche, produit, clients, style, prix : réponds à 5 questions et Vigenia crée ta boutique Shopify." };
+export const metadata: Metadata = { title: "Le quiz : trouve ton produit et ta boutique", description: "Ton profil, un univers, un produit, tes clients et le style qui te plaît : réponds au quiz et Vigenia crée ta boutique Shopify." };
 
 export default function Page() {
-  return <div className="pt-20 sm:pt-24"><PublicQuiz /></div>;
+  return <div className="min-h-[100dvh] pt-20 sm:pt-24"><PublicQuiz /></div>;
 }

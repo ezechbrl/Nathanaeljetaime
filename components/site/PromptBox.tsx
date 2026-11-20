@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp, ImagePlus, Link2, PenLine, Sparkles, X } from "lucide-react";
+import { ImagePlus, Link2, PenLine, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import * as api from "@/lib/api/client";
@@ -25,11 +25,6 @@ export const MODES = [
   },
 ] as const;
 
-const EXAMPLES = [
-  "Café de spécialité en abonnement",
-  "Harnais pour chien, coloris pastel",
-  "Sac à dos cabine pour l'Espagne",
-];
 const MAX_PHOTOS = 3;
 
 export function PromptBox({ target = "/inscription", className, align = "center", inputId = "prompt" }: { target?: string; className?: string; align?: "center" | "left"; inputId?: string }) {
@@ -199,15 +194,6 @@ export function PromptBox({ target = "/inscription", className, align = "center"
         <QuizCard href="/quiz" className={cn("mt-6", align === "center" && "mx-auto")} />
       )}
 
-      {mode === "start" && (
-        <div className={cn("mt-4 hidden flex-wrap gap-2 sm:flex", align === "center" && "justify-center")}>
-          {EXAMPLES.map((ex) => (
-            <button key={ex} type="button" onClick={() => setValue(ex)} className="flex items-center gap-1.5 rounded-full border border-white/[0.07] px-3 py-1 text-xs text-fg-faint transition-colors hover:border-white/15 hover:text-fg-muted">
-              {ex} <ArrowUp className="h-3 w-3 rotate-45" />
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
