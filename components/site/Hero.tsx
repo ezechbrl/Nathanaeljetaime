@@ -1,8 +1,9 @@
 import { Check } from "lucide-react";
 import { CTA } from "@/lib/launch";
 import { Reveal } from "@/components/ui/Reveal";
-import { DemoVideos } from "./DemoVideos";
 import { PromptBox } from "./PromptBox";
+import { StoreCarousel } from "./StoreCarousel";
+import { StoreMarquee } from "./StoreMarquee";
 
 export function Hero() {
   return (
@@ -35,14 +36,13 @@ export function Hero() {
             <li key={t} className={`${mobile ? "flex" : "hidden sm:flex"} items-center gap-1.5 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-fg/85`}><Check className="h-3.5 w-3.5 text-accent" /> {t}</li>
           ))}</ul>
         </Reveal>
+        <StoreMarquee />
       </div>
       <div className="relative px-4 sm:px-6">
-        {/* Démonstration : enregistrement réel de l'app, du lien produit à la boutique en ligne. */}
+        {/* Une vraie boutique créée avec Vigenia, qui change toutes les 3 secondes. */}
         <Reveal delay={380} className="relative mx-auto mt-10 max-w-[1320px] sm:mt-14">
-          <div aria-hidden className="absolute -inset-6 rounded-[32px] bg-[radial-gradient(closest-side,rgb(46_230_166/0.35),transparent)] blur-2xl" />
-          <div className="relative">
-            <DemoVideos />
-          </div>
+          <div aria-hidden className="absolute -inset-6 rounded-[32px] bg-[radial-gradient(closest-side,rgb(46_230_166/0.3),transparent)] blur-2xl" />
+          <div className="relative"><StoreCarousel /></div>
         </Reveal>
       </div>
     </section>

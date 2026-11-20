@@ -26,6 +26,8 @@ export const MODES = [
 ] as const;
 
 const MAX_PHOTOS = 3;
+// Lien d'exemple : un vrai produit (mini aspirateur de voiture), pour voir le résultat sans chercher.
+const EXAMPLE_LINK = "https://fr.aliexpress.com/item/1005012660420402.html";
 
 export function PromptBox({ target = "/inscription", className, align = "center", inputId = "prompt" }: { target?: string; className?: string; align?: "center" | "left"; inputId?: string }) {
   const router = useRouter();
@@ -165,12 +167,18 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             >
               <ImagePlus className="h-4 w-4" /> {photos.length ? `Photo ${photos.length}/${MAX_PHOTOS}` : "Photo du produit"}
             </button>
-            <button type="submit" className="inline-flex h-9 items-center gap-2 rounded-full border border-[#6ee7b7]/50 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_0_18px_rgb(46_230_166/0.55)] transition-all hover:-translate-y-px hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_0_28px_rgb(46_230_166/0.8)]">
+            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-full border border-[#a7f3d0]/70 bg-[linear-gradient(180deg,#5ff7c2,#10b981)] px-5 text-[15px] font-bold text-[#03140d] transition-all [animation:cta-glow_2.4s_ease-in-out_infinite] hover:-translate-y-px hover:brightness-110">
               <Sparkles className="h-4 w-4" /> Générer
             </button>
           </div>
         </div>
       </form>
+      {/* Pas de produit sous la main : un vrai lien d'exemple, reconnu tout de suite (photo et nom). */}
+      {!value.trim() && (
+        <button type="button" onClick={() => setValue(EXAMPLE_LINK)} className={cn("mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#86efc9] underline-offset-4 hover:text-white hover:underline", align === "center" && "mx-auto flex")}>
+          <Link2 className="h-4 w-4" /> Essayer avec un exemple
+        </button>
+      )}
       {photoError && <p role="alert" className={cn("mt-2 text-sm text-red-300", align === "center" && "text-center")}>{photoError}</p>}
 
       {/* Les 2 façons de commencer, sous le champ, aux couleurs des cartes Shopify. */}

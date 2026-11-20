@@ -1,9 +1,8 @@
 import { BuyerReviews } from "@/components/site/BuyerReviews";
-import { Compare } from "@/components/site/Compare";
+import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Hero } from "@/components/site/Hero";
-import { Instant } from "@/components/site/Instant";
 import { PriceTeaser } from "@/components/site/PriceTeaser";
 import { Reviews } from "@/components/site/Reviews";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
@@ -17,9 +16,8 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <Compare />
+      <BeforeAfterSlider />
       <ShowcaseGrid />
-      <Instant />
       <BuyerReviews />
       <PriceTeaser />
       <Reviews />
