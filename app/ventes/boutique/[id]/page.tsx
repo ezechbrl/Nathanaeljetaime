@@ -3,6 +3,7 @@
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
+import { TeaserPreview } from "@/components/app/LockedStore";
 import { StorePreview, type PreviewPage } from "@/components/app/StorePreview";
 import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
@@ -39,13 +40,16 @@ export default function OwnerStorePage({ params }: { params: Promise<{ id: strin
               ))}
             </ul>
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          {!data.store.plan && <p className="mt-3 text-sm text-white/80">Aperçu seulement : ce client n'a pas débloqué sa boutique complète.</p>}
+          <div className={cn("mt-4 flex flex-wrap items-center gap-2", !data.store.plan && "hidden")}>
             {PAGES.map(([p, l]) => <button key={p} type="button" onClick={() => setPage(p)} className={cn("rounded-full px-3 py-1.5 text-sm", page === p ? "bg-white text-[#111]" : "bg-white/10 text-white")}>{l}</button>)}
             <span className="mx-1 h-5 w-px bg-white/20" />
             {(["mobile", "desktop"] as const).map((d) => <button key={d} type="button" onClick={() => setDevice(d)} className={cn("rounded-full px-3 py-1.5 text-sm", device === d ? "bg-white text-[#111]" : "bg-white/10 text-white")}>{d === "mobile" ? "Téléphone" : "Ordinateur"}</button>)}
           </div>
           <div className={cn("mx-auto mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white", device === "mobile" ? "max-w-[400px]" : "")}>
-            {data.store.plan ? <StorePreview store={data.store} page={page} device={device} assets={data.assets} /> : <p className="p-6 text-sm text-[#666]">Boutique pas encore créée (aperçu seulement).</p>}
+            {data.store.plan
+              ? <StorePreview store={data.store} page={page} device={device} assets={data.assets} />
+              : data.store.teaser ? <TeaserPreview store={data.store} /> : <p className="p-6 text-sm text-[#666]">Aperçu pas encore prêt.</p>}
           </div>
         </>
       )}

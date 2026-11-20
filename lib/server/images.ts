@@ -70,7 +70,9 @@ export async function editImage(referenceUrl: string, prompt: string, ratio: Asp
         : { prompt, image_url: referenceUrl, aspect_ratio: KONTEXT_RATIO[ratio], num_images: 1, output_format: "jpeg" });
       if (!res.ok) {
         const detail = (await res.text().catch(() => "")).slice(0, 200);
-        console.error("fal.ai", model, res.status, detail);
+        // Refus « contenu signalé » sur une retouche : le modèle suivant prend le relais, ce n'est pas une panne.
+        const flagged = res.status === 422 && /content_policy|flagged/i.test(detail);
+        (flagged && model !== EDIT_MODELS[EDIT_MODELS.length - 1] ? console.warn : console.error)("fal.ai", model, res.status, detail);
         throw new HttpError(502, "upstream_error", `Retouche d'image refusée (code ${res.status}).`);
       }
       const out = (await res.json()) as { images?: { url: string; width?: number; height?: number }[] };
