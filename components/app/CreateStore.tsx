@@ -3,6 +3,7 @@
 import { AlertCircle, Check, ImagePlus, Link2, PenLine, Plus, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { QuizCard } from "@/components/site/QuizCard";
+import { STYLE_TEXT, likedStyle } from "@/components/site/StyleSwipe";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
@@ -134,7 +135,11 @@ export function CreateStore() {
     }
     if (mode === "recraft" && !shop) return setError(new ApiClientError(400, "no_shop", "Connecte d'abord ta boutique Shopify pour la refondre."));
     if (mode !== "link" && !(mode === "start" && shots.length) && brief.trim().length < 10) return setError(new ApiClientError(400, "invalid_input", "Décris ton projet en une ou deux phrases.", "brief"));
-    const input: GenerateStoreInput = { mode, brief: brief.trim() || (url.trim() ? "Boutique à partir du lien produit" : "Boutique à partir des photos du produit"), productUrl: mode === "link" && url.trim() ? url.trim() : undefined, screenshots: mode !== "recraft" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
+    // Style aimé sur la page d'accueil (cœur / croix), ajouté à la description s'il n'y est pas déjà.
+    const liked = likedStyle();
+    const base = brief.trim() || (url.trim() ? "Boutique à partir du lien produit" : "Boutique à partir des photos du produit");
+    const withStyle = liked && !/Style de boutique/i.test(base) ? `${base} ${STYLE_TEXT[liked]}` : base;
+    const input: GenerateStoreInput = { mode, brief: withStyle, productUrl: mode === "link" && url.trim() ? url.trim() : undefined, screenshots: mode !== "recraft" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
     // Sans abonnement : une boutique d'aperçu gratuite (floutée), puis l'offre pour la débloquer.
     generate(input);
   }
