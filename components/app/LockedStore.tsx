@@ -72,13 +72,13 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
       {/* Haut de page : grande photo + accroche, comme dans la boutique finale. */}
       {t.image ? (
         wide ? (
-          <div className="relative flex min-h-[420px] items-center overflow-hidden text-white">
+          <div className="relative flex aspect-[16/8] min-h-[420px] items-center overflow-hidden text-white">
             <img src={t.image} alt="" className={cn("absolute inset-0 h-full w-full object-cover", blurImg)} style={{ objectPosition: "70% center" }} />
-            <div className="absolute inset-0" style={{ background: style === "premium" ? "rgba(0,0,0,.42)" : "linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.28) 45%,transparent 75%)" }} />
-            <div className={cn("relative px-8 py-12", style === "premium" ? "mx-auto max-w-[640px] text-center" : "max-w-[520px]")}>
+            <div className="absolute inset-0" style={{ background: style === "premium" ? "linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,.18) 50%,transparent 75%)" : "linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.28) 45%,transparent 75%)" }} />
+            <div className="relative max-w-[520px] px-8 py-12">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs backdrop-blur"><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{t.tagline}</span>
               <h3 className="mt-4 text-[2.5rem] leading-[1.04]" style={heading}>{t.heroTitle}</h3>
-              <p className={cn("mt-3 max-w-[38ch] text-[15px] opacity-90", style === "premium" && "mx-auto")}>{t.heroSubtitle}</p>
+              <p className="mt-3 max-w-[38ch] text-[15px] opacity-90">{t.heroSubtitle}</p>
               <span className="mt-6 inline-flex rounded-full px-6 py-3 text-sm font-semibold shadow-lg" style={{ background: accent, color: onAccent }}>Acheter · {eur(t.price)}</span>
             </div>
           </div>
@@ -140,7 +140,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
           <div>
             <p className={cn("leading-tight", wide ? "text-[1.7rem]" : "text-[1.45rem]")} style={heading}>{t.productTitle}</p>
             <p className="mt-2 text-xl font-bold">{eur(t.price)}</p>
-            <p className="mt-3 text-[14.5px] leading-relaxed opacity-80">{t.description || t.heroSubtitle}</p>
+            <p className="mt-3 text-[14.5px] leading-relaxed opacity-80">{(t.description ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() || t.heroSubtitle}</p>
             <ul className="mt-4 space-y-2 text-[14.5px]">{bullets.map((b) => <li key={b} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: accent }} />{b}</li>)}</ul>
             <button type="button" onClick={onUnlock} className="mt-5 flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold shadow-lg" style={{ background: accent, color: onAccent }}>Ajouter au panier · {eur(t.price)}</button>
             <p className="mt-2 flex items-center justify-center gap-1.5 text-xs opacity-60"><Lock className="h-3 w-3" /> Paiement sécurisé · Livraison suivie</p>
