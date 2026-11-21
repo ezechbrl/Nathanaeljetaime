@@ -26,6 +26,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
   // La liste des boutiques est déjà chargée : on affiche tout de suite, puis on rafraîchit en fond.
   const [store, setStoreState] = useState<Store | null>(() => stores.find((s) => s.id === id) ?? null);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
+  const [finishedJob, setFinishedJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const [lastPublishError, setLastPublishError] = useState<string | null>(null);
@@ -58,8 +59,12 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
   usePoll(async () => {
     if (!activeJob) return;
     const { job } = await api.getJob(activeJob.id);
-    setActiveJob(job.status === "queued" || job.status === "running" ? job : null);
-    if (job.status === "succeeded" || job.status === "failed") {
+    const over = job.status === "succeeded" || job.status === "failed";
+    // Tâche finie : on garde la tâche terminée (100 %) affichée jusqu'à ce que la boutique soit rechargée,
+    // pour que l'écran de création ne reparte jamais à zéro entre les deux.
+    setActiveJob(over ? null : job);
+    if (over) {
+      setFinishedJob(job);
       if (job.kind === "publish") {
         if (job.status === "succeeded") {
           let live = true;
@@ -68,7 +73,8 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
         } else toast(job.error ?? "La publication a échoué.", "error");
       }
       if (job.kind === "generate" && job.status === "succeeded") setCelebrate(true);
-      reload();
+      await reload();
+      setFinishedJob(null);
     }
   }, 1000, !!activeJob);
 
@@ -87,7 +93,7 @@ export function StoreProvider({ id, children }: { id: string; children: React.Re
     return <LockedStore store={store} onUnlocked={(res) => { setStore(res.store); setActiveJob(res.job); }} />;
   }
   return (
-    <StoreCtx.Provider value={{ store, activeJob, lastError, lastPublishError, setStore, reload, trackJob: setActiveJob }}>
+    <StoreCtx.Provider value={{ store, activeJob: activeJob ?? (store.status === "generating" ? finishedJob : null), lastError, lastPublishError, setStore, reload, trackJob: setActiveJob }}>
       {children}
       {celebrate && store.status !== "generating" && <LaunchCelebration store={store} onClose={() => setCelebrate(false)} />}
       {activeJob?.kind === "publish" && <PublishProgress store={store} job={activeJob} />}

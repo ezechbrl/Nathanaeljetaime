@@ -3,7 +3,7 @@
 import { useLiveProgress } from "@/lib/use-progress";
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, Lightbulb, Monitor, Smartphone, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LogoMark } from "@/components/ui/Logo";
 import { BuildStage } from "./BuildStage";
 import type { Job, JobStepKey, Store } from "@/lib/api/types";
@@ -88,9 +88,13 @@ function ProgressRing({ value, label }: { value: number; label: string }) {
 
 // Écran de création en plein écran : anneau de progression, pensées de l'IA, chantier de la boutique en direct,
 // et une petite liste de choses à préparer pendant l'attente.
-export function GenerationProgress({ store, job }: { store: Store; job: Job | null }) {
+export function GenerationProgress({ store, job: jobProp }: { store: Store; job: Job | null }) {
+  // On garde la dernière tâche connue : l'écran ne repart jamais au début pendant un rechargement.
+  const lastJob = useRef<Job | null>(jobProp);
+  if (jobProp) lastJob.current = jobProp;
+  const job = jobProp ?? lastJob.current;
   const steps = job?.steps ?? [];
-  const progress = useLiveProgress(job?.progress ?? 2);
+  const progress = useLiveProgress(job?.progress ?? 2, job?.status === "succeeded");
   const running = steps.find((s) => s.status === "running") ?? steps.find((s) => s.status === "pending");
   const thoughts = (running && THOUGHTS[running.key]) ?? ["L'IA travaille…"];
   const t = useTicker(thoughts.length, 3200, running?.key);
@@ -135,10 +139,12 @@ export function GenerationProgress({ store, job }: { store: Store; job: Job | nu
         </Link>
       </header>
 
-      <main className="relative mx-auto grid max-w-[1400px] gap-8 px-5 pb-10 pt-2 sm:px-8 lg:grid-cols-[380px_1fr] lg:gap-12">
-        <section className="flex flex-col">
+      {/* Téléphone : titre et progression, puis la boutique qui se construit, puis la liste à cocher.
+          Ordinateur : progression et liste à gauche, la boutique à droite. */}
+      <main className="relative mx-auto grid max-w-[1400px] gap-8 px-5 pb-10 pt-2 sm:px-8 lg:grid-cols-[380px_1fr] lg:gap-x-12 lg:gap-y-0">
+        <section className="flex flex-col lg:col-start-1 lg:row-start-1">
           <h1 className="text-[clamp(1.9rem,1.2rem+2vw,2.8rem)] font-semibold leading-[1.05] tracking-[-0.035em]">
-            {publishing ? <>Publication sur <span className="serif-accent">Shopify</span></> : <>On construit ta <span className="serif-accent">boutique</span></>}
+            {publishing ? <>Publication sur <span className="serif-accent">Shopify</span></> : store.teaser ? <>On crée ta boutique <span className="serif-accent">complète</span></> : <>On construit ta <span className="serif-accent">boutique</span></>}
           </h1>
 
           <div className="mt-6 flex items-center gap-5">
@@ -162,7 +168,27 @@ export function GenerationProgress({ store, job }: { store: Store; job: Job | nu
               </li>
             ))}
           </ol>
+        </section>
 
+        <section className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="flex items-center gap-2 text-sm text-fg-muted"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> Ta boutique se construit en direct</p>
+            <div className="flex rounded-full border border-white/10 bg-white/[0.03] p-0.5 text-xs" role="radiogroup" aria-label="Format d'aperçu">
+              {[{ v: false, l: "Ordinateur", I: Monitor }, { v: true, l: "Mobile", I: Smartphone }].map(({ v, l, I }) => (
+                <button key={l} type="button" role="radio" aria-checked={mobile === v} onClick={() => setMobile(v)} className={cn("flex items-center gap-1.5 rounded-full px-3 py-1 transition-colors", mobile === v ? "bg-white/10 text-fg" : "text-fg-muted hover:text-fg")}>
+                  <I className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{l}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="relative">
+            <div aria-hidden className="absolute -inset-6 rounded-[36px] bg-[radial-gradient(closest-side,rgb(16_176_127/0.22),transparent)] blur-2xl" />
+            <div className="relative"><BuildStage store={store} job={job} mobile={mobile} /></div>
+          </div>
+          <p className="mt-4 text-center text-xs text-fg-faint">Tu peux quitter cette page : la création continue et ta boutique t'attendra dans « Mes boutiques ».</p>
+        </section>
+
+        <section className="flex flex-col lg:col-start-1 lg:row-start-2">
           {!publishing && (
             <div className="mt-6 rounded-card border border-white/[0.08] bg-white/[0.03] p-4 backdrop-blur">
               <p className="text-sm font-medium">Pendant ce temps, prépare ton lancement</p>
@@ -199,24 +225,6 @@ export function GenerationProgress({ store, job }: { store: Store; job: Job | nu
             </div>
             <p key={tip} className="mt-2 animate-[fade-in_.3s_ease-out] text-sm leading-relaxed text-fg-muted">{TIPS[tip]}</p>
           </div>
-        </section>
-
-        <section className="min-w-0">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="flex items-center gap-2 text-sm text-fg-muted"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> Ta boutique se construit en direct</p>
-            <div className="flex rounded-full border border-white/10 bg-white/[0.03] p-0.5 text-xs" role="radiogroup" aria-label="Format d'aperçu">
-              {[{ v: false, l: "Ordinateur", I: Monitor }, { v: true, l: "Mobile", I: Smartphone }].map(({ v, l, I }) => (
-                <button key={l} type="button" role="radio" aria-checked={mobile === v} onClick={() => setMobile(v)} className={cn("flex items-center gap-1.5 rounded-full px-3 py-1 transition-colors", mobile === v ? "bg-white/10 text-fg" : "text-fg-muted hover:text-fg")}>
-                  <I className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{l}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="relative">
-            <div aria-hidden className="absolute -inset-6 rounded-[36px] bg-[radial-gradient(closest-side,rgb(16_176_127/0.22),transparent)] blur-2xl" />
-            <div className="relative"><BuildStage store={store} job={job} mobile={mobile} /></div>
-          </div>
-          <p className="mt-4 text-center text-xs text-fg-faint">Tu peux quitter cette page : la création continue et ta boutique t'attendra dans « Mes boutiques ».</p>
         </section>
       </main>
     </div>

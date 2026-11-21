@@ -26,12 +26,13 @@ export const GENERATE_STEPS: Omit<Step, "status">[] = [
   { key: "theme", label: "Réglages du thème" },
 ];
 
-// Aperçu gratuit : mêmes étapes affichées, mais une seule petite génération de texte, sans photos IA.
+// Aperçu gratuit : une petite génération de texte, puis une photo du produit s'il n'en a pas.
 export const TEASER_STEPS: Omit<Step, "status">[] = [
   { key: "strategy", label: "Analyse de ton produit" },
-  { key: "brand", label: "Identité de marque" },
-  { key: "pages", label: "Accroche et atouts" },
+  { key: "brand", label: "Nom, couleurs et accroche" },
+  { key: "pages", label: "Photo de ton produit" },
 ];
+export const TEASER_WEIGHTS: Partial<Record<JobStepKey, number>> = { strategy: 2, brand: 4, pages: 5 };
 
 export const PUBLISH_STEPS: Omit<Step, "status">[] = [
   { key: "product", label: "Produit, prix et images" },
@@ -48,13 +49,17 @@ export async function createJob(storeId: string, userId: string, kind: "generate
 export const GENERATE_WEIGHTS: Partial<Record<JobStepKey, number>> = { strategy: 14, brand: 2, pages: 34, product: 2, images: 44, theme: 4 };
 export const PUBLISH_WEIGHTS: Partial<Record<JobStepKey, number>> = { product: 45, publish: 25, theme: 30 };
 
-type Tracker = ((key: JobStepKey) => Promise<void>) & { sub: (fraction: number) => Promise<void> };
+// `estMs` : durée estimée d'une étape faite d'un seul long appel (texte IA, photo) : la barre avance
+// doucement pendant l'attente (jusqu'à 90 % de l'étape) au lieu de rester figée.
+type Tracker = ((key: JobStepKey, estMs?: number) => Promise<void>) & { sub: (fraction: number) => Promise<void>; stop: () => void };
 
 function tracker(jobId: string, steps: Step[], weights: Partial<Record<JobStepKey, number>> = {}): Tracker {
   const w = (k: JobStepKey) => weights[k] ?? 1;
   const total = steps.reduce((n, s) => n + w(s.key), 0);
   let current = -1;
   let last = -1;
+  let timer: ReturnType<typeof setInterval> | null = null;
+  const stopTimer = () => { if (timer) clearInterval(timer); timer = null; };
   const write = async (fraction: number) => {
     const before = steps.slice(0, Math.max(0, current)).reduce((n, s) => n + w(s.key), 0);
     // Jamais 100 % avant la vraie fin (finish).
@@ -63,17 +68,24 @@ function tracker(jobId: string, steps: Step[], weights: Partial<Record<JobStepKe
     last = progress;
     await db().from("jobs").update({ status: "running", steps, progress }).eq("id", jobId);
   };
-  const step = (async (key: JobStepKey) => {
+  const step = (async (key: JobStepKey, estMs?: number) => {
+    stopTimer();
     current = steps.findIndex((s) => s.key === key);
     steps.forEach((s, j) => (s.status = j < current ? "done" : j === current ? "running" : s.status === "done" ? "done" : "pending"));
     last = -1;
     await write(0);
+    if (estMs) {
+      const t0 = Date.now();
+      timer = setInterval(() => void write(Math.min(0.9, 1 - Math.exp(-(Date.now() - t0) / estMs))).catch(() => {}), 1500);
+    }
   }) as Tracker;
-  step.sub = (fraction) => write(Math.max(0, Math.min(1, fraction))).catch(() => {});
+  step.sub = (fraction) => { stopTimer(); return write(Math.max(0, Math.min(1, fraction))).catch(() => {}); };
+  step.stop = stopTimer;
   return step;
 }
 
-async function finish(jobId: string, steps: Step[], error?: string) {
+async function finish(jobId: string, steps: Step[], error?: string, t?: Tracker) {
+  t?.stop();
   steps.forEach((s) => { if (s.status !== "done") s.status = error ? (s.status === "running" ? "failed" : s.status) : "done"; });
   await db().from("jobs").update({ status: error ? "failed" : "succeeded", progress: error ? undefined : 100, steps, error: error ?? null, finished_at: new Date().toISOString() }).eq("id", jobId);
 }
@@ -104,7 +116,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
   const steps: Step[] = job.steps;
   const step = tracker(job.id, steps, GENERATE_WEIGHTS);
   try {
-    await step("strategy");
+    await step("strategy", 25_000);
     let sourceText: string | undefined;
     let sourceImages: string[] = [];
     let page: ProductPage | undefined;
@@ -158,11 +170,11 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     await db().from("stores").update({ plan, theme, name: plan.brand.name, status: "ready", updated_at: new Date().toISOString() }).eq("id", store.id);
     await db().from("store_versions").insert({ store_id: store.id, label: "Version initiale", snapshot: { plan, theme } });
     await db().from("users").update({ free_store_used: true }).eq("id", store.user_id); // boutique offerte utilisée (une seule fois)
-    await finish(job.id, steps);
+    await finish(job.id, steps, undefined, step);
   } catch (e) {
     console.error("Génération échouée", e);
     await db().from("stores").update({ status: "failed", updated_at: new Date().toISOString() }).eq("id", store.id);
-    await finish(job.id, steps, errorMessage(e));
+    await finish(job.id, steps, errorMessage(e), step);
   }
 }
 
@@ -174,7 +186,7 @@ const NATURAL = "real photograph taken with a professional camera, natural and b
 // après l'abonnement (runGeneration), à partir du même brief et du même lien.
 // Contenu de l'aperçu (nom, couleurs, accroche, photo du fournisseur), commun à l'aperçu d'un compte
 // et à l'aperçu créé sans compte depuis la page d'accueil.
-export async function buildTeaser(input: { mode: string; sourceUrl: string | null; brief: string; language: string; screenshots?: string[] }, onStep?: (k: "brand" | "pages") => Promise<void>) {
+export async function buildTeaser(input: { mode: string; sourceUrl: string | null; brief: string; language: string; screenshots?: string[] }, onStep?: (k: "brand" | "pages", estMs?: number) => Promise<void>) {
   let sourceText: string | undefined;
   let image: string | null = null;
   if (input.mode === "link" && input.sourceUrl) {
@@ -187,16 +199,16 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
     }
   }
   image ??= input.screenshots?.[0] ?? null;
-  await onStep?.("brand");
+  await onStep?.("brand", 7000);
   const t = await generateTeaser({ brief: input.brief, language: input.language, sourceText });
-  await onStep?.("pages");
+  await onStep?.("pages", !image && env.falKey() ? 12_000 : 1500);
   // Pas de photo (idée sans lien ni capture) : une vraie photo du produit, pour que l'aperçu donne envie.
   // La boutique complète repartira de cette photo, pour garder le même produit.
   if (!image && env.falKey()) {
     try {
-      const prompt = `Natural e-commerce product photo of ${t.productTitle} (${input.brief.slice(0, 200)}). The product alone, centered, full view, standing on a neutral surface in front of a plain neutral backdrop (soft warm grey, off-white or light beige), soft daylight from a window, gentle natural shadow, ${NATURAL}`;
-      // 768 × 768 : assez net pour l'aperçu, et environ 1,5 centime au lieu de 2,5 (aperçu gratuit ≤ 3 centimes en tout).
-      const img = await generateImage(prompt, "1:1", { width: 768, height: 768 });
+      const prompt = `Natural e-commerce product photo of ${t.productTitle} (${input.brief.slice(0, 200)}). The product alone, full view, placed slightly right of center on a neutral surface (light stone, pale wood or plain plinth) in front of a plain neutral backdrop (soft warm grey, off-white or light beige), calm empty space on the left, soft daylight from a window, gentle natural shadow, ${NATURAL}`;
+      // 1024 × 768 (paysage, place à gauche pour l'accroche) : ≈ 2 centimes. Aperçu gratuit ≤ 4 centimes en tout.
+      const img = await generateImage(prompt, "16:9", { width: 1024, height: 768 });
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
     } catch (e) {
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
@@ -208,17 +220,18 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
 
 export async function runTeaser(job: Record<string, any>, store: StoreRow) {
   const steps: Step[] = job.steps;
-  const step = tracker(job.id, steps);
+  // Poids ≈ durée réelle : lecture du lien, texte de l'IA, puis photo du produit.
+  const step = tracker(job.id, steps, TEASER_WEIGHTS);
   try {
-    await step("strategy");
-    const out = await buildTeaser({ mode: store.mode, sourceUrl: store.source_url, brief: store.brief, language: store.language, screenshots: (job.input as { screenshots?: string[] } | null)?.screenshots }, (k) => step(k));
+    await step("strategy", 3000);
+    const out = await buildTeaser({ mode: store.mode, sourceUrl: store.source_url, brief: store.brief, language: store.language, screenshots: (job.input as { screenshots?: string[] } | null)?.screenshots }, (k, est) => step(k, est));
     await db().from("stores").update({ ...out, status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
-    await finish(job.id, steps);
+    await finish(job.id, steps, undefined, step);
   } catch (e) {
     console.error("Aperçu échoué", e);
     await db().from("stores").update({ status: "failed", updated_at: new Date().toISOString() }).eq("id", store.id);
     await db().from("users").update({ free_store_used: false }).eq("id", store.user_id); // il pourra réessayer
-    await finish(job.id, steps, errorMessage(e));
+    await finish(job.id, steps, errorMessage(e), step);
   }
 }
 
@@ -333,9 +346,9 @@ export async function runRegenerateImages(job: Record<string, any>, store: Store
     }
     await generateStoreImages(store.id, store.plan as StorePlan, (d, t) => void step.sub(d / t));
     await db().from("stores").update({ updated_at: new Date().toISOString() }).eq("id", store.id);
-    await finish(job.id, steps);
+    await finish(job.id, steps, undefined, step);
   } catch (e) {
-    await finish(job.id, steps, errorMessage(e));
+    await finish(job.id, steps, errorMessage(e), step);
   }
 }
 
@@ -404,13 +417,13 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
       console.warn("Installation de thème non autorisée (dérogation Shopify manquante) : import manuel.");
       await db().from("stores").update({ shopify: { ...ids, themeManual: true } }).eq("id", store.id);
     }
-    await finish(job.id, steps);
+    await finish(job.id, steps, undefined, step);
   } catch (e) {
     console.error("Publication échouée", e);
     const { data: now } = await db().from("stores").select("shopify").eq("id", store.id).maybeSingle();
     const saved = (now?.shopify ?? {}) as ShopifyIds;
     await db().from("stores").update({ status: saved.productId ? "published" : previousStatus }).eq("id", store.id);
-    await finish(job.id, steps, errorMessage(e));
+    await finish(job.id, steps, errorMessage(e), step);
   }
 }
 
@@ -423,8 +436,8 @@ export async function runImage(job: Record<string, any>, storeId: string) {
     const img = await generateImage(prompt, aspectRatio);
     const saved = await storeImage(storeId, img.bytes, img.contentType);
     await db().from("assets").insert({ store_id: storeId, kind, storage_path: saved.path, url: saved.url, width: img.width, height: img.height, prompt });
-    await finish(job.id, steps);
+    await finish(job.id, steps, undefined, step);
   } catch (e) {
-    await finish(job.id, steps, errorMessage(e));
+    await finish(job.id, steps, errorMessage(e), step);
   }
 }
