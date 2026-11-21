@@ -85,7 +85,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
         ) : (
           <div className="overflow-hidden text-white" style={{ background: dark }}>
             <div className="relative aspect-[4/3.6] w-full overflow-hidden">
-              <img src={t.image} alt="" className={cn("h-full w-full object-cover", blurImg)} />
+              <img src={t.image} alt="" className={cn("h-full w-full object-cover", blurImg)} style={{ objectPosition: "68% center" }} />
               <div className="absolute inset-0" style={{ background: `linear-gradient(0deg, ${dark} 0%, transparent 38%)` }} />
             </div>
             <div className="relative -mt-6 px-5 pb-8">
@@ -136,7 +136,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
       {/* Fiche produit lisible (nom, prix, description, points forts), connecté seulement. */}
       {!loginHref && (
         <div className={cn("grid items-center gap-6", wide ? "grid-cols-2 px-8 py-8" : "px-5 py-6")} style={{ background: style === "premium" ? undefined : `${primary}06` }}>
-          <div className="aspect-square overflow-hidden rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}55, ${primary}55)` }}>{t.image && <img src={t.image} alt="" className="h-full w-full object-cover" />}</div>
+          <div className="aspect-square overflow-hidden rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}55, ${primary}55)` }}>{t.image && <img src={t.image} alt="" className="h-full w-full object-cover" style={{ objectPosition: "70% center" }} />}</div>
           <div>
             <p className={cn("leading-tight", wide ? "text-[1.7rem]" : "text-[1.45rem]")} style={heading}>{t.productTitle}</p>
             <p className="mt-2 text-xl font-bold">{eur(t.price)}</p>

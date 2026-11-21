@@ -206,9 +206,12 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
   // La boutique complète repartira de cette photo, pour garder le même produit.
   if (!image && env.falKey()) {
     try {
-      const prompt = `Natural e-commerce product photo of ${t.productTitle} (${input.brief.slice(0, 200)}). The product alone, full view, placed slightly right of center on a neutral surface (light stone, pale wood or plain plinth) in front of a plain neutral backdrop (soft warm grey, off-white or light beige), calm empty space on the left, soft daylight from a window, gentle natural shadow, ${NATURAL}`;
-      // 1024 × 768 (paysage, place à gauche pour l'accroche) : ≈ 2 centimes. Aperçu gratuit ≤ 4 centimes en tout.
-      const img = await generateImage(prompt, "16:9", { width: 1024, height: 768 });
+      // Même format que le haut de page des boutiques complètes (ex. Vélaro) : photo large, produit posé sur un
+      // socle à droite, lumière de studio douce, place à gauche pour l'accroche.
+      const c = t.brand.colors;
+      const prompt = `Wide premium product photograph of ${t.productTitle} (${input.brief.slice(0, 200)}). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. Smooth studio background with a gradient between ${c.background} and a deeper shade of it, soft spotlight from above, a very subtle warm glow in ${c.accent} behind the product. The product is placed on the right third of the frame, generous calm empty space on the left. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
+      // 1280 × 720 : ≈ 2,3 centimes. Aperçu gratuit ≤ 3,5 centimes en tout (texte compris).
+      const img = await generateImage(prompt, "16:9", { width: 1280, height: 720 });
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
     } catch (e) {
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
