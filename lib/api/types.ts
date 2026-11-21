@@ -53,6 +53,8 @@ export type StoreTeaser = {
   productTitle: string;
   price: string;
   benefits: { title: string; text: string }[];
+  description?: string; // fiche produit (aperçus créés depuis le 21/11/2026)
+  bullets?: string[];
   image: string | null;
 };
 

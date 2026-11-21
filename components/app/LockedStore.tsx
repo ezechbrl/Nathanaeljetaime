@@ -29,11 +29,21 @@ const eur = (p: string) => `${Number(p).toFixed(2).replace(".", ",")} €`;
 // Sans compte (`loginHref`) : la photo et la suite sont floutées, il faut se connecter pour les voir.
 export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; loginHref?: string; onUnlock?: () => void }) {
   const t = store.teaser!;
-  const { primary, accent, background } = store.theme.colors;
+  const style = store.theme.style ?? "lifestyle";
+  const lumOf = (h: string) => { const x = h.replace("#", "").padEnd(6, "0"); return 0.299 * parseInt(x.slice(0, 2), 16) + 0.587 * parseInt(x.slice(2, 4), 16) + 0.114 * parseInt(x.slice(4, 6), 16); };
+  // Style « sport et tech » : toujours sur fond sombre, comme la vraie boutique.
+  const c0 = store.theme.colors;
+  const flip = style === "tech" && lumOf(c0.background) > lumOf(c0.primary);
+  const { primary, accent, background } = flip ? { ...c0, primary: c0.background, background: c0.primary } : c0;
   const { headingFont, bodyFont } = store.theme;
   const serif = /serif|fraunces|playfair|cormorant|garamond|bodoni|lora/i.test(headingFont);
-  const heading = { fontFamily: `'${headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}`, fontWeight: serif ? 400 : 700 };
+  const heading = { fontFamily: `'${headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}`, fontWeight: serif ? 400 : 700, ...(style === "tech" ? { textTransform: "uppercase" as const, letterSpacing: "-0.01em" } : {}) };
   const onAccent = onColor(accent);
+  // Bandeau défilant et cartes d'atouts : un rendu par style.
+  const mqStyle = style === "premium" ? { background: `${primary}0a`, color: primary } : style === "direct" ? { background: primary, color: background } : { background: accent, color: onAccent };
+  const cardClass = style === "premium" ? "border" : style === "direct" ? "border-l-4" : "";
+  const cardStyle = (i: number) => style === "premium" ? { borderColor: `${primary}1f` } : style === "direct" ? { background: `${primary}08`, borderColor: accent } : style === "tech" ? { background: `${primary}0d`, boxShadow: i === 0 ? `0 0 0 1px ${accent}55` : undefined } : { background: `${accent}14` };
+  const bullets = (t.bullets?.length ? t.bullets : t.benefits.map((b) => b.title)).slice(0, 3);
   const ref = useRef<HTMLDivElement>(null);
   const [wide, setWide] = useState(false);
   useEffect(() => {
@@ -43,8 +53,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  const lum = (h: string) => { const x = h.replace("#", "").padEnd(6, "0"); return 0.299 * parseInt(x.slice(0, 2), 16) + 0.587 * parseInt(x.slice(2, 4), 16) + 0.114 * parseInt(x.slice(4, 6), 16); };
-  const dark = lum(primary) < lum(background) ? primary : background;
+  const dark = lumOf(primary) < lumOf(background) ? primary : background;
   const blurImg = loginHref ? "scale-110 blur-[14px]" : "";
   const trust = ["Livraison offerte", "Retours 30 jours", "Paiement sécurisé"];
   const icons = [Truck, RotateCcw, ShieldCheck];
@@ -65,11 +74,11 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
         wide ? (
           <div className="relative flex min-h-[420px] items-center overflow-hidden text-white">
             <img src={t.image} alt="" className={cn("absolute inset-0 h-full w-full object-cover", blurImg)} style={{ objectPosition: "70% center" }} />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.28) 45%,transparent 75%)" }} />
-            <div className="relative max-w-[520px] px-8 py-12">
+            <div className="absolute inset-0" style={{ background: style === "premium" ? "rgba(0,0,0,.42)" : "linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.28) 45%,transparent 75%)" }} />
+            <div className={cn("relative px-8 py-12", style === "premium" ? "mx-auto max-w-[640px] text-center" : "max-w-[520px]")}>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs backdrop-blur"><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{t.tagline}</span>
               <h3 className="mt-4 text-[2.5rem] leading-[1.04]" style={heading}>{t.heroTitle}</h3>
-              <p className="mt-3 max-w-[38ch] text-[15px] opacity-90">{t.heroSubtitle}</p>
+              <p className={cn("mt-3 max-w-[38ch] text-[15px] opacity-90", style === "premium" && "mx-auto")}>{t.heroSubtitle}</p>
               <span className="mt-6 inline-flex rounded-full px-6 py-3 text-sm font-semibold shadow-lg" style={{ background: accent, color: onAccent }}>Acheter · {eur(t.price)}</span>
             </div>
           </div>
@@ -101,7 +110,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
         {trust.map((x, i) => { const I = icons[i]; return <span key={x} className="flex items-center gap-2"><I className="h-4 w-4" style={{ color: accent }} />{x}</span>; })}
       </div>
       {mq.length > 1 && (
-        <div className="overflow-hidden py-3" style={{ background: accent, color: onAccent }}>
+        <div className="overflow-hidden py-3" style={mqStyle}>
           <div className="flex w-max" style={{ animation: "tp-mq 26s linear infinite" }}>
             {[0, 1].map((g) => (
               <div key={g} aria-hidden={g === 1} className="flex items-center gap-6 pr-6">
@@ -116,7 +125,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
       {!loginHref && (
         <div className={cn("grid gap-3 px-5 py-6", wide ? "grid-cols-3 px-8" : "grid-cols-1")}>
           {t.benefits.map((b) => (
-            <div key={b.title} className="flex gap-3 rounded-[14px] p-4" style={{ background: `${accent}14` }}>
+            <div key={b.title} className={cn("flex gap-3 rounded-[14px] p-4", cardClass)} style={cardStyle(t.benefits.indexOf(b))}>
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full" style={{ background: accent, color: onAccent }}><Check className="h-4 w-4" /></span>
               <span><span className="block font-semibold">{b.title}</span><span className="mt-0.5 block text-sm opacity-70">{b.text}</span></span>
             </div>
@@ -124,7 +133,22 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
         </div>
       )}
 
-      {/* La suite (fiche produit, comment ça marche…) : floutée jusqu'au déblocage. */}
+      {/* Fiche produit lisible (nom, prix, description, points forts), connecté seulement. */}
+      {!loginHref && (
+        <div className={cn("grid items-center gap-6", wide ? "grid-cols-2 px-8 py-8" : "px-5 py-6")} style={{ background: style === "premium" ? undefined : `${primary}06` }}>
+          <div className="aspect-square overflow-hidden rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}55, ${primary}55)` }}>{t.image && <img src={t.image} alt="" className="h-full w-full object-cover" />}</div>
+          <div>
+            <p className={cn("leading-tight", wide ? "text-[1.7rem]" : "text-[1.45rem]")} style={heading}>{t.productTitle}</p>
+            <p className="mt-2 text-xl font-bold">{eur(t.price)}</p>
+            <p className="mt-3 text-[14.5px] leading-relaxed opacity-80">{t.description || t.heroSubtitle}</p>
+            <ul className="mt-4 space-y-2 text-[14.5px]">{bullets.map((b) => <li key={b} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: accent }} />{b}</li>)}</ul>
+            <button type="button" onClick={onUnlock} className="mt-5 flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold shadow-lg" style={{ background: accent, color: onAccent }}>Ajouter au panier · {eur(t.price)}</button>
+            <p className="mt-2 flex items-center justify-center gap-1.5 text-xs opacity-60"><Lock className="h-3 w-3" /> Paiement sécurisé · Livraison suivie</p>
+          </div>
+        </div>
+      )}
+
+      {/* La suite (comment ça marche, photos, avis, FAQ…) : floutée jusqu'au déblocage. */}
       <div className="relative">
         <div aria-hidden className={cn("pointer-events-none select-none space-y-6 blur-[6px]", wide ? "p-8" : "p-5")}>
           {loginHref && (
@@ -132,16 +156,8 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
               {t.benefits.map((b) => <div key={b.title} className="rounded-[14px] p-4" style={{ background: `${accent}14` }}><p className="font-semibold">{b.title}</p><p className="mt-1 text-sm opacity-70">{b.text}</p></div>)}
             </div>
           )}
-          <div className={cn("grid gap-5", wide && "grid-cols-2")}>
-            <div className="aspect-square overflow-hidden rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}55, ${primary}55)` }}>{t.image && <img src={t.image} alt="" className="h-full w-full object-cover" />}</div>
-            <div className="space-y-3">
-              <p className="text-xl font-semibold" style={heading}>{t.productTitle}</p>
-              <p className="text-lg font-bold">{eur(t.price)}</p>
-              {[0, 1, 2].map((i) => <p key={i} className="flex items-center gap-2 text-sm"><Check className="h-4 w-4" style={{ color: accent }} />{t.benefits[i]?.title ?? ""}</p>)}
-              <div className="grid h-12 place-items-center rounded-full text-sm font-semibold" style={{ background: accent, color: onAccent }}>Ajouter au panier</div>
-              <div className="h-3 w-2/3 rounded-full" style={{ background: `${primary}22` }} />
-            </div>
-          </div>
+          <p className="text-center text-2xl" style={heading}>Comment ça marche</p>
+          <div className={cn("grid gap-4", wide ? "grid-cols-3" : "grid-cols-1")}>{[0, 1, 2].map((i) => <div key={i} className="rounded-[16px] p-3" style={{ background: `${primary}0a` }}><p className="text-xs font-bold" style={{ color: accent }}>0{i + 1}</p><div className="mt-2 aspect-[4/3] rounded-[12px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}30)` }} /><div className="mt-3 h-3 w-2/3 rounded-full" style={{ background: `${primary}22` }} /></div>)}</div>
           <div className={cn("grid gap-4", wide ? "grid-cols-3" : "grid-cols-1")}>{[0, 1, 2].map((i) => <div key={i} className="h-28 rounded-[16px]" style={{ background: `${primary}0f` }} />)}</div>
         </div>
         <div className="absolute inset-0 grid place-items-center bg-gradient-to-b from-transparent via-black/10 to-black/30 p-4">

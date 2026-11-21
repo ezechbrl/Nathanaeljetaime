@@ -214,7 +214,7 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
     }
   }
-  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), image };
+  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image };
   return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, t.brand.colors) };
 }
 

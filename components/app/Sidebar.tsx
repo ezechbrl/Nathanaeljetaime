@@ -23,15 +23,15 @@ const TINTS = {
   teal: "bg-[#14b8a6]/15 text-[#5eead4]",
   rose: "bg-[#f43f5e]/15 text-[#fb8197]",
   sky: "bg-[#0ea5e9]/15 text-[#6cc9f5]",
-  grey: "bg-white/[0.07] text-fg-muted",
+  grey: "bg-white/[0.08] text-white",
 } as const;
 
 function NavLink({ href, icon: Icon, children, exact, tint = "grey" }: { href: string; icon: React.ComponentType<{ className?: string }>; children: React.ReactNode; exact?: boolean; tint?: keyof typeof TINTS }) {
   const pathname = usePathname();
   const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
   return (
-    <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex items-center gap-2.5 rounded-ctl px-2 py-[6px] text-[13.5px] transition-colors", active ? "bg-white/[0.09] font-medium text-white" : "text-fg/90 hover:bg-white/[0.04] hover:text-white")}>
-      <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-[9px] transition-transform", TINTS[tint], active && "scale-105 ring-1 ring-white/15")}><Icon className="h-4 w-4" /></span> {children}
+    <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex items-center gap-3 rounded-ctl px-2 py-[7px] text-[15px] text-white transition-colors", active ? "bg-white/[0.1] font-semibold" : "font-medium hover:bg-white/[0.05]")}>
+      <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-[10px] transition-transform", TINTS[tint], active && "scale-105 ring-1 ring-white/20")}><Icon className="h-[18px] w-[18px]" /></span> {children}
     </Link>
   );
 }
@@ -46,7 +46,7 @@ function StoreSwitcher({ currentId }: { currentId?: string }) {
     <div className="relative">
       <button onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center gap-2.5 rounded-ctl border border-white/[0.07] bg-white/[0.02] px-2.5 py-2 text-left text-[13.5px] hover:border-white/15">
         <span className="h-5 w-5 shrink-0 rounded-[6px]" style={{ background: `linear-gradient(135deg, ${current.theme.colors.accent}, ${current.theme.colors.primary})` }} />
-        <span className="flex-1 truncate">{current.name}</span>
+        <span className="flex-1 truncate font-semibold text-white">{current.name}</span>
         <ChevronsUpDown className="h-3.5 w-3.5 text-fg-faint" />
       </button>
       {open && (
@@ -80,18 +80,18 @@ function SidebarBody() {
       {/* Le logo est déjà dans la barre du haut sur téléphone. */}
       <div className="hidden px-1.5 pb-4 pt-1 lg:block"><Logo href="/app" /></div>
       <NavLink href="/app" icon={Home} exact tint="green">Accueil</NavLink>
-      <NavLink href="/app/boutiques" icon={StoreIcon} exact tint="blue">Mes boutiques</NavLink>
+      <NavLink href="/app/boutiques" icon={StoreIcon} exact>Mes boutiques</NavLink>
       {user.isOwner && <NavLink href="/ventes" icon={TrendingUp} tint="amber">Mes ventes</NavLink>}
 
       {storeId && (
         <>
-          <p className="mt-5 px-2.5 pb-1.5 text-[10.5px] uppercase tracking-[0.14em] text-fg-muted">Ma boutique</p>
+          <p className="mt-5 px-2.5 pb-1.5 font-serif text-[17px] italic text-white/90">Ma boutique</p>
           <StoreSwitcher currentId={params.id} />
           <div className="mt-1 space-y-0.5">
-            <NavLink href={`/app/boutiques/${storeId}`} icon={LayoutGrid} exact tint="violet">Tableau de bord</NavLink>
+            <NavLink href={`/app/boutiques/${storeId}`} icon={LayoutGrid} exact>Tableau de bord</NavLink>
             <NavLink href={`/app/boutiques/${storeId}/editeur`} icon={MessageSquare} tint="amber">Éditeur IA</NavLink>
-            <NavLink href={`/app/boutiques/${storeId}/studio`} icon={ImageIcon} tint="pink">Studio et bibliothèque</NavLink>
-            <NavLink href="/app/outils" icon={Wand2} tint="teal">Outils IA (nom, slogan…)</NavLink>
+            <NavLink href={`/app/boutiques/${storeId}/studio`} icon={ImageIcon}>Studio et bibliothèque</NavLink>
+            <NavLink href="/app/outils" icon={Wand2}>Outils IA (nom, slogan…)</NavLink>
           </div>
         </>
       )}
@@ -100,8 +100,8 @@ function SidebarBody() {
         {user.plan === "free" ? (
           <div className="relative overflow-hidden rounded-card border border-[#2ee6a6]/35 bg-[linear-gradient(160deg,rgb(16_176_127/0.28),rgb(4_30_22/0.6))] p-3.5 shadow-[0_10px_30px_-15px_rgb(46_230_166/0.6)]">
             <span aria-hidden className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-[#2ee6a6]/25 blur-2xl" />
-            <p className="relative flex items-center gap-1.5 text-[13px] font-semibold text-white"><Sparkles className="h-4 w-4 text-[#6ee7b7]" /> Débloque ta boutique complète</p>
-            <p className="relative mt-1 text-xs leading-relaxed text-fg-muted">Textes, photos, éditeur IA et mise en ligne sur Shopify. Sans engagement.</p>
+            <p className="relative flex items-center gap-1.5 font-serif text-[17px] italic text-white"><Sparkles className="h-4 w-4 text-[#6ee7b7]" /> Débloque ta boutique complète</p>
+            <p className="relative mt-1 text-[13px] leading-relaxed text-white/80">Textes, photos, éditeur IA et mise en ligne sur Shopify. Sans engagement.</p>
             <Link href="/app/abonnement" className="relative mt-3 flex h-10 items-center justify-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[13.5px] font-semibold text-[#03140d] shadow-[0_8px_24px_-8px_rgb(46_230_166/0.8)] transition hover:brightness-110">Choisir mon offre</Link>
           </div>
         ) : (
@@ -110,15 +110,15 @@ function SidebarBody() {
           </Link>
         )}
         <div className="space-y-0.5">
-          <NavLink href="/app/abonnement" icon={CreditCard} tint="green">Abonnement</NavLink>
+          <NavLink href="/app/abonnement" icon={CreditCard}>Abonnement</NavLink>
           <NavLink href="/app/affiliation" icon={Gift} tint="rose">Affiliation</NavLink>
-          <NavLink href="/app/aide" icon={HelpCircle} tint="sky">Aide et contact</NavLink>
+          <NavLink href="/app/aide" icon={HelpCircle}>Aide et contact</NavLink>
           <NavLink href="/app/parametres" icon={Settings}>Paramètres</NavLink>
         </div>
         <div className="flex items-center gap-2.5 border-t border-white/[0.06] px-1.5 pt-3">
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[linear-gradient(160deg,#34f0b0,#0fae7c)] text-sm font-semibold text-[#03140d]">{user.firstName.charAt(0).toUpperCase()}</span>
           <div className="min-w-0 flex-1 leading-tight">
-            <p className="truncate text-[13px]">{user.firstName}</p>
+            <p className="truncate text-[14px] font-semibold text-white">{user.firstName}</p>
             <p className="truncate text-[11px] text-fg-faint">{user.email}</p>
           </div>
           <button onClick={signOut} aria-label="Se déconnecter" className="grid h-8 w-8 place-items-center rounded-ctl text-fg-faint hover:bg-white/5 hover:text-fg"><LogOut className="h-4 w-4" /></button>
