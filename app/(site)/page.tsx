@@ -4,6 +4,7 @@ import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Hero } from "@/components/site/Hero";
 import { PriceTeaser } from "@/components/site/PriceTeaser";
+import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
 import { Reviews } from "@/components/site/Reviews";
 import { StickyCta } from "@/components/site/StickyCta";
 import { HOME_FAQ } from "@/lib/content/faq";
@@ -16,6 +17,7 @@ export default function HomePage() {
     <>
       <Hero />
       <BeforeAfterSlider />
+      <ShowcaseGrid />
       <BuyerReviews />
       <PriceTeaser />
       <Reviews />

@@ -97,6 +97,10 @@
 }
 
 @keyframes store-mq { to { transform: translateX(-50%); } }
+@keyframes swipe-heart { 0% { transform: scale(.2); opacity: 0; } 30% { transform: scale(1.15); opacity: 1; } 55% { transform: scale(1) translateY(0); opacity: 1; } 100% { transform: scale(.9) translate(120px, -160px) rotate(18deg); opacity: 0; } }
+@keyframes swipe-float { 0% { transform: translate(calc(var(--x) * .4), 30px) scale(.4); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(calc(var(--x) * 1.6), -200px) scale(1.15) rotate(15deg); opacity: 0; } }
+@keyframes swipe-nope { 0% { transform: scale(.2) rotate(0); opacity: 0; } 30% { transform: scale(1.1) rotate(-8deg); opacity: 1; } 45% { transform: scale(1) rotate(8deg); } 60% { transform: scale(1) rotate(-6deg) translateX(0); opacity: 1; } 100% { transform: scale(.8) rotate(-25deg) translateX(-220px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { [class*="swipe-heart"], [class*="swipe-float"], [class*="swipe-nope"] { animation: none !important; opacity: 0 !important; } }
 @keyframes cta-glow { 0%, 100% { box-shadow: 0 0 18px rgb(46 230 166 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.45); } 50% { box-shadow: 0 0 34px 4px rgb(46 230 166 / 0.85), inset 0 1px 0 rgb(255 255 255 / 0.5); } }
 @keyframes quiz-glow { 0%, 100% { opacity: .55; transform: scale(.98); } 50% { opacity: 1; transform: scale(1.02); } }
 /* Titres mot par mot (voir splitWords dans Reveal.tsx). */

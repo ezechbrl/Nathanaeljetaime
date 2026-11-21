@@ -89,4 +89,31 @@ export const SHOWCASE: ShowcaseStore[] = [
     highlights: ["Style sport et tech, fond sombre", "Photos studio créées par l'IA", "Aide au choix de la taille"],
     image: "/showcase/velaro.jpg",
   },
+  {
+    slug: "klinn", name: "Klinn", category: "Auto", language: "français",
+    brief: "Aspirateur sans fil compact pour garder l'habitacle de la voiture propre.",
+    headline: "Un habitacle impeccable, en un geste.", sub: "L'aspirateur sans fil compact, pensé pour rester à portée de main.", product: "Klinn Mini", price: "29,90 €",
+    palette: { bg: "#fffaf5", ink: "#1c0f05", accent: "#f97316", soft: "#fde3cc" }, font: "sans", layout: "split",
+    highlights: ["Créée à partir d'un lien produit", "Packshot studio créé par l'IA", "Ton direct, orienté usage"],
+    image: "/showcase/klinn.jpg",
+  },
+  {
+    slug: "maison-brume", name: "Maison Brume", category: "Gourmandise", language: "français",
+    brief: "Chewing-gum haute gamme aux saveurs fines, dans un étui élégant.",
+    headline: "Le chewing-gum, version gourmet.", sub: "Des saveurs fines et durables, dans un étui qu'on aime sortir de sa poche.", product: "Coffret Découverte Brume", price: "24,90 €",
+    palette: { bg: "#f7efe7", ink: "#2e1f1a", accent: "#8c3b2e", soft: "#ecd9cb" }, font: "serif", layout: "center",
+    highlights: ["Style premium épuré", "Packshot sur fond chaud", "Coffret mis en valeur"],
+    image: "/showcase/brume.jpg",
+  },
+  {
+    slug: "vortex", name: "Vortex Audio", category: "Gaming", language: "français",
+    brief: "Casque gaming confortable et précis, avec un micro clair, à un prix juste.",
+    headline: "Entends chaque pas avant qu'il n'arrive.", sub: "Un casque gaming confortable et précis, avec un micro clair.", product: "Casque gaming Vortex Pulse", price: "49,90 €",
+    palette: { bg: "#0b0d12", ink: "#f2f2f2", accent: "#ff6a00", soft: "#1b1f27" }, font: "sans", layout: "split",
+    highlights: ["Style sport et tech, fond sombre", "Photo studio créée par l'IA", "Accent orange vif"],
+    image: "/showcase/vortex.jpg",
+  },
 ];
+
+// Accueil : 8 boutiques dans la grille « Exemples », 4 autres (une par style) dans le cœur / croix.
+export const GRID_SLUGS = ["pas-sur", "maison-ouate", "kordo", "klinn", "nido", "vortex", "velaro", "pincee"];
