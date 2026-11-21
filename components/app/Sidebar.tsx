@@ -2,7 +2,7 @@
 
 import {
   ChevronsUpDown, CreditCard, Gift, HelpCircle, Home, Image as ImageIcon, LayoutGrid, LogOut,
-  Menu, MessageSquare, Plus, Settings, Store as StoreIcon, TrendingUp, Wand2, X,
+  Menu, MessageSquare, Plus, Settings, Sparkles, Store as StoreIcon, TrendingUp, Wand2, X,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -13,12 +13,25 @@ import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 import { useApp } from "./AppContext";
 
-function NavLink({ href, icon: Icon, children, exact }: { href: string; icon: React.ComponentType<{ className?: string }>; children: React.ReactNode; exact?: boolean }) {
+// Une petite couleur par rubrique (pastille d'icône), pour s'y retrouver d'un coup d'œil.
+const TINTS = {
+  green: "bg-[#10b981]/15 text-[#34d399]",
+  blue: "bg-[#3b82f6]/15 text-[#7cb2ff]",
+  violet: "bg-[#8b5cf6]/15 text-[#b49bff]",
+  amber: "bg-[#f59e0b]/15 text-[#fbbf5a]",
+  pink: "bg-[#ec4899]/15 text-[#f58bc0]",
+  teal: "bg-[#14b8a6]/15 text-[#5eead4]",
+  rose: "bg-[#f43f5e]/15 text-[#fb8197]",
+  sky: "bg-[#0ea5e9]/15 text-[#6cc9f5]",
+  grey: "bg-white/[0.07] text-fg-muted",
+} as const;
+
+function NavLink({ href, icon: Icon, children, exact, tint = "grey" }: { href: string; icon: React.ComponentType<{ className?: string }>; children: React.ReactNode; exact?: boolean; tint?: keyof typeof TINTS }) {
   const pathname = usePathname();
   const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
   return (
-    <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex items-center gap-2.5 rounded-ctl px-2.5 py-[7px] text-[13.5px] transition-colors", active ? "bg-white/[0.09] font-medium text-white" : "text-fg/90 hover:bg-white/[0.04] hover:text-white")}>
-      <Icon className={cn("h-4 w-4", active && "text-accent")} /> {children}
+    <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex items-center gap-2.5 rounded-ctl px-2 py-[6px] text-[13.5px] transition-colors", active ? "bg-white/[0.09] font-medium text-white" : "text-fg/90 hover:bg-white/[0.04] hover:text-white")}>
+      <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-[9px] transition-transform", TINTS[tint], active && "scale-105 ring-1 ring-white/15")}><Icon className="h-4 w-4" /></span> {children}
     </Link>
   );
 }
@@ -64,29 +77,32 @@ function SidebarBody() {
 
   return (
     <div className="flex h-full flex-col gap-1 p-3">
-      <div className="px-1.5 pb-4 pt-1"><Logo href="/app" /></div>
-      <NavLink href="/app" icon={Home} exact>Accueil</NavLink>
-      <NavLink href="/app/boutiques" icon={StoreIcon} exact>Mes boutiques</NavLink>
-      {user.isOwner && <NavLink href="/ventes" icon={TrendingUp}>Mes ventes</NavLink>}
+      {/* Le logo est déjà dans la barre du haut sur téléphone. */}
+      <div className="hidden px-1.5 pb-4 pt-1 lg:block"><Logo href="/app" /></div>
+      <NavLink href="/app" icon={Home} exact tint="green">Accueil</NavLink>
+      <NavLink href="/app/boutiques" icon={StoreIcon} exact tint="blue">Mes boutiques</NavLink>
+      {user.isOwner && <NavLink href="/ventes" icon={TrendingUp} tint="amber">Mes ventes</NavLink>}
 
       {storeId && (
         <>
           <p className="mt-5 px-2.5 pb-1.5 text-[10.5px] uppercase tracking-[0.14em] text-fg-muted">Ma boutique</p>
           <StoreSwitcher currentId={params.id} />
           <div className="mt-1 space-y-0.5">
-            <NavLink href={`/app/boutiques/${storeId}`} icon={LayoutGrid} exact>Tableau de bord</NavLink>
-            <NavLink href={`/app/boutiques/${storeId}/editeur`} icon={MessageSquare}>Éditeur IA</NavLink>
-            <NavLink href={`/app/boutiques/${storeId}/studio`} icon={ImageIcon}>Studio et bibliothèque</NavLink>
-            <NavLink href="/app/outils" icon={Wand2}>Outils IA (nom, slogan…)</NavLink>
+            <NavLink href={`/app/boutiques/${storeId}`} icon={LayoutGrid} exact tint="violet">Tableau de bord</NavLink>
+            <NavLink href={`/app/boutiques/${storeId}/editeur`} icon={MessageSquare} tint="amber">Éditeur IA</NavLink>
+            <NavLink href={`/app/boutiques/${storeId}/studio`} icon={ImageIcon} tint="pink">Studio et bibliothèque</NavLink>
+            <NavLink href="/app/outils" icon={Wand2} tint="teal">Outils IA (nom, slogan…)</NavLink>
           </div>
         </>
       )}
 
       <div className="mt-auto space-y-3">
         {user.plan === "free" ? (
-          <div className="rounded-card border border-accent/25 bg-accent-deep/30 p-3">
-            <p className="text-xs leading-relaxed text-fg-muted">Abonne-toi pour créer et modifier tes boutiques avec l'IA.</p>
-            <Link href="/app" className="mt-2.5 block rounded-ctl bg-accent-strong py-1.5 text-center text-xs font-medium text-white transition hover:brightness-110">Choisir mon offre</Link>
+          <div className="relative overflow-hidden rounded-card border border-[#2ee6a6]/35 bg-[linear-gradient(160deg,rgb(16_176_127/0.28),rgb(4_30_22/0.6))] p-3.5 shadow-[0_10px_30px_-15px_rgb(46_230_166/0.6)]">
+            <span aria-hidden className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-[#2ee6a6]/25 blur-2xl" />
+            <p className="relative flex items-center gap-1.5 text-[13px] font-semibold text-white"><Sparkles className="h-4 w-4 text-[#6ee7b7]" /> Débloque ta boutique complète</p>
+            <p className="relative mt-1 text-xs leading-relaxed text-fg-muted">Textes, photos, éditeur IA et mise en ligne sur Shopify. Sans engagement.</p>
+            <Link href="/app/abonnement" className="relative mt-3 flex h-10 items-center justify-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[13.5px] font-semibold text-[#03140d] shadow-[0_8px_24px_-8px_rgb(46_230_166/0.8)] transition hover:brightness-110">Choisir mon offre</Link>
           </div>
         ) : (
           <Link href="/app/abonnement" className="block rounded-card border border-white/[0.08] bg-black/20 p-3 transition-colors hover:border-accent/30">
@@ -94,13 +110,13 @@ function SidebarBody() {
           </Link>
         )}
         <div className="space-y-0.5">
-          <NavLink href="/app/abonnement" icon={CreditCard}>Abonnement</NavLink>
-          <NavLink href="/app/affiliation" icon={Gift}>Affiliation</NavLink>
-          <NavLink href="/app/aide" icon={HelpCircle}>Aide et contact</NavLink>
+          <NavLink href="/app/abonnement" icon={CreditCard} tint="green">Abonnement</NavLink>
+          <NavLink href="/app/affiliation" icon={Gift} tint="rose">Affiliation</NavLink>
+          <NavLink href="/app/aide" icon={HelpCircle} tint="sky">Aide et contact</NavLink>
           <NavLink href="/app/parametres" icon={Settings}>Paramètres</NavLink>
         </div>
         <div className="flex items-center gap-2.5 border-t border-white/[0.06] px-1.5 pt-3">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-deep text-sm text-accent">{user.firstName.charAt(0).toUpperCase()}</span>
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[linear-gradient(160deg,#34f0b0,#0fae7c)] text-sm font-semibold text-[#03140d]">{user.firstName.charAt(0).toUpperCase()}</span>
           <div className="min-w-0 flex-1 leading-tight">
             <p className="truncate text-[13px]">{user.firstName}</p>
             <p className="truncate text-[11px] text-fg-faint">{user.email}</p>

@@ -17,7 +17,9 @@ import { PLANS, euro } from "@/lib/content/pricing";
 import { formatDate, formatMoney } from "@/lib/format";
 
 function Billing() {
-  const { refresh } = useApp();
+  const { refresh, stores } = useApp();
+  // Un aperçu en attente : payer depuis cette page le débloque, et on y revient après le paiement.
+  const locked = stores.find((x) => x.status === "locked");
   const params = useSearchParams();
   const router = useRouter();
   const toast = useToast();
@@ -68,7 +70,7 @@ function Billing() {
     return (
       <>
         <PageHeader title="Abonnement" />
-        <div className="p-5 sm:p-8"><Paywall initialInterval={params.get("interval") === "year" ? "year" : "month"} /></div>
+        <div className="p-5 sm:p-8"><Paywall unlockStoreId={locked?.id} initialInterval={params.get("interval") === "year" ? "year" : "month"} /></div>
       </>
     );
   }

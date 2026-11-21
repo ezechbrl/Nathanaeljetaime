@@ -82,12 +82,18 @@ async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | 
         currency: "eur",
         unit_amount: amount * 100,
         recurring: { interval },
-        product_data: { name: NAMES[plan], description: offer === "waitlist" ? "Prix réservé à vie (liste d'attente)" : offer === "launch" ? "Offre de lancement −50 % à vie" : undefined },
+        product_data: {
+          name: NAMES[plan],
+          description: `${offer === "waitlist" ? "Prix réservé à vie (liste d'attente). " : offer === "launch" ? "Offre de lancement −50 % à vie. " : ""}Ta boutique Shopify complète : textes, photos, éditeur IA et mise en ligne guidée. Sans engagement.`,
+          images: [`${env.appUrl()}/brand/icon-512.png`],
+        },
       },
     }],
     subscription_data: { metadata: { user_id: user.id, plan, interval, offer: offer ?? "none" } },
     ...(offer ? {} : { allow_promotion_codes: true }),
     locale: "fr",
+    // Rassure juste au-dessus du bouton de paiement.
+    custom_text: { submit: { message: "Sans engagement : tu peux arrêter ton abonnement en un clic depuis ton compte Vigenia. Ta boutique se crée juste après le paiement." } },
     success_url: `${env.appUrl()}/app/abonnement?checkout=success`,
     cancel_url: `${env.appUrl()}/app/abonnement`,
   });
