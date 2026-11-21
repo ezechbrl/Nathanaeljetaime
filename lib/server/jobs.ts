@@ -195,7 +195,8 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
   if (!image && env.falKey()) {
     try {
       const prompt = `Natural e-commerce product photo of ${t.productTitle} (${input.brief.slice(0, 200)}). The product alone, centered, full view, standing on a neutral surface in front of a plain neutral backdrop (soft warm grey, off-white or light beige), soft daylight from a window, gentle natural shadow, ${NATURAL}`;
-      const img = await generateImage(prompt, "1:1");
+      // 768 × 768 : assez net pour l'aperçu, et environ 1,5 centime au lieu de 2,5 (aperçu gratuit ≤ 3 centimes en tout).
+      const img = await generateImage(prompt, "1:1", { width: 768, height: 768 });
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
     } catch (e) {
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));

@@ -33,10 +33,11 @@ async function falPost(model: string, key: string, payload: unknown) {
 }
 
 // Génère une image via fal.ai (FAL_KEY), puis la copie dans le stockage Supabase.
-export async function generateImage(prompt: string, ratio: AspectRatio) {
+// `size` : taille plus petite possible (ex. photo de l'aperçu gratuit, prix calculé au mégapixel).
+export async function generateImage(prompt: string, ratio: AspectRatio, sizeOverride?: { width: number; height: number }) {
   const key = env.falKey();
   if (!key) throw new HttpError(503, "not_configured", "La génération d'images n'est pas encore activée (FAL_KEY manquante).");
-  const size = SIZES[ratio];
+  const size = sizeOverride ?? SIZES[ratio];
   const res = await falPost(process.env.FAL_MODEL ?? "fal-ai/flux/dev", key, { prompt, image_size: size, num_images: 1, enable_safety_checker: true });
   if (!res.ok) {
     const detail = (await res.text().catch(() => "")).slice(0, 160);
