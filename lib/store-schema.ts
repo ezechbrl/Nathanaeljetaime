@@ -24,6 +24,13 @@ export const RichHomeSchema = z.object({
       imagePrompt: z.string().describe("Photo EN ANGLAIS : une personne précise (âge, genre, style) utilise le produit dans ce contexte (lieu, activité, geste précis, lumière). Chacune des 3 photos montre une personne différente dans un contexte différent. Photo naturelle et réaliste, sans texte"),
     })).describe("Exactement 3 contextes d'usage différents (ex. 3 sports, 3 métiers, 3 profils), propres à la niche, chacun avec une personne différente"),
   }),
+  howItWorks: z.object({
+    title: z.string().describe("Titre court et concret, ex. « 10 secondes pour l'installer. 3 gestes et c'est fait. » ou « Comment ça marche »"),
+    steps: z.array(z.object({
+      title: z.string().describe("Action en 2 à 4 mots, ex. « Pose-le », « Branche et oublie »"),
+      text: z.string().describe("Une ou deux phrases simples (25 mots maximum) : ce que fait l'acheteur et ce qu'il y gagne"),
+    })).describe("Exactement 3 étapes, dans l'ordre réel d'utilisation du produit"),
+  }).describe("Section « Comment ça marche » en 3 étapes numérotées 01, 02, 03"),
   comparison: z.object({
     title: z.string().describe("Ex. « Notre produit vs l'option classique »"),
     text: z.string().describe("2 phrases qui expliquent la différence, sans dénigrer"),
@@ -60,6 +67,7 @@ export const VisualSchema = z.object({
 
 export const HomeBaseSchema = z.object({
     heroTitle: z.string(),
+    heroAccent: z.string().optional().describe("2 à 4 mots copiés EXACTEMENT du titre (même casse), mis en couleur : le cœur de la promesse. Ex. titre « Le réveil qui te sort du lit » → « te sort du lit »"),
     heroSubtitle: z.string(),
     ctaLabel: z.string(),
     benefits: z.array(z.object({ title: z.string(), text: z.string() })),

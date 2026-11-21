@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import {
   ArrowRight, Award, Check, ChevronLeft, ChevronRight, Clock, Droplet, Feather, Flame, Gift, Hand, Heart, Home, Leaf, Lock, Moon,
-  RefreshCw, RotateCcw, ShieldCheck, ShoppingBag, Smile, Sparkles, Star, Sun, Truck, X, Zap, type LucideIcon,
+  Menu, Minus, Plus, RefreshCw, RotateCcw, ShieldCheck, ShoppingBag, Smile, Sparkles, Star, Sun, Truck, X, Zap, type LucideIcon,
 } from "lucide-react";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
@@ -15,6 +15,7 @@ import type { IconName } from "@/lib/store-schema";
 import { marqueeFor, marqueeStyle, marqueeTexts, onColor, orderFor } from "@/lib/store-style";
 
 export type PreviewPage = "accueil" | "produit" | "faq" | "a-propos";
+const NAV: [PreviewPage, string][] = [["accueil", "Accueil"], ["produit", "Boutique"], ["faq", "FAQ"], ["a-propos", "À propos"]];
 
 const SERIF = /serif|fraunces|playfair|cormorant|garamond|bodoni|lora/i;
 const ICON: Record<IconName, LucideIcon> = {
@@ -42,12 +43,27 @@ function pickImages(assets: Asset[]) {
     moments: [1, 2, 3].map((i) => by(`moment${i}`) ?? lifestyle[i] ?? products[i]),
     story: by("story") ?? lifestyle.at(-1),
     life: [1, 2, 3].map((i) => by(`life${i}`)),
+    // « Comment ça marche » : le produit seul, un détail, puis le produit utilisé.
+    steps: [by("white") ?? products[1], by("detail") ?? products[2], by("life1") ?? by("inuse") ?? lifestyle[0]],
   };
 }
 
 // Rendu de la boutique générée, fidèle au thème Vigenia installé dans Shopify.
-export function StorePreview({ store, page = "accueil", device = "auto", assets = [], className, animate = true }: { store: Store; page?: PreviewPage; device?: "desktop" | "mobile" | "auto"; assets?: Asset[]; className?: string; animate?: boolean }) {
+export function StorePreview({ store, page: pageProp = "accueil", device = "auto", assets = [], className, animate = true, onPageChange }: { store: Store; page?: PreviewPage; device?: "desktop" | "mobile" | "auto"; assets?: Asset[]; className?: string; animate?: boolean; onPageChange?: (p: PreviewPage) => void }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  // Aperçu cliquable comme une vraie boutique : menu, boutons vers la fiche produit, panier.
+  const [page, setPageState] = useState<PreviewPage>(pageProp);
+  useEffect(() => setPageState(pageProp), [pageProp]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [cart, setCart] = useState<{ qty: number; unit: number; label: string } | null>(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const go = (p: PreviewPage) => {
+    setPageState(p);
+    setMenuOpen(false);
+    onPageChange?.(p);
+    const top = rootRef.current?.getBoundingClientRect().top ?? 0;
+    if (top < 0) rootRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  };
   // Comme dans la vraie boutique : titres, textes et images apparaissent quand on descend.
   useEffect(() => {
     const root = rootRef.current;
@@ -111,7 +127,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
     <div className="rounded-[22px] border p-1.5" style={{ borderColor: light ? "rgb(255 255 255 / .2)" : `${primary}1f`, background: light ? "rgb(255 255 255 / .06)" : `${primary}0a` }}><Img a={a} ratio={ratio} /></div>
   );
   const Btn = ({ children, light = false }: { children: React.ReactNode; light?: boolean }) => (
-    <span className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-lg" style={light ? { background, color: primary } : { background: accent, color: onAccent }}>{children} <ArrowRight className="h-4 w-4" /></span>
+    <button type="button" onClick={() => go("produit")} className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-lg transition-transform hover:scale-[1.02]" style={light ? { background, color: primary } : { background: accent, color: onAccent }}>{children} <ArrowRight className="h-4 w-4" /></button>
   );
   const Eyebrow = ({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) => (
     <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: dark ? `${background}b3` : accent }}>{children}</p>
@@ -177,6 +193,37 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
     </div>
   ) : null;
 
+  // Logos des moyens de paiement acceptés par Shopify Payments (affichés sous le bouton, comme sur Shopify).
+  const PayBadges = () => (
+    <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5" aria-label="Moyens de paiement">
+      {["VISA", "Mastercard", "CB", "PayPal", "Apple Pay", "G Pay"].map((p) => <span key={p} className="rounded-[5px] border bg-white px-1.5 py-0.5 text-[10px] font-bold tracking-tight text-[#1f2937]" style={{ borderColor: "#e5e7eb" }}>{p}</span>)}
+    </div>
+  );
+  // Titre du haut de page : quelques mots en couleur (le cœur de la promesse), comme dans le thème.
+  const heroTitle = (onDark: boolean) => {
+    const w = home.heroAccent?.trim();
+    const t = home.heroTitle;
+    const at = w ? t.indexOf(w) : -1;
+    if (!w || at < 0) return t;
+    return <>{t.slice(0, at)}<span style={onDark ? { backgroundImage: `linear-gradient(transparent 62%, ${accent}b3 62%)`, padding: "0 .06em" } : { color: accent }}>{w}</span>{t.slice(at + w.length)}</>;
+  };
+  const how = home.howItWorks?.steps?.length ? home.howItWorks : null;
+  const stepsSection = how ? (
+    <section className={cn(pad, sec)}>
+      <h3 className={cn("max-w-[22ch] text-[2rem] leading-tight tracking-tight", H, !mobile && "mx-auto text-center")}>{how.title}</h3>
+      <div className={cn("mt-8 grid gap-5", mobile ? "grid-cols-1" : "grid-cols-3")}>
+        {how.steps.slice(0, 3).map((st, i) => (
+          <div key={st.title} className="rounded-[20px] border p-3" style={{ borderColor: `${primary}1a`, background: `${primary}06` }}>
+            <p className="px-1 pb-2 text-[13px] font-bold tabular-nums" style={{ color: accent }}>0{i + 1}</p>
+            <Img a={imgs.steps[i]} ratio="4/3" />
+            <p className="mt-4 px-1 text-[17px] font-semibold">{st.title}</p>
+            <p className="mt-1 px-1 pb-2 text-sm opacity-70">{st.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  ) : null;
+
   const productBlock = (
     <div className={cn("grid gap-8", !mobile && "grid-cols-[1.08fr_1fr] gap-12")}>
       <div className="space-y-3">
@@ -226,9 +273,10 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             })}
           </div>
         )}
-        <span className="mt-5 flex items-center justify-center rounded-full py-4 text-sm font-semibold shadow-lg" style={{ background: accent, color: onAccent }}>
+        <button type="button" onClick={() => { const b = bundles[bundle]; setCart({ qty: b?.quantity ?? 1, unit: b ? price * (1 - b.discountPercent / 100) : price, label: b ? b.label : prod.title }); setCartOpen(true); }} className="mt-5 flex w-full items-center justify-center rounded-full py-4 text-sm font-semibold shadow-lg transition-transform hover:scale-[1.01]" style={{ background: accent, color: onAccent }}>
           Ajouter au panier{bundles.length ? ` — ${eur(price * bundles[bundle].quantity * (1 - bundles[bundle].discountPercent / 100))}` : ""}
-        </span>
+        </button>
+        <PayBadges />
         {prod.guarantee && <p className="mt-4 flex gap-2 border-t pt-4 text-sm" style={{ borderColor: `${primary}1f` }}><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" style={{ color: accent }} />{prod.guarantee}</p>}
         <div className="mt-4 space-y-2.5 rounded-[18px] border p-4 text-[13px]" style={{ borderColor: `${primary}14`, background: `${primary}08` }}>
           {shipOffer && <p className="flex items-center gap-2.5"><Truck className="h-4 w-4 opacity-70" />{shipOffer}</p>}
@@ -251,16 +299,25 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
   const faq = [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))];
 
   return (
-    <div ref={rootRef} className={cn("overflow-hidden text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif`, ["--sp-h" as string]: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}` }}>
+    <div ref={rootRef} className={cn("relative overflow-hidden text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif`, ["--sp-h" as string]: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}` }}>
       <link rel="stylesheet" href={fontsUrl} precedence="default" />
       <style>{"@keyframes sp-mq{to{transform:translateX(-50%)}}.sp-rv{opacity:0;transform:translateY(16px);transition:opacity .5s ease-out,transform .55s cubic-bezier(.2,.8,.2,1)}img.sp-rv{transform:scale(1.04);transition:opacity .5s ease-out,transform .8s cubic-bezier(.2,.8,.2,1)}.sp-rv.sp-in{opacity:1;transform:none}@media (prefers-reduced-motion:reduce){[style*=sp-mq]{animation:none!important}.sp-rv{opacity:1;transform:none}}"}</style>
       <div className="flex h-9 items-center justify-center gap-2 px-4 text-center text-[11.5px]" style={{ background: primary, color: background }}>
         <Truck className="h-3.5 w-3.5" />{home.announcements?.[0] ?? offers[0] ?? plan.brand.tagline}
       </div>
-      <div className={cn("grid grid-cols-[1fr_auto_1fr] items-center border-b py-4", pad)} style={{ borderColor: `${primary}1a` }}>
-        <span className={cn("text-xl tracking-tight", H)}>{plan.brand.name}</span>
-        {!mobile ? <nav className="flex gap-7 text-[13px] opacity-80"><span>Boutique</span></nav> : <span />}
-        <span className="relative justify-self-end"><ShoppingBag className="h-5 w-5" /><span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] font-bold" style={{ background: accent, color: onAccent }}>0</span></span>
+      <div className={cn("relative grid grid-cols-[1fr_auto_1fr] items-center border-b py-4", pad)} style={{ borderColor: `${primary}1a` }}>
+        {mobile
+          ? <button type="button" onClick={() => setMenuOpen((v) => !v)} aria-label="Menu" className="justify-self-start"><Menu className="h-5 w-5" /></button>
+          : <button type="button" onClick={() => go("accueil")} className={cn("justify-self-start text-xl tracking-tight", H)}>{plan.brand.name}</button>}
+        {!mobile
+          ? <nav className="flex gap-7 text-[13px]">{NAV.map(([p, l]) => <button key={p} type="button" onClick={() => go(p)} className={cn("transition-opacity hover:opacity-100", page === p ? "font-semibold opacity-100 underline underline-offset-4" : "opacity-75")} style={page === p ? { textDecorationColor: accent } : undefined}>{l}</button>)}</nav>
+          : <button type="button" onClick={() => go("accueil")} className={cn("text-xl tracking-tight", H)}>{plan.brand.name}</button>}
+        <button type="button" onClick={() => setCartOpen(true)} aria-label="Panier" className="relative justify-self-end"><ShoppingBag className="h-5 w-5" /><span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[9px] font-bold" style={{ background: accent, color: onAccent }}>{cart?.qty ?? 0}</span></button>
+        {mobile && menuOpen && (
+          <nav className="absolute inset-x-0 top-full z-30 border-b shadow-lg" style={{ background, borderColor: `${primary}1a` }}>
+            {NAV.map(([p, l]) => <button key={p} type="button" onClick={() => go(p)} className="flex w-full items-center justify-between border-t px-5 py-4 text-left text-[15px]" style={{ borderColor: `${primary}12`, fontWeight: page === p ? 600 : 400 }}>{l}<ChevronRight className="h-4 w-4 opacity-50" /></button>)}
+          </nav>
+        )}
       </div>
 
       {page === "accueil" && orderFor(store.theme.style).map((key) => {
@@ -275,7 +332,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
               </div>
               <div className={cn("relative -mt-6 pb-10", pad)}>
                 <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs"><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{plan.brand.tagline}</span>
-                <h2 className={cn("text-[2.1rem] leading-[1.04]", H)}>{home.heroTitle}</h2>
+                <h2 className={cn("text-[2.1rem] leading-[1.04]", H)}>{heroTitle(true)}</h2>
                 <p className="mt-3 text-[15px] opacity-85">{home.heroSubtitle}</p>
                 <div className="mt-6"><Btn light>{home.ctaLabel}</Btn></div>
                 <div className="mt-5 flex flex-col gap-2 text-[13px] opacity-90">{[shipOffer, returnOffer].filter(Boolean).map((t) => <span key={t} className="flex items-start gap-1.5"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0" />{t}</span>)}</div>
@@ -287,7 +344,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
               <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : layout === "center" ? "rgba(0,0,0,.48)" : `linear-gradient(${layout === "right" ? 270 : 90}deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)` }} />
               <div className={cn("relative w-full pb-10 pt-24", pad, !mobile && layout === "right" && "flex justify-end text-right", !mobile && layout === "center" && "flex justify-center text-center")}><div className={cn(layout === "center" && !mobile ? "max-w-[720px]" : "max-w-[560px]")}>
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs backdrop-blur"><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{plan.brand.tagline}</span>
-                <h2 className={cn("text-[2.9rem] leading-[1.02]", H, mobile && "text-[2.2rem]")}>{home.heroTitle}</h2>
+                <h2 className={cn("text-[2.9rem] leading-[1.02]", H, mobile && "text-[2.2rem]")}>{heroTitle(true)}</h2>
                 <p className={cn("mt-4 max-w-[36ch] text-[16px] opacity-90", !mobile && layout === "center" && "mx-auto", !mobile && layout === "right" && "ml-auto")}>{home.heroSubtitle}</p>
                 <div className="mt-7"><Btn light>{home.ctaLabel}</Btn></div>
                 <div className={cn("mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[13px] opacity-95", !mobile && layout === "right" && "justify-end", !mobile && layout === "center" && "justify-center")}>{[shipOffer, returnOffer].filter(Boolean).map((t) => <span key={t} className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5" />{t}</span>)}</div>
@@ -297,7 +354,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             <section className={cn("grid items-center gap-8", pad, sec, !mobile && layout !== "center" && "grid-cols-2", layout === "center" && "text-center")} style={{ background: tint }}>
               <div className={cn(!mobile && layout === "right" && "order-2", layout === "center" && "mx-auto max-w-[640px]")}>
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs" style={{ background: `${accent}24` }}><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{plan.brand.tagline}</span>
-                <h2 className={cn("text-[2.6rem] leading-[1.02]", H, mobile && "text-[2rem]")}>{home.heroTitle}</h2>
+                <h2 className={cn("text-[2.6rem] leading-[1.02]", H, mobile && "text-[2rem]")}>{heroTitle(false)}</h2>
                 <p className="mt-4 text-[15px] opacity-70">{home.heroSubtitle}</p>
                 <div className="mt-7"><Btn>{home.ctaLabel}</Btn></div>
               </div>
@@ -305,6 +362,7 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
             </section>
           )}</>
           ),
+          steps: stepsSection,
           marquee: marquee(mq.first, false, false, true),
           features: (
             <section className={cn("text-center", pad, sec)} style={{ background: tint }}>
@@ -405,6 +463,44 @@ export function StorePreview({ store, page = "accueil", device = "auto", assets 
           <h2 className={cn("text-3xl tracking-tight", H)}>{plan.aboutPage.title}</h2>
           <div className="prose-store mt-5 text-[15px] leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: sanitizeHtml(plan.aboutPage.bodyHtml) }} />
         </section>
+      )}
+
+      {/* Panier (comme le tiroir du thème Shopify) : s'ouvre après « Ajouter au panier ». */}
+      {cartOpen && (
+        <div className="absolute inset-0 z-40 flex items-start justify-end" data-no-reveal>
+          <button type="button" aria-label="Fermer" onClick={() => setCartOpen(false)} className="absolute inset-0 bg-black/45" />
+          <aside className="sticky top-0 flex h-[min(100vh,820px)] w-full max-w-[380px] flex-col overflow-auto shadow-2xl" style={{ background, color: primary }}>
+            <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: `${primary}1a` }}><p className={cn("text-xl", H)}>Ton panier</p><button type="button" onClick={() => setCartOpen(false)} aria-label="Fermer"><X className="h-5 w-5" /></button></div>
+            {cart ? (
+              <>
+                {shipOffer && <p className="mx-5 mt-4 rounded-[12px] px-3 py-2 text-[12.5px]" style={{ background: tint }}><Truck className="mr-1.5 inline h-3.5 w-3.5" />{shipOffer}</p>}
+                <div className="flex gap-3 px-5 py-4">
+                  <span className="h-20 w-20 shrink-0 overflow-hidden rounded-[12px]"><Img a={imgs.gallery[0]} className="h-full rounded-[12px]" /></span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[14px] font-semibold leading-snug">{prod.title}</p>
+                    {cart.label !== prod.title && <p className="text-xs opacity-60">{cart.label}</p>}
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="inline-flex items-center rounded-full border" style={{ borderColor: `${primary}29` }}>
+                        <button type="button" aria-label="Moins" onClick={() => setCart((c) => (c && c.qty > 1 ? { ...c, qty: c.qty - 1 } : null))} className="grid h-8 w-8 place-items-center"><Minus className="h-3.5 w-3.5" /></button>
+                        <span className="w-6 text-center text-sm tabular-nums">{cart.qty}</span>
+                        <button type="button" aria-label="Plus" onClick={() => setCart((c) => (c ? { ...c, qty: c.qty + 1 } : c))} className="grid h-8 w-8 place-items-center"><Plus className="h-3.5 w-3.5" /></button>
+                      </span>
+                      <strong className="text-sm">{eur(cart.unit * cart.qty)}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-auto border-t px-5 py-4" style={{ borderColor: `${primary}1a` }}>
+                  <p className="flex justify-between text-[15px]"><span>Total</span><strong>{eur(cart.unit * cart.qty)}</strong></p>
+                  <span className="mt-3 flex items-center justify-center gap-2 rounded-full py-3.5 text-sm font-semibold" style={{ background: accent, color: onAccent }}><Lock className="h-4 w-4" />Passer commande</span>
+                  <PayBadges />
+                  <p className="mt-2 text-center text-[11px] opacity-55">Aperçu : le vrai paiement se fait sur ta boutique Shopify.</p>
+                </div>
+              </>
+            ) : (
+              <div className="grid flex-1 place-items-center p-6 text-center"><div><p className="text-sm opacity-70">Ton panier est vide.</p><button type="button" onClick={() => { setCartOpen(false); go("produit"); }} className="mt-4 rounded-full px-5 py-3 text-sm font-semibold" style={{ background: accent, color: onAccent }}>Voir le produit</button></div></div>
+            )}
+          </aside>
+        </div>
       )}
 
       <footer className={cn("flex flex-wrap items-center justify-between gap-3 py-8 text-[12px]", pad)} style={{ background: primary, color: background }}>

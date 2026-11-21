@@ -39,13 +39,13 @@ export default function StoreFullPreview() {
             <span aria-hidden className="absolute left-1/2 top-2 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-black" />
             <div ref={scroller} className="h-full overflow-y-auto overscroll-contain rounded-[42px] bg-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <div className="h-9" style={{ background: store.theme.colors.primary }} />
-              <StorePreview store={store} page={page} device="mobile" assets={assets.data?.assets} />
+              <StorePreview store={store} page={page} onPageChange={setPage} device="mobile" assets={assets.data?.assets} />
             </div>
           </div>
         </div>
       ) : (
         <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto bg-white">
-          <StorePreview store={store} page={page} device={device} assets={assets.data?.assets} />
+          <StorePreview store={store} page={page} onPageChange={setPage} device={device} assets={assets.data?.assets} />
         </div>
       )}
     </div>

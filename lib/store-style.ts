@@ -27,13 +27,13 @@ export const STYLE_LAYOUTS: Record<StoreStyle, readonly ("left" | "right" | "cen
 };
 
 // Ordre des sections de l'accueil. « extras » = encadrés ajoutés ; « marquee2 » = second bandeau (sens inverse).
-export type HomeSection = "hero" | "marquee" | "features" | "benefits" | "moments" | "extras" | "comparison" | "reviews" | "buy" | "faq" | "marquee2" | "banner";
+export type HomeSection = "hero" | "steps" | "marquee" | "features" | "benefits" | "moments" | "extras" | "comparison" | "reviews" | "buy" | "faq" | "marquee2" | "banner";
 export const STYLE_ORDER: Record<StoreStyle | "legacy", HomeSection[]> = {
-  premium: ["hero", "marquee", "benefits", "moments", "features", "extras", "reviews", "buy", "comparison", "banner"],
-  direct: ["hero", "marquee", "benefits", "comparison", "features", "extras", "reviews", "buy", "faq", "marquee2", "banner"],
-  lifestyle: ["hero", "moments", "marquee", "benefits", "features", "extras", "reviews", "buy", "marquee2", "banner"],
-  tech: ["hero", "marquee", "features", "comparison", "benefits", "moments", "extras", "reviews", "buy", "marquee2", "banner"],
-  legacy: ["hero", "marquee", "features", "benefits", "moments", "extras", "comparison", "reviews", "buy", "banner"],
+  premium: ["hero", "marquee", "steps", "benefits", "moments", "features", "extras", "reviews", "buy", "comparison", "banner"],
+  direct: ["hero", "marquee", "steps", "benefits", "comparison", "features", "extras", "reviews", "buy", "faq", "marquee2", "banner"],
+  lifestyle: ["hero", "moments", "marquee", "steps", "benefits", "features", "extras", "reviews", "buy", "marquee2", "banner"],
+  tech: ["hero", "marquee", "steps", "features", "comparison", "benefits", "moments", "extras", "reviews", "buy", "marquee2", "banner"],
+  legacy: ["hero", "marquee", "steps", "features", "benefits", "moments", "extras", "comparison", "reviews", "buy", "banner"],
 };
 
 // Couleurs des bandeaux défilants : base / tint / dark / accent (mêmes noms que les sections du thème).

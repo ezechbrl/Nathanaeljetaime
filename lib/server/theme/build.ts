@@ -156,6 +156,14 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...blocks(moments.filter((m) => m.image || m.image_asset).map((m) => ({ type: "moment", settings: { image: m.image, image_asset: m.image_asset, title: m.title, text: m.text ?? "" } }))),
   };
 
+  // « Comment ça marche » : 3 étapes numérotées, avec le produit seul, un détail, puis le produit utilisé.
+  const stepImgs = [["white", "packshot"], ["detail", "studio"], ["life1", "inuse"]].map((slots) => slots.map((x) => ({ image: file(x), image_asset: asset(x) })).find((x) => x.image || x.image_asset) ?? {});
+  const howSection = home.howItWorks?.steps?.length ? {
+    type: "steps",
+    settings: { scheme: "base", title: home.howItWorks.title },
+    ...blocks(home.howItWorks.steps.slice(0, 3).map((st, i) => ({ type: "step", settings: { ...stepImgs[i], title: st.title, text: st.text } }))),
+  } : null;
+
   // Bandeaux défilants : textes courts (atouts) entre de petites photos de la boutique.
   const mq = marqueeFor(theme.style);
   const texts = marqueeTexts(home, [shipOffer, returnOffer].filter((t) => t && t.length <= 40));
@@ -166,7 +174,8 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     ...blocks(texts.map((text, i) => ({ type: "item", settings: { text, style: marqueeStyle(i + (direction === "right" ? 1 : 0)), ...(withImages && pics.length ? pics[i % pics.length] : {}) } }))),
   };
   const all: Record<string, unknown> = {
-    hero: { type: "hero", settings: { image: file("hero"), image_asset: asset("hero"), layout: ctx.theme.heroLayout ?? "left", ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
+    hero: { type: "hero", settings: { image: file("hero"), image_asset: asset("hero"), layout: ctx.theme.heroLayout ?? "left", ...(product ? { product } : {}), eyebrow: plan.brand.tagline, title: home.heroTitle, accent_words: home.heroAccent && home.heroTitle.includes(home.heroAccent) ? home.heroAccent : "", subtitle: home.heroSubtitle, cta: home.ctaLabel }, ...blocks([shipOffer, returnOffer, prod.guarantee ?? ""].filter(Boolean).slice(0, 3).map((t, i) => ({ type: "trust", settings: { icon: (["truck", "return", "shield"] as const)[i], text: clip(t, 60) } }))) },
+    ...(howSection ? { steps: howSection } : {}),
     features: featuresSection,
     benefits: benefitsSection,
     ...(momentsSection ? { moments: momentsSection } : {}),

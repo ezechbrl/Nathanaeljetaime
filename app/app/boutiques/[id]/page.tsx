@@ -81,7 +81,7 @@ export default function StoreDashboard() {
           {/* Grand encadré lumineux, comme sur la page d'accueil. */}
           <div className="glow-frame rounded-b-[14px] rounded-tr-[14px] p-[1.5px]">
             <div ref={previewRef} className="preview-fs max-h-[720px] overflow-y-auto rounded-b-[13px] rounded-tr-[13px] bg-white">
-              <StorePreview store={store} page={page} assets={assets.data?.assets} />
+              <StorePreview store={store} page={page} onPageChange={setPage} assets={assets.data?.assets} />
             </div>
           </div>
         </div>

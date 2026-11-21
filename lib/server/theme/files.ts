@@ -212,6 +212,16 @@ p{margin:0}
 .moment .media{aspect-ratio:4/5}
 .moment h3{font-family:var(--f-body);font-weight:600;letter-spacing:0;font-size:19px;margin-top:16px}
 @media (max-width:900px){.moments{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:78%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}.moment{scroll-snap-align:start}}
+.hero h1 .hl{color:var(--c-accent)}
+.hero:not(.hero--split) h1 .hl{color:inherit;background:linear-gradient(transparent 62%,color-mix(in srgb,var(--c-accent) 70%,transparent) 62%);padding:0 .06em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.step{border:1px solid color-mix(in srgb,var(--fgc,#000) 10%,transparent);border-radius:22px;padding:14px;background:color-mix(in srgb,var(--fgc,#000) 3%,transparent)}
+.step__n{font-weight:700;font-size:14px;color:var(--c-accent);margin:0 4px 10px;font-variant-numeric:tabular-nums}
+.step .media{aspect-ratio:4/3;border-radius:16px;overflow:hidden}
+.step .media img{width:100%;height:100%;object-fit:cover}
+.step h3{font-family:var(--f-body);font-weight:600;letter-spacing:0;font-size:19px;margin:16px 4px 0}
+.step .muted{margin:6px 4px 4px}
+@media (max-width:900px){.steps{grid-template-columns:1fr;gap:16px}}
 .vs{display:grid;grid-template-columns:1fr 1.05fr;gap:72px;align-items:center}
 .vs__card{background:var(--c-bg);color:var(--c-primary);border-radius:26px;padding:34px;box-shadow:0 40px 80px -40px rgba(0,0,0,.5)}
 .vs__head{display:grid;grid-template-columns:1fr 1fr;gap:18px;text-align:center;margin-bottom:10px}
@@ -661,6 +671,8 @@ ${schema({ name: "En-tête", settings: [
 ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline", label: "Phrase de présentation" }, { type: "url", id: "about_url", label: "Lien « Notre histoire »" }, { type: "url", id: "faq_url", label: "Lien FAQ" }] })}`,
 
   hero: `{%- assign p = all_products[section.settings.product] -%}
+{%- assign htitle = section.settings.title | escape -%}
+{%- if section.settings.accent_words != blank and section.settings.title contains section.settings.accent_words -%}{%- assign hw = section.settings.accent_words | escape -%}{%- assign hspan = '<span class="hl">' | append: hw | append: '</span>' -%}{%- assign htitle = htitle | replace_first: hw, hspan -%}{%- endif -%}
 {%- assign bgimg = section.settings.image -%}
 {%- assign bgasset = '' -%}
 {%- if bgimg == blank and section.settings.image_asset != blank -%}{%- assign bgasset = section.settings.image_asset | asset_url -%}{%- endif -%}
@@ -670,7 +682,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
   <div class="hero__bg">{% if bgimg != blank %}${img("bgimg", 2400, 1350, true)}{% else %}<img src="{{ bgasset }}" alt="" width="2400" height="1350" loading="eager">{% endif %}</div>
   <div class="wrap"><div class="hero__c reveal">
     {% if section.settings.eyebrow != blank %}<p class="pill">{{ section.settings.eyebrow }}</p>{% endif %}
-    <h1>{{ section.settings.title }}</h1>
+    <h1>{{ htitle }}</h1>
     <p class="hero__sub">{{ section.settings.subtitle }}</p>
     <a class="btn btn--light" href="{% if p %}{{ p.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}">{{ section.settings.cta }} {% render 'icon', name: 'arrow' %}</a>
     <div class="hero__trust">{%- for block in section.blocks -%}<span {{ block.shopify_attributes }}>{% render 'icon', name: block.settings.icon %}{{ block.settings.text }}</span>{%- endfor -%}</div>
@@ -681,7 +693,7 @@ ${schema({ name: "Pied de page", settings: [SCHEME, { type: "text", id: "tagline
   <div class="wrap hero__grid">
     <div class="reveal">
       {% if section.settings.eyebrow != blank %}<p class="pill">{{ section.settings.eyebrow }}</p>{% endif %}
-      <h1>{{ section.settings.title }}</h1>
+      <h1>{{ htitle }}</h1>
       <p class="hero__sub muted">{{ section.settings.subtitle }}</p>
       <a class="btn" href="{% if p %}{{ p.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}">{{ section.settings.cta }} {% render 'icon', name: 'arrow' %}</a>
       <div class="hero__trust muted">{%- for block in section.blocks -%}<span>{% render 'icon', name: block.settings.icon %}{{ block.settings.text }}</span>{%- endfor -%}</div>
@@ -694,6 +706,7 @@ ${schema({ name: "Héros", settings: [
     { type: "image_picker", id: "image", label: "Image de fond" },
     { type: "text", id: "image_asset", label: "Image de fond Vigenia (fichier du thème)" },
     { type: "select", id: "layout", label: "Mise en page", options: [{ value: "left", label: "Texte à gauche" }, { value: "right", label: "Texte à droite" }, { value: "center", label: "Texte centré" }], default: "left" },
+    { type: "text", id: "accent_words", label: "Mots du titre en couleur (copiés tels quels du titre)" },
     { type: "product", id: "product", label: "Produit mis en avant" },
     { type: "text", id: "eyebrow", label: "Petite étiquette" },
     { type: "textarea", id: "title", label: "Titre" },
@@ -751,6 +764,16 @@ ${schema({ name: "Image et texte", settings: [SCHEME, { type: "image_picker", id
   </div>
 </section>
 ${schema({ name: "Le produit en situation", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "moment", name: "Situation", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Le produit en situation" }] })}`,
+
+  steps: `<section class="sec s-{{ section.settings.scheme }}">
+  <div class="wrap">
+    <div class="head center reveal"><h2 class="title">{{ section.settings.title }}</h2></div>
+    <div class="steps">
+      {%- for block in section.blocks -%}<div class="step reveal" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}><p class="step__n">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</p><div class="media">{% if block.settings.image != blank %}${img("block.settings.image", 900, 675)}{% elsif block.settings.image_asset != blank %}<img src="{{ block.settings.image_asset | asset_url }}" alt="{{ block.settings.title | escape }}" width="900" height="675" loading="lazy">{% else %}<div class="ph"></div>{% endif %}</div><h3>{{ block.settings.title }}</h3>{% if block.settings.text != blank %}<p class="muted">{{ block.settings.text }}</p>{% endif %}</div>{%- endfor -%}
+    </div>
+  </div>
+</section>
+${schema({ name: "Comment ça marche", settings: [SCHEME, { type: "text", id: "title", label: "Titre" }], blocks: [{ type: "step", name: "Étape", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }, { type: "text", id: "title", label: "Titre" }, { type: "text", id: "text", label: "Texte" }] }], max_blocks: 4, presets: [{ name: "Comment ça marche" }] })}`,
 
   comparison: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap vs">

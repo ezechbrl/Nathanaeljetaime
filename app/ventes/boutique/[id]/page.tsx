@@ -48,7 +48,7 @@ export default function OwnerStorePage({ params }: { params: Promise<{ id: strin
           </div>
           <div className={cn("mx-auto mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white", device === "mobile" ? "max-w-[400px]" : "")}>
             {data.store.plan
-              ? <StorePreview store={data.store} page={page} device={device} assets={data.assets} />
+              ? <StorePreview store={data.store} page={page} onPageChange={setPage} device={device} assets={data.assets} />
               : data.store.teaser ? <TeaserPreview store={data.store} /> : <p className="p-6 text-sm text-[#666]">Aperçu pas encore prêt.</p>}
           </div>
         </>

@@ -279,7 +279,7 @@ export default function EditorPage() {
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
             <div ref={previewRef} className={cn("preview-fs overflow-hidden rounded-b-card rounded-tr-card ring-1 ring-white/10 transition-shadow duration-700", flash && "shadow-[0_0_0_3px_rgb(0_166_118/0.5)]")}>
-              <StorePreview store={store} page={page} device={device} assets={assets.data?.assets} />
+              <StorePreview store={store} page={page} onPageChange={setPage} device={device} assets={assets.data?.assets} />
             </div>
           </div>
         </section>
