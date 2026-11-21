@@ -181,3 +181,13 @@ export const sendTestimonial = (input: { rating: number; text: string; name: str
 // Boutique d'aperçu débloquée après l'abonnement : lance la génération complète.
 export const unlockStore = (id: string) =>
   live ? request<{ store: Store; job: Job }>(`/api/stores/${id}/unlock`, { method: "POST" }) : mock.ok().then(() => { throw new ApiClientError(400, "demo", "Indisponible en démo."); });
+
+// Ventes : parcours des derniers inscrits (origine, boutique, étape atteinte).
+export type Journey = {
+  email: string; at: string;
+  source: { name: string; device: string; country: string | null; entry: string; sure: boolean } | null;
+  lastSeen: { at: string; page: string } | null; visits: number;
+  store: { id: string; name: string; status: string; image: string | null; count: number } | null;
+  done: boolean[]; reached: number; cancelled: boolean;
+};
+export const getOwnerJourneys = () => request<{ steps: string[]; rows: Journey[] }>("/api/owner/journeys", { headers: ownerHeaders() });

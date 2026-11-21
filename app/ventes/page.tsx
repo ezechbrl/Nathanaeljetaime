@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import * as api from "@/lib/api/client";
+import { Journeys } from "./Journeys";
 import { ApiClientError } from "@/lib/api/errors";
 import type { OwnerStats } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
@@ -380,6 +381,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
           </ul>
         </Card>
       )}
+
+      {/* Grand tableau : d'où vient chaque inscrit, sa boutique et où il s'est arrêté. */}
+      <Journeys />
 
       {/* Pourquoi des clients arrêtent : réponses au petit questionnaire de départ. */}
       {!!s.departures?.length && (

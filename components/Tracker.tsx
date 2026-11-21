@@ -3,7 +3,8 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-// Compte les visiteurs (anonyme, sans cookie) : un identifiant aléatoire par onglet, pour la durée de la visite.
+// Compte les visiteurs (sans cookie) : un identifiant aléatoire par onglet, pour la durée de la visite,
+// et un par navigateur pour relier les visites au compte une fois inscrit.
 // Le fondateur et l'app Ventes ne sont pas comptés.
 export function Tracker() {
   const pathname = usePathname();
@@ -11,6 +12,7 @@ export function Tracker() {
     if (pathname.startsWith("/ventes")) return;
     let sid: string;
     let src = "";
+    let vid = "";
     try {
       if (localStorage.getItem("vg-owner") || navigator.webdriver) return; // fondateur, navigateurs pilotés par un robot
       sid = sessionStorage.getItem("vg-sid") ?? "";
@@ -22,12 +24,18 @@ export function Tracker() {
         src = q.get("utm_source") || q.get("ref") || document.referrer || "";
         sessionStorage.setItem("vg-src", src);
       } else src = sessionStorage.getItem("vg-src") ?? "";
+      // Même navigateur d'une visite à l'autre : relie les visites d'avant l'inscription au compte (Ventes).
+      vid = localStorage.getItem("vg-vid") ?? "";
+      if (!vid) {
+        vid = Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 24);
+        localStorage.setItem("vg-vid", vid);
+      }
     } catch {
       return;
     }
     const ping = () => {
       if (document.visibilityState !== "visible") return;
-      fetch("/api/track", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sid, path: pathname, src: src.slice(0, 300) }), keepalive: true }).catch(() => {});
+      fetch("/api/track", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sid, vid, path: pathname, src: src.slice(0, 300) }), keepalive: true }).catch(() => {});
     };
     ping();
     const t = window.setInterval(ping, 30_000);
