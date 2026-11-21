@@ -210,8 +210,9 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       // socle à droite, lumière de studio douce, place à gauche pour l'accroche.
       const c = t.brand.colors;
       const prompt = `Wide premium product photograph of ${t.productTitle} (${input.brief.slice(0, 200)}). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. Smooth studio background with a gradient between ${c.background} and a deeper shade of it, soft spotlight from above, a very subtle warm glow in ${c.accent} behind the product. The product is placed on the right third of the frame, generous calm empty space on the left. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
-      // 1280 × 720 : ≈ 2,3 centimes. Aperçu gratuit ≤ 3,5 centimes en tout (texte compris).
-      const img = await generateImage(prompt, "16:9", { width: 1280, height: 720 });
+      // 1344 × 768 (même taille que le haut de page des boutiques complètes) : ≈ 2,6 centimes.
+      // Aperçu gratuit ≤ 3,5 centimes en tout (texte compris).
+      const img = await generateImage(prompt, "16:9");
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
     } catch (e) {
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
