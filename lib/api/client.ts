@@ -182,12 +182,14 @@ export const sendTestimonial = (input: { rating: number; text: string; name: str
 export const unlockStore = (id: string) =>
   live ? request<{ store: Store; job: Job }>(`/api/stores/${id}/unlock`, { method: "POST" }) : mock.ok().then(() => { throw new ApiClientError(400, "demo", "Indisponible en démo."); });
 
-// Ventes : parcours des derniers inscrits (origine, boutique, étape atteinte).
+// Ventes : parcours des derniers inscrits (origine, boutique, étape atteinte) et résumé du jour.
 export type Journey = {
   email: string; at: string;
-  source: { name: string; device: string; country: string | null; entry: string; sure: boolean } | null;
+  source: { name: string; device: string; country: string | null; entry: string } | null;
   lastSeen: { at: string; page: string } | null; visits: number;
   store: { id: string; name: string; status: string; image: string | null; count: number } | null;
-  done: boolean[]; reached: number; cancelled: boolean;
+  done: boolean[]; reached: number; subState: "none" | "active" | "ending" | "ended";
+  mails: { kind: string; status: string }[];
 };
-export const getOwnerJourneys = () => request<{ steps: string[]; rows: Journey[] }>("/api/owner/journeys", { headers: ownerHeaders() });
+export type JourneysData = { steps: string[]; rows: Journey[]; today: { signups: number; stops: number[]; visits: number; exits: { page: string; count: number }[] } };
+export const getOwnerJourneys = () => request<JourneysData>("/api/owner/journeys", { headers: ownerHeaders() });

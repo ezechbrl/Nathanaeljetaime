@@ -401,41 +401,6 @@ function Dashboard({ s }: { s: OwnerStats }) {
         </Card>
       )}
 
-      {/* Derniers inscrits juste sous les chiffres : les 5 plus récents, avec l'heure exacte d'inscription */}
-      <Card>
-        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Derniers inscrits</h2>
-        {s.signups.length ? (
-          <ul className="mt-1 divide-y divide-[#eee] text-sm">
-            {s.signups.map((u, i) => (
-              <li key={i} className="flex items-center gap-3 py-2.5">
-                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", u.tester ? "bg-[#f1f1f1] text-[#616161]" : TONES.blue)}>{u.tester ? "Test Shopify" : "Compte"}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate">{u.email}{u.ref && <span className="text-[#8a8a8a]"> · via {u.ref}</span>}</span>
-                  <span className="block text-xs text-[#8a8a8a]">{signupTime(u.at)}{u.offer && !u.mails?.length && <OfferNote offer={u.offer} />}</span>
-                  {!!u.mails?.length && <MailBadges mails={u.mails} />}
-                  {/* Boutiques (ou aperçus) des 5 derniers inscrits, pour voir ce qu'ils ont créé. */}
-                  {!!u.stores?.length && (
-                    <span className="mt-1 flex flex-wrap gap-1.5">
-                      {u.stores.map((st) => (
-                        <Link key={st.id} href={`/ventes/boutique/${st.id}`} className="inline-flex items-center gap-1 rounded-full bg-[#e8f7f0] px-2 py-0.5 text-[11px] font-medium text-[#0a6e4a] hover:bg-[#d3f0e3]">
-                          Voir « {st.name} » · {st.status === "ready" ? "complète" : st.status === "locked" ? "aperçu" : st.status === "failed" ? "échec" : "en cours"} →
-                        </Link>
-                      ))}
-                    </span>
-                  )}
-                  {u.kind === "account" && (
-                    <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full bg-[#f1f1f1] px-2 py-0.5 text-[11px] text-[#444]">
-                      <ShoppingBag className="h-3 w-3" /> {u.shop ? (u.shop.plan ? `Shopify : ${u.shop.plan}` : u.shop.domain) : "Boutique Shopify non indiquée"}
-                    </span>
-                  )}
-                </span>
-                {u.offer && !u.tester && <OfferBadge offer={u.offer} now={now} />}
-              </li>
-            ))}
-          </ul>
-        ) : <p className="mt-2 text-sm text-[#8a8a8a]">Personne pour l'instant.</p>}
-      </Card>
-
       <div className="grid grid-cols-1 gap-3">
         <Card>
           <h2 className="text-[15px] font-semibold">Répartition des offres</h2>
