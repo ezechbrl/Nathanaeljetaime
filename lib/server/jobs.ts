@@ -150,7 +150,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
         console.warn("Avis du fournisseur non récupérés :", errorMessage(e));
         return undefined;
       }) : undefined,
-      generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t), screenshots[0]),
+      generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t), screenshots[0] ?? (store.teaser as { image?: string | null } | null)?.image ?? undefined),
     ]);
     if (reviews) plan.reviews = reviews;
 
@@ -165,6 +165,10 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
     await finish(job.id, steps, errorMessage(e));
   }
 }
+
+// Style photo commun : de vraies photos de marque, simples et naturelles (fonds neutres, lumière du jour),
+// légèrement mises en scène mais jamais « effet IA » (pas de 3D, de reflets brillants, de halo ni de paillettes).
+const NATURAL = "real photograph taken with a professional camera, natural and believable, true-to-life colors and materials, subtle real-world imperfections and slight natural film grain, calm neutral tones, not a 3D render, not CGI, no glossy reflections, no glow, no light haze, no sparkles, no floating objects, no added text, no logos, no brand names, no trademarks (no Apple, Nike or other brand logo), no watermark";
 
 // Aperçu gratuit : nom, couleurs, accroche et photo du fournisseur. La boutique complète est créée
 // après l'abonnement (runGeneration), à partir du même brief et du même lien.
@@ -186,6 +190,17 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
   await onStep?.("brand");
   const t = await generateTeaser({ brief: input.brief, language: input.language, sourceText });
   await onStep?.("pages");
+  // Pas de photo (idée sans lien ni capture) : une vraie photo du produit, pour que l'aperçu donne envie.
+  // La boutique complète repartira de cette photo, pour garder le même produit.
+  if (!image && env.falKey()) {
+    try {
+      const prompt = `Natural e-commerce product photo of ${t.productTitle} (${input.brief.slice(0, 200)}). The product alone, centered, full view, standing on a neutral surface in front of a plain neutral backdrop (soft warm grey, off-white or light beige), soft daylight from a window, gentle natural shadow, ${NATURAL}`;
+      const img = await generateImage(prompt, "1:1");
+      image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
+    } catch (e) {
+      console.warn("Photo de l'aperçu non générée :", errorMessage(e));
+    }
+  }
   const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), image };
   return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, t.brand.colors) };
 }
@@ -231,7 +246,7 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   const scene = noPeople(plan.visual?.scene ?? "") || `${plan.brand.tone}, soft natural light`;
   // Photos crédibles, comme prises par une vraie marque : lumière naturelle, vraies matières, pas d'effet « image IA »
   // (pas de rendu 3D, de paillettes, de produit qui flotte ni de rayons de lumière).
-  const CLEAN = "real photograph, natural and believable, true-to-life colors and materials, subtle real-world imperfections, not a 3D render, not CGI, no glow effects, no sparkles, no floating objects, the product is the only subject, no people, no hands, no faces, no added text, no logos, no brand names, no trademarks (no Apple, Nike or other brand logo), no watermark";
+  const CLEAN = `${NATURAL}, the product is the only subject, no people, no hands, no faces`;
   const save = async (slot: Slot, kind: string, img: { bytes: Uint8Array; contentType: string; width: number; height: number }, prompt: string) => {
     const saved = await storeImage(storeId, img.bytes, img.contentType, slot);
     await db().from("assets").insert({ store_id: storeId, kind, storage_path: saved.path, url: saved.url, width: img.width, height: img.height, prompt });
@@ -239,11 +254,11 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   };
 
   // 1. Packshot de référence, produit sans marque visible.
-  const packPrompt = `Professional e-commerce studio packshot of ${look}. Plain unbranded product without any logo or lettering. Product centered, full view, on a seamless backdrop in ${c.background}, soft diffused light, subtle shadow, sharp focus, ${CLEAN}`;
+  const packPrompt = `Professional e-commerce studio packshot of ${look}. Plain unbranded product without any logo or lettering. Product centered, full view, on a plain neutral seamless backdrop (soft warm grey, off-white or light beige), soft daylight, natural soft shadow, sharp focus, ${CLEAN}`;
   // Lien importé : le packshot part de la vraie photo du fournisseur (ou d'une capture de sa page),
   // nettoyée de ses textes et logos. Ainsi toutes les photos montrent le produit que le client recevra.
   const supplier = plan.sourceImages?.[0] ?? screenshot;
-  const fromPhoto = `Isolate the main product shown in this image and turn it into a professional e-commerce studio packshot: the product alone, centered, full view, on a seamless backdrop in ${c.background}, soft diffused light, subtle shadow. Remove every text, price, badge, watermark, logo, sticker, hand, person and other object. Keep the product exactly as it is: same shape, colors, materials and details. ${CLEAN}`;
+  const fromPhoto = `Isolate the main product shown in this image and turn it into a professional e-commerce studio packshot: the product alone, centered, full view, on a plain neutral seamless backdrop (soft warm grey, off-white or light beige), soft daylight, natural soft shadow. Remove every text, price, badge, watermark, logo, sticker, hand, person and other object. Keep the product exactly as it is: same shape, colors, materials and details. ${CLEAN}`;
   let reference: string | undefined;
   if (supplier) {
     try {
@@ -265,13 +280,13 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   // et dans un décor différent : pas tout sur un bureau.
   const shots: [Slot, string, AspectRatio, string][] = [
     ["white", "product", "1:1", `Rotate the product so it faces the camera straight on (front view). Place it on a clean off-white background, lit by soft daylight from a nearby window, with a natural soft shadow, simple and honest product photo. ${keep} ${CLEAN}`],
-    ["studio", "product", "1:1", `Rotate the product to a strict side profile view (90 degrees from the front). It stands firmly on a dark glossy surface, dark background, studio rim lighting outlining its silhouette, subtle reflection under it, product clearly resting on the surface. ${keep} ${CLEAN}`],
+    ["studio", "product", "1:1", `Rotate the product to a strict side profile view (90 degrees from the front). It stands firmly on a matte neutral surface (light grey stone or pale wood), plain neutral wall behind, soft side daylight, gentle natural shadow, product clearly resting on the surface. ${keep} ${CLEAN}`],
     ["detail", "product", "1:1", `Extreme macro close-up on one characteristic part of this product, showing its materials, texture and finish, shallow depth of field, soft light. ${keep} ${CLEAN}`],
-    ["inuse", "lifestyle", "4:5", `Top-down flat lay, camera directly above: the product lying flat on a textured surface (linen, slate or light wood) with a few tasteful related accessories around it, styled editorial composition, soft natural light. ${keep} ${CLEAN}`],
-    ["hero", "banner", "16:9", `Wide premium studio shot: the product stands firmly ON a minimal round pedestal (plinth), resting on it with a clear realistic contact shadow, never floating in the air. Background is a smooth gradient between ${c.background} and a deeper shade, with a soft spotlight from above and a subtle haze of light in ${c.accent} behind the product, modern and clean. Product on the right third, generous empty space on the left. ${keep} No people, no text, no logo, no watermark, real product photography look.`],
+    ["inuse", "lifestyle", "4:5", `Top-down flat lay, camera directly above: the product lying flat on a neutral textured surface (linen, light stone or pale wood) with two or three simple related objects around it, tidy but natural composition, soft daylight. ${keep} ${CLEAN}`],
+    ["hero", "banner", "16:9", `Wide, simple and elegant product photo: the product stands firmly on a minimal matte plinth (stone, plaster or light wood), with a clear realistic contact shadow, never floating. Plain neutral background in a soft tone that goes well with ${c.background}, soft natural daylight from the side, a small touch of ${c.accent} only in one discreet prop or detail. Product on the right third, calm empty space on the left. ${keep} ${CLEAN}`],
     ["moment1", "product", "1:1", `Rotate the product to show it from behind (rear three-quarter view), resting on a rough natural stone block, warm soft side light, neutral beige background. ${keep} ${CLEAN}`],
-    ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a muted tone close to ${c.background}, gentle window light. ${keep} ${CLEAN}`],
-    ["moment3", "lifestyle", "16:9", `Wide atmospheric shot, ${scene}: the product seen from a slightly high front three-quarter angle, placed in an empty, tidy setting that fits the brand, warm natural evening light, lots of space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
+    ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a soft neutral tone, gentle window light. ${keep} ${CLEAN}`],
+    ["moment3", "lifestyle", "16:9", `Wide natural photo, ${scene}: the product seen from a slightly high front three-quarter angle, placed in a real, tidy everyday setting with neutral colors that fits the brand, soft natural daylight, space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
   ];
   // Scènes de vie : 3 personnes différentes utilisent le produit, chacune dans un contexte différent.
   // Profils variés d'une photo à l'autre, même si la scène décrite par l'IA ne le précise pas.

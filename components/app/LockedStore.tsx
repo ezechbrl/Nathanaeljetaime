@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, Camera, Lock, MessageSquare, PenLine, Rocket, Sparkles, Star } from "lucide-react";
+import { ArrowDown, Camera, HelpCircle, Lock, MessageSquare, PenLine, Rocket, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -11,10 +11,13 @@ import { onColor } from "@/lib/store-style";
 import { useApp } from "./AppContext";
 import { Paywall } from "./Paywall";
 
-export const UNLOCKS = [
+// Ce que contient la boutique complète. Les avis ne sont promis que s'il y a un lien fournisseur (avis réels importés).
+const unlocksFor = (withLink: boolean) => [
   { icon: PenLine, title: "Tous les textes", text: "Accueil, fiche produit, FAQ, offres par lot" },
-  { icon: Camera, title: "9 photos de pro", text: "Ton produit en studio et en situation" },
-  { icon: Star, title: "Vrais avis acheteurs", text: "Importés et traduits automatiquement" },
+  { icon: Camera, title: "Une dizaine de photos", text: "Ton produit sur fond neutre et en situation" },
+  withLink
+    ? { icon: Star, title: "Vrais avis acheteurs", text: "Ceux du produit chez ton fournisseur, traduits" }
+    : { icon: HelpCircle, title: "FAQ et garanties", text: "Les réponses qui rassurent avant l'achat" },
   { icon: MessageSquare, title: "Éditeur IA", text: "Modifie tout en une phrase" },
   { icon: Rocket, title: "Mise en ligne Shopify", text: "Produit et design à importer, guidé pas à pas" },
 ];
@@ -72,7 +75,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
             </div>
           )}
           <div className="grid gap-5 sm:grid-cols-2">
-            <div className="aspect-square rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}55, ${primary}55)` }} />
+            <div className="aspect-square overflow-hidden rounded-[16px]" style={{ background: `linear-gradient(150deg, ${accent}55, ${primary}55)` }}>{t.image && <img src={t.image} alt="" className="h-full w-full object-cover" />}</div>
             <div className="space-y-3">
               <p className="text-xl font-semibold">{t.productTitle}</p>
               <p className="text-lg">{eur(t.price)}</p>
@@ -132,7 +135,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <div className="glow-frame rounded-[14px] p-[1.5px]"><TeaserPreview store={store} onUnlock={openPay} /></div>
           <div className="flex flex-col gap-2.5">
-            {UNLOCKS.map(({ icon: I, title, text }) => (
+            {unlocksFor(store.mode === "link").map(({ icon: I, title, text }) => (
               <div key={title} className="flex items-center gap-3 rounded-[16px] border border-white/10 bg-white/[0.04] p-3.5">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[linear-gradient(160deg,#34f0b0,#0fae7c)] text-[#03140d]"><I className="h-5 w-5" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold">{title}</span><span className="block text-[13px] text-fg-muted">{text}</span></span>
@@ -142,8 +145,28 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
             <a href="#debloquer" onClick={openPay} className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.8)]">
               {busy ? <><Spinner /> Déblocage…</> : <>Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></>}
             </a>
+            <p className="text-center text-xs text-fg-muted">Prête en 3 minutes · sans engagement · annulable en un clic</p>
           </div>
         </div>
+
+        {/* À quoi ressemble une boutique complète : une vraie boutique créée avec Vigenia (exemple). */}
+        <div className="mt-10 grid items-center gap-5 rounded-[20px] border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-[1.4fr_1fr] sm:p-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/showcase/ouate-store.jpg" alt="Exemple de boutique complète créée avec Vigenia" loading="lazy" className="w-full rounded-[12px] ring-1 ring-white/10" />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6ee7b7]">Exemple de boutique complète</p>
+            <p className="mt-2 text-xl font-semibold leading-snug">Voilà ce que devient ton aperçu une fois débloqué.</p>
+            <p className="mt-2 text-sm text-fg-muted">Ici, Maison Ouate : photos, textes, page produit, panier et FAQ, prêts à mettre en ligne sur Shopify. La tienne garde ton nom, tes couleurs et ton produit.</p>
+            <a href="#debloquer" onClick={openPay} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#03140d]">Débloquer la mienne <ArrowDown className="h-4 w-4" /></a>
+          </div>
+        </div>
+
+        {/* Téléphone : le bouton reste en bas de l'écran tant que l'offre n'est pas ouverte. */}
+        {!paid && !showPay && (
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#04140f]/95 p-3 pb-[max(env(safe-area-inset-bottom),12px)] backdrop-blur lg:hidden">
+            <a href="#debloquer" onClick={openPay} className="flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d]">Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></a>
+          </div>
+        )}
 
         <div id="debloquer" className="scroll-mt-6">{!paid && showPay && <div className="mt-12 [animation:fade-in_.4s_ease-out_both]"><Paywall unlockStoreId={store.id} /></div>}</div>
       </div>
