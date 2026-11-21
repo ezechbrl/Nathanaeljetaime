@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { CTA } from "@/lib/launch";
 import { Reveal } from "@/components/ui/Reveal";
 import { PromptBox } from "./PromptBox";
-import { StoreCarousel } from "./StoreCarousel";
+import { LandingSwipe } from "./LandingSwipe";
 import { StoreMarquee } from "./StoreMarquee";
 
 export function Hero() {
@@ -39,10 +39,10 @@ export function Hero() {
         <StoreMarquee />
       </div>
       <div className="relative px-4 sm:px-6">
-        {/* Une vraie boutique créée avec Vigenia, qui change toutes les 3 secondes. */}
+        {/* Les vraies boutiques créées avec Vigenia, en grand : cœur ou croix (le style aimé sert ensuite). */}
         <Reveal delay={380} className="relative mx-auto mt-10 max-w-[1320px] sm:mt-14">
-          <div aria-hidden className="absolute -inset-6 rounded-[32px] bg-[radial-gradient(closest-side,rgb(46_230_166/0.3),transparent)] blur-2xl" />
-          <div className="relative"><StoreCarousel /></div>
+          <div aria-hidden className="absolute -inset-6 rounded-[32px] bg-[radial-gradient(closest-side,rgb(46_230_166/0.25),transparent)] blur-2xl" />
+          <div className="relative"><LandingSwipe /></div>
         </Reveal>
       </div>
     </section>

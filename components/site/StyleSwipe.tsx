@@ -3,7 +3,8 @@
 import { Heart, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { SHOWCASE } from "@/lib/content/showcase";
-import { StoreLongFrame } from "./StoreFrame";
+import { cn } from "@/lib/cn";
+import { StoreFrame, StoreLongFrame } from "./StoreFrame";
 
 // Boutiques à aimer ou non (cœur / croix) : elles servent à choisir le style de la boutique.
 export const STYLE_OF: Record<string, string> = { "pas-sur": "premium", "maison-ouate": "premium", kordo: "direct", delie: "direct", nido: "lifestyle", macho: "lifestyle", velaro: "tech", silencio: "tech" };
@@ -24,7 +25,8 @@ function saveLikedStyle(style: string | null) {
 }
 
 // Boutiques à aimer (cœur) ou non (croix), comme sur une appli de rencontre : on peut aussi les faire glisser.
-export function StyleSwipe({ onDone }: { onDone: (style: string | null) => void }) {
+// `big` (page d'accueil) : grande carte, la boutique en version ordinateur sur grand écran, en long sur téléphone.
+export function StyleSwipe({ onDone, big = false }: { onDone: (style: string | null) => void; big?: boolean }) {
   const [i, setI] = useState(0);
   const [likes, setLikes] = useState<Record<string, number>>({});
   const [fly, setFly] = useState<"left" | "right" | null>(null);
@@ -48,22 +50,27 @@ export function StyleSwipe({ onDone }: { onDone: (style: string | null) => void 
   }
 
   if (!s) return null;
-  const tx = fly === "right" ? 520 : fly === "left" ? -520 : dx;
+  const tx = fly === "right" ? (big ? 1100 : 520) : fly === "left" ? (big ? -1100 : -520) : dx;
   return (
     <div className="flex flex-col items-center">
       <p className="mb-4 text-center text-sm text-fg-muted">{i + 1} / {SWIPE.length}</p>
-      <div className="relative h-[430px] w-full max-w-[320px]">
+      <div className={cn("relative w-full", big ? "h-[540px] max-w-[440px] sm:h-auto sm:max-w-[860px] sm:aspect-[16/10.6]" : "h-[430px] max-w-[320px]")}>
         {SWIPE[i + 1] && <div className="absolute inset-0 scale-[0.94] rounded-[22px] opacity-50" style={{ background: SWIPE[i + 1].palette.accent }} />}
         <div
           onPointerDown={(e) => { start.current = e.clientX; (e.target as HTMLElement).setPointerCapture?.(e.pointerId); }}
           onPointerMove={(e) => { if (start.current !== null) setDx(e.clientX - start.current); }}
           onPointerUp={() => { const d = dx; start.current = null; if (d > 90) decide(true); else if (d < -90) decide(false); else setDx(0); }}
-          className="absolute inset-0 cursor-grab touch-pan-y select-none overflow-hidden rounded-[22px] p-4 shadow-[0_30px_60px_-25px_rgb(0_0_0/0.8)] ring-1 ring-white/15 active:cursor-grabbing"
+          className={cn("absolute inset-0 cursor-grab touch-pan-y select-none overflow-hidden rounded-[22px] p-4 shadow-[0_30px_60px_-25px_rgb(0_0_0/0.8)] ring-1 ring-white/15 active:cursor-grabbing", big && "sm:p-7")}
           style={{ transform: `translateX(${tx}px) rotate(${tx / 22}deg)`, transition: start.current !== null ? "none" : "transform .28s ease-out", background: `linear-gradient(165deg, color-mix(in oklab, ${s.palette.accent} 70%, white), ${s.palette.accent} 55%, color-mix(in oklab, ${s.palette.accent} 75%, black))` }}
         >
-          <div className="pointer-events-none"><StoreLongFrame s={s} /></div>
+          {big ? (
+            <>
+              <div className="pointer-events-none sm:hidden"><StoreLongFrame s={s} /></div>
+              <div className="pointer-events-none hidden sm:block"><StoreFrame s={s} /></div>
+            </>
+          ) : <div className="pointer-events-none"><StoreLongFrame s={s} /></div>}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 pb-4 pt-10">
-            <p className="text-xl font-semibold text-white">{s.name}</p>
+            <p className={cn("text-xl font-semibold text-white", big && "sm:text-2xl")}>{s.name}</p>
             <p className="text-xs text-white/75">{s.category}</p>
           </div>
           {dx > 30 && <span className="pointer-events-none absolute left-4 top-4 rotate-[-12deg] rounded-lg border-2 border-[#34f0b0] px-2 py-0.5 text-sm font-bold text-[#34f0b0]">J'AIME</span>}
