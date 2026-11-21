@@ -24,7 +24,7 @@ export const LEGAL: LegalDoc[] = [
     sections: [
       { heading: "Éditeur du site", body: [`${site.name} est édité par ${COMPANY.name}, ${COMPANY.form}, ${COMPANY.address}.`, `SIRET : ${COMPANY.siret}. ${COMPANY.vat}.`, `Contact : ${COMPANY.email}.`, `Directeur de la publication : ${COMPANY.director}.`] },
       { heading: "Hébergement", body: [`Le site est hébergé par ${COMPANY.host}. Les données de l'application sont stockées par Supabase Inc. dans l'Union européenne.`] },
-      { heading: "Propriété intellectuelle", body: [`Les contenus du site (textes, interface, logo, code) sont la propriété de ${COMPANY.name}. Toute reproduction sans autorisation est interdite.`, "Shopify est une marque de Shopify Inc. Le service n'est ni affilié à Shopify, ni approuvé par Shopify."] },
+      { heading: "Propriété intellectuelle", body: [`Les contenus du site (textes, interface, logo, code) sont la propriété de ${COMPANY.name}. Toute reproduction sans autorisation est interdite.`, "Shopify est une marque de Shopify Inc. Vigenia est un service indépendant : il n'est ni édité, ni approuvé par Shopify. Vigenia participe au programme d'affiliation de Shopify : quand une personne crée un compte Shopify via un lien partenaire de Vigenia, Vigenia peut recevoir une commission de Shopify, sans aucun surcoût pour elle."] },
     ],
   },
   {

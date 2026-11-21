@@ -138,6 +138,8 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
           </span>
         </a>
       </div>
+      {/* Obligatoire (programme d'affiliation Shopify) : dire que le lien est un lien partenaire rémunéré. */}
+      <p className="text-center text-[11.5px] leading-snug text-fg-faint">« Créer mon compte Shopify » est un lien partenaire : Vigenia fait partie du programme d'affiliation Shopify et peut recevoir une commission de Shopify. Ça ne change rien à ton prix.</p>
 
       {open && sent && (
         <div role="status" className="rounded-card border border-accent/25 bg-accent-deep/25 p-4 text-sm">
