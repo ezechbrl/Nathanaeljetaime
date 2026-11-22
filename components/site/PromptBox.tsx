@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
-import { QuizCard } from "./QuizCard";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
 // Mêmes couleurs que les 2 cartes Shopify de la connexion : « Décrire » = vert de « Connecter mon compte
@@ -197,10 +196,6 @@ export function PromptBox({ target = "/inscription", className, align = "center"
         ))}
       </div>
 
-      {/* Pas encore d'idée : quiz en 5 questions, avant la création du compte. */}
-      {!value.trim() && (
-        <QuizCard href="/quiz" className={cn("mt-6", align === "center" && "mx-auto")} />
-      )}
 
     </div>
   );

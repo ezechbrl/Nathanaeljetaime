@@ -7,7 +7,7 @@ import * as api from "@/lib/api/client";
 // Les questions du quiz, dans l'ordre (sans idée de produit).
 const STEPS: [string, string][] = [
   ["level", "1. Niveau en e-commerce"], ["goal", "2. Objectif"], ["time", "3. Temps disponible"], ["idea", "4. A-t-il une idée ?"],
-  ["big", "5. Grande catégorie"], ["sub", "6. Petite catégorie"], ["product", "7. Choix du produit"], ["audience", "8. À qui vendre"], ["style", "9. Cœur / croix (style)"],
+  ["big", "5. Grande catégorie"], ["sub", "6. Petite catégorie"], ["product", "7. Choix du produit"], ["audience", "8. À qui vendre"], ["price", "9. Prix de vente"], ["style", "10. Boutique préférée (cœur / croix)"],
 ];
 
 // Ventes : où les visiteurs s'arrêtent dans le quiz (7 derniers jours).

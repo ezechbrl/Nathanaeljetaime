@@ -4,7 +4,7 @@
 // Profil (où il en est, objectif, temps), puis son idée ou une grande catégorie → un univers → un produit,
 // ses clients, et enfin les boutiques qu'il aime (cœur / croix) pour choisir le style.
 // Toujours un nombre pair de réponses, pour des grilles bien alignées sur téléphone.
-import { ArrowLeft, ArrowRight, Baby, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Baby, BadgeEuro, Coins, Crown, Wallet, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
@@ -46,6 +46,13 @@ const AUDIENCES: Option[] = [
   { id: "seniors", label: "Les plus de 50 ans", icon: UserRound },
   { id: "tous", label: "Tout le monde", icon: Users },
 ];
+const PRICES: Option[] = [
+  { id: "p1", label: "Moins de 20 €", hint: "Achat coup de cœur", icon: Coins },
+  { id: "p2", label: "20 à 40 €", hint: "Le plus courant", icon: Wallet },
+  { id: "p3", label: "40 à 80 €", hint: "Produit plus travaillé", icon: BadgeEuro },
+  { id: "p4", label: "Plus de 80 €", hint: "Haut de gamme", icon: Crown },
+];
+const PRICE_TEXT: Record<string, string> = { p1: "Prix de vente visé : moins de 20 €.", p2: "Prix de vente visé : entre 20 et 40 €.", p3: "Prix de vente visé : entre 40 et 80 €.", p4: "Prix de vente visé : plus de 80 €, positionnement haut de gamme." };
 const AUDIENCE_TEXT: Record<string, string> = { femmes: "les femmes", hommes: "les hommes", jeunes: "les jeunes de 18 à 25 ans", parents: "les parents", sportifs: "les sportifs", animaux: "les propriétaires d'animaux", seniors: "les plus de 50 ans", tous: "tout le monde" };
 const LEVEL_TEXT: Record<string, string> = {
   debut: "Le vendeur débute : textes simples, rassurants et très clairs.",
@@ -56,7 +63,7 @@ const LEVEL_TEXT: Record<string, string> = {
   createur: "Le vendeur crée ses propres produits : mettre en avant le savoir-faire et l'histoire.",
 };
 
-type Step = "level" | "goal" | "time" | "idea" | "big" | "sub" | "product" | "audience" | "style";
+type Step = "level" | "goal" | "time" | "idea" | "big" | "sub" | "product" | "audience" | "price" | "style";
 
 export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Promise<void>; skipHref?: string }) {
   const [history, setHistory] = useState<Step[]>(["level"]);
@@ -70,13 +77,14 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
   const [niche, setNiche] = useState<string | null>(null);
   const [product, setProduct] = useState<string | null>(null);
   const [audience, setAudience] = useState<string | null>(null);
+  const [price, setPrice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const b = BIG_NICHES.find((x) => x.id === big);
   const n = NICHES.find((x) => x.id === niche);
 
-  // 9 questions sans idée de produit ; 6 s'il a déjà la sienne.
-  const plan: Step[] = hasIdea ? ["level", "goal", "time", "idea", "audience", "style"] : ["level", "goal", "time", "idea", "big", "sub", "product", "audience", "style"];
+  // 10 questions sans idée de produit ; 7 s'il a déjà la sienne. La dernière : les boutiques qu'il aime (cœur / croix).
+  const plan: Step[] = hasIdea ? ["level", "goal", "time", "idea", "audience", "price", "style"] : ["level", "goal", "time", "idea", "big", "sub", "product", "audience", "price", "style"];
   const index = plan.indexOf(step);
   const go = (s: Step) => setHistory((h) => [...h, s]);
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
@@ -96,7 +104,7 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
 
   async function finish(style: string | null) {
     if (!chosen || !audience) return;
-    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, level ? LEVEL_TEXT[level] : "", style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
+    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, price ? PRICE_TEXT[price] : "", level ? LEVEL_TEXT[level] : "", style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
     setBusy(true);
     setError("");
     track("fin", plan.length, true);
@@ -117,7 +125,8 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
     sub: <>Plutôt <span className="serif-accent">lequel</span> ?</>,
     product: <>Lequel te <span className="serif-accent">plaît</span> le plus ?</>,
     audience: <>À qui veux-tu <span className="mark-green">vendre</span> ?</>,
-    style: <>Ces boutiques, tu <span className="serif-accent">aimes</span> ?</>,
+    price: <>À quel <span className="serif-accent">prix</span> veux-tu vendre ?</>,
+    style: <>Quelle boutique tu aimerais <span className="serif-accent">avoir</span> ?</>,
   };
 
   return (
@@ -175,11 +184,12 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
             {n.products.map(([name, brief], i) => <Card key={name} tint={i} row icon={n.icon} label={name} hint={brief} on={product === brief} onClick={() => setProduct(brief)} />)}
           </div>
         )}
-        {step === "audience" && <Grid options={AUDIENCES} value={audience} cols={4} onPick={(id) => { setAudience(id); go("style"); }} />}
+        {step === "audience" && <Grid options={AUDIENCES} value={audience} cols={4} onPick={(id) => { setAudience(id); go("price"); }} />}
+        {step === "price" && <Grid options={PRICES} value={price} cols={4} onPick={(id) => { setPrice(id); go("style"); }} />}
         {step === "style" && !busy && (
           <>
             <p className="-mt-4 mb-4 text-center text-sm text-fg-muted">Un cœur si tu aimes, une croix sinon : ta boutique prendra le style que tu préfères.</p>
-            <StyleSwipe onDone={finish} />
+            <StyleSwipe big compact onDone={finish} />
           </>
         )}
       </div>

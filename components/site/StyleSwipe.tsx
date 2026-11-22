@@ -2,7 +2,7 @@
 
 import { Heart, X } from "lucide-react";
 import { useRef, useState } from "react";
-import { SHOWCASE } from "@/lib/content/showcase";
+import { SHOWCASE, cardColor } from "@/lib/content/showcase";
 import { cn } from "@/lib/cn";
 import { StoreFrame, StoreLongFrame } from "./StoreFrame";
 
@@ -14,8 +14,8 @@ export const STYLE_TEXT: Record<string, string> = {
   lifestyle: "Style de boutique souhaité : lifestyle chaleureux, avec des photos de vie.",
   tech: "Style de boutique souhaité : sport et tech, fond sombre et couleurs vives.",
 };
-// Une boutique par style, différentes de celles de la grille « Exemples » de l'accueil.
-export const SWIPE = ["maison-brume", "delie", "macho", "silencio"].map((slug) => SHOWCASE.find((x) => x.slug === slug)).filter((x): x is (typeof SHOWCASE)[number] => !!x);
+// Une boutique par style, différentes de celles de la grille de l'accueil, couleurs chaudes et froides mêlées.
+export const SWIPE = ["maison-brume", "klinn", "nido", "vortex"].map((slug) => SHOWCASE.find((x) => x.slug === slug)).filter((x): x is (typeof SHOWCASE)[number] => !!x);
 
 const LIKED_KEY = "vg-liked-style";
 export function likedStyle(): string | null {
@@ -27,7 +27,7 @@ function saveLikedStyle(style: string | null) {
 
 // Boutiques à aimer (cœur) ou non (croix), comme sur une appli de rencontre : on peut aussi les faire glisser.
 // `big` (page d'accueil) : grande carte, la boutique en version ordinateur sur grand écran, en long sur téléphone.
-export function StyleSwipe({ onDone, big = false }: { onDone: (style: string | null) => void; big?: boolean }) {
+export function StyleSwipe({ onDone, big = false, compact = false }: { onDone: (style: string | null) => void; big?: boolean; compact?: boolean }) {
   const [i, setI] = useState(0);
   const [likes, setLikes] = useState<Record<string, number>>({});
   const [fly, setFly] = useState<"left" | "right" | null>(null);
@@ -57,14 +57,14 @@ export function StyleSwipe({ onDone, big = false }: { onDone: (style: string | n
   return (
     <div className="flex flex-col items-center">
       <p className="mb-4 text-center text-sm text-fg-muted">{i + 1} / {SWIPE.length}</p>
-      <div className={cn("relative w-full", big ? "h-[540px] max-w-[440px] sm:h-auto sm:max-w-[860px] sm:aspect-[16/10.6]" : "h-[430px] max-w-[320px]")}>
-        {SWIPE[i + 1] && <div className="absolute inset-0 scale-[0.94] rounded-[22px] opacity-50" style={{ background: SWIPE[i + 1].palette.accent }} />}
+      <div className={cn("relative w-full", big ? cn("h-[540px] max-w-[440px] sm:h-auto sm:aspect-[16/10.6]", compact ? "sm:max-w-[640px]" : "sm:max-w-[860px]") : "h-[430px] max-w-[320px]")}>
+        {SWIPE[i + 1] && <div className="absolute inset-0 scale-[0.94] rounded-[22px] opacity-50" style={{ background: cardColor(SWIPE[i + 1]) }} />}
         <div
           onPointerDown={(e) => { start.current = e.clientX; (e.target as HTMLElement).setPointerCapture?.(e.pointerId); }}
           onPointerMove={(e) => { if (start.current !== null) setDx(e.clientX - start.current); }}
           onPointerUp={() => { const d = dx; start.current = null; if (d > 90) decide(true); else if (d < -90) decide(false); else setDx(0); }}
           className={cn("absolute inset-0 cursor-grab touch-pan-y select-none overflow-hidden rounded-[22px] p-4 shadow-[0_30px_60px_-25px_rgb(0_0_0/0.8)] ring-1 ring-white/15 active:cursor-grabbing", big && "sm:p-7")}
-          style={{ transform: `translateX(${tx}px) rotate(${tx / 22}deg)`, transition: start.current !== null ? "none" : "transform .42s cubic-bezier(.4,0,.6,1)", background: `linear-gradient(165deg, color-mix(in oklab, ${s.palette.accent} 70%, white), ${s.palette.accent} 55%, color-mix(in oklab, ${s.palette.accent} 75%, black))` }}
+          style={{ transform: `translateX(${tx}px) rotate(${tx / 22}deg)`, transition: start.current !== null ? "none" : "transform .42s cubic-bezier(.4,0,.6,1)", background: `linear-gradient(165deg, color-mix(in oklab, ${cardColor(s)} 70%, white), ${cardColor(s)} 55%, color-mix(in oklab, ${cardColor(s)} 75%, black))` }}
         >
           {big ? (
             <>

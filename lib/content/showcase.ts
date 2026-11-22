@@ -116,4 +116,10 @@ export const SHOWCASE: ShowcaseStore[] = [
 ];
 
 // Accueil : 8 boutiques dans la grille « Exemples », 4 autres (une par style) dans le cœur / croix.
-export const GRID_SLUGS = ["pas-sur", "maison-ouate", "kordo", "klinn", "nido", "vortex", "velaro", "pincee"];
+// Accueil : 8 boutiques en 2 lignes de 4, couleurs chaudes et froides alternées.
+export const GRID_SLUGS = ["delie", "pas-sur", "pincee", "velaro", "silencio", "maison-ouate", "kordo", "macho"];
+
+// Couleur du fond de la carte (vitrine, cœur / croix) quand elle diffère de la couleur de la marque,
+// pour varier : sinon presque toutes les cartes seraient orange ou marron.
+const CARD: Record<string, string> = { pincee: "#0d9488", kordo: "#0891b2", klinn: "#4f46e5", vortex: "#0284c7", nido: "#d97706" };
+export const cardColor = (s: ShowcaseStore) => CARD[s.slug] ?? s.palette.accent;
