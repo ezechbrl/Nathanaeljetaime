@@ -89,7 +89,7 @@ export function fixPalette(colors: { primary: string; accent: string; background
   if (!HEX.test(accent)) accent = "#2563eb";
   const dark = style === "tech";
   if (dark && luminance(background) > 0.05) background = mixHex(background, "#05060a", 0.9);
-  if (!dark && isStyle(style) && luminance(background) < 0.6) background = mixHex(background, "#ffffff", 0.85);
+  // Les fonds sombres sont permis pour tous les styles (boutiques contrastées, plus modernes).
   const ink = luminance(background) > 0.4 ? "#111111" : "#f5f5f7";
   for (let i = 0; i < 8 && contrast(primary, background) < 7; i++) primary = mixHex(primary, ink, 0.35);
   // L'accent sert aussi aux icônes et sur-titres : assez visible sur le fond (sans le salir pour autant).

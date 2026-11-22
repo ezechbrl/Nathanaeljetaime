@@ -103,6 +103,8 @@ const hueHint = () => `Pour varier, oriente l'accent vers la famille « ${HUES[M
 // Aperçu gratuit (sans abonnement) : un seul appel au modèle le moins cher, réponse courte.
 // Coût visé ≈ 0,01 €, plafond 0,20 € par client (texte source tronqué, sortie limitée).
 const TEASER_MODEL = "claude-haiku-5-5";
+// Palette de l'aperçu (prioritaire sur le guide de style) : fond sombre et un accent vif, complémentaire et lié au produit.
+const TEASER_PALETTE = `PALETTE (prioritaire sur toute autre consigne de couleur) : contraste fort, façon marque moderne. background TRÈS SOMBRE (noir, anthracite, bleu nuit, vert ou brun très foncé), primary très clair (blanc cassé), et UNE couleur d'accent VIVE, complémentaire du fond et en lien avec le produit ou son univers (ex. gourde de sport : citron vert ou bleu glacier ; café : orange cuivré ; beauté : rose vif ; tech : bleu électrique ; bébé : jaune doux). Jamais de fond pastel, beige ou clair, jamais d'accent terne.`;
 const TeaserSchema = z.object({
   storeStyle: z.enum(STORE_STYLES),
   brand: z.object({
@@ -125,7 +127,7 @@ export async function generateTeaser(input: { brief: string; language: string; s
     model: TEASER_MODEL,
     max_tokens: 2000,
     output_config: { effort: "low", format: betaZodOutputFormat(TeaserSchema) },
-    system: `Tu poses l'identité d'une boutique Shopify à partir du brief d'un marchand : style, nom, slogan, palette, accroche, produit, prix et 3 atouts. Textes courts et concrets, dans la langue demandée (${input.language}).\n\n${STYLE_GUIDE}\n${hueHint()}\n\n${BASE_RULES}`,
+    system: `Tu poses l'identité d'une boutique Shopify à partir du brief d'un marchand : style, nom, slogan, palette, accroche, produit, prix et 3 atouts. Textes courts et concrets, dans la langue demandée (${input.language}).\n\n${STYLE_GUIDE}\n${hueHint()}\n\n${TEASER_PALETTE}\n\n${BASE_RULES}`,
     messages: [{ role: "user", content: [data("brief", input.brief), input.sourceText && data("page produit", input.sourceText.slice(0, 6000))].filter(Boolean).join("\n\n") }],
   });
   const usd = (res.usage.input_tokens * 0.1 + res.usage.output_tokens * 0.5) / 1_000_000;

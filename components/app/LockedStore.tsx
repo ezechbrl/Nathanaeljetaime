@@ -51,72 +51,105 @@ function teaserStore(store: Store): { store: Store; assets: Asset[] } {
     faq: [], aboutPage: { title: "", bodyHtml: "" },
   };
   const img = (id: string, slot: string, kind: Asset["kind"]) => ({ id, storeId: store.id, kind, url: t.image!, width: 1280, height: 720, prompt: null, slot, createdAt: store.createdAt });
-  const assets: Asset[] = t.image ? [img("t-hero", "hero", "banner"), img("t-pack", "packshot", "product"), img("t-life", "story", "lifestyle")] : [];
+  const assets: Asset[] = t.image ? [img("t-hero", "hero", "banner")] : [];
   // La photo de l'aperçu laisse la place à gauche (produit à droite) : le titre va toujours à gauche.
   return { store: { ...store, theme: { ...store.theme, heroLayout: "left" }, plan: plan as unknown as Store["plan"] }, assets };
 }
 
-// Ce que la boutique complète ajoute (dessiné aux couleurs de la marque, flouté) : comment ça marche,
-// photos en situation, questions fréquentes.
-function LockedSections({ store }: { store: Store }) {
+// Deux blocs qui donnent envie d'acheter, sans répéter la photo : les atouts, puis l'offre (prix, points forts, bouton).
+function ConversionBlocks({ store, onUnlock }: { store: Store; onUnlock?: () => void }) {
+  const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
-  const block = (h: number) => <div className="rounded-[16px]" style={{ height: h, background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }} />;
+  const onAccent = onColor(accent);
+  const serif = /serif|fraunces|playfair|cormorant|garamond|bodoni|lora/i.test(store.theme.headingFont);
+  const heading = { fontFamily: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}`, fontWeight: serif ? 400 : 700, ...(store.theme.style === "tech" ? { textTransform: "uppercase" as const } : {}) };
+  const bullets = (t.bullets?.length ? t.bullets : t.benefits.map((b) => b.title)).slice(0, 3);
+  const desc = (t.description ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() || t.heroSubtitle;
+  const icons = [Star, ShieldCheck, Truck];
   return (
-    <div aria-hidden className="pointer-events-none select-none space-y-14 px-6 py-14 sm:px-12" style={{ background, color: primary }}>
-      <div>
-        <p className="text-center text-2xl font-semibold">Comment ça marche</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">{[0, 1, 2].map((i) => <div key={i} className="rounded-[18px] p-3" style={{ background: `${primary}08` }}><p className="text-xs font-bold" style={{ color: accent }}>0{i + 1}</p><div className="mt-2">{block(150)}</div><div className="mt-3 h-3 w-1/2 rounded-full" style={{ background: `${primary}26` }} /></div>)}</div>
+    <div style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif` }}>
+      <div className="px-5 py-12 sm:px-12">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: accent }}>{t.tagline}</p>
+        <h3 className="mt-2 text-center text-[1.9rem] leading-tight" style={heading}>Pourquoi tu vas l&apos;adorer</h3>
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          {t.benefits.slice(0, 3).map((b, i) => {
+            const I = icons[i];
+            return (
+              <div key={b.title} className="rounded-[20px] p-5" style={{ background: `${primary}0d`, boxShadow: `inset 0 0 0 1px ${primary}14` }}>
+                <span className="grid h-11 w-11 place-items-center rounded-full" style={{ background: accent, color: onAccent }}><I className="h-5 w-5" /></span>
+                <p className="mt-4 text-[17px] font-semibold">{b.title}</p>
+                <p className="mt-1.5 text-sm leading-relaxed opacity-75">{b.text}</p>
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div>
-        <p className="text-center text-2xl font-semibold">Partout avec toi</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">{[0, 1, 2].map((i) => <div key={i}>{block(260)}</div>)}</div>
-      </div>
-      <div className="mx-auto max-w-2xl">
-        <p className="text-center text-2xl font-semibold">Questions fréquentes</p>
-        {[0, 1, 2, 3].map((i) => <div key={i} className="mt-4 h-12 rounded-[12px]" style={{ background: `${primary}0d` }} />)}
+      <div className="px-5 pb-12 sm:px-12">
+        <div className="mx-auto max-w-[720px] rounded-[26px] p-6 sm:p-8" style={{ background: `linear-gradient(160deg, ${primary}12, ${primary}05)`, boxShadow: `inset 0 0 0 1.5px ${accent}66, 0 30px 60px -30px ${accent}55` }}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[1.6rem] leading-tight" style={heading}>{t.productTitle}</p>
+              <p className="mt-2 text-sm opacity-75">{desc}</p>
+            </div>
+            <p className="shrink-0 rounded-full px-4 py-1.5 text-xl font-bold" style={{ background: `${accent}22`, color: accent }}>{eur(t.price)}</p>
+          </div>
+          <ul className="mt-5 grid gap-2.5 sm:grid-cols-3">{bullets.map((b) => <li key={b} className="flex items-start gap-2 text-[14.5px]"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: accent }} />{b}</li>)}</ul>
+          <button type="button" onClick={onUnlock} className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold shadow-lg transition-transform hover:scale-[1.01]" style={{ background: accent, color: onAccent }}><ShoppingBag className="h-5 w-5" /> Ajouter au panier · {eur(t.price)}</button>
+          <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-xs opacity-75">
+            <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> Livraison offerte</span>
+            <span className="flex items-center gap-1.5"><RotateCcw className="h-3.5 w-3.5" /> Retours 30 jours</span>
+            <span className="flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" /> Paiement sécurisé</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-// Aperçu gratuit : exactement le rendu d'une boutique complète (comme les boutiques payées), avec le nom,
-// les couleurs, l'accroche, la photo et la fiche produit de l'aperçu. La fin est floutée jusqu'au déblocage.
-// Sans compte (`loginHref`) : seul le haut de page est net.
-export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; loginHref?: string; onUnlock?: () => void }) {
-  const data = teaserStore(store);
-  const ref = useRef<HTMLDivElement>(null);
-  const [cut, setCut] = useState<number | null>(null);
-  // Le flou commence après la fiche produit (ou après le haut de page sans compte).
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const measure = () => {
-      const sections = [...el.querySelectorAll("section")];
-      const top = el.getBoundingClientRect().top;
-      const at = (i: number) => (sections[i] ? sections[i].getBoundingClientRect().bottom - top : el.offsetHeight * 0.6);
-      const buy = sections.findIndex((x) => /Ajouter au panier/.test(x.textContent ?? ""));
-      setCut(loginHref ? at(0) : buy >= 0 ? at(buy) : el.offsetHeight * 0.6);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [loginHref]);
+// Ce que la boutique complète ajoute, flouté : une 2ᵉ photo (différente), comment ça marche, FAQ.
+function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHref?: string; onUnlock?: () => void }) {
+  const t = store.teaser!;
+  const { primary, accent, background } = store.theme.colors;
+  const block = (h: number) => <div className="rounded-[16px]" style={{ height: h, background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }} />;
   return (
-    <div ref={ref} className="relative overflow-hidden rounded-[13px]">
-      <div className="pointer-events-none select-none"><StorePreview store={data.store} assets={data.assets} animate={false} /></div>
-      <LockedSections store={store} />
-      {cut !== null && (
-        <div className="absolute inset-x-0 bottom-0 backdrop-blur-[7px]" style={{ top: cut }}>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/15 to-black/35" />
-          <div className="sticky top-1/2 grid place-items-center p-6 pt-16">
-            <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[#0b1f1b]/90 px-5 py-3 text-sm font-semibold text-white shadow-2xl backdrop-blur">
-              <Lock className="h-4 w-4 text-[#2ee6a6]" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque la suite de ta boutique"}
-            </a>
-            {!loginHref && <p className="mt-3 rounded-full bg-black/45 px-4 py-1.5 text-center text-xs text-white backdrop-blur">+ une dizaine de photos, comment ça marche, FAQ, mise en ligne Shopify</p>}
+    <div className="relative overflow-hidden" style={{ background, color: primary }}>
+      <div aria-hidden className="pointer-events-none select-none space-y-14 px-6 py-14 blur-[8px] sm:px-12">
+        <div>
+          <p className="text-center text-2xl font-semibold">Partout avec toi</p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-[1.4fr_1fr]">
+            <div className="aspect-[4/3] overflow-hidden rounded-[18px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }}>{t.image2 && <img src={t.image2} alt="" className="h-full w-full scale-105 object-cover" />}</div>
+            <div className="grid gap-4">{block(140)}{block(140)}</div>
           </div>
         </div>
-      )}
+        <div>
+          <p className="text-center text-2xl font-semibold">Comment ça marche</p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">{[0, 1, 2].map((i) => <div key={i} className="rounded-[18px] p-3" style={{ background: `${primary}08` }}><p className="text-xs font-bold" style={{ color: accent }}>0{i + 1}</p><div className="mt-2">{block(140)}</div></div>)}</div>
+        </div>
+        <div className="mx-auto max-w-2xl">
+          <p className="text-center text-2xl font-semibold">Questions fréquentes</p>
+          {[0, 1, 2].map((i) => <div key={i} className="mt-4 h-12 rounded-[12px]" style={{ background: `${primary}0d` }} />)}
+        </div>
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/45" />
+      <div className="absolute inset-x-0 top-24 grid place-items-center p-6">
+        <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-6 py-3.5 text-[15px] font-semibold text-[#03140d] shadow-[0_12px_36px_-8px_rgb(46_230_166/0.8)]">
+          <Lock className="h-4 w-4" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque la suite de ta boutique"}
+        </a>
+        {!loginHref && <p className="mt-3 rounded-full bg-black/55 px-4 py-1.5 text-center text-xs text-white backdrop-blur">+ une dizaine de photos, comment ça marche, FAQ, mise en ligne Shopify</p>}
+      </div>
+    </div>
+  );
+}
+
+// Aperçu gratuit : le haut d'une vraie boutique (même rendu que les boutiques complètes), avec la photo une
+// seule fois, puis deux blocs qui donnent envie d'acheter, puis la suite floutée (avec une 2ᵉ photo).
+export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; loginHref?: string; onUnlock?: () => void }) {
+  const data = teaserStore(store);
+  return (
+    <div className="overflow-hidden rounded-[13px]">
+      <div className="pointer-events-none select-none"><StorePreview store={data.store} assets={data.assets} animate={false} sections={["hero", "marquee", "features"]} footer={false} /></div>
+      {!loginHref && <ConversionBlocks store={store} onUnlock={onUnlock} />}
+      <LockedSections store={store} loginHref={loginHref} onUnlock={onUnlock} />
     </div>
   );
 }
@@ -129,7 +162,12 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
   // Étape intermédiaire : d'abord la boutique, l'offre ne s'affiche qu'après « Débloquer ».
   const [showPay, setShowPay] = useState(false);
   useEffect(() => { if (window.location.hash === "#debloquer") setShowPay(true); }, []);
-  const openPay = () => setShowPay(true);
+  // Ouvre l'offre puis descend jusqu'à elle (le bloc n'existe qu'après l'ouverture).
+  const openPay = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    setShowPay(true);
+    window.setTimeout(() => document.getElementById("debloquer")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  };
   const paid = user.plan !== "free";
 
   // Abonnement actif : on lance tout de suite la vraie génération.
@@ -157,6 +195,11 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
             Ta boutique <span className="serif-accent">{store.name}</span> t'attend
           </h1>
           <p className="mx-auto mt-2 max-w-xl text-fg-muted">Ton nom, tes couleurs, ton accroche et tes atouts sont prêts et gardés dans ton compte. Quand tu veux, débloque-la : textes, photos et design se créent en quelques minutes.</p>
+          {!paid && (
+            <a href="#debloquer" onClick={openPay} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-7 text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.8)] [animation:cta-glow_2.4s_ease-in-out_infinite]">
+              Débloquer ma boutique <ArrowDown className="h-4 w-4" />
+            </a>
+          )}
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">

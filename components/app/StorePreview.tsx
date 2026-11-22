@@ -49,7 +49,7 @@ function pickImages(assets: Asset[]) {
 }
 
 // Rendu de la boutique générée, fidèle au thème Vigenia installé dans Shopify.
-export function StorePreview({ store, page: pageProp = "accueil", device = "auto", assets = [], className, animate = true, onPageChange }: { store: Store; page?: PreviewPage; device?: "desktop" | "mobile" | "auto"; assets?: Asset[]; className?: string; animate?: boolean; onPageChange?: (p: PreviewPage) => void }) {
+export function StorePreview({ store, page: pageProp = "accueil", device = "auto", assets = [], className, animate = true, onPageChange, sections, footer = true }: { store: Store; page?: PreviewPage; device?: "desktop" | "mobile" | "auto"; assets?: Asset[]; className?: string; animate?: boolean; onPageChange?: (p: PreviewPage) => void; sections?: string[]; footer?: boolean }) {
   const rootRef = useRef<HTMLDivElement>(null);
   // Aperçu cliquable comme une vraie boutique : menu, boutons vers la fiche produit, panier.
   const [page, setPageState] = useState<PreviewPage>(pageProp);
@@ -320,7 +320,7 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
         )}
       </div>
 
-      {page === "accueil" && orderFor(store.theme.style).map((key) => {
+      {page === "accueil" && orderFor(store.theme.style).filter((key) => !sections || sections.includes(key)).map((key) => {
         const node = {
           hero: (
             <>{imgs.hero && mobile ? (
@@ -503,10 +503,12 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
         </div>
       )}
 
-      <footer className={cn("flex flex-wrap items-center justify-between gap-3 py-8 text-[12px]", pad)} style={{ background: primary, color: background }}>
-        <span className={cn("text-lg", H)}>{plan.brand.name}</span>
-        <span className="opacity-70">© {plan.brand.name} · {plan.brand.tagline}</span>
-      </footer>
+      {footer && (
+        <footer className={cn("flex flex-wrap items-center justify-between gap-3 py-8 text-[12px]", pad)} style={{ background: primary, color: background }}>
+          <span className={cn("text-lg", H)}>{plan.brand.name}</span>
+          <span className="opacity-70">© {plan.brand.name} · {plan.brand.tagline}</span>
+        </footer>
+      )}
     </div>
   );
 }

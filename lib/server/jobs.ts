@@ -222,6 +222,14 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
   await onStep?.("brand", 7000);
   const t = await generateTeaser({ brief: input.brief, language: input.language, sourceText });
   await onStep?.("pages", !image && env.falKey() ? 12_000 : 1500);
+  // 2ᵉ photo, différente (produit utilisé, en situation), montrée floutée dans la partie à débloquer :
+  // petite (512 × 512, ≈ 0,65 centime) puisqu'elle est floutée.
+  const scene = env.falKey()
+    ? generateImage(`Candid lifestyle photo: ${t.productTitle} (${input.brief.slice(0, 160)}) being used by a person in a real everyday setting that fits the product, natural light, moody contrasted look, realistic, no text, no logos, no watermark.`, "1:1", { width: 512, height: 512 })
+        .then((img) => storeImage("teasers", img.bytes, img.contentType, "life1"))
+        .then((x) => x.url)
+        .catch((e) => { console.warn("2ᵉ photo de l'aperçu non générée :", errorMessage(e)); return null; })
+    : Promise.resolve(null);
   // Pas de photo (idée sans lien ni capture) : une vraie photo du produit, pour que l'aperçu donne envie.
   // La boutique complète repartira de cette photo, pour garder le même produit.
   if (!image && env.falKey()) {
@@ -231,15 +239,15 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       const c = t.brand.colors;
       // L'IA d'images suit mal les codes couleur : on décrit le fond et l'accent avec des mots.
       const prompt = `Wide premium product photograph of ${t.productTitle} (${input.brief.slice(0, 200)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge; the whole left half of the image is calm empty background (space for a headline). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
-      // 1344 × 768 (même taille que le haut de page des boutiques complètes) : ≈ 2,6 centimes.
-      // Aperçu gratuit ≤ 3,5 centimes en tout (texte compris).
-      const img = await generateImage(prompt, "16:9");
+      // 1152 × 648 : ≈ 1,9 centime (aperçu ≤ 2,7 centimes en tout avec la 2ᵉ photo et le texte).
+      const img = await generateImage(prompt, "16:9", { width: 1152, height: 648 });
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
     } catch (e) {
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
     }
   }
-  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image };
+  const image2 = await scene;
+  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image, image2 };
   return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, t.brand.colors) };
 }
 
