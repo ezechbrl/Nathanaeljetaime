@@ -238,8 +238,15 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
     }
   }
+  // 3ᵉ photo, montrée floutée (pour donner envie de voir la suite) : modèle rapide FLUX schnell (≈ 0,3 centime).
+  const third = env.falKey()
+    ? generateImage(`Close-up lifestyle detail photo of ${t.productLook || t.productTitle}, in a cosy real setting, warm natural light, shallow depth of field, realistic, no text, no logos.`, "1:1", { width: 768, height: 768 }, "fal-ai/flux/schnell")
+        .then((img) => storeImage("teasers", img.bytes, img.contentType, "detail"))
+        .then((x) => x.url)
+        .catch((e) => { console.warn("3ᵉ photo de l'aperçu non générée :", errorMessage(e)); return null; })
+    : Promise.resolve(null);
   // 2ᵉ photo : le MÊME produit (retouche de la 1ʳᵉ), en situation, dans un vrai décor. ≈ 2,3 centimes.
-  // Aperçu ≈ 4,8 centimes en tout (2 photos + texte), budget fixé à 5 centimes.
+  // Aperçu ≈ 5,1 centimes en tout (3 photos + texte), budget fixé à 6 centimes.
   let image2: string | null = null;
   if (image && env.falKey()) {
     try {
@@ -250,7 +257,8 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       console.warn("2ᵉ photo de l'aperçu non générée :", errorMessage(e));
     }
   }
-  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image, image2 };
+  const image3 = await third;
+  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image, image2, image3 };
   return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, darkPalette(t.brand.colors)) };
 }
 

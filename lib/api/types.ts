@@ -56,7 +56,8 @@ export type StoreTeaser = {
   description?: string; // fiche produit (aperçus créés depuis le 21/11/2026)
   bullets?: string[];
   image: string | null;
-  image2?: string | null; // 2ᵉ photo (en situation), montrée floutée
+  image2?: string | null; // 2ᵉ photo : le même produit en situation
+  image3?: string | null; // 3ᵉ photo, montrée floutée
 };
 
 export type StoreTheme = {

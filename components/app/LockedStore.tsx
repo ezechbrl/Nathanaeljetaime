@@ -123,7 +123,7 @@ function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHre
         <div>
           <p className="text-center text-2xl font-semibold">Partout avec toi</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-[1.4fr_1fr]">
-            <div className="aspect-[4/3] overflow-hidden rounded-[18px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }}>{t.image && <img src={t.image} alt="" className="h-full w-full scale-[1.6] object-cover" style={{ objectPosition: "72% 60%" }} />}</div>
+            <div className="aspect-[4/3] overflow-hidden rounded-[18px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }}>{t.image3 ? <img src={t.image3} alt="" className="h-full w-full scale-105 object-cover" /> : t.image && <img src={t.image} alt="" className="h-full w-full scale-[1.6] object-cover" style={{ objectPosition: "72% 60%" }} />}</div>
             <div className="grid gap-4">{block(140)}{block(140)}</div>
           </div>
         </div>
