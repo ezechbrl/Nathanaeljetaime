@@ -46,20 +46,19 @@ export function Header() {
   return (
     <header className={cn("fixed inset-x-0 top-0 z-50 transition-[background,border-color,backdrop-filter] duration-300", open ? "border-b border-white/[0.06] bg-[#05261d]/95 backdrop-blur-xl" : scrolled ? "border-b border-white/[0.06] bg-bg/75 backdrop-blur-xl" : "border-b border-transparent")}>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-bg-3 focus:px-3 focus:py-2">Aller au contenu</a>
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4 sm:px-6">
-        <div className="flex items-center gap-8">
-        <Logo />
+      {/* Comme une barre d'appli : logo bien à gauche, les liens groupés dans une seule pilule au centre, les boutons à droite. */}
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:grid lg:h-[72px] lg:grid-cols-[1fr_auto_1fr] lg:px-10">
+        <div className="justify-self-start"><Logo className="lg:gap-3 lg:text-[22px] lg:font-semibold [&_svg]:lg:h-9 [&_svg]:lg:w-9" /></div>
 
-        <nav aria-label="Navigation principale" className="hidden items-center gap-2 lg:flex">
+        <nav aria-label="Navigation principale" className="hidden items-center gap-1 rounded-full border border-white/12 bg-white/[0.05] p-1.5 shadow-[0_8px_30px_-12px_rgb(0_0_0/0.5),inset_0_1px_0_rgb(255_255_255/0.06)] backdrop-blur-xl lg:flex">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className={cn("rounded-full border px-4 py-2 text-[14.5px] font-medium backdrop-blur transition-all", active(n.href) ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_-2px_rgb(46_230_166/0.45)]" : "border-white/12 bg-white/[0.04] text-white hover:border-[#2ee6a6]/40")}>
+            <Link key={n.href} href={n.href} className={cn("rounded-full px-4 py-2 text-[15px] font-semibold transition-all", active(n.href) ? "bg-[#2ee6a6]/15 text-white shadow-[0_0_16px_-4px_rgb(46_230_166/0.5)]" : "text-white/90 hover:bg-white/[0.07] hover:text-white")}>
               {n.label}
             </Link>
           ))}
         </nav>
-        </div>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden items-center gap-2 justify-self-end lg:flex">
           <ButtonLink href="/connexion" variant="ghost" size="sm">Connexion</ButtonLink>
           <ButtonLink href={isWaitlist ? "/inscription" : "/quiz"} size="sm">{CTA.main}</ButtonLink>
         </div>
