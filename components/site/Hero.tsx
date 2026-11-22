@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
-import { CTA } from "@/lib/launch";
+import { CTA, isWaitlist } from "@/lib/launch";
+import { PAID_PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
 import { Reveal } from "@/components/ui/Reveal";
 import { PromptBox } from "./PromptBox";
 import { DemoVideos } from "./DemoVideos";
@@ -7,15 +8,16 @@ import { StoreMarquee } from "./StoreMarquee";
 
 export function Hero() {
   return (
-    <section className="relative pb-16 pt-28 sm:pt-36">
+    <section className="relative pb-16 pt-24 sm:pt-36">
       <div className="relative mx-auto max-w-[1100px] px-4 text-center sm:px-6">
-        <Reveal>
+        {/* Sur téléphone, on va droit au titre (la pastille ne s'affiche que sur grand écran). */}
+        <Reveal className="hidden sm:block">
           <span className="eyebrow mx-auto">
             <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_rgb(94_211_140)]" />
             {CTA.eyebrow}
           </span>
         </Reveal>
-        <Reveal delay={80} as="h1" className="mx-auto mt-7 max-w-4xl text-[clamp(2.6rem,1.4rem+3.8vw,4.8rem)] leading-[1.02] tracking-[-0.045em] [text-shadow:0_4px_40px_rgb(0_0_0/0.35)]">
+        <Reveal delay={80} as="h1" className="mx-auto mt-2 sm:mt-7 max-w-4xl text-[clamp(2.6rem,1.4rem+3.8vw,4.8rem)] leading-[1.02] tracking-[-0.045em] [text-shadow:0_4px_40px_rgb(0_0_0/0.35)]">
           Ta boutique Shopify qui <span className="serif-accent pr-1">vend</span>, en 3 minutes
         </Reveal>
         <Reveal delay={180} as="p" className="mx-auto mt-5 max-w-2xl text-[16px] font-medium leading-relaxed text-fg-muted sm:mt-6 sm:text-lg">
@@ -24,6 +26,10 @@ export function Hero() {
         </Reveal>
         <Reveal delay={260} className="mt-9">
           <div id="creer" className="scroll-mt-28"><PromptBox align="center" /></div>
+          {/* Le prix tout de suite : pas de surprise après l'aperçu. */}
+          <p className="mx-auto mt-4 max-w-xl text-[13.5px] text-fg-muted sm:text-sm">
+            <b className="text-white">Aperçu gratuit</b>, sans carte bancaire. Ensuite, la boutique complète dès <b className="text-white">{euro(isWaitlist ? WAITLIST_PRICES.pro.monthly : withOffer(PAID_PLANS[0].monthly))}/mois</b>{isWaitlist ? " (prix liste d'attente)" : " avec l'offre de lancement (valable 24 h après ton inscription)"}, sans engagement.
+          </p>
         </Reveal>
         {/* Petits arguments vérifiables (pas de prix ici : il vient plus tard) (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
         <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap justify-center gap-2 text-[13px] sm:text-sm">

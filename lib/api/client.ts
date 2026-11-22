@@ -179,6 +179,10 @@ export const sendTestimonial = (input: { rating: number; text: string; name: str
   live ? request<{ ok: true }>("/api/testimonials", { method: "POST", json: input }) : mock.ok();
 
 // Boutique d'aperçu débloquée après l'abonnement : lance la génération complète.
+// « Qu'est-ce qui te fait hésiter ? » sur l'aperçu (une réponse par aperçu, facultative).
+export const sendHesitation = (id: string, reason: string, details?: string) =>
+  live ? request<void>(`/api/stores/${id}/hesitation`, { method: "POST", json: { reason, details } }) : mock.ok();
+
 export const unlockStore = (id: string) =>
   live ? request<{ store: Store; job: Job }>(`/api/stores/${id}/unlock`, { method: "POST" }) : mock.ok().then(() => { throw new ApiClientError(400, "demo", "Indisponible en démo."); });
 

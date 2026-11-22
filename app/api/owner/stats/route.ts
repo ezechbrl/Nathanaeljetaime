@@ -224,10 +224,17 @@ export const GET = route(async () => {
   const departures = ((await db().from("cancel_feedback").select("email, reason, wish, details, created_at").order("created_at", { ascending: false }).limit(10)).data ?? [])
     .map((d) => ({ email: d.email as string, reason: d.reason as string | null, wish: d.wish as string | null, details: d.details as string | null, at: d.created_at as string }));
 
+  // « Qu'est-ce qui te fait hésiter ? » sur l'aperçu (les 15 dernières réponses, sans les comptes de test).
+  const hesitations = ((await db().from("hesitations").select("email, reason, details, created_at").order("created_at", { ascending: false }).limit(30)).data ?? [])
+    .filter((h) => !/^ezechiel\.barrellon/i.test(h.email ?? "") && h.email !== "zouzou.barrellon@gmail.com" && !/@shopify\.com$/i.test(h.email ?? ""))
+    .slice(0, 15)
+    .map((h) => ({ email: h.email as string, reason: h.reason as string, details: h.details as string | null, at: h.created_at as string }));
+
   return json({
     shopifyAffiliation,
     customers,
     departures,
+    hesitations,
     deviceToken: owner.newDeviceToken ?? null,
     mrr,
     arr: mrr * 12,

@@ -25,3 +25,13 @@ export const CANCEL_WISHES = [
 ] as const;
 
 export const cancelLabel = (list: readonly { id: string; label: string }[], id?: string | null) => list.find((x) => x.id === id)?.label ?? id ?? "";
+
+// Question posée sur l'aperçu, avant le paiement : pourquoi la personne n'a pas encore débloqué sa boutique.
+export const HESITATIONS = [
+  { id: "price", label: "C'est trop cher pour moi" },
+  { id: "doubt", label: "Je ne suis pas sûr que ça marche pour moi" },
+  { id: "quality", label: "L'aperçu ne me plaît pas assez" },
+  { id: "unclear", label: "Je ne comprends pas bien ce que je vais avoir" },
+  { id: "later", label: "Je regarde juste pour l'instant" },
+  { id: "other", label: "Autre chose" },
+] as const;

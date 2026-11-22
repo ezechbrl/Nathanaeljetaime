@@ -1,6 +1,6 @@
 "use client";
 
-import { CANCEL_REASONS, CANCEL_WISHES, cancelLabel } from "@/lib/content/cancel";
+import { CANCEL_REASONS, CANCEL_WISHES, HESITATIONS, cancelLabel } from "@/lib/content/cancel";
 import {
   AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Percent, Receipt, RefreshCw,
   ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
@@ -411,6 +411,29 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
       {/* Quiz : où les visiteurs s'arrêtent. */}
       <QuizFunnel />
+
+      {/* Pourquoi ils ne paient pas : réponses à « Qu'est-ce qui te fait hésiter ? » sur l'aperçu. */}
+      <Card>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.amber)}><Wallet className="h-3.5 w-3.5" /></span>Pourquoi ils ne paient pas <span className="font-normal text-[#8a8a8a]">· sur l'aperçu</span></h2>
+        {s.hesitations?.length ? (
+          <>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {HESITATIONS.map((h) => ({ h, n: s.hesitations!.filter((x) => x.reason === h.id).length })).filter((x) => x.n).sort((a, b) => b.n - a.n).map(({ h, n }) => (
+                <span key={h.id} className="rounded-full bg-[#f1f1f1] px-2.5 py-1 text-[12px]"><b>{n}</b> · {h.label}</span>
+              ))}
+            </div>
+            <ul className="mt-1 divide-y divide-[#eee] text-sm">
+              {s.hesitations.map((d) => (
+                <li key={d.email + d.at} className="py-2.5">
+                  <span className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate font-medium">{d.email}</span><span className="text-xs text-[#8a8a8a]">{signupTime(d.at)}</span></span>
+                  <span className="mt-1 block text-[13px]">{cancelLabel(HESITATIONS, d.reason)}</span>
+                  {d.details && <span className="mt-0.5 block text-xs text-[#555]">« {d.details} »</span>}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : <p className="mt-2 text-sm text-[#8a8a8a]">Pas encore de réponse. La question s'affiche aux personnes qui regardent leur aperçu sans le débloquer.</p>}
+      </Card>
 
       {/* Pourquoi des clients arrêtent : réponses au petit questionnaire de départ. */}
       {!!s.departures?.length && (

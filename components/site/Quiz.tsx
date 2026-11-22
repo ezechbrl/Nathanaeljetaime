@@ -201,7 +201,7 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
         {step === "price" && <Grid options={PRICES} value={price} cols={4} onPick={setPrice} />}
         {step === "style" && !busy && (
           <>
-            <p className="-mt-4 mb-4 text-center text-sm text-fg-muted">Un cœur si tu aimes, une croix sinon : ta boutique prendra le style que tu préfères.</p>
+            <p className="-mt-4 mb-4 text-center text-sm text-fg-muted">Un cœur si tu aimes, une croix sinon : ta boutique prendra le style que tu préfères. Ensuite, ton aperçu est gratuit.</p>
             <StyleSwipe big compact onDone={finish} />
           </>
         )}

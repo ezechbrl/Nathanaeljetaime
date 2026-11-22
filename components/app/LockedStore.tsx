@@ -1,6 +1,11 @@
 "use client";
 
-import { ArrowDown, Camera, Check, HelpCircle, Lock, MessageSquare, PenLine, Rocket, RotateCcw, ShieldCheck, ShoppingBag, Star, Truck } from "lucide-react";
+import { ArrowDown, Camera, Check, HelpCircle, Lock, Mail, MessageSquare, PenLine, Rocket, RotateCcw, ShieldCheck, ShoppingBag, Star, Timer, Truck, X } from "lucide-react";
+import Link from "next/link";
+import { useCountdown } from "@/components/pricing/PlanCards";
+import { useApi } from "@/lib/api/hooks";
+import { HESITATIONS } from "@/lib/content/cancel";
+import { LAUNCH_OFFER, PAID_PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -160,6 +165,70 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
   );
 }
 
+// Le prix, dès l'aperçu (pas de surprise après « Débloquer ») : prix réel de l'offre Starter,
+// avec le compte à rebours réel de l'offre de lancement si elle est encore valable pour ce compte.
+function PriceLine() {
+  const billing = useApi(() => api.getBilling(false), []);
+  const left = useCountdown(billing.data?.offerEndsAt);
+  if (!billing.data) return null;
+  const full = PAID_PLANS[0].monthly;
+  const waitlist = billing.data.offerKind === "waitlist";
+  const price = left ? (waitlist ? WAITLIST_PRICES.pro.monthly : withOffer(full)) : full;
+  return (
+    <p className="mx-auto mt-3 flex max-w-xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-fg-muted">
+      <span>Boutique complète : <b className="text-white">{euro(price)}/mois</b>{left && <> <s className="text-fg-faint">{euro(full)}</s></>}</span>
+      {left && <span className="inline-flex items-center gap-1 rounded-full bg-[#2ee6a6]/15 px-2.5 py-0.5 text-[12.5px] font-semibold text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" />{waitlist ? "prix liste d'attente" : `−${LAUNCH_OFFER.percent} % à vie`}, encore {left.h} h {left.m} min</span>}
+      <span>· sans engagement, annulable en un clic</span>
+    </p>
+  );
+}
+
+// « Qu'est-ce qui te fait hésiter ? » : petite carte qui apparaît après un moment sur l'aperçu (ou quand la souris
+// quitte la page sur ordinateur), une seule fois par aperçu. La réponse arrive dans Ventes et dans les topos.
+function HesitationAsk({ storeId }: { storeId: string }) {
+  const key = `vg-hesit-${storeId}`;
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState<string | null>(null);
+  const [details, setDetails] = useState("");
+  const [sent, setSent] = useState(false);
+  useEffect(() => {
+    try { if (localStorage.getItem(key)) return; } catch { return; }
+    const show = () => setOpen(true);
+    const t = window.setTimeout(show, 45_000);
+    const onLeave = (e: MouseEvent) => { if (e.clientY <= 0) show(); };
+    document.addEventListener("mouseout", onLeave);
+    return () => { window.clearTimeout(t); document.removeEventListener("mouseout", onLeave); };
+  }, [key]);
+  const close = () => { setOpen(false); try { localStorage.setItem(key, "1"); } catch { /* stockage indisponible */ } };
+  const send = () => {
+    if (!reason) return;
+    api.sendHesitation(storeId, reason, details.trim() || undefined).catch(() => {});
+    setSent(true);
+    try { localStorage.setItem(key, "1"); } catch { /* stockage indisponible */ }
+    window.setTimeout(() => setOpen(false), 2500);
+  };
+  if (!open) return null;
+  return (
+    <div role="dialog" aria-label="Qu'est-ce qui te fait hésiter ?" className="fixed inset-x-3 bottom-[84px] z-50 mx-auto max-w-[420px] rounded-[18px] border border-white/15 bg-[#06261c]/95 p-4 shadow-2xl backdrop-blur [animation:rise_.4s_cubic-bezier(.2,.8,.2,1)_both] lg:bottom-6 lg:left-auto lg:right-6 lg:mx-0">
+      <button type="button" onClick={close} aria-label="Fermer" className="absolute right-3 top-3 text-fg-faint hover:text-white"><X className="h-4 w-4" /></button>
+      {sent ? <p className="py-2 pr-6 text-sm">Merci, ça nous aide vraiment à améliorer Vigenia 🙏</p> : (
+        <>
+          <p className="pr-6 text-[15px] font-semibold">Qu'est-ce qui te fait hésiter ?</p>
+          <p className="mt-0.5 text-xs text-fg-muted">Un clic suffit : ta réponse nous aide à améliorer Vigenia.</p>
+          <div className="mt-3 grid gap-1.5">
+            {HESITATIONS.map((h) => (
+              <button key={h.id} type="button" onClick={() => setReason(h.id)} aria-pressed={reason === h.id}
+                className={cn("rounded-[11px] border px-3 py-2 text-left text-[13.5px] transition-colors", reason === h.id ? "border-[#3dff9a] bg-[#3dff9a]/15 text-white" : "border-white/10 bg-white/[0.04] text-fg-muted hover:border-white/25")}>{h.label}</button>
+            ))}
+          </div>
+          {reason && <input value={details} onChange={(e) => setDetails(e.target.value)} maxLength={500} placeholder="Un mot de plus ? (facultatif)" className="field mt-2 h-10 text-sm" />}
+          <button type="button" disabled={!reason} onClick={send} className="mt-3 h-10 w-full rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-sm font-semibold text-[#03140d] disabled:opacity-40">Envoyer</button>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (res: { store: Store; job: Job }) => void }) {
   const { user, refresh } = useApp();
   const toast = useToast();
@@ -206,6 +275,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
               Débloquer ma boutique <ArrowDown className="h-4 w-4" />
             </a>
           )}
+          {!paid && <PriceLine />}
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
@@ -236,6 +306,19 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
             <a href="#debloquer" onClick={openPay} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#03140d]">Débloquer la mienne <ArrowDown className="h-4 w-4" /></a>
           </div>
         </div>
+
+        {/* Un vrai humain derrière Vigenia : on peut poser sa question avant de payer. */}
+        {!paid && (
+          <div className="mt-6 flex flex-col items-start gap-3 rounded-[20px] border border-white/10 bg-white/[0.03] p-5 sm:flex-row sm:items-center">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15 text-[#a7f3d0]"><Mail className="h-5 w-5" /></span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[16px] font-semibold">Une question avant de te lancer ?</p>
+              <p className="text-sm text-fg-muted">Vigenia est un petit projet indépendant : c&apos;est son créateur qui lit chaque message et qui te répond.</p>
+            </div>
+            <Link href="/contact" className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-white/20 px-5 text-sm font-semibold hover:border-white/40">Écrire un message</Link>
+          </div>
+        )}
+        {!paid && <HesitationAsk storeId={store.id} />}
 
         {/* Téléphone : le bouton reste en bas de l'écran tant que l'offre n'est pas ouverte. */}
         {!paid && !showPay && (
