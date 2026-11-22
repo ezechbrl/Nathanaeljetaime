@@ -63,6 +63,7 @@ export const RichProductSchema = z.object({
 export const VisualSchema = z.object({
   productLook: z.string().describe("Description visuelle précise du produit EN ANGLAIS (forme, matière, couleurs, emballage) pour des photos cohérentes"),
   scene: z.string().describe("Univers photo EN ANGLAIS : décor, surfaces, lumière, ambiance, sans aucune personne"),
+  props: z.string().optional().describe("EN ANGLAIS : 3 à 5 petits objets de l'univers du produit, propres à CE produit, pour remplir la photo du haut de page autour du produit. Ex. blender à smoothie : « sliced strawberries, halved oranges, banana, fresh mint leaves » ; bougie : « dried flowers, a linen napkin, matches » ; casque gaming : « a game controller, a mechanical keyboard, a mouse ». Jamais de personne ni de texte."),
 });
 
 export const HomeBaseSchema = z.object({

@@ -29,10 +29,10 @@ export const STYLE_LAYOUTS: Record<StoreStyle, readonly ("left" | "right" | "cen
 // Ordre des sections de l'accueil. « extras » = encadrés ajoutés ; « marquee2 » = second bandeau (sens inverse).
 export type HomeSection = "hero" | "steps" | "marquee" | "features" | "benefits" | "moments" | "extras" | "comparison" | "reviews" | "buy" | "faq" | "marquee2" | "banner";
 export const STYLE_ORDER: Record<StoreStyle | "legacy", HomeSection[]> = {
-  premium: ["hero", "marquee", "steps", "benefits", "moments", "features", "extras", "reviews", "buy", "comparison", "banner"],
+  premium: ["hero", "marquee", "steps", "benefits", "moments", "features", "extras", "reviews", "buy", "comparison", "faq", "banner"],
   direct: ["hero", "marquee", "steps", "benefits", "comparison", "features", "extras", "reviews", "buy", "faq", "marquee2", "banner"],
-  lifestyle: ["hero", "moments", "marquee", "steps", "benefits", "features", "extras", "reviews", "buy", "marquee2", "banner"],
-  tech: ["hero", "marquee", "steps", "features", "comparison", "benefits", "moments", "extras", "reviews", "buy", "marquee2", "banner"],
+  lifestyle: ["hero", "moments", "marquee", "steps", "benefits", "features", "extras", "reviews", "buy", "faq", "marquee2", "banner"],
+  tech: ["hero", "marquee", "steps", "features", "comparison", "benefits", "moments", "extras", "reviews", "buy", "faq", "marquee2", "banner"],
   legacy: ["hero", "marquee", "steps", "features", "benefits", "moments", "extras", "comparison", "reviews", "buy", "banner"],
 };
 

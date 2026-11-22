@@ -15,7 +15,7 @@ import type { IconName } from "@/lib/store-schema";
 import { marqueeFor, marqueeStyle, marqueeTexts, onColor, orderFor } from "@/lib/store-style";
 
 export type PreviewPage = "accueil" | "produit" | "faq" | "a-propos";
-const NAV: [PreviewPage, string][] = [["accueil", "Accueil"], ["produit", "Boutique"], ["faq", "FAQ"], ["a-propos", "À propos"]];
+const NAV: [PreviewPage, string][] = [["accueil", "Accueil"], ["produit", "Boutique"], ["faq", "FAQ"]];
 
 const SERIF = /serif|fraunces|playfair|cormorant|garamond|bodoni|lora/i;
 const ICON: Record<IconName, LucideIcon> = {
@@ -82,7 +82,8 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
   const [narrow, setNarrow] = useState(false);
   const [shot, setShot] = useState(0);
   const [bundle, setBundle] = useState(0);
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState(-1);
+  const [faqOpen, setFaqOpen] = useState(0);
   useEffect(() => {
     const el = rootRef.current?.parentElement;
     if (!el || device !== "auto") return;
@@ -225,8 +226,8 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
   ) : null;
 
   const productBlock = (
-    <div className={cn("grid gap-8", !mobile && "grid-cols-[1.08fr_1fr] gap-12")}>
-      <div className="space-y-3">
+    <div className={cn("grid gap-8", !mobile && "grid-cols-[1.08fr_1fr] items-start gap-12")}>
+      <div className={cn("space-y-3", !mobile && "sticky top-4")}>
         <div className="relative">
           <Img a={imgs.gallery[shot % Math.max(imgs.gallery.length, 1)]} ratio="1" />
           {imgs.gallery.length > 1 && (
@@ -297,9 +298,25 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
 
   const features = home.features?.length ? home.features : home.benefits.map((b, i) => ({ icon: BENEFIT_ICONS[i % 6], title: b.title, text: b.text }));
   const faq = [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))];
+  // FAQ : une photo du produit en situation à côté, et des questions qui s'ouvrent au clic.
+  const faqPic = imgs.life[1] ?? imgs.moments[0] ?? imgs.inuse;
+  const faqBlock = (n: number) => (
+    <div className={cn("grid gap-8", !mobile && faqPic && "grid-cols-[.85fr_1.15fr] items-start gap-12")}>
+      {faqPic && <div className={cn(!mobile && "sticky top-4")}><Frame a={faqPic} ratio={mobile ? "4/3" : "4/5"} /></div>}
+      <div>
+        <h3 className={cn("text-[2rem] tracking-tight", H, (mobile || !faqPic) && "text-center")}>Questions fréquentes</h3>
+        <div className="mt-6">{faq.slice(0, n).map((f, i) => (
+          <div key={f.question} className="border-b" style={{ borderColor: `${primary}24` }}>
+            <button type="button" onClick={() => setFaqOpen(faqOpen === i ? -1 : i)} aria-expanded={faqOpen === i} className="flex w-full items-center justify-between gap-4 py-4 text-left font-semibold">{f.question}<span className={cn("text-xl font-light transition-transform", faqOpen === i && "rotate-45")}>+</span></button>
+            {faqOpen === i && <p className="pb-4 text-sm opacity-75">{f.answer}</p>}
+          </div>
+        ))}</div>
+      </div>
+    </div>
+  );
 
   return (
-    <div ref={rootRef} className={cn("relative overflow-hidden text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif`, ["--sp-h" as string]: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}` }}>
+    <div ref={rootRef} className={cn("relative overflow-clip text-left transition-[max-width] duration-500 ease-out", device === "mobile" ? "mx-auto max-w-[390px]" : "max-w-none", className)} style={{ background, color: primary, fontFamily: `'${store.theme.bodyFont}', system-ui, sans-serif`, ["--sp-h" as string]: `'${store.theme.headingFont}', ${serif ? "Georgia, serif" : "system-ui, sans-serif"}` }}>
       <link rel="stylesheet" href={fontsUrl} precedence="default" />
       <style>{"@keyframes sp-mq{to{transform:translateX(-50%)}}.sp-rv{opacity:0;transform:translateY(16px);transition:opacity .5s ease-out,transform .55s cubic-bezier(.2,.8,.2,1)}img.sp-rv{transform:scale(1.04);transition:opacity .5s ease-out,transform .8s cubic-bezier(.2,.8,.2,1)}.sp-rv.sp-in{opacity:1;transform:none}@media (prefers-reduced-motion:reduce){[style*=sp-mq]{animation:none!important}.sp-rv{opacity:1;transform:none}}"}</style>
       <div className="flex h-9 items-center justify-center gap-2 px-4 text-center text-[11.5px]" style={{ background: primary, color: background }}>
@@ -379,7 +396,7 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
             <div>
               {home.benefitsEyebrow && <Eyebrow>{home.benefitsEyebrow}</Eyebrow>}
               <h3 className={cn("mt-2 text-[2rem] leading-tight tracking-tight", H)}>{home.benefitsTitle ?? plan.strategy.promise}</h3>
-              <ul className="mt-6 space-y-4">{home.benefits.map((b, i) => { const I = ICON[(home.benefitIcons?.[i] ?? BENEFIT_ICONS[i % 6]) as IconName] ?? Check; return <li key={b.title} className="grid grid-cols-[auto_1fr] gap-x-3"><I className="row-span-2 mt-0.5 h-5 w-5" style={{ color: accent }} /><strong className="text-[15px]">{b.title}</strong><span className="text-sm opacity-70">{b.text}</span></li>; })}</ul>
+              <ul className="mt-6 space-y-4">{home.benefits.map((b, i) => <li key={b.title} className="grid grid-cols-[auto_1fr] gap-x-3"><span className="row-span-2 mt-0.5 w-6 text-[13px] font-bold tabular-nums" style={{ color: accent }}>0{i + 1}</span><strong className="text-[15px]">{b.title}</strong><span className="text-sm opacity-70">{b.text}</span></li>)}</ul>
               <div className="mt-7"><Btn>{home.ctaLabel}</Btn></div>
             </div>
           </section>
@@ -419,15 +436,7 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
           reviews: reviewsSection,
           buy: <section className={cn(pad, sec)} style={{ background: tint }}>{productBlock}</section>,
           faq: faq.length ? (
-            <section className={cn(pad, sec)} style={{ background: tint }}>
-              <h3 className={cn("text-center text-[2rem] tracking-tight", H)}>Questions fréquentes</h3>
-              <div className="mx-auto mt-6 max-w-2xl">{faq.slice(0, 6).map((f) => (
-                <div key={f.question} className="border-b py-4" style={{ borderColor: `${primary}24` }}>
-                  <p className="font-semibold">{f.question}</p>
-                  <p className="mt-1 text-sm opacity-70">{f.answer}</p>
-                </div>
-              ))}</div>
-            </section>
+            <section className={cn(pad, sec)} style={{ background: tint }}>{faqBlock(6)}</section>
           ) : null,
           marquee2: marquee(mq.second, true, mq.big, false),
           banner: (
@@ -446,17 +455,7 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
 
       {page === "produit" && <><section className={cn(pad, "py-10")}>{productBlock}</section>{reviewsSection}{momentsSection}</>}
 
-      {page === "faq" && (
-        <section className={cn(pad, sec)}>
-          <h2 className={cn("text-3xl tracking-tight", H)}>Questions fréquentes</h2>
-          <div className="mt-6">{faq.map((f) => (
-            <div key={f.question} className="border-b py-4" style={{ borderColor: `${primary}24` }}>
-              <p className="font-semibold">{f.question}</p>
-              <p className="mt-1 text-sm opacity-70">{f.answer}</p>
-            </div>
-          ))}</div>
-        </section>
-      )}
+      {page === "faq" && <section className={cn(pad, sec)}>{faqBlock(faq.length)}</section>}
 
       {page === "a-propos" && (
         <section className={cn(pad, sec, !mobile && "mx-auto max-w-2xl")}>

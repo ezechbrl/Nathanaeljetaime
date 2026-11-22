@@ -204,6 +204,7 @@ p{margin:0}
 .ticks li{display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
 .ticks .ico{font-size:22px;color:var(--c-accent);grid-row:span 2;margin-top:2px}
 .s-dark .ticks .ico{color:inherit}
+.ticks__n{font-size:13px!important;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;margin-top:4px!important}
 .ticks strong{font-size:16.5px}
 .ticks span{font-size:15px}
 .split .btn{margin-top:34px}
@@ -325,6 +326,9 @@ p{margin:0}
 .banner p{margin-top:16px;font-size:18px;opacity:.92}
 .banner .btn{margin-top:32px}
 .faq{max-width:840px}
+.faq--pic{max-width:none;display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start}
+.faq__pic{position:sticky;top:100px}.faq__pic .media{aspect-ratio:4/5}
+@media (max-width:860px){.faq--pic{grid-template-columns:1fr;gap:28px}.faq__pic{position:static}.faq__pic .media{aspect-ratio:4/3}}
 .news{text-align:center;max-width:640px;margin:0 auto}
 .news form{display:flex;gap:10px;margin-top:26px}
 .news input{flex:1;min-height:56px;border:1.5px solid color-mix(in srgb,var(--fgc) 20%,transparent);border-radius:999px;background:var(--c-bg);color:var(--c-primary);font:inherit;padding:0 22px}
@@ -748,7 +752,7 @@ ${schema({ name: "Bandeau d'atouts", settings: [SCHEME, { type: "text", id: "tit
       {% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{% endif %}
       <h2 class="title">{{ section.settings.title }}</h2>
       {% if section.settings.text != blank %}<div class="muted rte" style="margin-top:18px;font-size:17px">{{ section.settings.text }}</div>{% endif %}
-      {%- if section.blocks.size > 0 -%}<ul class="ticks">{%- for block in section.blocks -%}<li {{ block.shopify_attributes }}>{% render 'icon', name: block.settings.icon %}<strong>{{ block.settings.title }}</strong><span class="muted">{{ block.settings.text }}</span></li>{%- endfor -%}</ul>{%- endif -%}
+      {%- if section.blocks.size > 0 -%}<ul class="ticks">{%- for block in section.blocks -%}<li {{ block.shopify_attributes }}><span class="ico ticks__n">0{{ forloop.index }}</span><strong>{{ block.settings.title }}</strong><span class="muted">{{ block.settings.text }}</span></li>{%- endfor -%}</ul>{%- endif -%}
       {%- if section.settings.cta != blank -%}{%- if section.settings.cta_style == 'link' -%}<p><a class="link" href="{{ section.settings.url }}">{{ section.settings.cta }} {% render 'icon', name: 'arrow' %}</a></p>{%- else -%}<a class="btn" href="{{ section.settings.url }}">{{ section.settings.cta }} {% render 'icon', name: 'arrow' %}</a>{%- endif -%}{%- endif -%}
     </div>
   </div>
@@ -830,13 +834,18 @@ ${schema({ name: "Avis clients", settings: [SCHEME, { type: "paragraph", content
 </section>
 ${schema({ name: "Bannière", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }, { type: "text", id: "title", label: "Titre" }, { type: "textarea", id: "text", label: "Texte" }, { type: "text", id: "cta", label: "Bouton" }, { type: "url", id: "url", label: "Lien" }], presets: [{ name: "Bannière" }] })}`,
 
-  faq: `<section class="sec s-{{ section.settings.scheme }}">
-  <div class="wrap faq">
+  faq: `{%- assign p = all_products[section.settings.product] -%}{%- assign pic = blank -%}
+{%- if p -%}{%- for m in p.media -%}{%- if m.alt contains 'situation' -%}{%- assign pic = m -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+<section class="sec s-{{ section.settings.scheme }}">
+  <div class="wrap faq{% if pic != blank %} faq--pic{% endif %}">
+    {% if pic != blank %}<div class="frame reveal faq__pic"><div class="media">${img("pic", 1200, 1500)}</div></div>{% endif %}
+    <div>
     <div class="head reveal">{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{% endif %}<h2 class="title" style="margin-top:10px">{{ section.settings.title }}</h2></div>
     <div class="acc">{%- for block in section.blocks -%}<details class="reveal" {{ block.shopify_attributes }} {% if forloop.first and section.settings.open_first %}open{% endif %}><summary>{{ block.settings.question }}</summary><div class="rte muted"><p>{{ block.settings.answer }}</p></div></details>{%- endfor -%}</div>
+    </div>
   </div>
 </section>
-${schema({ name: "FAQ", settings: [SCHEME, { type: "text", id: "eyebrow", label: "Sur-titre" }, { type: "text", id: "title", label: "Titre", default: "Questions fréquentes" }, { type: "checkbox", id: "open_first", label: "Ouvrir la première question", default: true }], blocks: [{ type: "q", name: "Question", settings: [{ type: "text", id: "question", label: "Question" }, { type: "textarea", id: "answer", label: "Réponse" }] }], presets: [{ name: "FAQ" }] })}`,
+${schema({ name: "FAQ", settings: [SCHEME, { type: "product", id: "product", label: "Produit (pour afficher une photo en situation)" }, { type: "text", id: "eyebrow", label: "Sur-titre" }, { type: "text", id: "title", label: "Titre", default: "Questions fréquentes" }, { type: "checkbox", id: "open_first", label: "Ouvrir la première question", default: true }], blocks: [{ type: "q", name: "Question", settings: [{ type: "text", id: "question", label: "Question" }, { type: "textarea", id: "answer", label: "Réponse" }] }], presets: [{ name: "FAQ" }] })}`,
 
   newsletter: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap news reveal">

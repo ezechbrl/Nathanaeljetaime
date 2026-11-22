@@ -173,7 +173,7 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
         console.warn("Avis du fournisseur non récupérés :", errorMessage(e));
         return undefined;
       }) : undefined,
-      generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t), screenshots[0] ?? (store.teaser as { image?: string | null } | null)?.image ?? undefined),
+      generateStoreImages(store.id, plan, (d, t) => void step.sub(d / t), screenshots[0] ?? (store.teaser as { image?: string | null } | null)?.image ?? undefined, theme.heroLayout),
     ]);
     if (reviews) plan.reviews = reviews;
 
@@ -241,7 +241,7 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       // socle à droite, lumière de studio douce, place à gauche pour l'accroche.
       const c = darkPalette(t.brand.colors); // mêmes couleurs (sombres) que la boutique affichée
       // L'IA d'images suit mal les codes couleur : on décrit le fond et l'accent avec des mots.
-      const prompt = `Wide premium product photograph of ${t.productLook || t.productTitle} (${input.brief.slice(0, 160)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge; the whole left half of the image is calm empty background (space for a headline). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
+      const prompt = `Wide premium product photograph of ${t.productLook || t.productTitle} (${input.brief.slice(0, 160)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge, standing firmly on a surface with a clear realistic contact shadow, never floating in the air. The whole frame is filled with objects from its world, placed naturally around it and also on the left side (softly out of focus there, slightly darker, so a headline stays readable): ${t.props || "a few small objects related to how the product is used"}. A second, smaller one of the same product stands further back on the left, softly blurred. Rich but tidy composition, no large empty area. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
       // 1152 × 648 : ≈ 1,9 centime (aperçu ≤ 2,7 centimes en tout avec le texte).
       const img = await generateImage(prompt, "16:9", { width: 1152, height: 648 });
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
@@ -313,9 +313,17 @@ export async function runAnonymousPreview(previewId: string, input: Parameters<t
 // que le produit reste strictement le même partout : le produit seul sous plusieurs angles et décors,
 // puis 3 scènes de vie où une personne de la cible l'utilise. Ce sont des illustrations IA : le marchand
 // peut les remplacer par ses vraies photos.
-export async function generateStoreImages(storeId: string, plan: StorePlan, onProgress?: (done: number, total: number) => void, screenshot?: string) {
+export async function generateStoreImages(storeId: string, plan: StorePlan, onProgress?: (done: number, total: number) => void, screenshot?: string, heroLayout?: string) {
   if (!env.falKey()) return;
   const c = plan.brand.colors;
+  // Objets de l'univers du produit (ex. des fruits pour un blender) : ils remplissent la photo du haut de page.
+  const props = plan.visual?.props?.trim() || "a few small objects related to how the product is used";
+  // Le produit se place du côté opposé au texte de l'accroche (sinon le texte le recouvre).
+  const side = heroLayout === "right" ? "left" : heroLayout === "center" ? "center" : "right";
+  const textSide = side === "left" ? "right" : "left";
+  const heroPrompt = side === "center"
+    ? `Wide, rich product photo filling the whole frame: the product stands firmly in the lower center on a matte surface, with a clear realistic contact shadow, never floating. All around it, objects from its world, arranged naturally and filling the frame (the upper part slightly out of focus and darker, so a centered headline stays readable): ${props}. Background in a soft tone that goes well with ${c.background}, soft natural daylight, a small touch of ${c.accent} in one prop.`
+    : `Wide, rich product photo filling the whole frame: the product stands firmly on the ${side} third of the frame on a matte surface, with a clear realistic contact shadow, never floating. Objects from its world are placed naturally around it and also spread across the ${textSide} side of the frame (softly out of focus there and slightly darker, so a headline stays readable): ${props}. A second, smaller one of the same product stands further back on the ${textSide} side, softly blurred. Rich but tidy composition, no large empty area. Background in a soft tone that goes well with ${c.background}, soft natural daylight from the side, a small touch of ${c.accent} in one prop.`;
   const look = plan.visual?.productLook || `${plan.product.title}, ${plan.product.subtitle}`;
   // Les descriptions de décor écrites par l'IA peuvent mentionner des gens : on retire ces passages.
   const PEOPLE = /\b(people|person|persons|man|men|woman|women|girl|boy|kid|kids|child|children|friends?|family|couple|gamers?|players?|users?|customers?|hands?|face|faces|someone|teen|teens|student|students|athlete|athletes|crowd|he|she|they)\b/i;
@@ -359,8 +367,8 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
     ["white", "product", "1:1", `Rotate the product so it faces the camera straight on (front view). Place it on a clean off-white background, lit by soft daylight from a nearby window, with a natural soft shadow, simple and honest product photo. ${keep} ${CLEAN}`],
     ["studio", "product", "1:1", `Rotate the product to a strict side profile view (90 degrees from the front). It stands firmly on a matte neutral surface (light grey stone or pale wood), plain neutral wall behind, soft side daylight, gentle natural shadow, product clearly resting on the surface. ${keep} ${CLEAN}`],
     ["detail", "product", "1:1", `Extreme macro close-up on one characteristic part of this product, showing its materials, texture and finish, shallow depth of field, soft light. ${keep} ${CLEAN}`],
-    ["inuse", "lifestyle", "4:5", `Top-down flat lay, camera directly above: the product lying flat on a neutral textured surface (linen, light stone or pale wood) with two or three simple related objects around it, tidy but natural composition, soft daylight. ${keep} ${CLEAN}`],
-    ["hero", "banner", "16:9", `Wide, simple and elegant product photo: the product stands firmly on a minimal matte plinth (stone, plaster or light wood), with a clear realistic contact shadow, never floating. Plain neutral background in a soft tone that goes well with ${c.background}, soft natural daylight from the side, a small touch of ${c.accent} only in one discreet prop or detail. Product on the right third, calm empty space on the left. ${keep} ${CLEAN}`],
+    ["inuse", "lifestyle", "4:5", `Top-down flat lay, camera directly above: the product lying flat on a neutral textured surface (linen, light stone or pale wood) with two or three objects from its world around it (${props}), tidy but natural composition, soft daylight. ${keep} ${CLEAN}`],
+    ["hero", "banner", "16:9", `${heroPrompt} ${keep} ${NATURAL}, no people, no hands, no faces`],
     ["moment1", "product", "1:1", `Rotate the product to show it from behind (rear three-quarter view), resting on a rough natural stone block, warm soft side light, neutral beige background. ${keep} ${CLEAN}`],
     ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a soft neutral tone, gentle window light. ${keep} ${CLEAN}`],
     ["moment3", "lifestyle", "16:9", `Wide natural photo, ${scene}: the product seen from a slightly high front three-quarter angle, placed in a real, tidy everyday setting with neutral colors that fits the brand, soft natural daylight, space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
@@ -407,7 +415,7 @@ export async function runRegenerateImages(job: Record<string, any>, store: Store
       if (paths.length) await db().storage.from("assets").remove(paths);
       await db().from("assets").delete().in("id", old.map((a) => a.id));
     }
-    await generateStoreImages(store.id, store.plan as StorePlan, (d, t) => void step.sub(d / t));
+    await generateStoreImages(store.id, store.plan as StorePlan, (d, t) => void step.sub(d / t), undefined, (store.theme as { heroLayout?: string } | null)?.heroLayout);
     await db().from("stores").update({ updated_at: new Date().toISOString() }).eq("id", store.id);
     await finish(job.id, steps, undefined, step);
   } catch (e) {
@@ -426,7 +434,7 @@ export async function runPublish(job: Record<string, any>, store: StoreRow) {
     // Boutique créée avant l'activation des visuels : on les génère maintenant.
     if (!assets.some((a) => a.kind !== "upload" && a.kind !== "logo") && env.falKey()) {
       await step("product");
-      await generateStoreImages(store.id, store.plan as StorePlan, (d, t) => void step.sub((d / t) * 0.6));
+      await generateStoreImages(store.id, store.plan as StorePlan, (d, t) => void step.sub((d / t) * 0.6), undefined, (store.theme as { heroLayout?: string } | null)?.heroLayout);
       assets = await listAssets();
     }
     const plan0 = store.plan as StorePlan;
