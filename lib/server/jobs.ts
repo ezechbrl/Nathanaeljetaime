@@ -228,7 +228,7 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
     try {
       // Même format que le haut de page des boutiques complètes (ex. Vélaro) : photo large, produit posé sur un
       // socle à droite, lumière de studio douce, place à gauche pour l'accroche.
-      const c = t.brand.colors;
+      const c = darkPalette(t.brand.colors); // mêmes couleurs (sombres) que la boutique affichée
       // L'IA d'images suit mal les codes couleur : on décrit le fond et l'accent avec des mots.
       const prompt = `Wide premium product photograph of ${t.productLook || t.productTitle} (${input.brief.slice(0, 160)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge; the whole left half of the image is calm empty background (space for a headline). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
       // 1152 × 648 : ≈ 1,9 centime (aperçu ≤ 2,7 centimes en tout avec le texte).
