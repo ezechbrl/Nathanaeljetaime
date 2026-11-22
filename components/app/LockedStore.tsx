@@ -106,7 +106,7 @@ function ConversionBlocks({ store, onUnlock }: { store: Store; onUnlock?: () => 
   );
 }
 
-// Ce que la boutique complète ajoute, flouté : une 2ᵉ photo (différente), comment ça marche, FAQ.
+// Ce que la boutique complète ajoute, flouté : un gros plan du produit, comment ça marche, FAQ.
 function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHref?: string; onUnlock?: () => void }) {
   const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
@@ -117,7 +117,7 @@ function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHre
         <div>
           <p className="text-center text-2xl font-semibold">Partout avec toi</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-[1.4fr_1fr]">
-            <div className="aspect-[4/3] overflow-hidden rounded-[18px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }}>{t.image2 && <img src={t.image2} alt="" className="h-full w-full scale-105 object-cover" />}</div>
+            <div className="aspect-[4/3] overflow-hidden rounded-[18px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }}>{(t.image2 ?? t.image) && <img src={(t.image2 ?? t.image)!} alt="" className="h-full w-full scale-[1.6] object-cover" style={{ objectPosition: "72% 60%" }} />}</div>
             <div className="grid gap-4">{block(140)}{block(140)}</div>
           </div>
         </div>
