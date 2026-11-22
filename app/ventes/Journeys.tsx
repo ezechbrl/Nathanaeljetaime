@@ -8,23 +8,30 @@ import type { Journey, JourneysData } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 // Une couleur par étape, toujours la même partout (pastilles, textes, barres) pour ne pas se mélanger.
-// Une seule couleur pour les étapes (vert = fait, gris = pas encore) : plus lisible qu'un arc-en-ciel.
-const STEP_COLORS = Array.from({ length: 7 }, () => ({ dot: "#0a8f5f", text: "text-[#111]", bg: "bg-[#f1f1f1]", ring: "ring-[#d4d4d4]" }));
+const STEP_COLORS = [
+  { dot: "#94a3b8", text: "text-[#475569]", bg: "bg-[#f1f5f9]", ring: "ring-[#cbd5e1]" }, // 1 Compte créé : gris
+  { dot: "#3b82f6", text: "text-[#1d4ed8]", bg: "bg-[#e0ecff]", ring: "ring-[#bfdbfe]" }, // 2 Boutique lancée : bleu
+  { dot: "#f59e0b", text: "text-[#b45309]", bg: "bg-[#fff1d6]", ring: "ring-[#fde68a]" }, // 3 Aperçu prêt : orange
+  { dot: "#8b5cf6", text: "text-[#6d28d9]", bg: "bg-[#efe7ff]", ring: "ring-[#ddd6fe]" }, // 4 Page de paiement : violet
+  { dot: "#10b981", text: "text-[#047857]", bg: "bg-[#d9f7e8]", ring: "ring-[#a7f3d0]" }, // 5 Abonné : vert
+  { dot: "#14b8a6", text: "text-[#0f766e]", bg: "bg-[#ccfbf1]", ring: "ring-[#99f6e4]" }, // 6 Boutique complète : turquoise
+  { dot: "#0f766e", text: "text-[#134e4a]", bg: "bg-[#d1fae5]", ring: "ring-[#6ee7b7]" }, // 7 Sur Shopify : vert foncé
+];
 
 // D'où vient chaque visiteur : couleur et nom lisible.
 const SOURCES: Record<string, { label: string; tone: string }> = {
-  tiktok: { label: "TikTok", tone: "bg-[#f1f1f1] text-[#333]" },
-  google: { label: "Google", tone: "bg-[#f1f1f1] text-[#333]" },
-  instagram: { label: "Instagram", tone: "bg-[#f1f1f1] text-[#333]" },
-  facebook: { label: "Facebook", tone: "bg-[#f1f1f1] text-[#333]" },
-  youtube: { label: "YouTube", tone: "bg-[#f1f1f1] text-[#333]" },
-  snapchat: { label: "Snapchat", tone: "bg-[#f1f1f1] text-[#333]" },
-  bing: { label: "Bing", tone: "bg-[#f1f1f1] text-[#333]" },
-  x: { label: "X (Twitter)", tone: "bg-[#f1f1f1] text-[#333]" },
-  linkedin: { label: "LinkedIn", tone: "bg-[#f1f1f1] text-[#333]" },
-  direct: { label: "Direct (lien tapé)", tone: "bg-[#f1f1f1] text-[#333]" },
+  tiktok: { label: "TikTok", tone: "bg-[#111] text-white" },
+  google: { label: "Google", tone: "bg-[#e0ecff] text-[#1d4ed8]" },
+  instagram: { label: "Instagram", tone: "bg-[#ffe4f1] text-[#be185d]" },
+  facebook: { label: "Facebook", tone: "bg-[#e0e7ff] text-[#3730a3]" },
+  youtube: { label: "YouTube", tone: "bg-[#fee2e2] text-[#b91c1c]" },
+  snapchat: { label: "Snapchat", tone: "bg-[#fef9c3] text-[#854d0e]" },
+  bing: { label: "Bing", tone: "bg-[#e0f2fe] text-[#0369a1]" },
+  x: { label: "X (Twitter)", tone: "bg-[#f1f1f1] text-[#111]" },
+  linkedin: { label: "LinkedIn", tone: "bg-[#dbeafe] text-[#1e40af]" },
+  direct: { label: "Direct (lien tapé)", tone: "bg-[#f1f1f1] text-[#555]" },
 };
-const sourceOf = (name: string) => SOURCES[name] ?? { label: name, tone: "bg-[#f1f1f1] text-[#333]" };
+const sourceOf = (name: string) => SOURCES[name] ?? { label: name, tone: "bg-[#efe7ff] text-[#6d28d9]" };
 
 // Pages du site en mots simples.
 function pageName(p: string) {
@@ -44,11 +51,11 @@ function pageName(p: string) {
 }
 
 const STORE_STATUS: Record<string, { label: string; tone: string }> = {
-  generating: { label: "En création", tone: "bg-[#f1f1f1] text-[#444]" },
-  locked: { label: "Aperçu (pas payé)", tone: "bg-[#f1f1f1] text-[#444]" },
+  generating: { label: "En création", tone: "bg-[#fff1d6] text-[#c2410c]" },
+  locked: { label: "Aperçu (pas payé)", tone: "bg-[#fff1d6] text-[#b45309]" },
   ready: { label: "Complète", tone: "bg-[#d9f7e8] text-[#047857]" },
-  publishing: { label: "Envoi Shopify…", tone: "bg-[#f1f1f1] text-[#444]" },
-  published: { label: "Sur Shopify", tone: "bg-[#d9f7e8] text-[#047857]" },
+  publishing: { label: "Envoi Shopify…", tone: "bg-[#e0ecff] text-[#1d4ed8]" },
+  published: { label: "Sur Shopify", tone: "bg-[#d1fae5] text-[#134e4a]" },
   failed: { label: "Échec", tone: "bg-[#fee8e5] text-[#d72c0d]" },
 };
 
@@ -63,9 +70,9 @@ const MAIL_NAME: Record<string, string> = { "offer-reminder": "Mail 12 h", "offe
 const MAIL_STATUS: Record<string, { label: string; tone: string }> = {
   clicked: { label: "cliqué ✓", tone: "bg-[#d9f7e8] text-[#047857]" },
   opened: { label: "ouvert ✓", tone: "bg-[#d9f7e8] text-[#047857]" },
-  delivered: { label: "reçu, pas ouvert", tone: "bg-[#f1f1f1] text-[#444]" },
+  delivered: { label: "reçu, pas ouvert", tone: "bg-[#fff1d6] text-[#b45309]" },
   sent: { label: "envoyé", tone: "bg-[#f1f1f1] text-[#616161]" },
-  delivery_delayed: { label: "en retard", tone: "bg-[#f1f1f1] text-[#444]" },
+  delivery_delayed: { label: "en retard", tone: "bg-[#fff1d6] text-[#b45309]" },
   bounced: { label: "non délivré", tone: "bg-[#fee8e5] text-[#d72c0d]" },
   complained: { label: "signalé spam", tone: "bg-[#fee8e5] text-[#d72c0d]" },
 };
