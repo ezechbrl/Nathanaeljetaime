@@ -13,7 +13,7 @@ import { themeZipUrl } from "./theme/link";
 import { db, must } from "./supabase";
 import type { StoreRow } from "./auth";
 import { env } from "./env";
-import { fixPalette, isStyle, STYLE_FONTS, STYLE_LAYOUTS, type StoreStyle } from "@/lib/store-style";
+import { fixPalette, isStyle, luminance, mixHex, STYLE_FONTS, STYLE_LAYOUTS, type StoreStyle } from "@/lib/store-style";
 
 type Step = { key: JobStepKey; label: string; status: "pending" | "running" | "done" | "failed" };
 
@@ -225,7 +225,7 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
   // 2ᵉ photo, différente (produit utilisé, en situation), montrée floutée dans la partie à débloquer :
   // petite (512 × 512, ≈ 0,65 centime) puisqu'elle est floutée.
   const scene = env.falKey()
-    ? generateImage(`Candid lifestyle photo: ${t.productTitle} (${input.brief.slice(0, 160)}) being used by a person in a real everyday setting that fits the product, natural light, moody contrasted look, realistic, no text, no logos, no watermark.`, "1:1", { width: 512, height: 512 })
+    ? generateImage(`Candid lifestyle photo: ${t.productLook || t.productTitle} being used by a person in a real everyday setting that fits the product, natural light, moody contrasted look, realistic, no text, no logos, no watermark.`, "1:1", { width: 512, height: 512 })
         .then((img) => storeImage("teasers", img.bytes, img.contentType, "life1"))
         .then((x) => x.url)
         .catch((e) => { console.warn("2ᵉ photo de l'aperçu non générée :", errorMessage(e)); return null; })
@@ -238,7 +238,7 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       // socle à droite, lumière de studio douce, place à gauche pour l'accroche.
       const c = t.brand.colors;
       // L'IA d'images suit mal les codes couleur : on décrit le fond et l'accent avec des mots.
-      const prompt = `Wide premium product photograph of ${t.productTitle} (${input.brief.slice(0, 200)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge; the whole left half of the image is calm empty background (space for a headline). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
+      const prompt = `Wide premium product photograph of ${t.productLook || t.productTitle} (${input.brief.slice(0, 160)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge; the whole left half of the image is calm empty background (space for a headline). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
       // 1152 × 648 : ≈ 1,9 centime (aperçu ≤ 2,7 centimes en tout avec la 2ᵉ photo et le texte).
       const img = await generateImage(prompt, "16:9", { width: 1152, height: 648 });
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
@@ -248,7 +248,15 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
   }
   const image2 = await scene;
   const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image, image2 };
-  return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, t.brand.colors) };
+  return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, darkPalette(t.brand.colors)) };
+}
+
+// Aperçus toujours sur fond sombre (contrasté, moderne) : si l'IA a choisi un fond clair, on inverse
+// fond et texte (le texte foncé devient le fond, assombri), l'accent reste la couleur vive.
+function darkPalette(c: { primary: string; accent: string; background: string }) {
+  if (luminance(c.background) < 0.2) return c;
+  const base = luminance(c.primary) < 0.2 ? c.primary : "#121212";
+  return { background: mixHex(base, "#050505", 0.35), primary: luminance(c.background) > 0.6 ? c.background : "#f4f1ec", accent: c.accent };
 }
 
 export async function runTeaser(job: Record<string, any>, store: StoreRow) {

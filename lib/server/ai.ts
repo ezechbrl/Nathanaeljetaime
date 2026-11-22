@@ -119,6 +119,7 @@ const TeaserSchema = z.object({
   benefits: z.array(z.object({ title: z.string(), text: z.string() })).describe("3 atouts, texte d'une phrase courte"),
   description: z.string().describe("Description produit de la fiche : 2 phrases courtes et concrètes (ce que c'est, ce que ça change), en texte simple, sans HTML"),
   bullets: z.array(z.string()).describe("3 points forts de la fiche produit, 3 à 7 mots chacun, concrets et vérifiables"),
+  productLook: z.string().describe("EN ANGLAIS : description visuelle courte et précise du produit pour un photographe (type d'objet, forme, matière, couleur), ex. « a scented soy wax candle in a matte black glass jar with a wooden wick »"),
 });
 export type TeaserResult = z.infer<typeof TeaserSchema>;
 
