@@ -126,9 +126,12 @@ function Billing() {
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => setChanging((v) => !v)}>Changer d'offre</Button>
             {!gifted && <><Button variant="secondary" onClick={portal} disabled={busy === "portal"}>{busy === "portal" ? <Spinner /> : <ExternalLink className="h-4 w-4" />} Mes factures et ma carte</Button>
-            {!confirmCancel && !sub.cancelAtPeriodEnd && <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Arrêter mon abonnement</Button>}</>}
+            </>}
+            {!confirmCancel && !sub.cancelAtPeriodEnd && <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Arrêter mon abonnement</Button>}
           </div>
-          {confirmCancel && !gifted && <CancelSurvey busy={busy === "cancel"} onConfirm={cancel} onKeep={() => setConfirmCancel(false)} />}
+          {/* Accès offert : rien à résilier, le questionnaire s'affiche en aperçu (aucune réponse enregistrée). */}
+          {confirmCancel && gifted && <p className="mt-4 text-sm text-[#fcd34d]">Aperçu : ton accès est offert, donc rien ne sera résilié et tes réponses ne sont pas enregistrées.</p>}
+          {confirmCancel && <CancelSurvey busy={busy === "cancel"} onConfirm={gifted ? () => { toast("Aperçu terminé : rien n'a été résilié."); setConfirmCancel(false); } : cancel} onKeep={() => setConfirmCancel(false)} />}
         </section>}
         {changing && <Paywall initialInterval={sub?.interval === "year" ? "year" : "month"} />}
       </div>
