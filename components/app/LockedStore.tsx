@@ -71,6 +71,12 @@ function ConversionBlocks({ store, onUnlock }: { store: Store; onUnlock?: () => 
       <div className="px-5 py-12 sm:px-12">
         <p className="text-center text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: accent }}>{t.tagline}</p>
         <h3 className="mt-2 text-center text-[1.9rem] leading-tight" style={heading}>Pourquoi tu vas l&apos;adorer</h3>
+        {t.image2 && (
+          <div className="mx-auto mt-8 max-w-[860px] overflow-hidden rounded-[22px]" style={{ boxShadow: `0 30px 60px -30px ${accent}66` }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={t.image2} alt={t.productTitle} className="aspect-[16/10] w-full object-cover" />
+          </div>
+        )}
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {t.benefits.slice(0, 3).map((b, i) => {
             const I = icons[i];
@@ -117,7 +123,7 @@ function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHre
         <div>
           <p className="text-center text-2xl font-semibold">Partout avec toi</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-[1.4fr_1fr]">
-            <div className="aspect-[4/3] overflow-hidden rounded-[18px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }}>{(t.image2 ?? t.image) && <img src={(t.image2 ?? t.image)!} alt="" className="h-full w-full scale-[1.6] object-cover" style={{ objectPosition: "72% 60%" }} />}</div>
+            <div className="aspect-[4/3] overflow-hidden rounded-[18px]" style={{ background: `linear-gradient(150deg, ${accent}40, ${primary}26)` }}>{t.image && <img src={t.image} alt="" className="h-full w-full scale-[1.6] object-cover" style={{ objectPosition: "72% 60%" }} />}</div>
             <div className="grid gap-4">{block(140)}{block(140)}</div>
           </div>
         </div>

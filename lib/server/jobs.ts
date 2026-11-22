@@ -7,7 +7,7 @@ import { generatePages, generateStrategy, generateTeaser } from "./ai";
 import { UnreadablePageError, type ProductPage } from "@/lib/fetch-product-page";
 import { supplierReviews } from "./reviews";
 import { cachedProductPage } from "./link-cache";
-import { editImage, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
+import { editImage, editImageCheap, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
 import { connectionFor, installTheme, publish, readStoreContent, uploadSceneFiles, type ShopifyIds } from "./shopify";
 import { themeZipUrl } from "./theme/link";
 import { db, must } from "./supabase";
@@ -221,7 +221,7 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
   image ??= input.screenshots?.[0] ?? null;
   await onStep?.("brand", 7000);
   const t = await generateTeaser({ brief: input.brief, language: input.language, sourceText });
-  await onStep?.("pages", !image && env.falKey() ? 12_000 : 1500);
+  await onStep?.("pages", env.falKey() ? (image ? 12_000 : 22_000) : 1500);
   // Pas de photo (idée sans lien ni capture) : une vraie photo du produit, pour que l'aperçu donne envie.
   // La boutique complète repartira de cette photo, pour garder le même produit.
   if (!image && env.falKey()) {
@@ -238,7 +238,19 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
     }
   }
-  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image };
+  // 2ᵉ photo : le MÊME produit (retouche de la 1ʳᵉ), en situation, dans un vrai décor. ≈ 2,3 centimes.
+  // Aperçu ≈ 4,8 centimes en tout (2 photos + texte), budget fixé à 5 centimes.
+  let image2: string | null = null;
+  if (image && env.falKey()) {
+    try {
+      const scene = `Show this exact same product being used in a real everyday setting that fits it (${t.productLook || t.productTitle}), held or used naturally by a person, natural light, realistic lifestyle photo, moody and contrasted. Keep the product exactly identical: same shape, colors, materials and details. Remove any text, price, badge, watermark or logo. No added text.`;
+      const img = await editImageCheap(image, scene);
+      image2 = (await storeImage("teasers", img.bytes, img.contentType, "life1")).url;
+    } catch (e) {
+      console.warn("2ᵉ photo de l'aperçu non générée :", errorMessage(e));
+    }
+  }
+  const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image, image2 };
   return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, darkPalette(t.brand.colors)) };
 }
 

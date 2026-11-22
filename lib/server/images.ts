@@ -88,6 +88,24 @@ export async function editImage(referenceUrl: string, prompt: string, ratio: Asp
   throw lastError;
 }
 
+// Retouche bon marché (aperçu gratuit) : FLUX Kontext dev garde le même produit et change la scène.
+// Facturé au mégapixel commencé (≈ 0,025 $ pour une image de moins d'1 mégapixel).
+export async function editImageCheap(referenceUrl: string, prompt: string) {
+  const key = env.falKey();
+  if (!key) throw new HttpError(503, "not_configured", "La génération d'images n'est pas encore activée (FAL_KEY manquante).");
+  const res = await falPost("fal-ai/flux-kontext/dev", key, { prompt, image_url: referenceUrl, num_images: 1, output_format: "jpeg", enable_safety_checker: true });
+  if (!res.ok) {
+    const detail = (await res.text().catch(() => "")).slice(0, 200);
+    console.warn("fal.ai kontext dev", res.status, detail);
+    throw new HttpError(502, "upstream_error", `Retouche d'image refusée (code ${res.status}).`);
+  }
+  const out = (await res.json()) as { images?: { url: string; width?: number; height?: number }[] };
+  const first = out.images?.[0];
+  if (!first?.url) throw new HttpError(502, "upstream_error", "Aucune image renvoyée.");
+  const img = await fetch(first.url);
+  return { bytes: new Uint8Array(await img.arrayBuffer()), contentType: img.headers.get("content-type") ?? "image/jpeg", width: first.width ?? 1024, height: first.height ?? 768 };
+}
+
 export async function storeImage(storeId: string, bytes: Uint8Array, contentType: string, slot?: string) {
   const ext = contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
   const path = `${storeId}/${slot ? `${slot}-` : ""}${Date.now()}-${randomToken(6)}.${ext}`;
