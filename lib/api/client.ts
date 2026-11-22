@@ -193,3 +193,4 @@ export type Journey = {
 };
 export type JourneysData = { steps: string[]; rows: Journey[]; today: { signups: number; stops: number[]; visits: number; exits: { page: string; count: number }[] } };
 export const getOwnerJourneys = () => request<JourneysData>("/api/owner/journeys", { headers: ownerHeaders() });
+export const getOwnerQuiz = () => request<{ started: number; finished: number; stops: Record<string, number> }>("/api/owner/quiz", { headers: ownerHeaders() });

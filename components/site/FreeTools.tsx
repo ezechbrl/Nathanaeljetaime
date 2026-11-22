@@ -207,7 +207,7 @@ export function FreeTools({ inApp = false, defaults = {}, only }: { inApp?: bool
                 <p className="rounded-ctl border border-accent/20 bg-accent-deep/20 p-4 text-sm text-fg-muted">Copie ce qui te plaît, puis demande à l'éditeur IA de l'utiliser dans ta boutique (ex. « renomme la boutique en … »).</p>
               ) : (
                 <div className="rounded-ctl border border-accent/20 bg-accent-deep/20 p-4 text-sm text-fg-muted">
-                  Envie de la boutique entière, pas seulement d'un texte ? <ButtonLink href="/inscription" variant="ghost" size="sm" className="ml-1 text-accent">Créer ma boutique →</ButtonLink>
+                  Envie de la boutique entière, pas seulement d'un texte ? <ButtonLink href="/quiz" variant="ghost" size="sm" className="ml-1 text-accent">Créer ma boutique →</ButtonLink>
                 </div>
               )}
             </div>

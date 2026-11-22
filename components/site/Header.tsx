@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
-import { CTA } from "@/lib/launch";
+import { CTA, isWaitlist } from "@/lib/launch";
 
 // Seulement les pages utiles, en pilules bien visibles. Les autres pages sont dans le pied de page.
 const NAV = [
@@ -61,7 +61,7 @@ export function Header() {
 
         <div className="hidden items-center gap-2 lg:flex">
           <ButtonLink href="/connexion" variant="ghost" size="sm">Connexion</ButtonLink>
-          <ButtonLink href="/inscription" size="sm">{CTA.main}</ButtonLink>
+          <ButtonLink href={isWaitlist ? "/inscription" : "/quiz"} size="sm">{CTA.main}</ButtonLink>
         </div>
 
         {/* Bouton burger animé : les barres se croisent pour former une croix. */}
@@ -99,7 +99,7 @@ export function Header() {
           </div>
           <div className="mt-auto grid grid-cols-2 gap-2 pt-8">
             <ButtonLink href="/connexion" variant="secondary" size="lg">Connexion</ButtonLink>
-            <ButtonLink href="/inscription" size="lg">{CTA.short}</ButtonLink>
+            <ButtonLink href={isWaitlist ? "/inscription" : "/quiz"} size="lg">{CTA.short}</ButtonLink>
           </div>
         </div>
       )}

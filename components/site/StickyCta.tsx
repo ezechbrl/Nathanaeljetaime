@@ -1,11 +1,11 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
+import { ArrowRight, ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import { CTA } from "@/lib/launch";
+import { CTA, isWaitlist } from "@/lib/launch";
 
 // Téléphone : bouton « Créer ma boutique » fixé en bas de l'écran dès que le champ du haut n'est plus visible.
-// Il ramène au champ et le sélectionne.
+// Il ouvre le quiz (inscriptions ouvertes), sinon il ramène au champ.
 export function StickyCta() {
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -16,6 +16,8 @@ export function StickyCta() {
     return () => io.disconnect();
   }, []);
   const go = () => {
+    // Inscriptions ouvertes : « Créer ma boutique » ouvre le quiz (pour ceux qui n'ont pas encore d'idée).
+    if (!isWaitlist) { window.location.href = "/quiz"; return; }
     const box = document.getElementById("creer");
     box?.scrollIntoView({ behavior: "smooth", block: "center" });
     window.setTimeout(() => box?.querySelector<HTMLTextAreaElement | HTMLInputElement>("textarea, input")?.focus({ preventScroll: true }), 450);
@@ -23,7 +25,7 @@ export function StickyCta() {
   return (
     <div className={`fixed inset-x-0 bottom-0 z-50 p-3 pb-[max(12px,env(safe-area-inset-bottom))] transition-all duration-300 sm:hidden ${show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0"}`}>
       <button type="button" onClick={go} className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-8px_rgb(46_230_166/0.7)]">
-        {CTA.main} <ArrowUp className="h-4 w-4" />
+        {CTA.main} {isWaitlist ? <ArrowUp className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
       </button>
     </div>
   );

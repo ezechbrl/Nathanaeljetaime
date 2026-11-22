@@ -28,7 +28,7 @@ export default function ProductPage() {
         subtitle="Stratégie, textes, visuels, mise en ligne, puis un suivi chaque matin : voici ce que Vigenia fait pour ta boutique Shopify."
       >
         <div className="flex flex-wrap justify-center gap-3">
-          <ButtonLink href="/inscription" size="lg">Créer ma boutique</ButtonLink>
+          <ButtonLink href="/quiz" size="lg">Créer ma boutique</ButtonLink>
           <ButtonLink href="/demo" variant="secondary" size="lg">Voir la démo</ButtonLink>
         </div>
       </PageHero>

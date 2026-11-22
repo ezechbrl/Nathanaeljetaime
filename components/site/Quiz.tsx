@@ -5,7 +5,7 @@
 // ses clients, et enfin les boutiques qu'il aime (cœur / croix) pour choisir le style.
 // Toujours un nombre pair de réponses, pour des grilles bien alignées sur téléphone.
 import { ArrowLeft, ArrowRight, Baby, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { BIG_NICHES, NICHES } from "@/lib/niches";
@@ -82,11 +82,24 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
   const chosen = hasIdea ? idea.trim() : product;
 
+  // Suivi anonyme (Ventes) : jusqu'à quelle question le visiteur va, et s'il finit le quiz.
+  const run = useRef("");
+  const track = (s: Step | "fin", i: number, done = false) => {
+    try {
+      if (!run.current) run.current = Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 20);
+      if (localStorage.getItem("vg-owner") || navigator.webdriver) return;
+      const vid = localStorage.getItem("vg-vid") ?? undefined;
+      fetch("/api/track/quiz", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: run.current, vid, step: s, index: i, total: plan.length, hasIdea, done }), keepalive: true }).catch(() => {});
+    } catch { /* suivi facultatif */ }
+  };
+  useEffect(() => { track(step, Math.max(0, index)); }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
+
   async function finish(style: string | null) {
     if (!chosen || !audience) return;
     const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, level ? LEVEL_TEXT[level] : "", style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
     setBusy(true);
     setError("");
+    track("fin", plan.length, true);
     try {
       await onFinish(brief);
     } catch (e) {

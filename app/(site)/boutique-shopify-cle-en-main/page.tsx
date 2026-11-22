@@ -58,7 +58,7 @@ export default function TurnkeyPage() {
               { title: "Tu relis et tu publies", text: "Modifie en discutant, puis publie sur Shopify." },
             ]} />
           </div>
-          <Reveal className="mt-12 text-center"><ButtonLink href="/inscription" size="lg">Créer ma boutique clé en main</ButtonLink></Reveal>
+          <Reveal className="mt-12 text-center"><ButtonLink href="/quiz" size="lg">Créer ma boutique clé en main</ButtonLink></Reveal>
         </Container>
       </section>
 
