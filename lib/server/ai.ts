@@ -64,9 +64,9 @@ ${HUMAN_VOICE}`;
 
 // Appel structuré : la réponse est validée par le schéma Zod.
 // Si `userId` est fourni, le coût réel de l'appel est débité de son budget hebdomadaire.
-async function structured<T extends z.ZodType>(opts: { schema: T; system: string; user: string; images?: string[]; effort: "low" | "medium" | "high"; maxTokens?: number; userId?: string }): Promise<z.infer<T>> {
+async function structured<T extends z.ZodType>(opts: { schema: T; system: string; user: string; images?: string[]; effort: "low" | "medium" | "high"; maxTokens?: number; userId?: string; model?: string }): Promise<z.infer<T>> {
   const res = await ai().beta.messages.parse({
-    model: MODEL,
+    model: opts.model ?? MODEL,
     max_tokens: opts.maxTokens ?? 16000,
     betas: ["server-side-fallback-2026-07-01"],
     fallbacks: "default",
@@ -373,6 +373,8 @@ export async function runTool(tool: ToolId, input: Record<string, string>) {
   const fields = Object.entries(input).filter(([k]) => k !== "language").map(([k, v]) => data(k, v.slice(0, 600))).join("\n");
   return structured({
     schema: TOOL_SCHEMAS[tool],
+    // Outils gratuits du site : le modèle le moins cher (moins de 0,1 centime par génération).
+    model: TEASER_MODEL,
     effort: "low",
     maxTokens: 4000,
     system: `Tu aides un e-commerçant à créer sa boutique. Réponds dans la langue : ${input.language || "français"}.\n\n${BASE_RULES}`,

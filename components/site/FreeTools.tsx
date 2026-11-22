@@ -7,7 +7,7 @@ import { runTool } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 import { sanitizeHtml } from "@/lib/sanitize";
 
-type ToolId = "store-name" | "slogan" | "product-description" | "faq" | "tiktok-ideas" | "instagram-caption";
+export type ToolId = "store-name" | "slogan" | "product-description" | "faq" | "tiktok-ideas" | "instagram-caption";
 type Field = { name: string; label: string; placeholder: string; textarea?: boolean };
 
 const TOOLS: { id: ToolId; icon: LucideIcon; label: string; description: string; fields: Field[] }[] = [
@@ -81,8 +81,9 @@ function Skeleton() {
 }
 
 // Outils IA : sur le site (gratuits) et dans l'app (champs pré-remplis avec la boutique active).
-export function FreeTools({ inApp = false, defaults = {} }: { inApp?: boolean; defaults?: Record<string, string> }) {
-  const [toolId, setToolId] = useState<ToolId>("store-name");
+// `only` : un seul outil (pages publiques d'un outil), sans la liste des autres.
+export function FreeTools({ inApp = false, defaults = {}, only }: { inApp?: boolean; defaults?: Record<string, string>; only?: ToolId }) {
+  const [toolId, setToolId] = useState<ToolId>(only ?? "store-name");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState("");
@@ -120,7 +121,7 @@ export function FreeTools({ inApp = false, defaults = {} }: { inApp?: boolean; d
 
   return (
     <div>
-      <div role="tablist" aria-label="Outils" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {!only && <div role="tablist" aria-label="Outils" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {TOOLS.map(({ id, icon: Icon, label, description }) => {
           const active = id === toolId;
           return (
@@ -146,9 +147,9 @@ export function FreeTools({ inApp = false, defaults = {} }: { inApp?: boolean; d
             </button>
           );
         })}
-      </div>
+      </div>}
 
-      <div className="mt-6 grid gap-6 rounded-[20px] border border-white/[0.08] bg-black/25 p-5 backdrop-blur sm:p-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <div className={cn("grid gap-6 rounded-[20px] border border-white/[0.08] bg-black/25 p-5 backdrop-blur sm:p-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]", !only && "mt-6")}>
         <form key={toolId} onSubmit={submit} className="space-y-4">
           <p className="flex items-center gap-2 text-lg tracking-tight"><tool.icon className="h-5 w-5 text-accent" /> {tool.label}</p>
           {tool.fields.map((f) => (
