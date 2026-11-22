@@ -1,10 +1,7 @@
 "use client";
 
 import { CANCEL_REASONS, CANCEL_WISHES, cancelLabel } from "@/lib/content/cancel";
-import {
-  AlertTriangle, BadgeCheck, Bell, BellRing, CalendarRange, Eye, Gauge, Percent, Receipt, RefreshCw,
-  ShoppingBag, TrendingDown, TrendingUp, UserPlus, Users, Wallet,
-} from "lucide-react";
+import { Bell, BellRing, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import * as api from "@/lib/api/client";
@@ -85,40 +82,8 @@ const TONES = {
   pink: "bg-[#ffe4f1] text-[#db2777]",
 } as const;
 
-// Visiteurs en ce moment (2 dernières minutes), avec un point vert qui pulse.
-function Live({ count }: { count: number }) {
-  return (
-    <Card className="flex h-[140px] flex-col">
-      <span className="flex h-8 items-center gap-2"><span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#10b981]" /></span><span className="text-xs font-medium text-[#0a8f5f]">En direct</span></span>
-      <p className="mt-auto truncate text-[13px] text-[#616161]">En ce moment</p>
-      <p className="mt-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.02em] tabular-nums">{count}</p>
-      <p className="mt-1.5 truncate text-[11.5px] leading-tight text-[#8a8a8a]">visiteur{count > 1 ? "s" : ""} sur le site</p>
-    </Card>
-  );
-}
 
-// Évolution par rapport à la période d'avant : ↑ vert, ↓ rouge (inversé pour les départs).
-function Delta({ cur, prev, inverse = false }: { cur: number; prev: number; inverse?: boolean }) {
-  if (!cur && !prev) return <span className="text-xs text-[#8a8a8a]">—</span>;
-  const up = cur >= prev, good = inverse ? !up : up;
-  const txt = prev ? `${up ? "↑" : "↓"} ${Math.abs(Math.round(((cur - prev) / prev) * 100))} %` : "↑ nouveau";
-  return <span className={cn("rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums", cur === prev ? "bg-[#f1f1f1] text-[#616161]" : good ? TONES.green : TONES.red)}>{cur === prev ? "= stable" : txt}</span>;
-}
 
-// Toutes les tuiles ont exactement la même taille.
-function Metric({ label, value, hint, icon: Icon, color = "green", cur, prev, inverse }: { label: string; value: string; hint?: string; icon: React.ComponentType<{ className?: string }>; color?: keyof typeof TONES; cur?: number; prev?: number; inverse?: boolean }) {
-  return (
-    <Card className="flex h-[140px] flex-col">
-      <span className="flex items-center justify-between gap-2">
-        <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-[10px]", TONES[color])}><Icon className="h-4 w-4" /></span>
-        {cur !== undefined && prev !== undefined && <Delta cur={cur} prev={prev} inverse={inverse} />}
-      </span>
-      <p className="mt-auto truncate text-[13px] text-[#616161]">{label}</p>
-      <p className="mt-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.02em] tabular-nums">{value}</p>
-      <p className="mt-1.5 truncate text-[11.5px] leading-tight text-[#8a8a8a]">{hint ?? "\u00a0"}</p>
-    </Card>
-  );
-}
 
 // Graduations « rondes » de l'axe vertical (0, 5, 10… ou 0, 20 €, 40 €…).
 function niceMax(v: number, minStep = 1) {
@@ -301,6 +266,101 @@ function MoneyHero({ s }: { s: OwnerStats }) {
   );
 }
 
+const n = (x: number) => x.toLocaleString("fr-FR");
+const pc = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
+// Comparaison simple avec la période d'avant : « +2 », « −1 » ou « pareil ».
+function Vs({ cur, prev, money = false }: { cur: number; prev: number; money?: boolean }) {
+  const d = cur - prev;
+  return <span className={cn("text-xs tabular-nums", d > 0 ? "text-[#0a8f5f]" : d < 0 ? "text-[#d72c0d]" : "text-[#8a8a8a]")}>{d === 0 ? "pareil qu'avant" : `${d > 0 ? "+" : "−"}${money ? eur(Math.abs(d)) : n(Math.abs(d))} vs avant`}</span>;
+}
+
+// En phrases : ce qui s'est passé sur la période, sans jargon.
+function Summary({ p, label, live }: { p: OwnerStats["periods"]["today"]; label: string; live: number }) {
+  const lines = [
+    <><b>{n(p.visits)}</b> personne{p.visits > 1 ? "s" : ""} {p.visits > 1 ? "sont venues" : "est venue"} sur le site.</>,
+    <><b>{n(p.signups)}</b> {p.signups > 1 ? "se sont inscrites" : "s'est inscrite"}{p.visits ? <> : <b>{pc(p.signups, p.visits)} %</b> des visiteurs</> : null}.</>,
+    <><b>{n(p.stores)}</b> aperçu{p.stores > 1 ? "s" : ""} de boutique créé{p.stores > 1 ? "s" : ""}, <b>{n(p.checkouts)}</b> {p.checkouts > 1 ? "ont ouvert" : "a ouvert"} la page de paiement.</>,
+    <><b>{n(p.newSubs)}</b> nouvel{p.newSubs > 1 ? "s" : ""} abonné{p.newSubs > 1 ? "s" : ""}, <b>{eur(p.revenue)}</b> encaissé{p.cancels ? <>, <b className="text-[#d72c0d]">{n(p.cancels)}</b> résiliation{p.cancels > 1 ? "s" : ""}</> : null}.</>,
+  ];
+  return (
+    <Card>
+      <div className="flex items-center justify-between gap-2"><h2 className="text-[15px] font-semibold">En résumé · {label}</h2><span className="flex items-center gap-1.5 text-xs text-[#616161]"><span className="h-2 w-2 rounded-full bg-[#10b981]" />{live} en ce moment</span></div>
+      <ul className="mt-2 space-y-1.5 text-[14.5px] leading-snug">{lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
+      {p.visits > 0 && p.visits < 30 && <p className="mt-2 text-xs text-[#8a8a8a]">Moins de 30 visites : les pourcentages bougent beaucoup d'un jour à l'autre, regarde plutôt « 7 jours » ou « 30 jours ».</p>}
+    </Card>
+  );
+}
+
+// Entonnoir de la période : combien passent à l'étape suivante, et où on perd le plus de monde.
+function Funnel({ p }: { p: OwnerStats["periods"]["today"] }) {
+  const steps = [
+    { label: "Visiteurs", count: p.visits, prev: p.prev.visits },
+    { label: "Inscrits", count: p.signups, prev: p.prev.signups },
+    { label: "Aperçu créé", count: p.stores, prev: p.prev.stores },
+    { label: "Page de paiement", count: p.checkouts, prev: p.prev.checkouts },
+    { label: "Abonnés", count: p.newSubs, prev: p.prev.newSubs },
+  ];
+  const top = steps[0].count || 1;
+  let worst = -1, worstLoss = 0;
+  steps.forEach((st, i) => { if (i && steps[i - 1].count >= 3) { const loss = 1 - st.count / steps[i - 1].count; if (loss > worstLoss) { worstLoss = loss; worst = i; } } });
+  return (
+    <Card>
+      <h2 className="text-[15px] font-semibold">De la visite à l'abonnement</h2>
+      <div className="mt-3 space-y-3">
+        {steps.map((st, i) => (
+          <div key={st.label}>
+            <div className="flex items-baseline justify-between gap-2 text-sm">
+              <span className="font-medium">{st.label}</span>
+              <span className="flex items-baseline gap-2"><Vs cur={st.count} prev={st.prev} /><b className="tabular-nums">{n(st.count)}</b></span>
+            </div>
+            <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#f1f1f1]"><div className={cn("h-full rounded-full", i === worst ? "bg-[#d72c0d]" : "bg-[#0a8f5f]")} style={{ width: `${Math.max(st.count ? 3 : 0, (st.count / top) * 100)}%` }} /></div>
+            {i > 0 && steps[i - 1].count > 0 && <p className="mt-0.5 text-xs text-[#8a8a8a]">{n(st.count)} sur {n(steps[i - 1].count)} passent à cette étape ({pc(st.count, steps[i - 1].count)} %)</p>}
+          </div>
+        ))}
+      </div>
+      {worst > 0 && <p className="mt-3 rounded-xl bg-[#fee8e5] px-3 py-2 text-[13px] text-[#b42318]">Là où tu perds le plus : entre « {steps[worst - 1].label} » et « {steps[worst].label} » ({Math.round(worstLoss * 100)} % s'arrêtent).</p>}
+    </Card>
+  );
+}
+
+// D'où viennent les visiteurs, sur quel appareil, et combien de temps ils restent.
+function Sources({ p }: { p: OwnerStats["periods"]["today"] }) {
+  if (!p.visits) return null;
+  const mins = Math.floor(p.audience.avgSeconds / 60), secs = p.audience.avgSeconds % 60;
+  return (
+    <Card>
+      <h2 className="text-[15px] font-semibold">D'où viennent tes visiteurs</h2>
+      <ul className="mt-2 divide-y divide-[#eee] text-sm">
+        {p.sources.map((x) => <li key={x.name} className="flex items-center justify-between py-2"><span>{x.name === "Direct" ? "Direct (lien tapé ou partagé)" : x.name}</span><span className="tabular-nums"><b>{n(x.count)}</b> <span className="text-[#8a8a8a]">· {pc(x.count, p.visits)} %</span></span></li>)}
+      </ul>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+        {[["Sur téléphone", `${Math.round(p.audience.mobile * 100)} %`], ["Temps moyen", mins ? `${mins} min ${secs ? `${secs} s` : ""}` : `${secs} s`], ["Pages vues", `${String(p.audience.pagesPerVisit).replace(".", ",")} / visite`]].map(([l, v]) => (
+          <div key={l} className="rounded-xl bg-[#f6f6f6] px-1 py-2"><p className="text-[11px] text-[#616161]">{l}</p><p className="mt-0.5 text-sm font-semibold tabular-nums">{v}</p></div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+// L'argent : ce qui est rentré sur la période, et l'état des abonnements aujourd'hui.
+function Money({ s, p }: { s: OwnerStats; p: OwnerStats["periods"]["today"] }) {
+  const rows: [string, React.ReactNode, React.ReactNode?][] = [
+    ["Encaissé sur la période", <b key="a">{eur(p.revenue)}</b>, <Vs key="b" cur={p.revenue} prev={p.prev.revenue} money />],
+    ["Abonnés actifs", <b key="a">{n(s.subscribers.total)}</b>, <span key="b" className="text-xs text-[#8a8a8a]">{s.subscribers.starter} Starter · {s.subscribers.pro} Pro</span>],
+    ["Revenu par mois", <b key="a">{eur(s.mrr)}</b>, <span key="b" className="text-xs text-[#8a8a8a]">{eur(s.arpu)} par abonné</span>],
+    ["Résiliations sur la période", <b key="a" className={p.cancels ? "text-[#d72c0d]" : ""}>{n(p.cancels)}</b>, <span key="b" className="text-xs text-[#8a8a8a]">{pct(s.churn)} sur 30 jours</span>],
+    ["Comptes créés au total", <b key="a">{n(s.totals.accounts)}</b>, <span key="b" className="text-xs text-[#8a8a8a]">{pct(s.conversion)} sont devenus payants</span>],
+  ];
+  return (
+    <Card>
+      <h2 className="text-[15px] font-semibold">Ton argent</h2>
+      <ul className="mt-1 divide-y divide-[#eee] text-sm">
+        {rows.map(([l, v, h]) => <li key={l} className="flex items-center justify-between gap-3 py-2.5"><span className="min-w-0"><span className="block">{l}</span>{h && <span className="block">{h}</span>}</span><span className="tabular-nums">{v}</span></li>)}
+      </ul>
+    </Card>
+  );
+}
+
 function Dashboard({ s }: { s: OwnerStats }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -310,12 +370,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
   const [period, setPeriod] = useState<PeriodId>("today");
   const [metric, setMetric] = useState<"signups" | "revenue" | "visits">("revenue");
   const p = s.periods[period];
-  const q = p.prev;
   const vs = PERIODS.find((x) => x.id === period)!.vs;
-  const conv = (c: { signups: number; visits: number }) => (c.visits ? c.signups / c.visits : 0);
 
   const aff = s.affiliates.reduce((t, a) => ({ clicks: t.clicks + a.clicks, signups: t.signups + a.signups, customers: t.customers + a.customers, commission: t.commission + a.commission }), { clicks: 0, signups: 0, customers: 0, commission: 0 });
-  const subs = s.subscribers.total || 1;
   const chart = (k: "visits" | "signups" | "revenue") => p.chart.map((c) => ({ label: c.label, value: c[k], prev: c[k === "visits" ? "prevVisits" : k === "signups" ? "prevSignups" : "prevRevenue"] }));
   const plural = (n: number, w: string) => `${n} ${w}${n > 1 ? "s" : ""}`;
 
@@ -340,32 +397,18 @@ function Dashboard({ s }: { s: OwnerStats }) {
       {metric === "signups" && <Chart title="Inscrits" total={String(p.signups)} points={chart("signups")} color="#2563eb" format={(n) => plural(n, "inscrit")} short={compact} />}
       {metric === "revenue" && <Chart title="Revenus" total={eur(p.revenue)} points={chart("revenue")} color="#0a8f5f" format={eur} short={euroShort} money />}
       {metric === "visits" && <Chart title="Visites" total={String(p.visits)} points={chart("visits")} color="#f59e0b" format={(n) => plural(n, "visiteur")} short={compact} />}
-      <p className="px-1 text-xs text-white/60">Flèches : {vs} · vrais visiteurs seulement (sans robots ni passages Shopify)</p>
+      <p className="px-1 text-xs text-white/60">« vs avant » = {vs} · vrais visiteurs seulement (sans robots ni passages Shopify)</p>
 
-      {/* Les chiffres clés de la période, tous à la même taille */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Visites et inscrits d'abord */}
-        <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={q.visits} />
-        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint="Comptes créés" cur={p.signups} prev={q.signups} />
-        <Live count={s.liveNow} />
-        <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={Math.round(conv(q) * 1000)} />
-        <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={q.stores} />
-        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page de paiement" cur={p.checkouts} prev={q.checkouts} />
-        {/* Puis l'argent de la période */}
-        <Metric icon={Wallet} color="green" label="Encaissé" value={eur(p.revenue)} hint={plural(p.sales, "paiement")} cur={p.revenue} prev={q.revenue} />
-        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} hint="Premiers abonnements" cur={p.newSubs} prev={q.newSubs} />
-        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" cur={p.sales} prev={q.sales} />
-        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} hint={`Taux sur 30 j : ${pct(s.churn)}`} cur={p.cancels} prev={q.cancels} inverse />
-        <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
-        <Metric icon={Gauge} color="violet" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
-        <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
-        <Metric icon={UserPlus} color="blue" label="Comptes" value={String(s.totals.accounts)} hint={`${pct(s.conversion)} devenus payants`} />
-      </div>
+      {/* L'essentiel de la période, en phrases simples, puis l'entonnoir, les sources et l'argent. */}
+      <Summary p={p} label={PERIODS.find((x) => x.id === period)!.label} live={s.liveNow} />
+      <Funnel p={p} />
+      <Sources p={p} />
+      <Money s={s} p={p} />
 
       {/* Clients qui paient : toujours visibles, avec leurs boutiques. */}
       {!!s.customers?.length && (
         <Card>
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><Wallet className="h-3.5 w-3.5" /></span>Tes clients</h2>
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold">Tes clients</h2>
           <ul className="mt-1 divide-y divide-[#eee] text-sm">
             {s.customers.map((c) => (
               <li key={c.email} className="py-2.5">
@@ -392,7 +435,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
       {/* Pourquoi des clients arrêtent : réponses au petit questionnaire de départ. */}
       {!!s.departures?.length && (
         <Card>
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.blue)}><UserPlus className="h-3.5 w-3.5" /></span>Pourquoi ils arrêtent</h2>
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold">Pourquoi ils arrêtent</h2>
           <ul className="mt-1 divide-y divide-[#eee] text-sm">
             {s.departures.map((d) => (
               <li key={d.email + d.at} className="py-2.5">
@@ -406,18 +449,6 @@ function Dashboard({ s }: { s: OwnerStats }) {
       )}
 
       <div className="grid grid-cols-1 gap-3">
-        <Card>
-          <h2 className="text-[15px] font-semibold">Répartition des offres</h2>
-          <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-[#f1f1f1]">
-            <div className="bg-[#0a8f5f]" style={{ width: `${(s.subscribers.starter / subs) * 100}%` }} />
-            <div className="bg-[#111]" style={{ width: `${(s.subscribers.pro / subs) * 100}%` }} />
-          </div>
-          <div className="mt-3 space-y-1.5 text-sm">
-            <p className="flex justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#0a8f5f]" />Starter</span><span className="tabular-nums">{s.subscribers.starter}</span></p>
-            <p className="flex justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#111]" />Pro</span><span className="tabular-nums">{s.subscribers.pro}</span></p>
-          </div>
-        </Card>
-
         <Card>
           <h2 className="text-[15px] font-semibold">Affiliation Vigenia <span className="font-normal text-[#8a8a8a]">· les gens qui font ta pub</span></h2>
           <div className="mt-3 grid grid-cols-4 gap-2 text-center">
@@ -441,7 +472,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
       {/* Affiliation Shopify : ton lien d'affiliation Shopify (Impact). */}
       <Card>
-        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><ShoppingBag className="h-3.5 w-3.5" /></span>Affiliation Shopify <span className="font-normal text-[#8a8a8a]">· ton lien Shopify</span></h2>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold">Affiliation Shopify <span className="font-normal text-[#8a8a8a]">· ton lien Shopify</span></h2>
         {s.shopifyAffiliation.configured ? (
           <>
             <div className="mt-3 grid grid-cols-4 gap-2 text-center">
@@ -467,30 +498,8 @@ function Dashboard({ s }: { s: OwnerStats }) {
         )}
       </Card>
 
-      <div className="grid grid-cols-1 gap-3">
-        {/* Entonnoir : où les gens s'arrêtent avant d'acheter (30 derniers jours). */}
-        <Card>
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.violet)}><Gauge className="h-3.5 w-3.5" /></span>Parcours avant l'achat <span className="font-normal text-[#8a8a8a]">· 30 j</span></h2>
-          <div className="mt-3 space-y-2.5">
-            {s.funnel.map((f, i) => {
-              const first = s.funnel[0].count || 1;
-              const prev = i ? s.funnel[i - 1].count : f.count;
-              const lost = i && prev ? Math.round(((prev - f.count) / prev) * 100) : 0;
-              return (
-                <div key={f.step}>
-                  <div className="flex justify-between text-sm"><span>{f.step}</span><span className="tabular-nums font-medium">{f.count}{i > 0 && prev > 0 && <span className="ml-1.5 text-xs font-normal text-[#d72c0d]">−{lost} %</span>}</span></div>
-                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#f1f1f1]"><div className={cn("h-full rounded-full", ["bg-[#f59e0b]", "bg-[#2563eb]", "bg-[#7c3aed]", "bg-[#db2777]", "bg-[#0a8f5f]"][i])} style={{ width: `${Math.max(2, (f.count / first) * 100)}%` }} /></div>
-                </div>
-              );
-            })}
-          </div>
-          <p className="mt-3 text-xs text-[#8a8a8a]">Le plus gros pourcentage rouge = l'étape où tu perds le plus de monde.</p>
-        </Card>
-
-      </div>
-
       <Card>
-        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", s.errors.day ? TONES.red : TONES.green)}><AlertTriangle className="h-3.5 w-3.5" /></span>Erreurs du site</h2>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold">Erreurs du site</h2>
         {s.errors.month ? (
           <>
             <p className="mt-2 text-sm"><b className={s.errors.day ? "text-[#d72c0d]" : ""}>{s.errors.day}</b> sur 24 h · {s.errors.month} sur 30 jours</p>
@@ -508,7 +517,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
       </Card>
 
       <Card>
-        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><ShoppingBag className="h-3.5 w-3.5" /></span>Dernières ventes</h2>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold">Dernières ventes</h2>
         {s.recent.length ? (
           <ul className="mt-1 divide-y divide-[#eee] text-sm">
             {s.recent.map((r, i) => (
