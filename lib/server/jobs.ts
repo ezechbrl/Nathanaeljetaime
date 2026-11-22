@@ -182,6 +182,26 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
 // légèrement mises en scène mais jamais « effet IA » (pas de 3D, de reflets brillants, de halo ni de paillettes).
 const NATURAL = "real photograph taken with a professional camera, natural and believable, true-to-life colors and materials, subtle real-world imperfections and slight natural film grain, calm neutral tones, not a 3D render, not CGI, no glossy reflections, no glow, no light haze, no sparkles, no floating objects, no added text, no logos, no brand names, no trademarks (no Apple, Nike or other brand logo), no watermark";
 
+// Couleurs décrites avec des mots pour l'IA d'images (elle suit mal les codes hexadécimaux).
+const hexRgb = (h: string) => { const x = h.replace("#", "").padEnd(6, "0"); return [0, 2, 4].map((i) => parseInt(x.slice(i, i + 2), 16) || 0); };
+function toneWords(hex: string) {
+  const [r, g, b] = hexRgb(hex);
+  const l = 0.299 * r + 0.587 * g + 0.114 * b;
+  if (l < 60) return "Dark moody studio: deep charcoal, almost black background with a subtle gradient";
+  if (l < 140) return `Mid-tone ${colorWord(hex)} studio background with a subtle gradient`;
+  return `Soft light ${colorWord(hex, true)} studio background with a subtle gradient`;
+}
+function colorWord(hex: string, soft = false) {
+  const [r, g, b] = hexRgb(hex).map((v) => v / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  if (d < 0.08) return soft ? "warm neutral grey" : "neutral";
+  let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  h = (h * 60 + 360) % 360;
+  const names: [number, string][] = [[15, "red"], [40, "orange"], [65, "golden yellow"], [90, "lime green"], [160, "green"], [200, "teal"], [250, "blue"], [290, "purple"], [335, "pink"], [360, "red"]];
+  const n = names.find(([lim]) => h < lim)![1];
+  return soft ? `pale ${n}-tinted beige` : n;
+}
+
 // Aperçu gratuit : nom, couleurs, accroche et photo du fournisseur. La boutique complète est créée
 // après l'abonnement (runGeneration), à partir du même brief et du même lien.
 // Contenu de l'aperçu (nom, couleurs, accroche, photo du fournisseur), commun à l'aperçu d'un compte
@@ -209,7 +229,8 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       // Même format que le haut de page des boutiques complètes (ex. Vélaro) : photo large, produit posé sur un
       // socle à droite, lumière de studio douce, place à gauche pour l'accroche.
       const c = t.brand.colors;
-      const prompt = `Wide premium product photograph of ${t.productTitle} (${input.brief.slice(0, 200)}). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. Smooth studio background with a gradient between ${c.background} and a deeper shade of it, soft spotlight from above, a very subtle warm glow in ${c.accent} behind the product. The product is placed on the right third of the frame, generous calm empty space on the left. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
+      // L'IA d'images suit mal les codes couleur : on décrit le fond et l'accent avec des mots.
+      const prompt = `Wide premium product photograph of ${t.productTitle} (${input.brief.slice(0, 200)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge; the whole left half of the image is calm empty background (space for a headline). The product stands firmly on a minimal matte plinth, resting on it with a clear realistic contact shadow, never floating in the air. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
       // 1344 × 768 (même taille que le haut de page des boutiques complètes) : ≈ 2,6 centimes.
       // Aperçu gratuit ≤ 3,5 centimes en tout (texte compris).
       const img = await generateImage(prompt, "16:9");
