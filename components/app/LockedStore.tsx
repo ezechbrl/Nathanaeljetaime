@@ -52,7 +52,8 @@ function teaserStore(store: Store): { store: Store; assets: Asset[] } {
   };
   const img = (id: string, slot: string, kind: Asset["kind"]) => ({ id, storeId: store.id, kind, url: t.image!, width: 1280, height: 720, prompt: null, slot, createdAt: store.createdAt });
   const assets: Asset[] = t.image ? [img("t-hero", "hero", "banner"), img("t-pack", "packshot", "product"), img("t-life", "story", "lifestyle")] : [];
-  return { store: { ...store, plan: plan as unknown as Store["plan"] }, assets };
+  // La photo de l'aperçu laisse la place à gauche (produit à droite) : le titre va toujours à gauche.
+  return { store: { ...store, theme: { ...store.theme, heroLayout: "left" }, plan: plan as unknown as Store["plan"] }, assets };
 }
 
 // Ce que la boutique complète ajoute (dessiné aux couleurs de la marque, flouté) : comment ça marche,
