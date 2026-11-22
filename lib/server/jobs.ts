@@ -51,7 +51,7 @@ export const PUBLISH_WEIGHTS: Partial<Record<JobStepKey, number>> = { product: 4
 
 // `estMs` : durée estimée d'une étape faite d'un seul long appel (texte IA, photo) : la barre avance
 // doucement pendant l'attente (jusqu'à 90 % de l'étape) au lieu de rester figée.
-type Tracker = ((key: JobStepKey, estMs?: number) => Promise<void>) & { sub: (fraction: number) => Promise<void>; stop: () => void };
+type Tracker = ((key: JobStepKey, estMs?: number) => Promise<void>) & { sub: (fraction: number) => Promise<void>; stop: () => Promise<void> };
 
 function tracker(jobId: string, steps: Step[], weights: Partial<Record<JobStepKey, number>> = {}): Tracker {
   const w = (k: JobStepKey) => weights[k] ?? 1;
@@ -60,13 +60,23 @@ function tracker(jobId: string, steps: Step[], weights: Partial<Record<JobStepKe
   let last = -1;
   let timer: ReturnType<typeof setInterval> | null = null;
   const stopTimer = () => { if (timer) clearInterval(timer); timer = null; };
-  const write = async (fraction: number) => {
+  // Les mises à jour passent l'une après l'autre, et plus aucune après la fin : sinon une mise à jour
+  // « 99 % » partie juste avant la fin pouvait arriver après elle et bloquer la tâche à 99 %.
+  let closed = false;
+  let chain: Promise<void> = Promise.resolve();
+  const write = (fraction: number) => {
+    if (closed) return chain;
     const before = steps.slice(0, Math.max(0, current)).reduce((n, s) => n + w(s.key), 0);
     // Jamais 100 % avant la vraie fin (finish).
     const progress = Math.min(99, Math.round((100 * (before + (current >= 0 ? w(steps[current].key) * fraction : 0))) / total));
-    if (progress === last) return;
+    if (progress === last) return chain;
     last = progress;
-    await db().from("jobs").update({ status: "running", steps, progress }).eq("id", jobId);
+    const snapshot = JSON.parse(JSON.stringify(steps)) as Step[];
+    chain = chain.then(async () => {
+      if (closed) return;
+      await db().from("jobs").update({ status: "running", steps: snapshot, progress }).eq("id", jobId).in("status", ["queued", "running"]);
+    }).catch(() => {});
+    return chain;
   };
   const step = (async (key: JobStepKey, estMs?: number) => {
     stopTimer();
@@ -80,12 +90,13 @@ function tracker(jobId: string, steps: Step[], weights: Partial<Record<JobStepKe
     }
   }) as Tracker;
   step.sub = (fraction) => { stopTimer(); return write(Math.max(0, Math.min(1, fraction))).catch(() => {}); };
-  step.stop = stopTimer;
+  // Fin : plus aucune mise à jour de progression, et on attend celles déjà parties.
+  step.stop = () => { stopTimer(); closed = true; return chain; };
   return step;
 }
 
 async function finish(jobId: string, steps: Step[], error?: string, t?: Tracker) {
-  t?.stop();
+  await t?.stop();
   steps.forEach((s) => { if (s.status !== "done") s.status = error ? (s.status === "running" ? "failed" : s.status) : "done"; });
   await db().from("jobs").update({ status: error ? "failed" : "succeeded", progress: error ? undefined : 100, steps, error: error ?? null, finished_at: new Date().toISOString() }).eq("id", jobId);
 }
