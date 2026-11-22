@@ -1,8 +1,7 @@
 "use client";
 
-import { AlertCircle, Check, ImagePlus, Link2, PenLine, Plus, Sparkles, X } from "lucide-react";
+import { AlertCircle, Check, ImagePlus, Link2, PenLine, Plus, RefreshCw, Sparkles, Store, X } from "lucide-react";
 import Link from "next/link";
-import { QuizCard } from "@/components/site/QuizCard";
 import { STYLE_TEXT, likedStyle } from "@/components/site/StyleSwipe";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -19,6 +18,7 @@ import { PaywallDialog, readPendingDraft } from "./Paywall";
 const MODES: { id: CreationMode; label: string; sub: string; color: string; icon: typeof PenLine; placeholder: string; hint: string }[] = [
   { id: "link", label: "Coller un lien", sub: "Ton fournisseur, ex. AliExpress", color: "#34d399", icon: Link2, placeholder: "Facultatif : ce que tu veux préciser (cible, prix de vente, ambiance)…", hint: "Le lien du produit que tu vends chez ton fournisseur (AliExpress, CJ…) ou sur ta propre page. L'IA en relève les caractéristiques et écrit une boutique originale." },
   { id: "start", label: "Décrire", sub: "Ton idée en une phrase", color: "#a78bfa", icon: PenLine, placeholder: "Décris ton projet (ex. : bijoux minimalistes en acier doré, cible 25-35 ans, ton chic et accessible)…", hint: "Plus ton brief est précis (produit, cible, prix, ambiance), meilleur est le résultat." },
+  { id: "recraft", label: "Refaire ma boutique", sub: "Améliorer l'existante", color: "#fbbf24", icon: RefreshCw, placeholder: "Ce qui ne va pas aujourd'hui et ce que tu veux (ex. : ton plus premium, fiche produit plus claire)…", hint: "Colle l'adresse de ta boutique en ligne : l'IA lit ses pages publiques et propose une nouvelle version, sans rien toucher à ta boutique actuelle." },
 ];
 
 // Ce qui rend un brief bon : chaque critère détecté s'allume, un clic ajoute une amorce.
@@ -133,13 +133,13 @@ export function CreateStore() {
     if (mode === "link" && link.state === "blocked" && !shots.length && brief.trim().length < 25) {
       return setError(new ApiClientError(400, "invalid_input", "Ce site ne laisse pas lire sa page. Ajoute 1 à 3 captures d'écran de la page produit (ou décris le produit en une phrase), puis clique sur Générer.", "url"));
     }
-    if (mode === "recraft" && !shop) return setError(new ApiClientError(400, "no_shop", "Connecte d'abord ta boutique Shopify pour la refondre."));
+    if (mode === "recraft" && !/^https?:\/\/\S+\.\S+/.test(url.trim())) return setError(new ApiClientError(400, "invalid_input", "Colle l'adresse de ta boutique (elle commence par https://).", "url"));
     if (mode !== "link" && !(mode === "start" && shots.length) && brief.trim().length < 10) return setError(new ApiClientError(400, "invalid_input", "Décris ton projet en une ou deux phrases.", "brief"));
     // Style aimé sur la page d'accueil (cœur / croix), ajouté à la description s'il n'y est pas déjà.
     const liked = likedStyle();
     const base = brief.trim() || (url.trim() ? "Boutique à partir du lien produit" : "Boutique à partir des photos du produit");
     const withStyle = liked && !/Style de boutique/i.test(base) ? `${base} ${STYLE_TEXT[liked]}` : base;
-    const input: GenerateStoreInput = { mode, brief: withStyle, productUrl: mode === "link" && url.trim() ? url.trim() : undefined, screenshots: mode !== "recraft" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
+    const input: GenerateStoreInput = { mode, brief: withStyle, productUrl: (mode === "link" || mode === "recraft") && url.trim() ? url.trim() : undefined, screenshots: mode !== "recraft" && shots.length ? shots : undefined, language, shopConnectionId: shop || undefined };
     // Sans abonnement : une boutique d'aperçu gratuite (floutée), puis l'offre pour la débloquer.
     generate(input);
   }
@@ -191,6 +191,14 @@ export function CreateStore() {
     <div className="mx-auto w-full max-w-[720px]">
       <form onSubmit={submit} onPaste={(e) => { if (mode !== "recraft" && e.clipboardData.files.length) { e.preventDefault(); addShots(e.clipboardData.files); } }} className="glow-frame rounded-[16px] p-[1.5px]">
         <div className="rounded-[15px] bg-[linear-gradient(180deg,#0d3a2d,#062419)]">
+          {mode === "recraft" && (
+            <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3.5">
+              <Store className="h-5 w-5 shrink-0 text-[#fbbf24]" />
+              <label htmlFor="shopurl" className="sr-only">Adresse de ta boutique</label>
+              <input id="shopurl" type="url" inputMode="url" autoFocus value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Colle l'adresse de ta boutique (ex. https://ma-boutique.com)" className="w-full bg-transparent text-base placeholder:text-fg-faint focus:outline-none" />
+              {url && <button type="button" onClick={() => setUrl("")} aria-label="Effacer l'adresse" className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-fg-faint hover:bg-white/5 hover:text-fg"><X className="h-4 w-4" /></button>}
+            </div>
+          )}
           {mode === "link" && (
             <div className="border-b border-white/[0.06]">
               <div className="flex items-center gap-2 px-4 py-3.5">
@@ -271,7 +279,7 @@ export function CreateStore() {
         </div>
       )}
 
-      <div role="tablist" aria-label="Mode de création" className="mx-auto mt-6 grid max-w-[560px] grid-cols-2 items-stretch gap-2 sm:gap-3">
+      <div role="tablist" aria-label="Mode de création" className="mx-auto mt-6 grid max-w-[820px] grid-cols-3 items-stretch gap-2 sm:gap-3">
         {MODES.map((m) => {
           const on = mode === m.id;
           return (
@@ -289,7 +297,6 @@ export function CreateStore() {
           );
         })}
       </div>
-      <QuizCard href="/app/quiz" className="mx-auto mt-5" />
       <p className="mt-3 text-center text-xs text-fg-faint">{current.hint}</p>
 
       {paywall && <PaywallDialog draft={paywall} onClose={() => setPaywall(null)} />}

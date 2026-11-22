@@ -197,3 +197,18 @@ export const avg = (items: { rating: number }[]) => Math.round((items.reduce((s,
 export async function fetchProductPageText(rawUrl: string): Promise<string> {
   return (await fetchProductPage(rawUrl)).text;
 }
+
+// Boutique existante (mode « Refaire ma boutique ») : page d'accueil et, pour une boutique Shopify,
+// ses produits publics (/products.json). Seulement des pages publiques, rien n'est modifié.
+export async function readPublicStore(rawUrl: string): Promise<string> {
+  const home = await fetchHtml(rawUrl);
+  const origin = new URL(home.url).origin;
+  const parts = [`Page d'accueil (${origin}) : ${parseProductHtml(home.html, home.url).text.slice(0, 6000)}`];
+  try {
+    const raw = (await fetchHtml(`${origin}/products.json?limit=5`)).html;
+    const data = JSON.parse(raw) as { products?: { title: string; body_html?: string; variants?: { price?: string }[] }[] };
+    const strip = (h = "") => h.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 1500);
+    for (const pr of data.products ?? []) parts.push(`Produit : ${pr.title} (${pr.variants?.[0]?.price ?? "?"}) — ${strip(pr.body_html)}`);
+  } catch { /* pas une boutique Shopify, ou produits non publics : la page d'accueil suffit */ }
+  return parts.join("\n").slice(0, 15000);
+}

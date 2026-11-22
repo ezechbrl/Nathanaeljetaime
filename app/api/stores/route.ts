@@ -42,7 +42,7 @@ export const POST = route(async (req) => {
   } else {
     await assertAiBudget(user.id, user.plan); // abonnement requis
     await assertQuota(user.id, user.plan, "stores");
-    if (input.mode === "recraft") await connectionFor(user.id, input.shopConnectionId ?? null);
+    if (input.mode === "recraft" && !input.productUrl) await connectionFor(user.id, input.shopConnectionId ?? null);
   }
 
   const store = must(await db().from("stores").insert({

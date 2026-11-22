@@ -4,7 +4,7 @@ import type { StoreTheme } from "@/lib/api/types";
 import type { JobStepKey } from "@/lib/api/types";
 import type { StorePlan } from "@/lib/store-schema";
 import { generatePages, generateStrategy, generateTeaser } from "./ai";
-import { UnreadablePageError, type ProductPage } from "@/lib/fetch-product-page";
+import { UnreadablePageError, readPublicStore, type ProductPage } from "@/lib/fetch-product-page";
 import { supplierReviews } from "./reviews";
 import { cachedProductPage } from "./link-cache";
 import { editImage, editImageCheap, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
@@ -148,8 +148,18 @@ export async function runGeneration(job: Record<string, any>, store: StoreRow) {
       }
     }
     if (store.mode === "recraft") {
-      const conn = await connectionFor(store.user_id, store.shop_connection_id);
-      existingStore = await readStoreContent(conn.shop, conn.token);
+      // Adresse de la boutique collée : on lit ses pages publiques. Sinon, la boutique Shopify connectée.
+      if (store.source_url) {
+        try {
+          existingStore = await readPublicStore(store.source_url);
+        } catch (e) {
+          if (store.brief.trim().length < 25) throw new Error(`On n'a pas pu lire ta boutique${e instanceof UnreadablePageError ? ` (${e.message.replace(/\.$/, "")})` : ""}. Vérifie l'adresse, ou décris en une phrase ce que tu vends et ce que tu veux changer.`);
+          console.warn("Boutique illisible, refonte à partir de la description :", (e as Error).message);
+        }
+      } else {
+        const conn = await connectionFor(store.user_id, store.shop_connection_id);
+        existingStore = await readStoreContent(conn.shop, conn.token);
+      }
     }
     // Aperçu déjà vu (style et couleurs) : la boutique complète le respecte.
     const prev = store.theme as { style?: string; heroLayout?: string; colors?: { primary: string; accent: string; background: string } } | null;
