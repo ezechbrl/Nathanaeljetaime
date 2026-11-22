@@ -16,7 +16,7 @@ type Option = { id: string; label: string; hint?: string; icon: Icon };
 
 const LEVELS: Option[] = [
   { id: "debut", label: "Je débute complètement", hint: "Jamais vendu en ligne", icon: Sprout },
-  { id: "apprendre", label: "J'apprends le e-commerce", hint: "Vidéos, formations…", icon: GraduationCap },
+  { id: "apprendre", label: "J'apprends l'e-commerce ou le dropshipping", hint: "Vidéos, formations…", icon: GraduationCap },
   { id: "essai", label: "J'ai déjà essayé", hint: "Pas encore de vente", icon: Compass },
   { id: "ailleurs", label: "Je vends déjà ailleurs", hint: "Vinted, Instagram, marché…", icon: Store },
   { id: "boutique", label: "J'ai déjà une boutique", hint: "Je veux en lancer une autre", icon: TrendingUp },
@@ -116,8 +116,21 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
     }
   }
 
+  // Question suivante pour chaque étape, une fois la réponse choisie.
+  const next: Record<Exclude<Step, "style">, { ready: boolean; go: () => void }> = {
+    level: { ready: !!level, go: () => go("goal") },
+    goal: { ready: !!goal, go: () => go("time") },
+    time: { ready: !!time, go: () => go("idea") },
+    idea: { ready: hasIdea === false || (hasIdea === true && idea.trim().length >= 3), go: () => go(hasIdea ? "audience" : "big") },
+    big: { ready: !!big, go: () => go("sub") },
+    sub: { ready: !!niche, go: () => go("product") },
+    product: { ready: !!product, go: () => go("audience") },
+    audience: { ready: !!audience, go: () => go("price") },
+    price: { ready: !!price, go: () => go("style") },
+  };
+
   const titles: Record<Step, React.ReactNode> = {
-    level: <>Où en es-tu dans le <span className="serif-accent">e-commerce</span> ?</>,
+    level: <>Où en es-tu en <span className="serif-accent">e-commerce</span> ou en <span className="serif-accent">dropshipping</span> ?</>,
     goal: <>Quel est ton <span className="mark-green">objectif</span> ?</>,
     time: <>Combien de <span className="serif-accent">temps</span> peux-tu y consacrer ?</>,
     idea: <>Tu as déjà une <span className="serif-accent">idée</span> de produit ?</>,
@@ -144,14 +157,14 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
       <h1 key={step} className="mt-6 text-center text-[clamp(1.7rem,1.2rem+1.8vw,2.5rem)] font-semibold leading-tight tracking-[-0.03em] [animation:rise_.45s_cubic-bezier(.2,.8,.2,1)_both]">{titles[step]}</h1>
 
       <div className="mt-8 [animation:fade-in_.35s_ease-out_both]" key={`${step}-body`}>
-        {step === "level" && <Grid options={LEVELS} value={level} onPick={(id) => { setLevel(id); go("goal"); }} />}
-        {step === "goal" && <Grid options={GOALS} value={goal} onPick={(id) => { setGoal(id); go("time"); }} />}
-        {step === "time" && <Grid options={TIMES} value={time} cols={4} onPick={(id) => { setTime(id); go("idea"); }} />}
+        {step === "level" && <Grid options={LEVELS} value={level} onPick={setLevel} />}
+        {step === "goal" && <Grid options={GOALS} value={goal} onPick={setGoal} />}
+        {step === "time" && <Grid options={TIMES} value={time} cols={4} onPick={setTime} />}
         {step === "idea" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <Card tint={0} icon={Lightbulb} label="Oui, j'ai mon idée" hint="Je l'écris juste en dessous" on={hasIdea === true} onClick={() => setHasIdea(true)} />
-              <Card tint={3} icon={Sparkles} label="Pas encore" hint="Propose-moi des produits" on={hasIdea === false} onClick={() => { setHasIdea(false); go("big"); }} />
+              <Card tint={3} icon={Sparkles} label="Pas encore" hint="Propose-moi des produits" on={hasIdea === false} onClick={() => setHasIdea(false)} />
             </div>
             {hasIdea && (
               <div className="rounded-[18px] border border-[#34f0b0]/40 bg-[#34f0b0]/[0.07] p-4 [animation:fade-in_.3s_ease-out_both]">
@@ -164,7 +177,7 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
         {step === "big" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {BIG_NICHES.map((x, i) => <BigCard key={x.id} tint={i} icon={x.icon} label={x.label} hint={x.hint} on={big === x.id} onClick={() => { if (x.id !== big) { setNiche(null); setProduct(null); } setBig(x.id); go("sub"); }} />)}
+              {BIG_NICHES.map((x, i) => <BigCard key={x.id} tint={i} icon={x.icon} label={x.label} hint={x.hint} on={big === x.id} onClick={() => { if (x.id !== big) { setNiche(null); setProduct(null); } setBig(x.id); }} />)}
             </div>
             {/* « Surprends-moi » en grand, sous toutes les catégories. */}
             <button type="button" onClick={() => { const r = NICHES[Math.floor(Math.random() * NICHES.length)]; setBig(BIG_NICHES.find((x) => (x.subs as readonly string[]).includes(r.id))?.id ?? null); setNiche(r.id); setProduct(null); setHistory((h) => [...h, "sub", "product"]); }}
@@ -176,7 +189,7 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
         )}
         {step === "sub" && b && (
           <div className="grid grid-cols-2 gap-3">
-            {b.subs.map((id, i) => { const x = NICHES.find((y) => y.id === id)!; return <BigCard key={id} tint={i + 2} icon={x.icon} label={x.label} hint={x.products.slice(0, 2).map((p) => p[0]).join(", ") + "…"} on={niche === id} onClick={() => { if (id !== niche) setProduct(null); setNiche(id); go("product"); }} />; })}
+            {b.subs.map((id, i) => { const x = NICHES.find((y) => y.id === id)!; return <BigCard key={id} tint={i + 2} icon={x.icon} label={x.label} hint={x.products.slice(0, 2).map((p) => p[0]).join(", ") + "…"} on={niche === id} onClick={() => { if (id !== niche) setProduct(null); setNiche(id); }} />; })}
           </div>
         )}
         {step === "product" && n && (
@@ -184,8 +197,8 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
             {n.products.map(([name, brief], i) => <Card key={name} tint={i} row icon={n.icon} label={name} hint={brief} on={product === brief} onClick={() => setProduct(brief)} />)}
           </div>
         )}
-        {step === "audience" && <Grid options={AUDIENCES} value={audience} cols={4} onPick={(id) => { setAudience(id); go("price"); }} />}
-        {step === "price" && <Grid options={PRICES} value={price} cols={4} onPick={(id) => { setPrice(id); go("style"); }} />}
+        {step === "audience" && <Grid options={AUDIENCES} value={audience} cols={4} onPick={setAudience} />}
+        {step === "price" && <Grid options={PRICES} value={price} cols={4} onPick={setPrice} />}
         {step === "style" && !busy && (
           <>
             <p className="-mt-4 mb-4 text-center text-sm text-fg-muted">Un cœur si tu aimes, une croix sinon : ta boutique prendra le style que tu préfères.</p>
@@ -195,18 +208,17 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
       </div>
 
       {error && <p role="alert" className="mt-6 text-center text-sm text-bad">{error}</p>}
-      {((step === "idea" && hasIdea) || step === "product") && (
-        <NextButton disabled={step === "idea" ? idea.trim().length < 3 : !product} onClick={() => go("audience")} />
-      )}
+      {/* On choisit (la carte s'éclaire en vert), puis « Continuer » : rien ne passe tout seul. */}
+      {step !== "style" && next[step].ready && <NextButton onClick={next[step].go} />}
       {busy && <p className="mt-8 flex items-center justify-center gap-3 text-fg-muted"><Spinner /> Ta boutique se prépare…</p>}
     </div>
   );
 }
 
-function NextButton({ disabled, onClick }: { disabled: boolean; onClick: () => void }) {
+function NextButton({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" disabled={disabled} onClick={onClick} className="mt-8 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-10px_rgb(46_230_166/0.8),inset_0_1px_0_rgb(255_255_255/0.45)] transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
-      Étape suivante <ArrowRight className="h-5 w-5" />
+    <button type="button" onClick={onClick} className="mt-8 [animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-10px_rgb(46_230_166/0.8),inset_0_1px_0_rgb(255_255_255/0.45)] transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
+      Continuer <ArrowRight className="h-5 w-5" />
     </button>
   );
 }
@@ -219,41 +231,43 @@ function Grid({ options, value, onPick, cols = 3 }: { options: Option[]; value: 
   );
 }
 
-// Gamme harmonieuse autour du vert Vigenia : menthe, turquoise, vert d'eau, jade, citron vert doux.
-const HUES = ["#34d399", "#2dd4bf", "#86efac", "#5eead4", "#a3e635", "#6ee7b7", "#22d3ee", "#4ade80", "#99f6e4", "#bef264", "#10b981", "#67e8f9"];
-const hue = (i: number) => HUES[i % HUES.length];
+// Même style pour toutes les cartes : icône noire dans un carré vert LED lumineux.
+// Carte choisie : elle s'éclaire en vert (bordure, fond et halo).
+const LED = "#3dff9a";
+const ON = { borderColor: LED, background: "linear-gradient(160deg, rgb(61 255 154 / .2), rgb(61 255 154 / .07))", boxShadow: "0 0 0 1px rgb(61 255 154 / .9), 0 0 34px -6px rgb(61 255 154 / .75), inset 0 0 24px rgb(61 255 154 / .1)" };
+const OFF = { borderColor: "rgb(255 255 255 / .12)", background: "rgb(255 255 255 / .04)" };
+const IconBox = ({ icon: I, size }: { icon: Icon; size: "s" | "m" | "l" }) => (
+  <span style={{ background: `linear-gradient(160deg, #7dffbd, ${LED} 55%, #19e07c)`, boxShadow: "0 0 18px -2px rgb(61 255 154 / .6), inset 0 1px 0 rgb(255 255 255 / .6)" }}
+    className={cn("grid shrink-0 place-items-center text-[#04120b] transition-transform group-hover:scale-105", size === "s" ? "h-11 w-11 rounded-[13px]" : size === "m" ? "h-14 w-14 rounded-[14px]" : "h-16 w-16 rounded-[18px]")}>
+    <I className={size === "s" ? "h-5 w-5" : size === "m" ? "h-7 w-7" : "h-8 w-8"} />
+  </span>
+);
+const Tick = () => <span className="absolute right-2.5 top-2.5 grid h-5 w-5 place-items-center rounded-full text-[#04120b] [animation:fade-in_.2s_ease-out_both]" style={{ background: LED }}><Check className="h-3 w-3" /></span>;
 
-function Card({ icon: I, label, hint, on, row, tint = 0, onClick }: { icon: Icon; label: string; hint?: string; on: boolean; row?: boolean; tint?: number; onClick: () => void }) {
-  const c = hue(tint);
+// `tint` est gardé pour compatibilité, il n'a plus d'effet : toutes les cartes ont les mêmes couleurs.
+function Card({ icon, label, hint, on, row, onClick }: { icon: Icon; label: string; hint?: string; on: boolean; row?: boolean; tint?: number; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={on}
-      style={{ borderColor: on ? c : `${c}33`, background: on ? `linear-gradient(160deg, ${c}2b, ${c}10)` : `linear-gradient(160deg, ${c}12, rgb(255 255 255 / 0.02))`, boxShadow: on ? `0 0 30px -8px ${c}` : undefined }}
-      className={cn("group relative flex h-full rounded-[18px] border p-4 text-left backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110", row ? "items-center gap-3.5" : "flex-col items-center gap-3 py-6 text-center")}>
-      <span style={{ background: `linear-gradient(150deg, ${c}, color-mix(in srgb, ${c} 55%, #052e22))`, boxShadow: `0 8px 20px -8px ${c}, inset 0 1px 0 rgb(255 255 255 / 0.45)` }}
-        className={cn("grid shrink-0 place-items-center rounded-[14px] text-[#03140d] transition-transform group-hover:scale-105", row ? "h-11 w-11" : "h-14 w-14")}>
-        <I className={row ? "h-5 w-5" : "h-7 w-7"} />
-      </span>
+    <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
+      className={cn("group relative flex h-full rounded-[18px] border p-4 text-left backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25", row ? "items-center gap-3.5" : "flex-col items-center gap-3 py-6 text-center")}>
+      <IconBox icon={icon} size={row ? "s" : "m"} />
       <span className="min-w-0">
         <span className="block text-[15px] font-semibold leading-tight text-white">{label}</span>
         {hint && <span className="mt-1 block text-xs leading-snug text-fg-muted">{hint}</span>}
       </span>
-      {on && <span className="absolute right-2.5 top-2.5 grid h-5 w-5 place-items-center rounded-full text-[#03140d]" style={{ background: c }}><Check className="h-3 w-3" /></span>}
+      {on && <Tick />}
     </button>
   );
 }
 
 // Grande carte (catégories) : icône plus grande, titre en belle typographie.
-function BigCard({ icon: I, label, hint, on, tint = 0, onClick }: { icon: Icon; label: string; hint: string; on: boolean; tint?: number; onClick: () => void }) {
-  const c = hue(tint);
+function BigCard({ icon, label, hint, on, onClick }: { icon: Icon; label: string; hint: string; on: boolean; tint?: number; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={on}
-      style={{ borderColor: on ? c : `${c}40`, background: `radial-gradient(120% 90% at 50% 0%, ${c}26, transparent 70%), linear-gradient(160deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.01))`, boxShadow: on ? `0 0 34px -8px ${c}` : undefined }}
-      className="group relative flex h-full flex-col items-center gap-3 rounded-[22px] border px-3 py-7 text-center backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:brightness-110">
-      <span style={{ background: `linear-gradient(150deg, ${c}, color-mix(in srgb, ${c} 50%, #052e22))`, boxShadow: `0 12px 28px -10px ${c}, inset 0 1px 0 rgb(255 255 255 / 0.5)` }} className="grid h-16 w-16 place-items-center rounded-[18px] text-[#03140d] transition-transform group-hover:scale-105">
-        <I className="h-8 w-8" />
-      </span>
+    <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
+      className="group relative flex h-full flex-col items-center gap-3 rounded-[22px] border px-3 py-7 text-center backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-white/25">
+      <IconBox icon={icon} size="l" />
       <span className="font-display text-[17px] font-semibold leading-tight tracking-[-0.01em] text-white sm:text-[19px]">{label}</span>
       <span className="text-xs leading-snug text-fg-muted">{hint}</span>
+      {on && <Tick />}
     </button>
   );
 }
