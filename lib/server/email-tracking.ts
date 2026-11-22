@@ -16,7 +16,7 @@ const FINAL = ["opened", "clicked", "bounced", "complained"];
 // Relit chez Resend l'état des mails des 7 derniers jours (appelé chaque heure par la tâche planifiée).
 export async function refreshEmailEvents(max = 25) {
   const key = env.resendKey();
-  if (!key) return 0;
+  if (!key) { console.warn("Suivi des mails : clé Resend absente"); return 0; }
   const { data } = await db().from("email_events").select("id, last_event")
     .gte("sent_at", new Date(Date.now() - 7 * 86_400_000).toISOString())
     .order("checked_at", { ascending: true, nullsFirst: true }).limit(100);
@@ -24,6 +24,11 @@ export async function refreshEmailEvents(max = 25) {
   let updated = 0;
   for (const e of todo) {
     const res = await fetch(`https://api.resend.com/emails/${encodeURIComponent(e.id)}`, { headers: { authorization: `Bearer ${key}` } }).catch(() => null);
+    if (!res?.ok) {
+      // Raison du refus de Resend (ex. 401 : clé limitée à l'envoi, sans droit de lecture).
+      console.warn("Suivi des mails : Resend refuse la lecture", res?.status ?? "réseau", (await res?.text().catch(() => "") ?? "").slice(0, 200));
+      break;
+    }
     if (res?.ok) {
       const out = (await res.json().catch(() => ({}))) as { last_event?: string };
       await db().from("email_events").update({ last_event: out.last_event ?? e.last_event, checked_at: new Date().toISOString() }).eq("id", e.id);
