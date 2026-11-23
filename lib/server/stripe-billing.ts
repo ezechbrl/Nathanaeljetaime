@@ -146,6 +146,8 @@ export async function singlePaid(s: Stripe.Checkout.Session) {
   if (s.metadata?.kind !== "single" || !userId || s.payment_status !== "paid") return;
   const until = new Date(Date.now() + SINGLE.days * 86_400_000).toISOString();
   await db().from("users").update({ single_until: until, single_store_id: storeId ?? null }).eq("id", userId);
+  // La boutique reste marquée comme payée, même si le client en achète une autre plus tard.
+  if (storeId) await db().from("stores").update({ single_paid_at: new Date().toISOString() }).eq("id", storeId).eq("user_id", userId);
   const user = must(await db().from("users").select("email").eq("id", userId).maybeSingle()) as { email: string } | null;
   const amount = s.amount_total ?? 0;
   await notifyOwner(`💰 Nouvelle vente Vigenia${s.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", "Ma boutique (paiement unique)", formatMoney(amount, "EUR")));

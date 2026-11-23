@@ -87,7 +87,7 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
     <div className={cn("grid gap-4 sm:grid-cols-2", single ? "lg:grid-cols-3" : null)}>
       {PAID_PLANS.map((plan) => {
         const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
-        const featured = plan.featured;
+        const featured = plan.featured || (!single && plan.id === "pro"); // sans « Ma boutique » à côté, le Starter reste mis en avant
         return (
           <div key={plan.id} className={cn("relative rounded-[22px] p-px", featured ? "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_60px_-18px_rgb(46_230_166/0.55)]" : "bg-[linear-gradient(160deg,rgb(52_211_153/0.45),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))]")}>
             <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))] p-6 backdrop-blur-xl">
@@ -248,17 +248,17 @@ export function SingleCard({ left, action }: { left?: Left | null; action: React
     <div className="relative rounded-[22px] bg-[linear-gradient(160deg,#fde047,rgb(255_255_255/0.08)_45%,#facc15)] p-px shadow-[0_0_60px_-18px_rgb(253_224_71/0.45)]">
       <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))] p-6 backdrop-blur-xl">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[1.6rem] font-semibold tracking-[-0.02em]">Ma boutique</p>
-          <span className="shrink-0 rounded-full border border-[#fde047]/40 bg-[#fde047]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#fef08a]">Paiement unique</span>
+          <p className="whitespace-nowrap text-[1.6rem] font-semibold tracking-[-0.02em]">Ma boutique</p>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#fde047]/40 bg-[#fde047]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#fef08a]"><Sparkles className="h-3 w-3" /> Le plus avantageux</span>
         </div>
         <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">Tu veux juste ta boutique ? Tu paies une fois, elle est à toi pour toujours.</p>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-1 gap-y-1">
           {left && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(SINGLE.price)}</span>}
           <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(left ? SINGLE.offer : SINGLE.price)}</span>
-          <span className="whitespace-nowrap text-sm text-fg-muted">une fois</span>
+          <span className="whitespace-nowrap text-sm text-fg-muted">une seule fois</span>
         </p>
         {left ? <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#fde047]/30 bg-[#fde047]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>
-          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#fef08a]">Sans abonnement</p>}
+          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#fef08a]">Paiement unique, sans abonnement</p>}
         <div className="mt-5">{action}</div>
         <div className="my-5 h-px bg-white/10" />
         <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>
@@ -305,3 +305,7 @@ export const planButtonClass = (featured?: boolean) =>
       ? "bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.4),0_10px_30px_-8px_rgb(46_230_166/0.7)]"
       : "border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 text-[#d1fae5] shadow-[0_0_24px_-10px_rgb(46_230_166/0.6)] hover:bg-[#2ee6a6]/20",
   );
+
+// Bouton jaune de « Ma boutique » (l'offre la plus avantageuse).
+export const singleButtonClass =
+  "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#fde68a,#facc15)] text-[15px] font-semibold text-[#1a1400] shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_10px_30px_-8px_rgb(250_204_21/0.6)] transition-all hover:-translate-y-px disabled:opacity-60";

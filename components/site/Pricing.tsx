@@ -3,7 +3,7 @@
 import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { AuroraBackground, IntervalToggle, PlanCards, SingleCard, TrustRow, planButtonClass, type Interval } from "@/components/pricing/PlanCards";
+import { AuroraBackground, IntervalToggle, PlanCards, SingleCard, TrustRow, singleButtonClass, planButtonClass, type Interval } from "@/components/pricing/PlanCards";
 import { CTA } from "@/lib/launch";
 import { AI_FAIR_USE, LAUNCH_OFFER, PAID_PLANS, SINGLE } from "@/lib/content/pricing";
 
@@ -22,7 +22,7 @@ export function PricingCards() {
         <PlanCards
           interval={interval}
           offer
-          single={<SingleCard action={<Link href="/quiz" className={planButtonClass(false)}>Créer ma boutique <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>} />}
+          single={<SingleCard action={<Link href="/quiz" className={singleButtonClass}>Créer ma boutique <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>} />}
           action={(plan, iv) => (
             <Link href={`/inscription?plan=${plan.id}&interval=${iv}`} className={planButtonClass(plan.featured)}>
               {CTA.short} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

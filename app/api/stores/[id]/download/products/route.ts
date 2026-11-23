@@ -10,7 +10,7 @@ export const GET = route<Ctx>(async (_req, { params }) => {
   const user = await requireUser();
   const store = await ownedStore(user.id, (await params).id);
   // Abonné, ou boutique achetée avec « Ma boutique » (à lui pour toujours, même après les 7 jours).
-  if (user.plan === "free" && user.single_store_id !== store.id) throw new HttpError(402, "subscription_required", "Choisis ton offre pour télécharger ta boutique.");
+  if (user.plan === "free" && user.single_store_id !== store.id && !store.single_paid_at) throw new HttpError(402, "subscription_required", "Choisis ton offre pour télécharger ta boutique.");
   if (!store.plan) throw new HttpError(404, "not_found", "Boutique pas encore générée.");
   const plan = store.plan as StorePlan;
   checkSellable(plan);

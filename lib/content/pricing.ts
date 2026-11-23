@@ -39,7 +39,7 @@ export const PLANS: Plan[] = [
     // Ce que le Starter n'a pas : affiché grisé et barré sur sa carte (vraies limites, voir lib/server/quota.ts et budget.ts).
     missing: ["3 boutiques Shopify connectées", "Support prioritaire"],
     limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
-    cta: "Commencer", featured: true,
+    cta: "Commencer",
   },
   {
     id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 59, yearly: 499, was: 79,

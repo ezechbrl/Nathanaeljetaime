@@ -86,6 +86,7 @@ export type Store = {
   liveUrl: string | null;
   // Thème Vigenia dans Shopify : installé automatiquement, ou à importer à la main (appli sans dérogation thèmes).
   themeStatus?: "installed" | "manual" | null;
+  singlePaid?: boolean; // achetée en paiement unique : téléchargeable pour toujours
   createdAt: string;
   updatedAt: string;
 };

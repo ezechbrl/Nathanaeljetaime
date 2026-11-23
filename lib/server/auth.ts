@@ -66,6 +66,7 @@ export async function ownedStore(userId: string, storeId: string) {
 
 export type StoreRow = {
   id: string;
+  single_paid_at?: string | null; // achetée une fois (« Ma boutique »)
   user_id: string;
   shop_connection_id: string | null;
   name: string;
