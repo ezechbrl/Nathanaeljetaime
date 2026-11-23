@@ -98,7 +98,7 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
                 {was !== null && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(was)}</span>}
                 <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(billed)}</span>
                 <span className="whitespace-nowrap text-sm text-fg-muted">{interval === "year" ? "/ an" : "/ mois"}</span>
-                {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{Math.round((1 - billed / was) * 100)} % à l'année</span>}
+                {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{Math.round((1 - billed / was) * 100)} %</span>}
               </p>
               {interval === "year" ? (
                 <p className="mt-2 text-[14px] font-medium leading-snug text-[#6ee7b7]">
