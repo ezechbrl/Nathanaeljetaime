@@ -177,7 +177,7 @@ function PriceLine() {
   return (
     <p className="mx-auto mt-3 flex max-w-xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-fg-muted">
       <span>Boutique complète : <b className="text-white">{euro(price)}/mois</b>{left && <> <s className="text-fg-faint">{euro(full)}</s></>}</span>
-      {left && <span className="inline-flex items-center gap-1 rounded-full bg-[#2ee6a6]/15 px-2.5 py-0.5 text-[12.5px] font-semibold text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" />{waitlist ? "prix liste d'attente" : `−${LAUNCH_OFFER.percent} % à vie`}, encore {left.h} h {left.m} min</span>}
+      {left && <span className="inline-flex items-center gap-1 rounded-full bg-[#2ee6a6]/15 px-2.5 py-0.5 text-[12.5px] font-semibold text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" />{waitlist ? "prix spécial à vie" : `−${LAUNCH_OFFER.percent} % à vie`}, encore {left.h} h {left.m} min</span>}
       <span>· sans engagement, annulable en un clic</span>
     </p>
   );

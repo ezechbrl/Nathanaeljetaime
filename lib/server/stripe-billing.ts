@@ -84,7 +84,7 @@ async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | 
         recurring: { interval },
         product_data: {
           name: NAMES[plan],
-          description: `${offer === "waitlist" ? "Prix réservé à vie (liste d'attente). " : offer === "launch" ? "Offre de lancement −50 % à vie. " : ""}Ta boutique Shopify complète : textes, photos, éditeur IA et mise en ligne guidée. Sans engagement.`,
+          description: `${offer === "waitlist" ? "Prix spécial à vie. " : offer === "launch" ? "Offre de lancement −50 % à vie. " : ""}Ta boutique Shopify complète : textes, photos, éditeur IA et mise en ligne guidée. Sans engagement.`,
           images: [`${env.appUrl()}/brand/icon-512.png`],
         },
       },
@@ -162,7 +162,7 @@ export async function syncSubscription(sub: Stripe.Subscription) {
   const info = PLANS.find((p) => p.id === plan);
   if (was === "free" && plan !== "free" && info) {
     const offer = sub.metadata?.offer;
-    await notifyOwner(`💰 Nouvelle vente Vigenia${sub.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount ?? 0, "EUR")}/${interval === "year" ? "an" : "mois"}${offer === "waitlist" ? " avec le prix liste d'attente" : offer === "launch" ? " avec l'offre −50 %" : ""}`));
+    await notifyOwner(`💰 Nouvelle vente Vigenia${sub.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount ?? 0, "EUR")}/${interval === "year" ? "an" : "mois"}${offer === "waitlist" ? " avec le prix spécial" : offer === "launch" ? " avec l'offre −50 %" : ""}`));
     if (sub.livemode && before?.stripe_subscription_id !== sub.id) await logRevenue({ user_id: userId, kind: "new", plan, amount_cents: amount ?? 0, currency: "EUR", external_id: `new:${sub.id}` });
   } else if (was !== "free" && plan === "free") {
     await notifyOwner("Abonné parti", `${user?.email ?? "Un client"} a arrêté son abonnement Vigenia.`);

@@ -26,7 +26,7 @@ export function OfferBanner() {
     <Link href="/app/abonnement" className="group relative z-30 block border-b lg:sticky lg:top-0 border-white/[0.08] bg-black/25 px-4 py-2.5 backdrop-blur-xl sm:px-8">
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <div>
-          <p className="text-[16px] font-bold uppercase tracking-[0.03em] text-white sm:text-[18px]">{waitlist ? "Prix liste d'attente, rien que pour toi" : `Offre de lancement : −${LAUNCH_OFFER.percent} % à vie`}</p>
+          <p className="text-[16px] font-bold uppercase tracking-[0.03em] text-white sm:text-[18px]">{waitlist ? "Prix spécial, rien que pour toi" : `Offre de lancement : −${LAUNCH_OFFER.percent} % à vie`}</p>
           <p className="text-[13px] text-white/85 sm:text-[14px]"><span className="font-semibold text-white">{euro(now)}/mois</span> au lieu de <span className="line-through decoration-[#ef4444] decoration-2">{euro(starter.monthly)}</span>, pour toujours. Valable {LAUNCH_OFFER.hours} h après ton inscription.</p>
         </div>
         <div className="flex items-center gap-4">

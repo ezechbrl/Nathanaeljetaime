@@ -33,17 +33,22 @@ export async function sendOfferReminders() {
       const last = r.key === "offer-last";
       const name = u.first_name ? ` ${u.first_name}` : "";
       const url = `${env.appUrl()}/app/abonnement`;
-      // Le vrai prix de cette personne : prix « liste d'attente » si elle y a droit, sinon l'offre de lancement.
-      const starter = PAID_PLANS[0];
-      const monthly = u.waitlist_member ? WAITLIST_PRICES.pro.monthly : withOffer(starter.monthly);
-      const yearly = u.waitlist_member ? WAITLIST_PRICES.pro.yearly : withOffer(starter.yearly);
-      const deal = u.waitlist_member ? "ton prix spécial à vie" : "−50 % à vie sur ton abonnement";
+      // Dernière heure : on baisse encore le prix (prix spécial : 29 €/mois Starter, 59 €/mois Pro, à vie),
+      // activé sur le compte avant l'envoi, valable jusqu'à la fin des 24 h. Sinon, le vrai prix de la personne.
+      const starter = PAID_PLANS[0], pro = PAID_PLANS[1];
+      const lowered = last && !u.waitlist_member;
+      if (lowered) await db().from("users").update({ waitlist_member: true }).eq("id", u.id);
+      const special = last || !!u.waitlist_member;
+      const monthly = special ? WAITLIST_PRICES.pro.monthly : withOffer(starter.monthly);
+      const yearly = special ? WAITLIST_PRICES.pro.yearly : withOffer(starter.yearly);
+      const proMonthly = special ? WAITLIST_PRICES.agency.monthly : withOffer(pro.monthly);
+      const deal = lowered ? `dernière heure : on baisse encore ton prix, ${monthly} € par mois à vie au lieu de ${withOffer(starter.monthly)} €` : special ? "ton prix spécial à vie" : "−50 % à vie sur ton abonnement";
       const ok = await sendEmail(
         u.email,
-        last ? `🔥 Dernière heure : ton prix de lancement (${monthly} €/mois à vie) se termine dans ${left}` : `⏳ Plus que ${left} pour ton prix de lancement (${monthly} €/mois à vie)`,
-        `Salut${name},\n\n${last ? "C'est la dernière heure : t" : "T"}on offre Vigenia se termine dans ${left} : ${deal} (${monthly} € par mois au lieu de ${starter.monthly} € pour Starter, ou ${yearly} € par an).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${url}\n\nÀ tout de suite,\nL'équipe Vigenia`,
+        last ? `🔥 Dernière heure : ta boutique à ${monthly} €/mois à vie, plus que ${left}` : `⏳ Plus que ${left} pour ton prix de lancement (${monthly} €/mois à vie)`,
+        `Salut${name},\n\n${last ? "C'est la dernière heure : t" : "T"}on offre Vigenia se termine dans ${left} : ${deal} (Starter : ${monthly} € par mois au lieu de ${starter.monthly} €, ou ${yearly} € par an ; Pro : ${proMonthly} € par mois au lieu de ${pro.monthly} €).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${url}\n\nÀ tout de suite,\nL'équipe Vigenia`,
         undefined,
-        reminderHtml(name, left, url, last, { monthly, yearly, fullMonthly: starter.monthly, fullYearly: starter.yearly, label: u.waitlist_member ? "Prix spécial à vie" : "Offre de lancement · −50 % à vie" }),
+        reminderHtml(name, left, url, last, { monthly, proMonthly, fullMonthly: starter.monthly, fullPro: pro.monthly, label: lowered ? `Prix baissé : ${monthly} €/mois à vie` : special ? "Prix spécial à vie" : "Offre de lancement · −50 % à vie" }),
       );
       if (ok) {
         reminders++;
@@ -56,7 +61,7 @@ export async function sendOfferReminders() {
 }
 
 // E-mail en HTML (tableaux et styles en ligne pour les messageries) : gros compteur, prix, bouton.
-function reminderHtml(name: string, left: string, url: string, last: boolean, p: { monthly: number; yearly: number; fullMonthly: number; fullYearly: number; label: string }) {
+function reminderHtml(name: string, left: string, url: string, last: boolean, p: { monthly: number; proMonthly: number; fullMonthly: number; fullPro: number; label: string }) {
   const price = (label: string, now: string, was: string) =>
     `<td style="padding:14px 16px;background:#0b3a2c;border:1px solid #1f6b52;border-radius:14px;text-align:center"><div style="font-size:13px;color:#a7f3d0">${label}</div><div style="margin-top:4px"><span style="font-size:15px;color:#9ca3af;text-decoration:line-through">${was}</span>&nbsp;<span style="font-size:26px;font-weight:700;color:#ffffff">${now}</span></div></td>`;
   return `<!doctype html><html lang="fr"><body style="margin:0;padding:0;background:#04211a">
@@ -66,9 +71,9 @@ function reminderHtml(name: string, left: string, url: string, last: boolean, p:
 <tr><td style="background:linear-gradient(160deg,#0d5c44,#062e24);background-color:#0a4433;border:1px solid #2ee6a6;border-radius:22px;padding:30px 24px;text-align:center">
 <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;color:#d9f99d;text-transform:uppercase">${last ? `🔥 Dernière heure · ${p.label}` : p.label}</div>
 <div style="margin:18px 0 4px;font-size:64px;font-weight:800;line-height:1;color:#ffffff">${left}</div>
-<div style="font-size:15px;color:#a7f3d0">avant la fin de ton prix de lancement</div>
+<div style="font-size:15px;color:#a7f3d0">avant la fin de ton prix</div>
 <p style="margin:22px 0 0;font-size:16px;line-height:1.55;color:#e8fff6;text-align:left">Salut${name} 👋<br>Ta boutique t'attend. Si tu t'abonnes maintenant, tu gardes <b>${p.monthly} € par mois pour toujours</b>, tant que tu restes abonné. Après le compteur, c'est le prix normal.</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin-top:14px"><tr>${price("Starter / mois", `${p.monthly} €`, `${p.fullMonthly} €`)}${price("Starter / an", `${p.yearly} €`, `${p.fullYearly} €`)}</tr></table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin-top:14px"><tr>${price("Starter / mois", `${p.monthly} €`, `${p.fullMonthly} €`)}${price("Pro / mois", `${p.proMonthly} €`, `${p.fullPro} €`)}</tr></table>
 <a href="${url}" style="display:inline-block;margin-top:22px;padding:15px 30px;border-radius:999px;background:#2ee6a6;color:#03140d;font-size:16px;font-weight:700;text-decoration:none">J'en profite maintenant →</a>
 <div style="margin-top:14px;font-size:12px;color:#9ca3af">Sans engagement · Annulable en 1 clic · Paiement sécurisé par carte</div>
 </td></tr>

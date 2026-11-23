@@ -64,8 +64,8 @@ export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?:
   return (
     <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-white/[0.04] px-5 py-3 backdrop-blur shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
       <div>
-        <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">{waitlist ? `Prix liste d'attente : ${euro(WAITLIST_PRICES.pro.monthly)}/mois à vie` : `Offre de lancement : −${LAUNCH_OFFER.percent} % à vie`}</p>
-        <p className="text-[12.5px] text-fg-muted">{waitlist ? "Réservé aux inscrits de la liste d'attente, plus bas que l'offre de lancement. " : ""}Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
+        <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">{waitlist ? `Prix spécial : ${euro(WAITLIST_PRICES.pro.monthly)}/mois à vie` : `Offre de lancement : −${LAUNCH_OFFER.percent} % à vie`}</p>
+        <p className="text-[12.5px] text-fg-muted">{waitlist ? "Rien que pour toi, encore plus bas que l'offre de lancement. " : ""}Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
       </div>
       <div className="flex items-end gap-1.5 font-semibold tabular-nums" aria-label={`Il reste ${left.h} heures ${left.m} minutes`}>
         {[{ v: left.h, l: "heures" }, { v: left.m, l: "min" }, { v: left.s, l: "sec" }].map((u, i) => (

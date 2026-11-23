@@ -4,7 +4,7 @@ import { db, must } from "@/lib/server/supabase";
 
 // Parcours des inscrits (Ventes) : d'où ils viennent, leur boutique, l'étape atteinte,
 // et le résumé du jour (où les inscrits bloquent, sur quelle page les visiteurs partent).
-const STEPS = ["Compte créé", "Boutique lancée", "Aperçu prêt", "Page de paiement", "Abonné", "Boutique complète", "Envoyée sur Shopify"] as const;
+const STEPS = ["Compte créé", "Aperçu demandé", "Aperçu prêt", "A ouvert le paiement (Stripe)", "Abonné (a payé)", "Boutique complète", "Envoyée sur Shopify"] as const;
 const real = (email: string) => !isOwnerEmail(email) && !/@shopify\.com$/i.test(email ?? "");
 
 // Minuit à Paris aujourd'hui, en heure UTC.

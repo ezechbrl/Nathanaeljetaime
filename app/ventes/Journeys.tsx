@@ -35,18 +35,21 @@ const sourceOf = (name: string) => SOURCES[name] ?? (name.startsWith("tiktok-") 
 
 // Pages du site en mots simples.
 function pageName(p: string) {
-  if (p === "/") return "Page d'accueil";
-  if (p.startsWith("/inscription")) return "Création de compte";
-  if (p.startsWith("/connexion")) return "Connexion";
-  if (p === "/quiz" || p.startsWith("/app/quiz")) return "Quiz";
+  if (p === "/") return "Page d'accueil (vigenia.com)";
+  if (p.startsWith("/inscription")) return "Page de création de compte (e-mail)";
+  if (p.startsWith("/connexion")) return "Page de connexion";
+  if (p === "/quiz" || p.startsWith("/app/quiz")) return "Quiz (avant de créer le compte)";
   if (/^\/app\/boutiques\/[^/]+\/installer/.test(p)) return "Mise en ligne Shopify";
-  if (/^\/app\/boutiques\/[^/]+/.test(p)) return "Sa boutique (aperçu)";
+  if (/^\/app\/boutiques\/[^/]+/.test(p)) return "Son aperçu de boutique (pas encore payé)";
   if (p.startsWith("/app/boutiques")) return "Liste de ses boutiques";
-  if (p.startsWith("/app/abonnement")) return "Page abonnement";
-  if (p === "/app" || p === "/app/") return "Son tableau de bord";
-  if (p.startsWith("/exemples")) return "Exemples";
-  if (p.startsWith("/blog")) return "Blog";
-  if (p.startsWith("/tarifs")) return "Tarifs";
+  if (p.startsWith("/app/abonnement")) return "Choix de l'offre / paiement";
+  if (p === "/app" || p === "/app/") return "Son espace (page « Créer une boutique »)";
+  if (p.startsWith("/exemples")) return "Page Exemples de boutiques";
+  if (p.startsWith("/blog")) return "Un article du blog";
+  if (p.startsWith("/tarifs")) return "Page Tarifs (les prix des offres)";
+  if (p.startsWith("/demo")) return "Page Comment ça marche";
+  if (p.startsWith("/contact")) return "Page Contact";
+  if (p.startsWith("/outils-gratuits")) return "Outils gratuits";
   return p;
 }
 
@@ -191,7 +194,7 @@ function Today({ data }: { data: JourneysData }) {
           <div className="mt-2.5 space-y-1.5">
             {exitList.map(([page, n]) => (
               <div key={page} className="flex items-center gap-2 text-[13px]">
-                <span className="w-[150px] shrink-0 truncate font-medium">{page}</span>
+                <span className="w-[210px] shrink-0 font-medium leading-tight">{page}</span>
                 <span className="h-3 flex-1 overflow-hidden rounded-full bg-white"><span className="block h-full rounded-full bg-[#f87171]" style={{ width: `${(n / maxExit) * 100}%` }} /></span>
                 <span className="w-6 text-right font-semibold tabular-nums">{n}</span>
               </div>
