@@ -3,31 +3,26 @@
 import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { AuroraBackground, IntervalToggle, PlanCards, TrustRow, planButtonClass, type Interval } from "@/components/pricing/PlanCards";
+import { AuroraBackground, IntervalToggle, PlanCards, SingleCard, TrustRow, planButtonClass, type Interval } from "@/components/pricing/PlanCards";
 import { CTA } from "@/lib/launch";
 import { AI_FAIR_USE, LAUNCH_OFFER, PAID_PLANS, SINGLE } from "@/lib/content/pricing";
-import { SingleCard } from "@/components/pricing/PlanCards";
 
 // Les deux offres (Starter et Pro), au mois ou à l'année.
 export function PricingCards() {
   const [interval, setPeriod] = useState<Interval>("month");
   return (
-    <div className="relative isolate mx-auto max-w-[940px] overflow-hidden rounded-[28px] border border-white/10 px-4 py-10 sm:px-10">
+    <div className="relative isolate mx-auto max-w-[1180px] overflow-hidden rounded-[28px] border border-white/10 px-4 py-10 sm:px-10">
       <AuroraBackground className="-z-10" />
       <div className="mx-auto mb-6 max-w-[760px] rounded-[18px] border border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(16_176_127/0.25),rgb(163_230_53/0.12))] px-5 py-3 text-center shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
         <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de bienvenue : ta boutique à {SINGLE.offer} € au lieu de {SINGLE.price} €</p>
         <p className="text-[12.5px] text-fg-muted">« Ma boutique », en paiement unique, pendant les {LAUNCH_OFFER.hours} h qui suivent ton inscription (compte à rebours dans ton espace).</p>
       </div>
-      {/* Paiement unique : la boutique seule, sans abonnement. */}
-      <div className="mx-auto mb-8 max-w-[780px]">
-        <SingleCard action={<Link href="/quiz" className={planButtonClass(true)}>Créer ma boutique <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>} />
-        <p className="mt-6 text-center text-[13px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ou un abonnement, pour aller plus loin</p>
-      </div>
       <IntervalToggle value={interval} onChange={setPeriod} />
-      <div className="mx-auto mt-8 max-w-[780px]">
+      <div className="mx-auto mt-8">
         <PlanCards
           interval={interval}
           offer
+          single={<SingleCard action={<Link href="/quiz" className={planButtonClass(false)}>Créer ma boutique <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>} />}
           action={(plan, iv) => (
             <Link href={`/inscription?plan=${plan.id}&interval=${iv}`} className={planButtonClass(plan.featured)}>
               {CTA.short} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

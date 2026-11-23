@@ -20,7 +20,7 @@ const PRICING_FAQ = [
 export default function PricingPage() {
   return (
     <>
-      <PageHero eyebrow="Tarifs" title={<>Un prix <span className="serif-accent">clair</span>, sans engagement</>} subtitle="Deux offres, sans engagement. Encore moins cher en payant à l'année." />
+      <PageHero eyebrow="Tarifs" title={<>Un prix <span className="serif-accent">clair</span>, sans engagement</>} subtitle="Deux abonnements sans engagement, ou ta boutique seule en paiement unique." />
       <Container><PricingCards /></Container>
       <FaqSection title="Questions sur les tarifs" items={PRICING_FAQ} />
       <FinalCta />

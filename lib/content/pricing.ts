@@ -12,6 +12,7 @@ export type Plan = {
   yearly: number;  // prix annuel total
   features: PlanFeature[];
   missing?: string[]; // options de l'offre supérieure, montrées barrées
+  was?: number; // ancien prix mensuel réellement payé (barré), affiché jusqu'à BARRED_UNTIL
   limits: { stores: string; conversations: string; images: string; shops: string; ai: string };
   cta: string;
   featured?: boolean;
@@ -26,7 +27,7 @@ export const PLANS: Plan[] = [
     features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
-    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 29, yearly: 249,
+    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 29, yearly: 249, was: 39,
     features: [
       "Ta boutique prête à vendre en 3 minutes, à partir d'un simple lien",
       { text: "Des photos dignes d'une grande marque, créées par l'IA", preview: "photos" },
@@ -39,16 +40,24 @@ export const PLANS: Plan[] = [
       "1 boutique Shopify connectée",
     ],
     // Ce que le Starter n'a pas : affiché grisé et barré sur sa carte (vraies limites, voir lib/server/quota.ts et budget.ts).
-    missing: ["3 boutiques Shopify connectées (au lieu de 1)", "3× plus de photos par mois (300 au lieu de 100)", "2× plus de crédit IA et 400 messages par mois", "Support prioritaire : on te répond en premier"],
+    missing: ["3 boutiques Shopify connectées", "Support prioritaire"],
     limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
     cta: "Commencer", featured: true,
   },
   {
-    id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 59, yearly: 499,
+    id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 59, yearly: 499, was: 79,
     features: [
+      "Ta boutique prête à vendre en 3 minutes, à partir d'un simple lien",
       { text: "3 boutiques Shopify : teste 3 produits en même temps et garde les gagnants", preview: "stores" },
-      "2× plus de crédit IA et 400 messages par mois (au lieu de 150)",
       { text: "3× plus de photos chaque mois (300 au lieu de 100)", preview: "photos-pro" },
+      "2× plus de crédit IA et 400 messages par mois (au lieu de 150)",
+      { text: "Des textes qui donnent envie d'acheter, écrits pour ton produit", preview: "texts" },
+      { text: "Les vrais avis clients du produit, importés et traduits", preview: "reviews" },
+      { text: "Des offres par lot qui font grimper ton panier moyen", preview: "offers" },
+      "Change de produit quand tu veux, autant de fois que tu veux",
+      "Modifie tout en parlant à l'IA, comme dans une conversation",
+      "Un design à tes couleurs, publié sur Shopify en 1 clic",
+      "Refais tes photos et tes textes quand tu veux (dans la limite de ton crédit)",
       "Support prioritaire : on te répond en premier",
     ],
     limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "3", ai: "2 € toutes les 5 h, 7 € / semaine" },
@@ -63,6 +72,11 @@ export const withOffer = (price: number) => price;
 
 // Paiement unique « Ma boutique » : une boutique complète, sans abonnement, et 7 jours de retouches.
 export const SINGLE = { price: 49, offer: 39, days: 7 };
+// Prix barrés des abonnements : les anciens prix réellement payés (39 € et 79 €/mois), pendant 30 jours.
+// La loi demande que le prix barré soit le plus bas des 30 derniers jours : ils disparaissent tout seuls après.
+export const BARRED_UNTIL = "2026-12-23T23:00:00Z";
+export const showBarred = () => Date.now() < new Date(BARRED_UNTIL).getTime();
+export const SINGLE_MISSING = ["Boutiques illimitées", "Éditeur IA sans limite de temps"];
 export const SINGLE_FEATURES = [
   "Ta boutique complète, créée par l'IA à partir de ton aperçu",
   "Une quinzaine de photos pro : photo de haut de page, packshots, scènes de vie",

@@ -3,7 +3,7 @@
 import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Star, Timer, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { PAID_PLANS, SINGLE, SINGLE_FEATURES, WAITLIST_PRICES, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
+import { PAID_PLANS, SINGLE, SINGLE_FEATURES, SINGLE_MISSING, WAITLIST_PRICES, euro, showBarred, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -38,7 +38,8 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
 export function planPrice(plan: Plan, interval: Interval, offer = false, waitlist = false) {
   const billed = interval === "year" ? plan.yearly : plan.monthly;
   if (offer && waitlist && plan.id !== "free") return { billed: WAITLIST_PRICES[plan.id][interval === "year" ? "yearly" : "monthly"], was: withOffer(billed) }; // barré : le prix des autres (offre de lancement)
-  return { billed: withOffer(billed), was: null }; // plus de réduction sur les abonnements (l'offre de 24 h porte sur « Ma boutique »)
+  // Prix barré : l'ancien prix réellement payé (39 € / 79 € par mois), pendant 30 jours seulement.
+  return { billed: withOffer(billed), was: interval === "month" && plan.was && showBarred() ? plan.was : null };
 }
 
 // Temps restant avant `endsAt`, mis à jour chaque seconde (null une fois écoulé).
@@ -80,9 +81,10 @@ export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?:
 }
 
 // Les deux offres côte à côte. `action` rend le bouton (paiement dans l'app, inscription sur le site).
-export function PlanCards({ interval, action, left, offer = false, waitlist = false }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null; offer?: boolean; waitlist?: boolean }) {
+// `single` : la carte « Ma boutique » (paiement unique), ajoutée tout à droite, sur la même ligne.
+export function PlanCards({ interval, action, left, offer = false, waitlist = false, single }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null; offer?: boolean; waitlist?: boolean; single?: ReactNode }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className={cn("grid gap-4 sm:grid-cols-2", single ? "lg:grid-cols-3" : null)}>
       {PAID_PLANS.map((plan) => {
         const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
         const featured = plan.featured;
@@ -109,7 +111,7 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
               {left && waitlist && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />
-              <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">{plan.id === "agency" ? "Tout le Starter, et en plus" : "Ce qui est inclus"}</p>
+              <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>
               <ul className="mt-3 space-y-2.5 text-[14.5px]">
                 {plan.features.map((f) => <FeatureItem key={typeof f === "string" ? f : f.text} f={f} />)}
               </ul>
@@ -125,6 +127,7 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
           </div>
         );
       })}
+      {single}
     </div>
   );
 }
@@ -239,30 +242,32 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
 }
 
 // Paiement unique « Ma boutique » : une boutique complète, sans abonnement (39 € pendant l'offre de bienvenue).
+// Même format que les cartes d'abonnement, en jaune, pour se mettre tout à droite sur la même ligne.
 export function SingleCard({ left, action }: { left?: Left | null; action: ReactNode }) {
   return (
-    <div className="relative rounded-[22px] bg-[linear-gradient(160deg,#fde047,rgb(255_255_255/0.08)_45%,#2ee6a6)] p-px shadow-[0_0_60px_-18px_rgb(253_224_71/0.45)]">
-      <div className="rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.9),rgb(4_16_12/0.95))] p-6 backdrop-blur-xl sm:p-7">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+    <div className="relative rounded-[22px] bg-[linear-gradient(160deg,#fde047,rgb(255_255_255/0.08)_45%,#facc15)] p-px shadow-[0_0_60px_-18px_rgb(253_224_71/0.45)]">
+      <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))] p-6 backdrop-blur-xl">
+        <div className="flex items-center justify-between gap-2">
           <p className="text-[1.6rem] font-semibold tracking-[-0.02em]">Ma boutique</p>
-          <span className="rounded-full border border-[#fde047]/40 bg-[#fde047]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#fef08a]">Paiement unique · sans abonnement</span>
+          <span className="shrink-0 rounded-full border border-[#fde047]/40 bg-[#fde047]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#fef08a]">Paiement unique</span>
         </div>
-        <p className="mt-2 text-[13.5px] text-fg-muted">Tu veux juste ta boutique ? Tu paies une fois, elle est à toi pour toujours.</p>
-        <div className="mt-4 grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
-          <div>
-            <p className="flex flex-wrap items-baseline gap-x-2">
-              {left && <span className="text-xl font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(SINGLE.price)}</span>}
-              <span className="text-[2.8rem] font-semibold leading-none tracking-[-0.04em] tabular-nums">{euro(left ? SINGLE.offer : SINGLE.price)}</span>
-              <span className="text-sm text-fg-muted">une fois</span>
-            </p>
-            {left && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#fde047]/30 bg-[#fde047]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
-            <div className="mt-4 sm:w-[240px]">{action}</div>
-          </div>
-          <ul className="grid gap-2 text-[14px] sm:grid-cols-2">
-            {SINGLE_FEATURES.map((f) => <li key={f} className="flex gap-2"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#fde047]/15"><Check className="h-3 w-3 text-[#fde047]" strokeWidth={3} /></span>{f}</li>)}
-          </ul>
-        </div>
-        <p className="mt-4 border-t border-white/10 pt-3 text-[12.5px] text-fg-muted">Avec un abonnement, en plus : des boutiques illimitées, l'éditeur IA sans limite de temps, 100 nouvelles photos par mois et le changement de produit quand tu veux.</p>
+        <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">Tu veux juste ta boutique ? Tu paies une fois, elle est à toi pour toujours.</p>
+        <p className="mt-4 flex flex-wrap items-baseline gap-x-1 gap-y-1">
+          {left && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(SINGLE.price)}</span>}
+          <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(left ? SINGLE.offer : SINGLE.price)}</span>
+          <span className="whitespace-nowrap text-sm text-fg-muted">une fois</span>
+        </p>
+        {left ? <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#fde047]/30 bg-[#fde047]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>
+          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#fef08a]">Sans abonnement</p>}
+        <div className="mt-5">{action}</div>
+        <div className="my-5 h-px bg-white/10" />
+        <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>
+        <ul className="mt-3 space-y-2.5 text-[14.5px]">
+          {SINGLE_FEATURES.map((f) => <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#fde047]/15"><Check className="h-3 w-3 text-[#fde047]" strokeWidth={3} /></span>{f}</li>)}
+        </ul>
+        <ul className="mt-3 space-y-2.5 border-t border-white/[0.07] pt-3 text-[14.5px] text-fg-faint" aria-label="Non inclus, dans les abonnements">
+          {SINGLE_MISSING.map((m) => <li key={m} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-white/[0.06]"><X className="h-3 w-3" strokeWidth={3} /></span><span className="line-through decoration-white/30">{m}</span></li>)}
+        </ul>
       </div>
     </div>
   );

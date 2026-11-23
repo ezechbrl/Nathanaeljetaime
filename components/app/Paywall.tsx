@@ -111,19 +111,16 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
       {text && !unlockStoreId && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{unlockStoreId ? "Débloque ta boutique" : draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
       <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 3 minutes.</p>
-      {unlockStoreId && (
-        <div className="mx-auto mt-6 max-w-[760px]">
-          <SingleCard left={left} action={
-            <button type="button" onClick={buySingle} onPointerEnter={prepareSingle} onFocus={prepareSingle} disabled={!!busy} className={planButtonClass(true)}>
-              {busy === "single" ? <Spinner /> : <>Payer {euro(left ? SINGLE.offer : SINGLE.price)} et débloquer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
-            </button>
-          } />
-          <p className="mt-6 text-center text-[13px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ou un abonnement, pour aller plus loin</p>
-        </div>
-      )}
       <div className="mt-6"><IntervalToggle value={interval} onChange={setPeriod} /></div>
-      <div className="mx-auto mt-7 max-w-[760px]">
+      <div className={unlockStoreId ? "mx-auto mt-7 max-w-[1120px]" : "mx-auto mt-7 max-w-[760px]"}>
         <PlanCards
+          single={unlockStoreId ? (
+            <SingleCard left={left} action={
+              <button type="button" onClick={buySingle} onPointerEnter={prepareSingle} onFocus={prepareSingle} disabled={!!busy} className={planButtonClass(false)}>
+                {busy === "single" ? <Spinner /> : <>Payer {euro(left ? SINGLE.offer : SINGLE.price)} et débloquer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+              </button>
+            } />
+          ) : undefined}
           interval={interval}
           left={left}
           waitlist={waitlist}
