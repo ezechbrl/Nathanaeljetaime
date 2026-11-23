@@ -139,6 +139,7 @@ p{margin:0}
 .burger{display:none;background:none;border:0;color:inherit;padding:8px;cursor:pointer;font-size:24px}
 @media (max-width:860px){.header__in{grid-template-columns:auto 1fr auto}.nav{display:none}.burger{display:block}.logo{font-size:24px}.nav.is-open{display:flex;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:0;background:var(--bgc);border-bottom:1px solid color-mix(in srgb,var(--fgc) 12%,transparent)}.nav.is-open a{padding:16px 20px;border-top:1px solid color-mix(in srgb,var(--fgc) 10%,transparent)}}
 .hero{position:relative;min-height:min(86vh,780px);display:flex;align-items:center;color:#fff;overflow:hidden;padding:80px 0}
+@media (min-width:861px){.hero:not(.hero--split){min-height:560px;aspect-ratio:16/9}.hero:not(.hero--split) .hero__bg img{object-position:72% center}.hero--right:not(.hero--split) .hero__bg img{object-position:28% center}.hero--center:not(.hero--split) .hero__bg img{object-position:50% center}}
 .hero__bg{position:absolute;inset:0}
 .hero__bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);animation:heroZoom 14s ease-out forwards}
 @keyframes heroZoom{to{transform:scale(1)}}

@@ -343,7 +343,7 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
           hero: (
             <>{imgs.hero && mobile ? (
             // Téléphone : la photo en entier en haut (le produit bien visible), le texte en dessous.
-            <section className="overflow-hidden text-white" style={{ background: heroDark }}>
+            <section data-no-reveal className="overflow-hidden text-white" style={{ background: heroDark }}>
               <div className="relative aspect-[4/3.4] w-full">
                 <img decoding="async" src={imgs.hero.url} alt="" className="h-full w-full object-cover" style={{ objectPosition: layout === "right" ? "28% center" : layout === "center" ? "50% center" : "72% center" }} />
                 <div className="absolute inset-0" style={{ background: `linear-gradient(0deg, ${heroDark} 0%, transparent 35%)` }} />
@@ -357,8 +357,10 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
               </div>
             </section>
           ) : imgs.hero ? (
-            <section className="relative flex min-h-[460px] items-end overflow-hidden text-white sm:items-center" style={{ minHeight: mobile ? 520 : 520 }}>
-              <img decoding="async" src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            // Toujours au format de la photo (16/9) : sur grand écran ou en plein écran, rien n'est coupé en haut ou
+            // en bas (le produit et les objets derrière restent visibles). Le texte n'a pas d'animation d'apparition.
+            <section data-no-reveal className="relative flex items-end overflow-hidden text-white sm:items-center" style={{ minHeight: 520, aspectRatio: "16 / 9" }}>
+              <img decoding="async" src={imgs.hero.url} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: layout === "right" ? "28% center" : layout === "center" ? "50% center" : "72% center" }} />
               <div className="absolute inset-0" style={{ background: mobile ? "linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.15))" : layout === "center" ? "rgba(0,0,0,.48)" : `linear-gradient(${layout === "right" ? 270 : 90}deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 45%,transparent 75%)` }} />
               <div className={cn("relative w-full pb-10 pt-24", pad, !mobile && layout === "right" && "flex justify-end text-right", !mobile && layout === "center" && "flex justify-center text-center")}><div className={cn(layout === "center" && !mobile ? "max-w-[720px]" : "max-w-[560px]")}>
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs backdrop-blur"><span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />{plan.brand.tagline}</span>
