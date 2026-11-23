@@ -100,11 +100,11 @@ export function PromptBox({ target = "/inscription", className, align = "center"
     const text = value.trim();
     const isLink = /^https?:\/\/\S+$/.test(text);
     const m = isLink ? "link" : mode;
-    // Parcours habituel : page d'inscription avec les 2 boutons Shopify, puis création dans le compte.
+    // Toujours le quiz d'abord (onboarding), avec la description ou le lien déjà donnés ; puis le compte et la boutique.
     const params = new URLSearchParams({ mode: m });
     if (text) params.set(m === "link" ? "url" : "brief", text);
     saveLandingPhotos(photos);
-    router.push(`${target}?${params}`);
+    router.push(`/quiz?${params}`);
   }
 
   return (

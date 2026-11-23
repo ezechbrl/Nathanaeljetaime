@@ -65,14 +65,15 @@ const LEVEL_TEXT: Record<string, string> = {
 
 type Step = "level" | "goal" | "time" | "idea" | "big" | "sub" | "product" | "audience" | "price" | "style";
 
-export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Promise<void>; skipHref?: string }) {
+// `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
+export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean } }) {
   const [history, setHistory] = useState<Step[]>(["level"]);
   const step = history[history.length - 1];
   const [level, setLevel] = useState<string | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
   const [time, setTime] = useState<string | null>(null);
-  const [hasIdea, setHasIdea] = useState<boolean | null>(null);
-  const [idea, setIdea] = useState("");
+  const [hasIdea, setHasIdea] = useState<boolean | null>(preset ? true : null);
+  const [idea, setIdea] = useState(preset && !preset.isLink ? preset.text : "");
   const [big, setBig] = useState<string | null>(null);
   const [niche, setNiche] = useState<string | null>(null);
   const [product, setProduct] = useState<string | null>(null);
@@ -84,11 +85,11 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
   const n = NICHES.find((x) => x.id === niche);
 
   // 10 questions sans idée de produit ; 7 s'il a déjà la sienne. La dernière : les boutiques qu'il aime (cœur / croix).
-  const plan: Step[] = hasIdea ? ["level", "goal", "time", "idea", "audience", "price", "style"] : ["level", "goal", "time", "idea", "big", "sub", "product", "audience", "price", "style"];
+  const plan: Step[] = preset ? ["level", "goal", "time", "audience", "price", "style"] : hasIdea ? ["level", "goal", "time", "idea", "audience", "price", "style"] : ["level", "goal", "time", "idea", "big", "sub", "product", "audience", "price", "style"];
   const index = plan.indexOf(step);
   const go = (s: Step) => setHistory((h) => [...h, s]);
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
-  const chosen = hasIdea ? idea.trim() : product;
+  const chosen = preset?.isLink ? "Produit du lien fourni" : hasIdea ? idea.trim() : product;
 
   // Suivi anonyme (Ventes) : jusqu'à quelle question le visiteur va, et s'il finit le quiz.
   const run = useRef("");
@@ -120,7 +121,7 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
   const next: Record<Exclude<Step, "style">, { ready: boolean; go: () => void }> = {
     level: { ready: !!level, go: () => go("goal") },
     goal: { ready: !!goal, go: () => go("time") },
-    time: { ready: !!time, go: () => go("idea") },
+    time: { ready: !!time, go: () => go(preset ? "audience" : "idea") },
     idea: { ready: hasIdea === false || (hasIdea === true && idea.trim().length >= 3), go: () => go(hasIdea ? "audience" : "big") },
     big: { ready: !!big, go: () => go("sub") },
     sub: { ready: !!niche, go: () => go("product") },
@@ -154,6 +155,11 @@ export function Quiz({ onFinish, skipHref }: { onFinish: (brief: string) => Prom
         <span>Question {index + 1} sur {plan.length}</span>
       </div>
 
+      {preset && step === "level" && (
+        <p className="mx-auto mt-5 w-fit max-w-full truncate rounded-full border border-[#3dff9a]/30 bg-[#3dff9a]/10 px-3.5 py-1.5 text-center text-[13px] text-[#c8ffe2]">
+          ✓ {preset.isLink ? "Ton lien produit est gardé" : `Ton idée est gardée : « ${preset.text.slice(0, 60)}${preset.text.length > 60 ? "…" : ""} »`}. Quelques questions pour faire ta boutique sur mesure.
+        </p>
+      )}
       <h1 key={step} className="mt-6 text-center text-[clamp(1.7rem,1.2rem+1.8vw,2.5rem)] font-semibold leading-tight tracking-[-0.03em] [animation:rise_.45s_cubic-bezier(.2,.8,.2,1)_both]">{titles[step]}</h1>
 
       <div className="mt-8 [animation:fade-in_.35s_ease-out_both]" key={`${step}-body`}>
@@ -273,13 +279,17 @@ function BigCard({ icon, label, hint, on, onClick }: { icon: Icon; label: string
 }
 
 const QUIZ_KEY = "vg-quiz-brief";
-export function saveQuizBrief(brief: string) {
-  try { localStorage.setItem(QUIZ_KEY, brief); } catch { /* stockage indisponible */ }
+export type QuizDraft = { brief: string; mode: "start" | "link"; url?: string };
+export function saveQuizBrief(brief: string, extra: { mode?: "start" | "link"; url?: string } = {}) {
+  try { localStorage.setItem(QUIZ_KEY, JSON.stringify({ brief, mode: extra.mode ?? "start", url: extra.url } satisfies QuizDraft)); } catch { /* stockage indisponible */ }
 }
-export function takeQuizBrief() {
+export function takeQuizDraft(): QuizDraft | null {
   try {
     const b = localStorage.getItem(QUIZ_KEY);
     localStorage.removeItem(QUIZ_KEY);
-    return b;
+    if (!b) return null;
+    try { const d = JSON.parse(b) as QuizDraft; if (d && typeof d.brief === "string") return d; } catch { /* ancien format : texte seul */ }
+    return { brief: b, mode: "start" };
   } catch { return null; }
 }
+export const takeQuizBrief = () => takeQuizDraft()?.brief ?? null;

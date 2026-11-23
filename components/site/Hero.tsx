@@ -1,6 +1,5 @@
 import { Check } from "lucide-react";
-import { CTA, isWaitlist } from "@/lib/launch";
-import { PAID_PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
+import { CTA } from "@/lib/launch";
 import { Reveal } from "@/components/ui/Reveal";
 import { PromptBox } from "./PromptBox";
 import { DemoVideos } from "./DemoVideos";
@@ -26,10 +25,6 @@ export function Hero() {
         </Reveal>
         <Reveal delay={260} className="mt-9">
           <div id="creer" className="scroll-mt-28"><PromptBox align="center" /></div>
-          {/* Le prix tout de suite : pas de surprise après l'aperçu. */}
-          <p className="mx-auto mt-4 max-w-xl text-[13.5px] text-fg-muted sm:text-sm">
-            <b className="text-white">Aperçu gratuit</b>, sans carte bancaire. Ensuite, la boutique complète dès <b className="text-white">{euro(isWaitlist ? WAITLIST_PRICES.pro.monthly : withOffer(PAID_PLANS[0].monthly))}/mois</b>{isWaitlist ? " (prix liste d'attente)" : " avec l'offre de lancement (valable 24 h après ton inscription)"}, sans engagement.
-          </p>
         </Reveal>
         {/* Petits arguments vérifiables (pas de prix ici : il vient plus tard) (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
         <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap justify-center gap-2 text-[13px] sm:text-sm">
