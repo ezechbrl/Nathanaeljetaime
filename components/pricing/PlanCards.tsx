@@ -58,7 +58,7 @@ export function useCountdown(endsAt: string | null | undefined) {
   return { h: pad(Math.floor(s / 3600)), m: pad(Math.floor((s % 3600) / 60)), s: pad(s % 60) };
 }
 
-type Left = NonNullable<ReturnType<typeof useCountdown>>;
+export type Left = NonNullable<ReturnType<typeof useCountdown>>;
 
 // Bandeau de l'offre de bienvenue (24 h après l'inscription), avec le compte à rebours.
 export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?: boolean }) {

@@ -6,9 +6,10 @@ import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import type { GenerateStoreInput } from "@/lib/api/types";
-import { AuroraBackground, IntervalToggle, OfferBanner, PlanCards, SingleCard, TrustRow, singleButtonClass, planButtonClass, planButtonFor, planPrice, useCountdown, type Interval } from "@/components/pricing/PlanCards";
+import { AuroraBackground, IntervalToggle, OfferBanner, TrustRow, useCountdown, type Interval } from "@/components/pricing/PlanCards";
 import { useApi } from "@/lib/api/hooks";
-import { SINGLE, euro, type Plan } from "@/lib/content/pricing";
+import { PAID_PLANS, type Plan } from "@/lib/content/pricing";
+import { PlanPicker, pickerButtonClass } from "@/components/pricing/PlanPicker";
 
 export const PENDING_BRIEF_KEY = "vitrio-pending-brief";
 // Boutique d'aperçu à débloquer au retour du paiement.
@@ -105,30 +106,31 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
 
   const text = draft?.brief || brief;
   return (
-    <div className="relative isolate overflow-hidden rounded-[26px] border border-white/10 px-4 py-8 sm:px-8 sm:py-10">
+    <div className="relative isolate overflow-clip rounded-[26px] border border-white/10 px-4 py-8 sm:px-8 sm:py-10">
       <AuroraBackground className="-z-10" />
       {left && <div className="mb-6"><OfferBanner left={left} waitlist={waitlist} /></div>}
       {text && !unlockStoreId && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{unlockStoreId ? "Débloque ta boutique" : draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
       <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 3 minutes.</p>
       <div className="mt-6"><IntervalToggle value={interval} onChange={setPeriod} /></div>
-      <div className={unlockStoreId ? "mx-auto mt-7 max-w-[1120px]" : "mx-auto mt-7 max-w-[760px]"}>
-        <PlanCards
-          single={unlockStoreId ? (
-            <SingleCard left={left} action={
-              <button type="button" onClick={buySingle} onPointerEnter={prepareSingle} onFocus={prepareSingle} disabled={!!busy} className={singleButtonClass}>
-                {busy === "single" ? <Spinner /> : <>Payer {euro(left ? SINGLE.offer : SINGLE.price)} et débloquer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
-              </button>
-            } />
-          ) : undefined}
+      <div className="mx-auto mt-9 max-w-[640px]">
+        <PlanPicker
           interval={interval}
           left={left}
           waitlist={waitlist}
-          action={(plan, iv) => (
-            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv, true)} onFocus={() => prepare(plan.id, iv, true)} disabled={!!busy} className={planButtonFor(plan)}>
-              {busy === plan.id ? <Spinner /> : <>{unlockStoreId ? "Débloquer" : "Payer"} {euro(planPrice(plan, iv, !!left, waitlist).billed)}{unlockStoreId ? "" : " et créer"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
-            </button>
-          )}
+          withSingle={!!unlockStoreId}
+          cta={(choice, iv) => {
+            const plan = PAID_PLANS.find((p) => p.id === choice);
+            return choice === "single" || !plan ? (
+              <button type="button" onClick={buySingle} onPointerEnter={prepareSingle} onFocus={prepareSingle} disabled={!!busy} className={pickerButtonClass}>
+                {busy === "single" ? <Spinner /> : <>Continuer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+              </button>
+            ) : (
+              <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv, true)} onFocus={() => prepare(plan.id, iv, true)} disabled={!!busy} className={pickerButtonClass}>
+                {busy === plan.id ? <Spinner /> : <>Continuer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+              </button>
+            );
+          }}
         />
         <TrustRow />
       </div>
