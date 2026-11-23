@@ -834,18 +834,19 @@ ${schema({ name: "Avis clients", settings: [SCHEME, { type: "paragraph", content
 </section>
 ${schema({ name: "Bannière", settings: [{ type: "image_picker", id: "image", label: "Image" }, { type: "text", id: "image_asset", label: "Image Vigenia (fichier du thème)" }, { type: "text", id: "title", label: "Titre" }, { type: "textarea", id: "text", label: "Texte" }, { type: "text", id: "cta", label: "Bouton" }, { type: "url", id: "url", label: "Lien" }], presets: [{ name: "Bannière" }] })}`,
 
-  faq: `{%- assign p = all_products[section.settings.product] -%}{%- assign pic = blank -%}
-{%- if p -%}{%- for m in p.media -%}{%- if m.alt contains 'situation' -%}{%- assign pic = m -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+  faq: `{%- assign p = all_products[section.settings.product] -%}{%- assign pic = section.settings.image -%}
+{%- assign picasset = '' -%}{%- if pic == blank and section.settings.image_asset != blank -%}{%- assign picasset = section.settings.image_asset | asset_url -%}{%- endif -%}
+{%- if pic == blank and picasset == blank and p -%}{%- for m in p.media -%}{%- if m.alt contains 'situation' -%}{%- assign pic = m -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
 <section class="sec s-{{ section.settings.scheme }}">
-  <div class="wrap faq{% if pic != blank %} faq--pic{% endif %}">
-    {% if pic != blank %}<div class="frame reveal faq__pic"><div class="media">${img("pic", 1200, 1500)}</div></div>{% endif %}
+  <div class="wrap faq{% if pic != blank or picasset != blank %} faq--pic{% endif %}">
+    {% if pic != blank %}<div class="frame reveal faq__pic"><div class="media">${img("pic", 1200, 1500)}</div></div>{% elsif picasset != blank %}<div class="frame reveal faq__pic"><div class="media"><img src="{{ picasset }}" alt="" width="1200" height="1500" loading="lazy"></div></div>{% endif %}
     <div>
     <div class="head reveal">{% if section.settings.eyebrow != blank %}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{% endif %}<h2 class="title" style="margin-top:10px">{{ section.settings.title }}</h2></div>
     <div class="acc">{%- for block in section.blocks -%}<details class="reveal" {{ block.shopify_attributes }} {% if forloop.first and section.settings.open_first %}open{% endif %}><summary>{{ block.settings.question }}</summary><div class="rte muted"><p>{{ block.settings.answer }}</p></div></details>{%- endfor -%}</div>
     </div>
   </div>
 </section>
-${schema({ name: "FAQ", settings: [SCHEME, { type: "product", id: "product", label: "Produit (pour afficher une photo en situation)" }, { type: "text", id: "eyebrow", label: "Sur-titre" }, { type: "text", id: "title", label: "Titre", default: "Questions fréquentes" }, { type: "checkbox", id: "open_first", label: "Ouvrir la première question", default: true }], blocks: [{ type: "q", name: "Question", settings: [{ type: "text", id: "question", label: "Question" }, { type: "textarea", id: "answer", label: "Réponse" }] }], presets: [{ name: "FAQ" }] })}`,
+${schema({ name: "FAQ", settings: [SCHEME, { type: "image_picker", id: "image", label: "Photo à côté des questions" }, { type: "text", id: "image_asset", label: "Photo fournie avec le thème (nom du fichier)" }, { type: "product", id: "product", label: "Produit (sinon une photo en situation du produit)" }, { type: "text", id: "eyebrow", label: "Sur-titre" }, { type: "text", id: "title", label: "Titre", default: "Questions fréquentes" }, { type: "checkbox", id: "open_first", label: "Ouvrir la première question", default: true }], blocks: [{ type: "q", name: "Question", settings: [{ type: "text", id: "question", label: "Question" }, { type: "textarea", id: "answer", label: "Réponse" }] }], presets: [{ name: "FAQ" }] })}`,
 
   newsletter: `<section class="sec s-{{ section.settings.scheme }}">
   <div class="wrap news reveal">

@@ -374,13 +374,15 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   // Chaque photo montre le produit sous un angle franchement différent (le produit tourne, pas seulement le décor),
   // et dans un décor différent : pas tout sur un bureau.
   const shots: [Slot, string, AspectRatio, string][] = [
-    ["white", "product", "1:1", `Rotate the product so it faces the camera straight on (front view). Place it on a clean off-white background, lit by soft daylight from a nearby window, with a natural soft shadow, simple and honest product photo. ${keep} ${CLEAN}`],
-    ["studio", "product", "1:1", `Rotate the product to a strict side profile view (90 degrees from the front). It stands firmly on a matte neutral surface (light grey stone or pale wood), plain neutral wall behind, soft side daylight, gentle natural shadow, product clearly resting on the surface. ${keep} ${CLEAN}`],
+    // Les fonds alternent : blanc pur (comme une fiche produit de marque), puis un vrai décor avec des objets de
+    // l'univers du produit, puis blanc, puis décor… Jamais tout gris-beige « IA ».
+    ["white", "product", "1:1", `Rotate the product so it faces the camera straight on (front view). Place it on a pure bright white seamless background, clean e-commerce product photo, soft even light, very light natural shadow under the product. ${keep} ${CLEAN}`],
+    ["studio", "product", "1:1", `Rotate the product to a side profile view. Place it in a real, lived-in setting where it is normally used (${scene}), on a real surface, with a few objects from its world around it (${props}), warm natural window light, gentle depth of field, colors that feel real and not overly beige. ${keep} ${NATURAL}, no people, no hands, no faces`],
     ["detail", "product", "1:1", `Extreme macro close-up on one characteristic part of this product, showing its materials, texture and finish, shallow depth of field, soft light. ${keep} ${CLEAN}`],
     ["inuse", "lifestyle", "4:5", `Top-down flat lay, camera directly above: the product lying flat on a neutral textured surface (linen, light stone or pale wood) with two or three objects from its world around it (${props}), tidy but natural composition, soft daylight. ${keep} ${CLEAN}`],
     ["hero", "banner", "16:9", `${heroPrompt} ${keep} ${NATURAL}, no people, no hands, no faces`],
-    ["moment1", "product", "1:1", `Rotate the product to show it from behind (rear three-quarter view), resting on a rough natural stone block, warm soft side light, neutral beige background. ${keep} ${CLEAN}`],
-    ["moment2", "product", "1:1", `Show the product lying on its side (or folded flat if it can fold), seen from a high three-quarter angle, on a soft draped fabric in a soft neutral tone, gentle window light. ${keep} ${CLEAN}`],
+    ["moment1", "product", "1:1", `Rotate the product to show it from behind (rear three-quarter view), on a pure bright white seamless background, clean studio product photo, soft even light, light natural shadow. ${keep} ${CLEAN}`],
+    ["moment2", "product", "1:1", `The product seen from a high three-quarter angle, placed on a colorful real surface that fits its world (a bold-colored table, tiles, a textile with a pattern, or outdoor ground, depending on the product), with one or two objects from its world nearby (${props}), bright natural daylight, lively but tidy. ${keep} ${NATURAL}, no people, no hands, no faces`],
     ["moment3", "lifestyle", "16:9", `Wide natural photo, ${scene}: the product seen from a slightly high front three-quarter angle, placed in a real, tidy everyday setting with neutral colors that fits the brand, soft natural daylight, space around it. Only the product and objects, nobody in the scene. ${keep} ${CLEAN}`],
   ];
   // Scènes de vie : 3 personnes différentes utilisent le produit, chacune dans un contexte différent.
@@ -394,6 +396,8 @@ export async function generateStoreImages(storeId: string, plan: StorePlan, onPr
   (plan.homepage.moments?.items ?? []).slice(0, 3).forEach((m, i) => {
     shots.push([`life${i + 1}` as Slot, "lifestyle", "4:5", `${m.imagePrompt}. ${PERSONAS[i]} ${life}`]);
   });
+  // 4ᵉ scène de vie, réservée à la FAQ (une photo qu'on ne voit nulle part ailleurs dans la boutique).
+  shots.push(["life4", "lifestyle", "4:5", `A person from the target customers of this product, at home in a calm everyday moment (for example in a bathroom, a living room or a kitchen), naturally using or holding the product, ${scene}. If the scene does not specify the person, show an adult of a different age and style than in other photos. ${life}`]);
   // Le packshot compte pour une photo ; chaque mise en scène terminée fait avancer la barre.
   let done = 1;
   onProgress?.(done, shots.length + 1);

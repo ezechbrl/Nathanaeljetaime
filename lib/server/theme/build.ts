@@ -98,7 +98,7 @@ export function themeContent(ctx: ThemeContext): Record<string, string> {
     },
   };
 
-  const faqSection = (title: string, scheme = "tint") => ({ type: "faq", settings: { scheme, ...(product ? { product } : {}), eyebrow: "FAQ", title, open_first: true }, ...blocks(faqItems.map((f) => ({ type: "q", settings: { question: clip(f.question, 250), answer: f.answer } }))) });
+  const faqSection = (title: string, scheme = "tint") => ({ type: "faq", settings: { scheme, ...(product ? { product } : {}), image: file("life4"), image_asset: asset("life4"), eyebrow: "FAQ", title, open_first: true }, ...blocks(faqItems.map((f) => ({ type: "q", settings: { question: clip(f.question, 250), answer: f.answer } }))) });
 
   const features = home.features?.length
     ? home.features

@@ -15,7 +15,7 @@ type AssetRow = { url: string; kind: string; storage_path: string | null };
 // Ordre des photos de la fiche produit : celles du marchand d'abord, puis packshot, détail, en situation.
 const GALLERY: Record<string, number> = { upload: 0, packshot: 1, white: 2, life1: 3, studio: 4, moment1: 5, life2: 6, moment2: 7, detail: 8, inuse: 9 };
 // Visuels du thème (page d'accueil) : héros, bannière de fin, scènes de vie.
-const THEME_SLOTS: Slot[] = ["hero", "moment3", "life1", "life2", "life3"];
+const THEME_SLOTS: Slot[] = ["hero", "moment3", "life1", "life2", "life3", "life4"];
 
 export async function storeVisuals(store: StoreRow) {
   const plan = store.plan as StorePlan;

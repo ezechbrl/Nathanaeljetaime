@@ -43,6 +43,7 @@ function pickImages(assets: Asset[]) {
     moments: [1, 2, 3].map((i) => by(`moment${i}`) ?? lifestyle[i] ?? products[i]),
     story: by("story") ?? lifestyle.at(-1),
     life: [1, 2, 3].map((i) => by(`life${i}`)),
+    faq: by("life4"), // photo réservée à la FAQ (pas déjà vue ailleurs dans la boutique)
     // « Comment ça marche » : le produit seul, un détail, puis le produit utilisé.
     steps: [by("white") ?? products[1], by("detail") ?? products[2], by("life1") ?? by("inuse") ?? lifestyle[0]],
   };
@@ -299,7 +300,7 @@ export function StorePreview({ store, page: pageProp = "accueil", device = "auto
   const features = home.features?.length ? home.features : home.benefits.map((b, i) => ({ icon: BENEFIT_ICONS[i % 6], title: b.title, text: b.text }));
   const faq = [...plan.faq, ...plan.strategy.objections.map((o) => ({ question: o.objection, answer: o.answer }))];
   // FAQ : une photo du produit en situation à côté, et des questions qui s'ouvrent au clic.
-  const faqPic = imgs.life[1] ?? imgs.moments[0] ?? imgs.inuse;
+  const faqPic = imgs.faq ?? imgs.life[1] ?? imgs.moments[0] ?? imgs.inuse;
   const faqBlock = (n: number) => (
     <div className={cn("grid gap-8", !mobile && faqPic && "grid-cols-[.85fr_1.15fr] items-start gap-12")}>
       {faqPic && <div className={cn(!mobile && "sticky top-4")}><Frame a={faqPic} ratio={mobile ? "4/3" : "4/5"} /></div>}
