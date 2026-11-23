@@ -31,7 +31,7 @@ const SOURCES: Record<string, { label: string; tone: string }> = {
   linkedin: { label: "LinkedIn", tone: "bg-[#dbeafe] text-[#1e40af]" },
   direct: { label: "Direct (lien tapé)", tone: "bg-[#f1f1f1] text-[#555]" },
 };
-const sourceOf = (name: string) => SOURCES[name] ?? { label: name, tone: "bg-[#efe7ff] text-[#6d28d9]" };
+const sourceOf = (name: string) => SOURCES[name] ?? (name.startsWith("tiktok-") ? { label: `TikTok (compte ${name.slice(7)})`, tone: SOURCES.tiktok.tone } : null) ?? { label: name, tone: "bg-[#efe7ff] text-[#6d28d9]" };
 
 // Pages du site en mots simples.
 function pageName(p: string) {

@@ -134,7 +134,7 @@ export const GET = route(async () => {
         return { label: b.label, visits: cur.visits, signups: cur.signups, revenue: cur.revenue, prevVisits: prev.visits, prevSignups: prev.signups, prevRevenue: prev.revenue };
       }),
       pages: top(v, "entry", 6, (p) => PAGE_NAME[p] ?? p),
-      sources: top(v, "source", 6, (s) => s === "direct" ? "Direct" : s.charAt(0).toUpperCase() + s.slice(1)),
+      sources: top(v, "source", 6, (s) => s === "direct" ? "Direct" : s.startsWith("tiktok-") ? `TikTok (compte ${s.slice(7)})` : s.charAt(0).toUpperCase() + s.slice(1)),
       countries: top(v, "country", 6, country),
       devices: top(v, "device", 3, (d) => d.charAt(0).toUpperCase() + d.slice(1)),
     }];
