@@ -242,14 +242,14 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
 }
 
 // Paiement unique « Ma boutique » : une boutique complète, sans abonnement (39 € pendant l'offre de bienvenue).
-// Même format que les cartes d'abonnement, en jaune, pour se mettre tout à droite sur la même ligne.
+// Même format que les cartes d'abonnement, tout à droite sur la même ligne, badge « Recommandé ».
 export function SingleCard({ left, action }: { left?: Left | null; action: ReactNode }) {
   return (
-    <div className="relative rounded-[22px] bg-[linear-gradient(160deg,#fde047,rgb(255_255_255/0.08)_45%,#facc15)] p-px shadow-[0_0_60px_-18px_rgb(253_224_71/0.45)]">
+    <div className="relative rounded-[22px] bg-[linear-gradient(160deg,rgb(52_211_153/0.45),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))] p-px">
       <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))] p-6 backdrop-blur-xl">
         <div className="flex items-center justify-between gap-2">
           <p className="whitespace-nowrap text-[1.6rem] font-semibold tracking-[-0.02em]">Ma boutique</p>
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#fde047]/40 bg-[#fde047]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#fef08a]"><Sparkles className="h-3 w-3" /> Le plus avantageux</span>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#a7f3d0]">Recommandé</span>
         </div>
         <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">Tu veux juste ta boutique ? Tu paies une fois, elle est à toi pour toujours.</p>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-1 gap-y-1">
@@ -257,13 +257,13 @@ export function SingleCard({ left, action }: { left?: Left | null; action: React
           <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(left ? SINGLE.offer : SINGLE.price)}</span>
           <span className="whitespace-nowrap text-sm text-fg-muted">une seule fois</span>
         </p>
-        {left ? <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#fde047]/30 bg-[#fde047]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>
-          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#fef08a]">Paiement unique, sans abonnement</p>}
+        {left ? <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>
+          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#a7f3d0]">Paiement unique, sans abonnement</p>}
         <div className="mt-5">{action}</div>
         <div className="my-5 h-px bg-white/10" />
         <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>
         <ul className="mt-3 space-y-2.5 text-[14.5px]">
-          {SINGLE_FEATURES.map((f) => <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#fde047]/15"><Check className="h-3 w-3 text-[#fde047]" strokeWidth={3} /></span>{f}</li>)}
+          {SINGLE_FEATURES.map((f) => <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>{f}</li>)}
         </ul>
         <ul className="mt-3 space-y-2.5 border-t border-white/[0.07] pt-3 text-[14.5px] text-fg-faint" aria-label="Non inclus, dans les abonnements">
           {SINGLE_MISSING.map((m) => <li key={m} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-white/[0.06]"><X className="h-3 w-3" strokeWidth={3} /></span><span className="line-through decoration-white/30">{m}</span></li>)}
@@ -306,6 +306,5 @@ export const planButtonClass = (featured?: boolean) =>
       : "border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 text-[#d1fae5] shadow-[0_0_24px_-10px_rgb(46_230_166/0.6)] hover:bg-[#2ee6a6]/20",
   );
 
-// Bouton jaune de « Ma boutique » (l'offre la plus avantageuse).
-export const singleButtonClass =
-  "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#fde68a,#facc15)] text-[15px] font-semibold text-[#1a1400] shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_10px_30px_-8px_rgb(250_204_21/0.6)] transition-all hover:-translate-y-px disabled:opacity-60";
+// Bouton de « Ma boutique » : discret, comme les offres non mises en avant.
+export const singleButtonClass = planButtonClass(false);

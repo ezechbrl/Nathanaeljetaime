@@ -27,7 +27,7 @@ export const PLANS: Plan[] = [
     features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
-    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 29, yearly: 249, was: 39,
+    id: "pro", name: "Starter", badge: "Le plus avantageux", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 29, yearly: 249, was: 39,
     features: [
       "Ta boutique prête en 3 minutes, à partir d'un simple lien",
       { text: "Des photos dignes d'une grande marque", preview: "photos" },
@@ -39,7 +39,7 @@ export const PLANS: Plan[] = [
     // Ce que le Starter n'a pas : affiché grisé et barré sur sa carte (vraies limites, voir lib/server/quota.ts et budget.ts).
     missing: ["3 boutiques Shopify connectées", "Support prioritaire"],
     limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
-    cta: "Commencer",
+    cta: "Commencer", featured: true,
   },
   {
     id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 59, yearly: 499, was: 79,

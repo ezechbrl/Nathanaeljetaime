@@ -125,7 +125,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
           left={left}
           waitlist={waitlist}
           action={(plan, iv) => (
-            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv, true)} onFocus={() => prepare(plan.id, iv, true)} disabled={!!busy} className={planButtonClass(!unlockStoreId && plan.id === "pro")}>
+            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv, true)} onFocus={() => prepare(plan.id, iv, true)} disabled={!!busy} className={planButtonClass(plan.featured)}>
               {busy === plan.id ? <Spinner /> : <>{unlockStoreId ? "Débloquer" : "Payer"} {euro(planPrice(plan, iv, !!left, waitlist).billed)}{unlockStoreId ? "" : " et créer"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
           )}
