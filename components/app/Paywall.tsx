@@ -6,7 +6,7 @@ import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import type { GenerateStoreInput } from "@/lib/api/types";
-import { AuroraBackground, IntervalToggle, OfferBanner, PlanCards, SingleCard, TrustRow, singleButtonClass, planButtonClass, planPrice, useCountdown, type Interval } from "@/components/pricing/PlanCards";
+import { AuroraBackground, IntervalToggle, OfferBanner, PlanCards, SingleCard, TrustRow, singleButtonClass, planButtonClass, planButtonFor, planPrice, useCountdown, type Interval } from "@/components/pricing/PlanCards";
 import { useApi } from "@/lib/api/hooks";
 import { SINGLE, euro, type Plan } from "@/lib/content/pricing";
 
@@ -125,7 +125,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
           left={left}
           waitlist={waitlist}
           action={(plan, iv) => (
-            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv, true)} onFocus={() => prepare(plan.id, iv, true)} disabled={!!busy} className={planButtonClass(plan.featured)}>
+            <button type="button" onClick={() => subscribe(plan, iv)} onPointerEnter={() => prepare(plan.id, iv, true)} onFocus={() => prepare(plan.id, iv, true)} disabled={!!busy} className={planButtonFor(plan)}>
               {busy === plan.id ? <Spinner /> : <>{unlockStoreId ? "Débloquer" : "Payer"} {euro(planPrice(plan, iv, !!left, waitlist).billed)}{unlockStoreId ? "" : " et créer"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
             </button>
           )}

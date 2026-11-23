@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Star, Timer, X } from "lucide-react";
+import { Check, CreditCard, Headphones, Rocket, ShieldCheck, ShoppingBag, Sparkles, Star, Timer, X, Zap } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { PAID_PLANS, SINGLE, SINGLE_FEATURES, SINGLE_MISSING, WAITLIST_PRICES, euro, showBarred, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
@@ -81,19 +81,32 @@ export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?:
 }
 
 // Les deux offres côte à côte. `action` rend le bouton (paiement dans l'app, inscription sur le site).
+// Chaque offre a sa couleur et son icône, pour les reconnaître d'un coup d'œil :
+// Starter vert (mis en avant), Pro bleu, Ma boutique jaune doux.
+type Tone = "green" | "blue" | "yellow";
+const TONE: Record<Tone, { border: string; badge: string; tile: string; check: string; checkBg: string; text: string; inner: string }> = {
+  green: { border: "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_60px_-18px_rgb(46_230_166/0.55)]", badge: "border-[#a3e635]/40 bg-[#a3e635]/10 text-[#bef264]", tile: "bg-[#2ee6a6]/15 text-[#2ee6a6]", check: "text-[#2ee6a6]", checkBg: "bg-[#2ee6a6]/15", text: "text-[#6ee7b7]", inner: "bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))]" },
+  blue: { border: "bg-[linear-gradient(160deg,rgb(56_189_248/0.55),rgb(255_255_255/0.06)_50%,rgb(56_189_248/0.25))]", badge: "border-[#38bdf8]/35 bg-[#38bdf8]/10 text-[#bae6fd]", tile: "bg-[#38bdf8]/15 text-[#7dd3fc]", check: "text-[#7dd3fc]", checkBg: "bg-[#38bdf8]/15", text: "text-[#7dd3fc]", inner: "bg-[linear-gradient(180deg,rgb(10_32_44/0.88),rgb(4_14_20/0.93))]" },
+  yellow: { border: "bg-[linear-gradient(160deg,rgb(253_224_71/0.5),rgb(255_255_255/0.06)_50%,rgb(253_224_71/0.22))]", badge: "border-[#fde047]/35 bg-[#fde047]/10 text-[#fef08a]", tile: "bg-[#fde047]/15 text-[#fde047]", check: "text-[#fde047]", checkBg: "bg-[#fde047]/15", text: "text-[#fef08a]", inner: "bg-[linear-gradient(180deg,rgb(36_34_14/0.86),rgb(14_14_6/0.93))]" },
+};
+const toneOf = (id: Plan["id"]): Tone => (id === "agency" ? "blue" : "green");
+const PLAN_ICON = { pro: Rocket, agency: Zap } as Record<string, typeof Rocket>;
+
 // `single` : la carte « Ma boutique » (paiement unique), ajoutée tout à droite, sur la même ligne.
 export function PlanCards({ interval, action, left, offer = false, waitlist = false, single }: { interval: Interval; action: (plan: Plan, interval: Interval) => ReactNode; left?: Left | null; offer?: boolean; waitlist?: boolean; single?: ReactNode }) {
   return (
     <div className={cn("grid gap-4 sm:grid-cols-2", single ? "lg:grid-cols-3" : null)}>
       {PAID_PLANS.map((plan) => {
         const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
-        const featured = plan.featured || (!single && plan.id === "pro"); // sans « Ma boutique » à côté, le Starter reste mis en avant
+        const featured = plan.featured;
+        const t = TONE[toneOf(plan.id)];
+        const Icon = PLAN_ICON[plan.id] ?? Rocket;
         return (
-          <div key={plan.id} className={cn("relative rounded-[22px] p-px", featured ? "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_60px_-18px_rgb(46_230_166/0.55)]" : "bg-[linear-gradient(160deg,rgb(52_211_153/0.45),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))]")}>
-            <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))] p-6 backdrop-blur-xl">
+          <div key={plan.id} className={cn("relative rounded-[22px] p-px", t.border)}>
+            <div className={cn("flex h-full flex-col rounded-[21px] p-6 backdrop-blur-xl", t.inner)}>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[1.6rem] font-semibold tracking-[-0.02em]">{plan.name}</p>
-                <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] font-semibold", featured ? "border-[#a3e635]/40 bg-[#a3e635]/10 text-[#bef264]" : "border-[#2ee6a6]/35 bg-[#2ee6a6]/10 text-[#a7f3d0]")}>{featured && <Sparkles className="h-3 w-3" />} {plan.badge}</span>
+                <p className="flex items-center gap-2.5 whitespace-nowrap text-[1.6rem] font-semibold tracking-[-0.02em]"><span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-[11px]", t.tile)}><Icon className="h-[18px] w-[18px]" /></span>{plan.name}</p>
+                <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] font-semibold", t.badge)}>{featured && <Sparkles className="h-3 w-3" />} {plan.badge}</span>
               </div>
               <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">{plan.tagline}</p>
               <p className="mt-4 flex flex-wrap items-baseline gap-x-1 gap-y-1">
@@ -103,17 +116,17 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
                 {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{Math.round((1 - billed / was) * 100)} %</span>}
               </p>
               {interval === "year" ? (
-                <p className="mt-2 text-[14px] font-medium leading-snug text-[#6ee7b7]">
+                <p className={cn("mt-2 text-[14px] font-medium leading-snug", t.text)}>
                   <span className="text-[16px] font-semibold text-white">≈ {(Math.round((billed / 12) * 10) / 10).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} € / mois</span>
                   <span className="block text-[12.5px] text-fg-muted">payé une fois par an</span>
                 </p>
-              ) : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#6ee7b7]">Sans engagement</p>}
+              ) : <p className={cn("mt-1.5 min-h-5 text-[14px] font-medium", t.text)}>Sans engagement</p>}
               {left && waitlist && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />
               <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>
               <ul className="mt-3 space-y-2.5 text-[14.5px]">
-                {plan.features.map((f) => <FeatureItem key={typeof f === "string" ? f : f.text} f={f} />)}
+                {plan.features.map((f) => <FeatureItem key={typeof f === "string" ? f : f.text} f={f} tone={toneOf(plan.id)} />)}
               </ul>
               {/* Ce qui n'est que dans le Pro : grisé et barré. */}
               {plan.missing?.length ? (
@@ -133,9 +146,10 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
 }
 
 // Une ligne d'offre ; au survol (ou au toucher sur téléphone), une petite bulle montre un aperçu réel.
-function FeatureItem({ f }: { f: PlanFeature }) {
+function FeatureItem({ f, tone = "green" }: { f: PlanFeature; tone?: Tone }) {
   const [open, setOpen] = useState(false);
-  const check = <span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>;
+  const t = TONE[tone];
+  const check = <span className={cn("mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full", t.checkBg)}><Check className={cn("h-3 w-3", t.check)} strokeWidth={3} /></span>;
   if (typeof f === "string") return <li className="flex gap-2.5">{check}{f}</li>;
   return (
     <li className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
@@ -245,11 +259,11 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
 // Même format que les cartes d'abonnement, tout à droite sur la même ligne, badge « Recommandé ».
 export function SingleCard({ left, action }: { left?: Left | null; action: ReactNode }) {
   return (
-    <div className="relative rounded-[22px] bg-[linear-gradient(160deg,rgb(52_211_153/0.45),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))] p-px">
-      <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))] p-6 backdrop-blur-xl">
+    <div className={cn("relative rounded-[22px] p-px", TONE.yellow.border)}>
+      <div className={cn("flex h-full flex-col rounded-[21px] p-6 backdrop-blur-xl", TONE.yellow.inner)}>
         <div className="flex items-center justify-between gap-2">
-          <p className="whitespace-nowrap text-[1.6rem] font-semibold tracking-[-0.02em]">Ma boutique</p>
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#a7f3d0]">Recommandé</span>
+          <p className="flex items-center gap-2.5 whitespace-nowrap text-[1.6rem] font-semibold tracking-[-0.02em]"><span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-[11px]", TONE.yellow.tile)}><ShoppingBag className="h-[18px] w-[18px]" /></span>Ma boutique</p>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#fde047]/40 bg-[#fde047]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#fef08a]">Recommandé</span>
         </div>
         <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">Tu veux juste ta boutique ? Tu paies une fois, elle est à toi pour toujours.</p>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-1 gap-y-1">
@@ -257,13 +271,13 @@ export function SingleCard({ left, action }: { left?: Left | null; action: React
           <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(left ? SINGLE.offer : SINGLE.price)}</span>
           <span className="whitespace-nowrap text-sm text-fg-muted">une seule fois</span>
         </p>
-        {left ? <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>
-          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#a7f3d0]">Paiement unique, sans abonnement</p>}
+        {left ? <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#fde047]/30 bg-[#fde047]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>
+          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#fef08a]">Paiement unique, sans abonnement</p>}
         <div className="mt-5">{action}</div>
         <div className="my-5 h-px bg-white/10" />
         <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>
         <ul className="mt-3 space-y-2.5 text-[14.5px]">
-          {SINGLE_FEATURES.map((f) => <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>{f}</li>)}
+          {SINGLE_FEATURES.map((f) => <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#fde047]/15"><Check className="h-3 w-3 text-[#fde047]" strokeWidth={3} /></span>{f}</li>)}
         </ul>
         <ul className="mt-3 space-y-2.5 border-t border-white/[0.07] pt-3 text-[14.5px] text-fg-faint" aria-label="Non inclus, dans les abonnements">
           {SINGLE_MISSING.map((m) => <li key={m} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-white/[0.06]"><X className="h-3 w-3" strokeWidth={3} /></span><span className="line-through decoration-white/30">{m}</span></li>)}
@@ -297,14 +311,19 @@ export function TrustRow() {
   );
 }
 
-// Bouton lumineux des offres.
-export const planButtonClass = (featured?: boolean) =>
+// Bouton lumineux des offres (couleur de l'offre).
+export const planButtonFor = (plan: Plan) => planButtonClass(plan.featured, toneOf(plan.id));
+export const planButtonClass = (featured?: boolean, tone?: Tone) =>
   cn(
     "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition-all hover:-translate-y-px disabled:opacity-60",
     featured
       ? "bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.4),0_10px_30px_-8px_rgb(46_230_166/0.7)]"
-      : "border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 text-[#d1fae5] shadow-[0_0_24px_-10px_rgb(46_230_166/0.6)] hover:bg-[#2ee6a6]/20",
+      : tone === "blue"
+        ? "border border-[#38bdf8]/40 bg-[#38bdf8]/10 text-[#e0f2fe] shadow-[0_0_24px_-10px_rgb(56_189_248/0.6)] hover:bg-[#38bdf8]/20"
+        : tone === "yellow"
+          ? "border border-[#fde047]/40 bg-[#fde047]/10 text-[#fef9c3] shadow-[0_0_24px_-10px_rgb(253_224_71/0.5)] hover:bg-[#fde047]/20"
+          : "border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 text-[#d1fae5] shadow-[0_0_24px_-10px_rgb(46_230_166/0.6)] hover:bg-[#2ee6a6]/20",
   );
 
 // Bouton de « Ma boutique » : discret, comme les offres non mises en avant.
-export const singleButtonClass = planButtonClass(false);
+export const singleButtonClass = planButtonClass(false, "yellow");
