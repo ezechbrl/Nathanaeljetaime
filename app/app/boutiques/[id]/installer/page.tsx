@@ -19,7 +19,7 @@ import * as api from "@/lib/api/client";
 export default function InstallPage() {
   const { store } = useStore();
   const { user, refresh } = useApp();
-  const paid = user.plan !== "free";
+  const paid = user.plan !== "free" || user.singleStoreId === store.id; // abonné, ou boutique achetée une fois
   const live = API_MODE === "live";
   const [editShop, setEditShop] = useState(false);
   const [done, setDone] = useState<string[]>([]);

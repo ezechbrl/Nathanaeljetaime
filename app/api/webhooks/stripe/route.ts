@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { env } from "@/lib/server/env";
-import { invoicePaid, stripe, syncSubscription } from "@/lib/server/stripe-billing";
+import { invoicePaid, singlePaid, stripe, syncSubscription } from "@/lib/server/stripe-billing";
 import { db } from "@/lib/server/supabase";
 
 // Événements Stripe (adresse à déclarer dans Stripe → Développeurs → Webhooks : https://vigenia.com/api/webhooks/stripe).
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       case "checkout.session.completed": {
         const s = event.data.object;
         if (s.subscription) await syncSubscription(await stripe().subscriptions.retrieve(String(s.subscription)));
+        else if (s.mode === "payment") await singlePaid(s);
         break;
       }
       case "customer.subscription.created":

@@ -26,7 +26,7 @@ export const PLANS: Plan[] = [
     features: [], limits: { stores: "0", conversations: "0", images: "0", shops: "1", ai: "Aucune" }, cta: "",
   },
   {
-    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 78, yearly: 398,
+    id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 29, yearly: 249,
     features: [
       "Ta boutique prête à vendre en 3 minutes, à partir d'un simple lien",
       { text: "Des photos dignes d'une grande marque, créées par l'IA", preview: "photos" },
@@ -44,7 +44,7 @@ export const PLANS: Plan[] = [
     cta: "Commencer", featured: true,
   },
   {
-    id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 158, yearly: 798,
+    id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 59, yearly: 499,
     features: [
       { text: "3 boutiques Shopify : teste 3 produits en même temps et garde les gagnants", preview: "stores" },
       "2× plus de crédit IA et 400 messages par mois (au lieu de 150)",
@@ -56,13 +56,28 @@ export const PLANS: Plan[] = [
   },
 ];
 
-// Offre de lancement : −50 % à vie si on s'abonne dans les 24 h après l'inscription (remise Shopify sans limite de durée).
-// Starter 78 → 39 €/mois (398 → 199 €/an), Pro 158 → 79 €/mois (798 → 399 €/an).
-// Après 24 h, le client paie vraiment le prix normal : c'est ce qui rend le prix barré légal.
-export const LAUNCH_OFFER = { hours: 24, percent: 50 };
-export const withOffer = (price: number) => Math.round(price * (1 - LAUNCH_OFFER.percent / 100));
+// Offre de bienvenue, 24 h après l'inscription : « Ma boutique » (paiement unique) à 39 € au lieu de 49 €.
+// Les abonnements n'ont plus de réduction : leur prix affiché est le prix payé.
+export const LAUNCH_OFFER = { hours: 24, percent: 0 };
+export const withOffer = (price: number) => price;
+
+// Paiement unique « Ma boutique » : une boutique complète, sans abonnement, et 7 jours de retouches.
+export const SINGLE = { price: 49, offer: 39, days: 7 };
+export const SINGLE_FEATURES = [
+  "Ta boutique complète, créée par l'IA à partir de ton aperçu",
+  "Une quinzaine de photos pro : photo de haut de page, packshots, scènes de vie",
+  "Tous les textes de vente : accueil, fiche produit, FAQ, garanties",
+  "Les vrais avis clients de ton produit, importés et traduits (avec un lien fournisseur)",
+  "Les offres par lot (1, 2, 3 produits) déjà prêtes",
+  "Le design à tes couleurs, en thème Shopify à télécharger",
+  "Le fichier produit pour Shopify et le guide de mise en ligne pas à pas",
+  "7 jours pour tout retoucher avec l'éditeur IA et refaire tes photos",
+  "Tout est à toi pour toujours, même sans abonnement",
+  "Aucun abonnement, rien à résilier",
+];
 
 // Inscrits de la liste d'attente : un prix encore plus bas que l'offre de lancement, à vie, dans le même délai de 24 h.
+// (Gardé pour les comptes qui l'ont déjà : 29 €/mois ou 149 €/an pour Starter, 59 €/mois ou 299 €/an pour Pro.)
 export const WAITLIST_PRICES: Record<"pro" | "agency", { monthly: number; yearly: number }> = {
   pro: { monthly: 29, yearly: 149 },
   agency: { monthly: 59, yearly: 299 },

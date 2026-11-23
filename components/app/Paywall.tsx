@@ -6,9 +6,9 @@ import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import * as api from "@/lib/api/client";
 import type { GenerateStoreInput } from "@/lib/api/types";
-import { AuroraBackground, IntervalToggle, OfferBanner, PlanCards, TrustRow, planButtonClass, planPrice, useCountdown, type Interval } from "@/components/pricing/PlanCards";
+import { AuroraBackground, IntervalToggle, OfferBanner, PlanCards, SingleCard, TrustRow, planButtonClass, planPrice, useCountdown, type Interval } from "@/components/pricing/PlanCards";
 import { useApi } from "@/lib/api/hooks";
-import { euro, type Plan } from "@/lib/content/pricing";
+import { SINGLE, euro, type Plan } from "@/lib/content/pricing";
 
 export const PENDING_BRIEF_KEY = "vitrio-pending-brief";
 // Boutique d'aperçu à débloquer au retour du paiement.
@@ -82,6 +82,27 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
     }
   }
 
+  // « Ma boutique » : paiement unique pour la boutique d'aperçu (page Stripe préparée au survol, comme les offres).
+  const single = useRef<Promise<{ url: string }> | null>(null);
+  const prepareSingle = () => {
+    if (!unlockStoreId) return null;
+    single.current ??= api.startSingleCheckout(unlockStoreId, true);
+    single.current.catch(() => { single.current = null; });
+    return single.current;
+  };
+  async function buySingle() {
+    if (!unlockStoreId) return;
+    setBusy("single");
+    savePending();
+    try {
+      const { url } = await (prepareSingle() ?? api.startSingleCheckout(unlockStoreId));
+      window.location.href = url;
+    } catch (e) {
+      toast((e as Error).message, "error");
+      setBusy(null);
+    }
+  }
+
   const text = draft?.brief || brief;
   return (
     <div className="relative isolate overflow-hidden rounded-[26px] border border-white/10 px-4 py-8 sm:px-8 sm:py-10">
@@ -90,6 +111,16 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
       {text && !unlockStoreId && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{unlockStoreId ? "Débloque ta boutique" : draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
       <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 3 minutes.</p>
+      {unlockStoreId && (
+        <div className="mx-auto mt-6 max-w-[760px]">
+          <SingleCard left={left} action={
+            <button type="button" onClick={buySingle} onPointerEnter={prepareSingle} onFocus={prepareSingle} disabled={!!busy} className={planButtonClass(true)}>
+              {busy === "single" ? <Spinner /> : <>Payer {euro(left ? SINGLE.offer : SINGLE.price)} et débloquer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}
+            </button>
+          } />
+          <p className="mt-6 text-center text-[13px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ou un abonnement, pour aller plus loin</p>
+        </div>
+      )}
       <div className="mt-6"><IntervalToggle value={interval} onChange={setPeriod} /></div>
       <div className="mx-auto mt-7 max-w-[760px]">
         <PlanCards

@@ -3,7 +3,7 @@ import { CANCEL_REASONS, cancelLabel } from "@/lib/content/cancel";
 import Stripe from "stripe";
 import type { Invoice, PlanId, Subscription } from "@/lib/api/types";
 import { formatMoney } from "@/lib/format";
-import { LAUNCH_OFFER, PLANS, WAITLIST_PRICES, withOffer } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PLANS, SINGLE, WAITLIST_PRICES, withOffer } from "@/lib/content/pricing";
 import { env } from "./env";
 import { HttpError } from "./http";
 import { notifyOwner, saleMessage } from "./notify";
@@ -33,7 +33,7 @@ export async function launchOfferEndsAt(user: UserRow) {
   return sub?.stripe_subscription_id ? null : new Date(ends).toISOString();
 }
 
-// Offre en cours : liste d'attente (prix réservé) ou lancement (−50 %), pendant 24 h après l'inscription.
+// Offre en cours, pendant 24 h après l'inscription : prix spécial (abonnements) ou bienvenue (« Ma boutique » à 39 €).
 export async function launchOffer(user: UserRow, cookie?: string | null) {
   const endsAt = await launchOfferEndsAt(user);
   return { endsAt, kind: endsAt ? ((await isWaitlistMember(user, cookie)) ? "waitlist" as const : "launch" as const) : null };
@@ -84,7 +84,7 @@ async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | 
         recurring: { interval },
         product_data: {
           name: NAMES[plan],
-          description: `${offer === "waitlist" ? "Prix spécial à vie. " : offer === "launch" ? "Offre de lancement −50 % à vie. " : ""}Ta boutique Shopify complète : textes, photos, éditeur IA et mise en ligne guidée. Sans engagement.`,
+          description: `${offer === "waitlist" ? "Prix spécial à vie. " : ""}Ta boutique Shopify complète : textes, photos, éditeur IA et mise en ligne guidée. Sans engagement.`,
           images: [`${env.appUrl()}/brand/icon-512.png`],
         },
       },
@@ -99,6 +99,57 @@ async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | 
   });
   if (!session.url) throw new HttpError(502, "billing_failed", "Le paiement n'a pas pu être préparé. Réessaie dans un instant.");
   return session.url;
+}
+
+// Paiement unique « Ma boutique » (49 €, ou 39 € pendant les 24 h qui suivent l'inscription) pour une boutique d'aperçu.
+export async function singleCheckoutUrl(user: UserRow, storeId: string) {
+  const endsAt = await launchOfferEndsAt(user);
+  const amount = endsAt ? SINGLE.offer : SINGLE.price;
+  const create = (customer: string) => stripe().checkout.sessions.create({
+    mode: "payment",
+    customer,
+    client_reference_id: user.id,
+    line_items: [{
+      quantity: 1,
+      price_data: {
+        currency: "eur",
+        unit_amount: amount * 100,
+        product_data: {
+          name: "Vigenia · Ma boutique",
+          description: `${endsAt ? "Offre de bienvenue. " : ""}Ta boutique complète (textes, photos, design, thème Shopify) et ${SINGLE.days} jours de retouches avec l'IA. Paiement unique, sans abonnement.`,
+          images: [`${env.appUrl()}/brand/icon-512.png`],
+        },
+      },
+    }],
+    metadata: { kind: "single", user_id: user.id, store_id: storeId },
+    payment_intent_data: { metadata: { kind: "single", user_id: user.id, store_id: storeId } },
+    locale: "fr",
+    custom_text: { submit: { message: "Paiement unique, sans abonnement. Ta boutique complète se crée juste après le paiement." } },
+    success_url: `${env.appUrl()}/app/abonnement?checkout=success`,
+    cancel_url: `${env.appUrl()}/app/boutiques/${storeId}`,
+  });
+  let session;
+  try {
+    session = await create(user.stripe_customer_id ?? await newCustomer(user));
+  } catch (e) {
+    if (!missing(e) || !user.stripe_customer_id) throw e;
+    session = await create(await newCustomer(user));
+  }
+  if (!session.url) throw new HttpError(502, "billing_failed", "Le paiement n'a pas pu être préparé. Réessaie dans un instant.");
+  return session.url;
+}
+
+// Paiement « Ma boutique » réussi (webhook) : 7 jours de droits Starter pour cette boutique, vente enregistrée.
+export async function singlePaid(s: Stripe.Checkout.Session) {
+  const userId = s.metadata?.user_id;
+  const storeId = s.metadata?.store_id;
+  if (s.metadata?.kind !== "single" || !userId || s.payment_status !== "paid") return;
+  const until = new Date(Date.now() + SINGLE.days * 86_400_000).toISOString();
+  await db().from("users").update({ single_until: until, single_store_id: storeId ?? null }).eq("id", userId);
+  const user = must(await db().from("users").select("email").eq("id", userId).maybeSingle()) as { email: string } | null;
+  const amount = s.amount_total ?? 0;
+  await notifyOwner(`💰 Nouvelle vente Vigenia${s.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", "Ma boutique (paiement unique)", formatMoney(amount, "EUR")));
+  if (s.livemode) await logRevenue({ user_id: userId, kind: "payment", plan: "single" as PlanId, amount_cents: amount, currency: "EUR", external_id: `single:${s.id}` });
 }
 
 export async function portalUrl(user: UserRow) {
@@ -162,7 +213,7 @@ export async function syncSubscription(sub: Stripe.Subscription) {
   const info = PLANS.find((p) => p.id === plan);
   if (was === "free" && plan !== "free" && info) {
     const offer = sub.metadata?.offer;
-    await notifyOwner(`💰 Nouvelle vente Vigenia${sub.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount ?? 0, "EUR")}/${interval === "year" ? "an" : "mois"}${offer === "waitlist" ? " avec le prix spécial" : offer === "launch" ? " avec l'offre −50 %" : ""}`));
+    await notifyOwner(`💰 Nouvelle vente Vigenia${sub.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount ?? 0, "EUR")}/${interval === "year" ? "an" : "mois"}${offer === "waitlist" ? " avec le prix spécial" : ""}`));
     if (sub.livemode && before?.stripe_subscription_id !== sub.id) await logRevenue({ user_id: userId, kind: "new", plan, amount_cents: amount ?? 0, currency: "EUR", external_id: `new:${sub.id}` });
   } else if (was !== "free" && plan === "free") {
     await notifyOwner("Abonné parti", `${user?.email ?? "Un client"} a arrêté son abonnement Vigenia.`);

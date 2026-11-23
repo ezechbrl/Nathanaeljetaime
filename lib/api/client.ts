@@ -124,6 +124,9 @@ export const dismissRecommendation = (id: string) =>
 // Facturation
 export const getBilling = (sync = false) =>
   live ? request<{ subscription: Subscription; usage: Usage; invoices: Invoice[]; offerEndsAt: string | null; offerKind?: "waitlist" | "launch" | null }>(`/api/billing${sync ? "?sync=1" : ""}`) : mock.getBilling();
+// Paiement unique « Ma boutique » pour une boutique d'aperçu.
+export const startSingleCheckout = (storeId: string, prefetch = false) =>
+  live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan: "single", storeId, prefetch } }) : mock.checkout("pro");
 export const startCheckout = (plan: "pro" | "agency", interval: "month" | "year", prefetch = false) =>
   live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan, interval, prefetch } }) : mock.checkout(plan);
 // Clic sur « Payer » quand la page de paiement était déjà prête (préparée au survol) : compté dans l'entonnoir.

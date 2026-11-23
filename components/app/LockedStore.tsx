@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCountdown } from "@/components/pricing/PlanCards";
 import { useApi } from "@/lib/api/hooks";
 import { HESITATIONS } from "@/lib/content/cancel";
-import { LAUNCH_OFFER, PAID_PLANS, WAITLIST_PRICES, euro, withOffer } from "@/lib/content/pricing";
+import { PAID_PLANS, SINGLE, euro } from "@/lib/content/pricing";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -177,20 +177,17 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
   );
 }
 
-// Le prix, dès l'aperçu (pas de surprise après « Débloquer ») : prix réel de l'offre Starter,
-// avec le compte à rebours réel de l'offre de lancement si elle est encore valable pour ce compte.
+// Le prix, dès l'aperçu (pas de surprise après « Débloquer ») : « Ma boutique » en paiement unique (39 € pendant
+// l'offre de bienvenue, avec son vrai compte à rebours), ou un abonnement dès 29 €/mois.
 function PriceLine() {
   const billing = useApi(() => api.getBilling(false), []);
   const left = useCountdown(billing.data?.offerEndsAt);
   if (!billing.data) return null;
-  const full = PAID_PLANS[0].monthly;
-  const waitlist = billing.data.offerKind === "waitlist";
-  const price = left ? (waitlist ? WAITLIST_PRICES.pro.monthly : withOffer(full)) : full;
   return (
     <p className="mx-auto mt-3 flex max-w-xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-fg-muted">
-      <span>Boutique complète : <b className="text-white">{euro(price)}/mois</b>{left && <> <s className="text-fg-faint">{euro(full)}</s></>}</span>
-      {left && <span className="inline-flex items-center gap-1 rounded-full bg-[#2ee6a6]/15 px-2.5 py-0.5 text-[12.5px] font-semibold text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" />{waitlist ? "prix spécial à vie" : `−${LAUNCH_OFFER.percent} % à vie`}, encore {left.h} h {left.m} min</span>}
-      <span>· sans engagement, annulable en un clic</span>
+      <span>Ta boutique complète : <b className="text-white">{euro(left ? SINGLE.offer : SINGLE.price)} une fois</b>{left && <> <s className="text-fg-faint">{euro(SINGLE.price)}</s></>}</span>
+      {left && <span className="inline-flex items-center gap-1 rounded-full bg-[#fde047]/15 px-2.5 py-0.5 text-[12.5px] font-semibold text-[#fef08a]"><Timer className="h-3.5 w-3.5" />offre de bienvenue, encore {left.h} h {left.m} min</span>}
+      <span>· ou un abonnement dès {euro(PAID_PLANS[0].monthly)}/mois</span>
     </p>
   );
 }

@@ -14,6 +14,10 @@ export type UserRow = {
   waitlist_member?: boolean;
   shop_domain?: string | null;
   created_at: string;
+  // Paiement unique « Ma boutique » : accès comme un abonné Starter, pour cette boutique, jusqu'à cette date.
+  single_until?: string | null;
+  single_store_id?: string | null;
+  single?: boolean; // calculé : achat « Ma boutique » encore valable (et pas d'abonnement)
 };
 
 // Utilisateur connecté (ou erreur 401). Crée sa fiche au premier passage (ex. connexion Google).
@@ -43,7 +47,13 @@ export async function requireUser(): Promise<UserRow & { email_verified: boolean
       await db().from("affiliate_events").insert({ code: row.referred_by, kind: "signup", referred_user_id: row.id });
     }
   }
-  return { ...row, email_verified: !!auth.email_confirmed_at };
+  return { ...withSingle(row), email_verified: !!auth.email_confirmed_at };
+}
+
+// Achat « Ma boutique » encore valable : mêmes droits qu'un Starter pendant 7 jours (une seule boutique).
+export function withSingle<T extends UserRow>(row: T): T {
+  if (row.plan === "free" && row.single_until && new Date(row.single_until).getTime() > Date.now()) return { ...row, plan: "pro", single: true };
+  return row;
 }
 
 // Vérifie qu'une boutique appartient à l'utilisateur et la renvoie.

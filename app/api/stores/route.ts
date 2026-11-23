@@ -34,6 +34,8 @@ export const POST = route(async (req) => {
   if (input.mode === "link" && !input.productUrl && !input.screenshots?.length) throw badRequest("Colle le lien de la page produit, ou ajoute une photo du produit.", "productUrl");
   await rateLimit(`generate:${user.id}`, 5, 3600);
   // Sans abonnement : une seule boutique d'aperçu (floutée), débloquée après le paiement.
+  // Achat « Ma boutique » : il couvre une seule boutique (celle qui a été payée).
+  if (user.single) throw new HttpError(402, "subscription_required", "Ton achat « Ma boutique » couvre une seule boutique. Prends un abonnement pour en créer d'autres.");
   const teaser = user.plan === "free";
   if (teaser) {
     if (input.mode === "recraft" || user.free_store_used) throw new HttpError(402, "subscription_required", "Choisis ton offre pour créer ta boutique (sans engagement).");

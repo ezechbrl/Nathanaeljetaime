@@ -13,6 +13,7 @@ export const POST = route<{ params: Promise<{ id: string }> }>(async (_req, { pa
   const user = await requireUser();
   const store = await ownedStore(user.id, (await params).id);
   if (store.status !== "locked") throw new HttpError(409, "conflict", "Cette boutique est déjà débloquée.");
+  if (user.single && user.single_store_id !== store.id) throw new HttpError(402, "subscription_required", "Ton achat « Ma boutique » couvre une autre boutique. Prends un abonnement pour débloquer celle-ci.");
   await assertAiBudget(user.id, user.plan); // abonnement requis
   // Une seule génération, même si le bouton est cliqué deux fois.
   const claimed = must(await db().from("stores").update({ status: "generating", updated_at: new Date().toISOString() }).eq("id", store.id).eq("status", "locked").select("*")) as typeof store[];

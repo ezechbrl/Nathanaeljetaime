@@ -3,7 +3,7 @@
 import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Star, Timer, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { LAUNCH_OFFER, PAID_PLANS, WAITLIST_PRICES, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
+import { PAID_PLANS, SINGLE, SINGLE_FEATURES, WAITLIST_PRICES, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
 
 export type Interval = "month" | "year";
 
@@ -38,7 +38,7 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
 export function planPrice(plan: Plan, interval: Interval, offer = false, waitlist = false) {
   const billed = interval === "year" ? plan.yearly : plan.monthly;
   if (offer && waitlist && plan.id !== "free") return { billed: WAITLIST_PRICES[plan.id][interval === "year" ? "yearly" : "monthly"], was: withOffer(billed) }; // barré : le prix des autres (offre de lancement)
-  return offer ? { billed: withOffer(billed), was: billed } : { billed, was: null };
+  return { billed: withOffer(billed), was: null }; // plus de réduction sur les abonnements (l'offre de 24 h porte sur « Ma boutique »)
 }
 
 // Temps restant avant `endsAt`, mis à jour chaque seconde (null une fois écoulé).
@@ -59,13 +59,13 @@ export function useCountdown(endsAt: string | null | undefined) {
 
 type Left = NonNullable<ReturnType<typeof useCountdown>>;
 
-// Bandeau de l'offre de lancement, avec le compte à rebours.
+// Bandeau de l'offre de bienvenue (24 h après l'inscription), avec le compte à rebours.
 export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?: boolean }) {
   return (
     <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-white/[0.04] px-5 py-3 backdrop-blur shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
       <div>
-        <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">{waitlist ? `Prix spécial : ${euro(WAITLIST_PRICES.pro.monthly)}/mois à vie` : `Offre de lancement : −${LAUNCH_OFFER.percent} % à vie`}</p>
-        <p className="text-[12.5px] text-fg-muted">{waitlist ? "Rien que pour toi, encore plus bas que l'offre de lancement. " : ""}Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné.</p>
+        <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">{waitlist ? `Prix spécial : ${euro(WAITLIST_PRICES.pro.monthly)}/mois à vie` : `Offre de bienvenue : « Ma boutique » à ${euro(SINGLE.offer)} au lieu de ${euro(SINGLE.price)}`}</p>
+        <p className="text-[12.5px] text-fg-muted">{waitlist ? "Rien que pour toi. Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné." : "Paiement unique, sans abonnement, valable jusqu'à la fin du compteur."}</p>
       </div>
       <div className="flex items-end gap-1.5 font-semibold tabular-nums" aria-label={`Il reste ${left.h} heures ${left.m} minutes`}>
         {[{ v: left.h, l: "heures" }, { v: left.m, l: "min" }, { v: left.s, l: "sec" }].map((u, i) => (
@@ -106,7 +106,7 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
                   <span className="block text-[12.5px] text-fg-muted">payé une fois par an</span>
                 </p>
               ) : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#6ee7b7]">Sans engagement</p>}
-              {left && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
+              {left && waitlist && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />
               <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">{plan.id === "agency" ? "Tout le Starter, et en plus" : "Ce qui est inclus"}</p>
@@ -238,12 +238,42 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
   );
 }
 
+// Paiement unique « Ma boutique » : une boutique complète, sans abonnement (39 € pendant l'offre de bienvenue).
+export function SingleCard({ left, action }: { left?: Left | null; action: ReactNode }) {
+  return (
+    <div className="relative rounded-[22px] bg-[linear-gradient(160deg,#fde047,rgb(255_255_255/0.08)_45%,#2ee6a6)] p-px shadow-[0_0_60px_-18px_rgb(253_224_71/0.45)]">
+      <div className="rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.9),rgb(4_16_12/0.95))] p-6 backdrop-blur-xl sm:p-7">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-[1.6rem] font-semibold tracking-[-0.02em]">Ma boutique</p>
+          <span className="rounded-full border border-[#fde047]/40 bg-[#fde047]/10 px-2.5 py-1 text-[11.5px] font-semibold text-[#fef08a]">Paiement unique · sans abonnement</span>
+        </div>
+        <p className="mt-2 text-[13.5px] text-fg-muted">Tu veux juste ta boutique ? Tu paies une fois, elle est à toi pour toujours.</p>
+        <div className="mt-4 grid gap-5 sm:grid-cols-[auto_1fr] sm:items-start">
+          <div>
+            <p className="flex flex-wrap items-baseline gap-x-2">
+              {left && <span className="text-xl font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px]">{euro(SINGLE.price)}</span>}
+              <span className="text-[2.8rem] font-semibold leading-none tracking-[-0.04em] tabular-nums">{euro(left ? SINGLE.offer : SINGLE.price)}</span>
+              <span className="text-sm text-fg-muted">une fois</span>
+            </p>
+            {left && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#fde047]/30 bg-[#fde047]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
+            <div className="mt-4 sm:w-[240px]">{action}</div>
+          </div>
+          <ul className="grid gap-2 text-[14px] sm:grid-cols-2">
+            {SINGLE_FEATURES.map((f) => <li key={f} className="flex gap-2"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#fde047]/15"><Check className="h-3 w-3 text-[#fde047]" strokeWidth={3} /></span>{f}</li>)}
+          </ul>
+        </div>
+        <p className="mt-4 border-t border-white/10 pt-3 text-[12.5px] text-fg-muted">Avec un abonnement, en plus : des boutiques illimitées, l'éditeur IA sans limite de temps, 100 nouvelles photos par mois et le changement de produit quand tu veux.</p>
+      </div>
+    </div>
+  );
+}
+
 export function TrustRow() {
   return (
     <>
     {/* Le prix remis en perspective : ordres de grandeur pour une boutique complète. */}
     <div className="mx-auto mt-6 grid max-w-[640px] grid-cols-3 overflow-hidden rounded-[16px] border border-white/10 text-center">
-      {[["Une agence", "≈ 2 000 €", "et 3 semaines"], ["Un freelance", "≈ 500 €", "et 1 à 2 semaines"], ["Vigenia", "39 €/mois", "et 3 minutes"]].map(([who, price, time], i) => (
+      {[["Une agence", "≈ 2 000 €", "et 3 semaines"], ["Un freelance", "≈ 500 €", "et 1 à 2 semaines"], ["Vigenia", `${euro(SINGLE.price)}`, "et 3 minutes"]].map(([who, price, time], i) => (
         <div key={who} className={cn("px-2 py-3", i === 2 ? "bg-[#2ee6a6]/12 shadow-[inset_0_0_30px_-10px_rgb(46_230_166/0.5)]" : "bg-black/20", i > 0 && "border-l border-white/10")}>
           <p className={cn("text-[11.5px] font-semibold uppercase tracking-[0.08em]", i === 2 ? "text-[#6ee7b7]" : "text-fg-faint")}>{who}</p>
           <p className={cn("mt-1 whitespace-nowrap text-[16px] font-bold tabular-nums sm:text-[20px]", i === 2 ? "text-white" : "text-fg-muted line-through decoration-[#ef4444]/70")}>{price}</p>

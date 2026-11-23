@@ -5,7 +5,7 @@ import { FinalCta } from "@/components/site/FinalCta";
 import { PageHero } from "@/components/site/PageHero";
 import { PricingCards } from "@/components/site/Pricing";
 
-export const metadata: Metadata = { title: "Tarifs", description: "Vigenia Starter à 39 € par mois et Pro à 79 € par mois avec l'offre de lancement (−50 % à vie), ou 199 € et 399 € par an. Sans engagement." };
+export const metadata: Metadata = { title: "Tarifs", description: "Vigenia : ta boutique en paiement unique à 49 €, ou un abonnement Starter à 29 € par mois et Pro à 59 € par mois (249 € et 499 € par an). Sans engagement." };
 
 const PRICING_FAQ = [
   { q: "Comment je paie ?", a: "Par carte bancaire, sur une page de paiement sécurisée (Stripe). Tes factures sont disponibles dans ton espace Abonnement, et tu peux arrêter quand tu veux." },

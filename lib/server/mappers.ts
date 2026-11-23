@@ -17,6 +17,9 @@ export const toUser = (u: UserRow & { email_verified?: boolean }): User => ({
   createdAt: u.created_at,
   shopDomain: u.shop_domain ?? null,
   isOwner: isOwnerEmail(u.email),
+  single: u.single ?? false,
+  singleUntil: u.single_until ?? null,
+  singleStoreId: u.single_store_id ?? null,
 });
 
 const DEFAULT_THEME: StoreTheme = { colors: { primary: "#1d1d22", accent: "#0f8f86", background: "#faf8f5" }, headingFont: "Instrument Serif", bodyFont: "DM Sans" };

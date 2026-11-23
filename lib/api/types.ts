@@ -19,6 +19,9 @@ export type User = {
   createdAt: string;
   shopDomain?: string | null; // boutique Shopify du client (ma-boutique.myshopify.com), saisie à l'inscription
   isOwner?: boolean; // fondateur de Vigenia : accès au tableau de bord des ventes
+  single?: boolean; // achat « Ma boutique » encore valable (7 jours)
+  singleUntil?: string | null;
+  singleStoreId?: string | null; // boutique achetée avec « Ma boutique » (téléchargeable pour toujours)
 };
 
 export type Usage = {

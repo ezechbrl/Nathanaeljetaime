@@ -32,7 +32,7 @@ export async function notifyOwner(title: string, message: string) {
   for (const r of results) if (r.status === "rejected") console.warn("Notification non envoyée :", r.reason);
 }
 
-// Ex. « marie@gmail.com vient de s'abonner à Starter (39 €/mois). »
+// Ex. « marie@gmail.com vient de s'abonner à Starter (29 €/mois). »
 export const saleMessage = (who: string, planName: string, price: string) => `${who} vient de s'abonner à ${planName} (${price}).`;
 
 // Push web vers chaque téléphone abonné ; les abonnements expirés (404/410) sont supprimés.

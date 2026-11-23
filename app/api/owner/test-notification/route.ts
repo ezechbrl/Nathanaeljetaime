@@ -10,7 +10,7 @@ async function send(req: Request) {
   await requireOwner();
   const delay = Math.min(30, Math.max(0, Number(new URL(req.url).searchParams.get("delay")) || 0));
   if (delay) await new Promise((r) => setTimeout(r, delay * 1000));
-  await notifyOwner("💰 Nouvelle vente Vigenia (test)", saleMessage("client-test@gmail.com", "Starter", "78 €/mois"));
+  await notifyOwner("💰 Nouvelle vente Vigenia (test)", saleMessage("client-test@gmail.com", "Starter", "29 €/mois"));
   return json({ ok: true, sent: Boolean(process.env.NTFY_TOPIC || process.env.PUSHOVER_USER_KEY || process.env.VAPID_PRIVATE_KEY) });
 }
 

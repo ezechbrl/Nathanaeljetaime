@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requireUser, type UserRow } from "@/lib/server/auth";
+import { requireUser, type UserRow, withSingle } from "@/lib/server/auth";
 import { body, HttpError, json, noContent, route } from "@/lib/server/http";
 import { toUser } from "@/lib/server/mappers";
 import { getUsage } from "@/lib/server/quota";
@@ -32,7 +32,7 @@ export const PATCH = route(async (req) => {
     ...(input.shopDomain !== undefined && { shop_domain: input.shopDomain }),
     updated_at: new Date().toISOString(),
   }).eq("id", user.id).select("*").single());
-  return json({ user: toUser({ ...row, email_verified: user.email_verified }) });
+  return json({ user: toUser(withSingle({ ...row, email_verified: user.email_verified })) });
 });
 
 export const DELETE = route(async (req) => {

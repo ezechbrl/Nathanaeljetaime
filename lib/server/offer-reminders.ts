@@ -2,7 +2,7 @@ import "server-only";
 import { sendEmail } from "./email";
 import { trackEmail } from "./email-tracking";
 import { env } from "./env";
-import { LAUNCH_OFFER, PAID_PLANS, WAITLIST_PRICES, withOffer } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PAID_PLANS, SINGLE } from "@/lib/content/pricing";
 import { db, must } from "./supabase";
 
 // Rappels de l'offre de lancement (24 h), à chaque inscrit pas encore abonné, un seul e-mail de chaque :
@@ -23,8 +23,8 @@ export async function sendOfferReminders() {
     // il reste valable de 12 h à 23 h après l'inscription, la tâche repasse chaque heure.
     const parisHour = Number(new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }).format(new Date(now)));
     if (r.key === "offer-reminder" && (parisHour >= 22 || parisHour < 8)) continue;
-    const due = must(await db().from("users").select("id, email, first_name, created_at, waitlist_member").eq("plan", "free")
-      .lte("created_at", new Date(now - r.after * 3_600_000).toISOString()).gt("created_at", new Date(now - until * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string; waitlist_member: boolean | null }[];
+    const due = must(await db().from("users").select("id, email, first_name, created_at").eq("plan", "free")
+      .lte("created_at", new Date(now - r.after * 3_600_000).toISOString()).gt("created_at", new Date(now - until * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string }[];
     for (const u of due) {
       const { error: dup } = await db().from("webhook_events").insert({ id: `${r.key}:${u.id}` });
       if (dup || !u.email || /@shopify\.com$/i.test(u.email)) continue; // pas de relance aux évaluateurs Shopify
@@ -33,22 +33,14 @@ export async function sendOfferReminders() {
       const last = r.key === "offer-last";
       const name = u.first_name ? ` ${u.first_name}` : "";
       const url = `${env.appUrl()}/app/abonnement`;
-      // Dernière heure : on baisse encore le prix (prix spécial : 29 €/mois Starter, 59 €/mois Pro, à vie),
-      // activé sur le compte avant l'envoi, valable jusqu'à la fin des 24 h. Sinon, le vrai prix de la personne.
-      const starter = PAID_PLANS[0], pro = PAID_PLANS[1];
-      const lowered = last && !u.waitlist_member;
-      if (lowered) await db().from("users").update({ waitlist_member: true }).eq("id", u.id);
-      const special = last || !!u.waitlist_member;
-      const monthly = special ? WAITLIST_PRICES.pro.monthly : withOffer(starter.monthly);
-      const yearly = special ? WAITLIST_PRICES.pro.yearly : withOffer(starter.yearly);
-      const proMonthly = special ? WAITLIST_PRICES.agency.monthly : withOffer(pro.monthly);
-      const deal = lowered ? `dernière heure : on baisse encore ton prix, ${monthly} € par mois à vie au lieu de ${withOffer(starter.monthly)} €` : special ? "ton prix spécial à vie" : "−50 % à vie sur ton abonnement";
+      // Offre de bienvenue : « Ma boutique » (paiement unique) à 39 € au lieu de 49 €, ou un abonnement dès 29 €/mois.
+      const starter = PAID_PLANS[0];
       const ok = await sendEmail(
         u.email,
-        last ? `🔥 Dernière heure : ta boutique à ${monthly} €/mois à vie, plus que ${left}` : `⏳ Plus que ${left} pour ton prix de lancement (${monthly} €/mois à vie)`,
-        `Salut${name},\n\n${last ? "C'est la dernière heure : t" : "T"}on offre Vigenia se termine dans ${left} : ${deal} (Starter : ${monthly} € par mois au lieu de ${starter.monthly} €, ou ${yearly} € par an ; Pro : ${proMonthly} € par mois au lieu de ${pro.monthly} €).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${url}\n\nÀ tout de suite,\nL'équipe Vigenia`,
+        last ? `🔥 Dernière heure : ta boutique à ${SINGLE.offer} € au lieu de ${SINGLE.price} €, plus que ${left}` : `⏳ Ta boutique à ${SINGLE.offer} € au lieu de ${SINGLE.price} €, encore ${left}`,
+        `Salut${name},\n\n${last ? "C'est la dernière heure : t" : "T"}on offre de bienvenue Vigenia se termine dans ${left} : ta boutique complète à ${SINGLE.offer} € une seule fois au lieu de ${SINGLE.price} €, sans abonnement (textes, photos, design, thème Shopify, et ${SINGLE.days} jours de retouches avec l'IA).\n\nTu préfères un abonnement ? Il commence à ${starter.monthly} € par mois, sans engagement.\n\nDébloquer ma boutique : ${url}\n\nÀ tout de suite,\nL'équipe Vigenia`,
         undefined,
-        reminderHtml(name, left, url, last, { monthly, proMonthly, fullMonthly: starter.monthly, fullPro: pro.monthly, label: lowered ? `Prix baissé : ${monthly} €/mois à vie` : special ? "Prix spécial à vie" : "Offre de lancement · −50 % à vie" }),
+        reminderHtml(name, left, url, last, { single: SINGLE.offer, singleFull: SINGLE.price, monthly: starter.monthly, days: SINGLE.days }),
       );
       if (ok) {
         reminders++;
@@ -61,7 +53,7 @@ export async function sendOfferReminders() {
 }
 
 // E-mail en HTML (tableaux et styles en ligne pour les messageries) : gros compteur, prix, bouton.
-function reminderHtml(name: string, left: string, url: string, last: boolean, p: { monthly: number; proMonthly: number; fullMonthly: number; fullPro: number; label: string }) {
+function reminderHtml(name: string, left: string, url: string, last: boolean, p: { single: number; singleFull: number; monthly: number; days: number }) {
   const price = (label: string, now: string, was: string) =>
     `<td style="padding:14px 16px;background:#0b3a2c;border:1px solid #1f6b52;border-radius:14px;text-align:center"><div style="font-size:13px;color:#a7f3d0">${label}</div><div style="margin-top:4px"><span style="font-size:15px;color:#9ca3af;text-decoration:line-through">${was}</span>&nbsp;<span style="font-size:26px;font-weight:700;color:#ffffff">${now}</span></div></td>`;
   return `<!doctype html><html lang="fr"><body style="margin:0;padding:0;background:#04211a">
@@ -69,13 +61,13 @@ function reminderHtml(name: string, left: string, url: string, last: boolean, p:
 <tr><td align="center"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px">
 <tr><td style="font-size:20px;font-weight:700;color:#ffffff;padding-bottom:18px">Vigenia</td></tr>
 <tr><td style="background:linear-gradient(160deg,#0d5c44,#062e24);background-color:#0a4433;border:1px solid #2ee6a6;border-radius:22px;padding:30px 24px;text-align:center">
-<div style="font-size:13px;font-weight:700;letter-spacing:1.5px;color:#d9f99d;text-transform:uppercase">${last ? `🔥 Dernière heure · ${p.label}` : p.label}</div>
+<div style="font-size:13px;font-weight:700;letter-spacing:1.5px;color:#d9f99d;text-transform:uppercase">${last ? "🔥 Dernière heure · offre de bienvenue" : "Offre de bienvenue"}</div>
 <div style="margin:18px 0 4px;font-size:64px;font-weight:800;line-height:1;color:#ffffff">${left}</div>
-<div style="font-size:15px;color:#a7f3d0">avant la fin de ton prix</div>
-<p style="margin:22px 0 0;font-size:16px;line-height:1.55;color:#e8fff6;text-align:left">Salut${name} 👋<br>Ta boutique t'attend. Si tu t'abonnes maintenant, tu gardes <b>${p.monthly} € par mois pour toujours</b>, tant que tu restes abonné. Après le compteur, c'est le prix normal.</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin-top:14px"><tr>${price("Starter / mois", `${p.monthly} €`, `${p.fullMonthly} €`)}${price("Pro / mois", `${p.proMonthly} €`, `${p.fullPro} €`)}</tr></table>
-<a href="${url}" style="display:inline-block;margin-top:22px;padding:15px 30px;border-radius:999px;background:#2ee6a6;color:#03140d;font-size:16px;font-weight:700;text-decoration:none">J'en profite maintenant →</a>
-<div style="margin-top:14px;font-size:12px;color:#9ca3af">Sans engagement · Annulable en 1 clic · Paiement sécurisé par carte</div>
+<div style="font-size:15px;color:#a7f3d0">avant la fin de ton offre</div>
+<p style="margin:22px 0 0;font-size:16px;line-height:1.55;color:#e8fff6;text-align:left">Salut${name} 👋<br>Ta boutique t'attend. Débloque-la maintenant pour <b>${p.single} € une seule fois</b> au lieu de ${p.singleFull} €, sans abonnement : textes, photos, design, thème Shopify et ${p.days} jours de retouches avec l'IA.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin-top:14px"><tr>${price("Ma boutique · une fois", `${p.single} €`, `${p.singleFull} €`)}<td style="padding:14px 16px;background:#0b3a2c;border:1px solid #1f6b52;border-radius:14px;text-align:center"><div style="font-size:13px;color:#a7f3d0">Ou un abonnement</div><div style="margin-top:4px;font-size:22px;font-weight:700;color:#ffffff">dès ${p.monthly} €<span style="font-size:13px;font-weight:400;color:#a7f3d0">/mois</span></div></td></tr></table>
+<a href="${url}" style="display:inline-block;margin-top:22px;padding:15px 30px;border-radius:999px;background:#2ee6a6;color:#03140d;font-size:16px;font-weight:700;text-decoration:none">Débloquer ma boutique →</a>
+<div style="margin-top:14px;font-size:12px;color:#9ca3af">Paiement unique ou sans engagement · Paiement sécurisé par carte</div>
 </td></tr>
 <tr><td style="padding:18px 6px 0;font-size:12px;color:#6b8f82;text-align:center">Tu reçois cet e-mail car tu as créé un compte Vigenia. ${last ? "C'est le dernier rappel, promis." : "Encore un seul rappel au maximum, promis."}</td></tr>
 </table></td></tr></table></body></html>`;
