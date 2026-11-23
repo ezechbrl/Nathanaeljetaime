@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import * as api from "@/lib/api/client";
 import { Journeys } from "./Journeys";
 import { QuizFunnel } from "./QuizFunnel";
+import { LiveNow } from "./LiveNow";
 import { ApiClientError } from "@/lib/api/errors";
 import type { OwnerStats } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
@@ -348,6 +349,8 @@ function Dashboard({ s }: { s: OwnerStats }) {
           </button>
         ))}
       </div>
+      {/* En direct : qui est sur le site et ce qu'il fait, mis à jour toutes les 10 secondes. */}
+      <LiveNow />
       {/* L'argent d'abord : revenu mensuel et prochain palier */}
       <MoneyHero s={s} />
 
