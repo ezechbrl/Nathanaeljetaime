@@ -4,10 +4,12 @@
 // Profil (où il en est, objectif, temps), puis son idée ou une grande catégorie → un univers → un produit,
 // ses clients, et enfin les boutiques qu'il aime (cœur / croix) pour choisir le style.
 // Toujours un nombre pair de réponses, pour des grilles bien alignées sur téléphone.
-import { ArrowLeft, ArrowRight, Baby, BadgeEuro, Coins, Crown, Wallet, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Baby, BadgeEuro, Camera, CircleHelp, Coins, Crown, Factory, Globe, Hammer, Landmark, MapPin, Megaphone, MessageCircle, Package, PiggyBank, Search, ShoppingBag, Truck, Video, Wallet, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import * as api from "@/lib/api/client";
+import { QuizAccount } from "./QuizAccount";
 import { BIG_NICHES, NICHES } from "@/lib/niches";
 import { STYLE_TEXT, StyleSwipe } from "./StyleSwipe";
 
@@ -52,6 +54,43 @@ const PRICES: Option[] = [
   { id: "p3", label: "40 à 80 €", hint: "Produit plus travaillé", icon: BadgeEuro },
   { id: "p4", label: "Plus de 80 €", hint: "Haut de gamme", icon: Crown },
 ];
+const BUDGETS: Option[] = [
+  { id: "b1", label: "Moins de 100 €", hint: "Je teste avec peu", icon: Coins },
+  { id: "b2", label: "100 à 300 €", hint: "Pour la pub et un premier stock", icon: PiggyBank },
+  { id: "b3", label: "300 à 1 000 €", hint: "Je peux investir un peu", icon: Wallet },
+  { id: "b4", label: "Plus de 1 000 €", hint: "Je veux aller vite", icon: Landmark },
+];
+const BUDGET_TEXT: Record<string, string> = { b1: "Budget de départ : moins de 100 €.", b2: "Budget de départ : 100 à 300 €.", b3: "Budget de départ : 300 à 1 000 €.", b4: "Budget de départ : plus de 1 000 €." };
+const SHOPIFY: Option[] = [
+  { id: "s1", label: "Oui, j'ai une boutique", hint: "Déjà en ligne sur Shopify", icon: Store },
+  { id: "s2", label: "J'ai un compte", hint: "Mais pas encore de boutique", icon: ShoppingBag },
+  { id: "s3", label: "Non, pas encore", hint: "Je n'ai pas de compte", icon: Sprout },
+  { id: "s4", label: "C'est quoi Shopify ?", hint: "Je ne connais pas", icon: CircleHelp },
+];
+const SHOPIFY_TEXT: Record<string, string> = { s1: "Le vendeur a déjà une boutique Shopify.", s2: "Le vendeur a un compte Shopify sans boutique.", s3: "Le vendeur n'a pas encore de compte Shopify.", s4: "Le vendeur ne connaît pas Shopify : tout expliquer très simplement." };
+const MARKETS: Option[] = [
+  { id: "fr", label: "En France", hint: "Seulement la France", icon: MapPin },
+  { id: "be", label: "France, Belgique, Suisse", hint: "Pays francophones", icon: Globe },
+  { id: "eu", label: "Toute l'Europe", hint: "Plusieurs langues", icon: Globe },
+  { id: "world", label: "Le monde entier", hint: "Partout", icon: Globe },
+];
+const MARKET_TEXT: Record<string, string> = { fr: "Pays de vente : France.", be: "Pays de vente : France, Belgique et Suisse.", eu: "Pays de vente : toute l'Europe.", world: "Pays de vente : le monde entier." };
+const SUPPLY: Option[] = [
+  { id: "drop", label: "Dropshipping", hint: "AliExpress, CJ… le fournisseur envoie", icon: Truck },
+  { id: "stock", label: "J'ai mon stock", hint: "J'envoie les colis moi-même", icon: Package },
+  { id: "make", label: "Je fabrique", hint: "Fait main ou atelier", icon: Hammer },
+  { id: "brand", label: "Ma marque", hint: "Je fais fabriquer à mon nom", icon: Factory },
+];
+const SUPPLY_TEXT: Record<string, string> = { drop: "Approvisionnement : dropshipping (délais de livraison à annoncer honnêtement).", stock: "Approvisionnement : stock du vendeur, expédition rapide.", make: "Approvisionnement : fabrication par le vendeur.", brand: "Approvisionnement : produit fabriqué sous la marque du vendeur." };
+const CHANNELS: Option[] = [
+  { id: "tiktok", label: "TikTok", hint: "Vidéos courtes", icon: Video },
+  { id: "insta", label: "Instagram", hint: "Posts et réels", icon: Camera },
+  { id: "ads", label: "Pubs Facebook / Meta", hint: "Payantes", icon: Megaphone },
+  { id: "google", label: "Google", hint: "Recherche et pubs", icon: Search },
+  { id: "word", label: "Bouche-à-oreille", hint: "Amis, groupes, avis", icon: MessageCircle },
+  { id: "unknown", label: "Je ne sais pas encore", hint: "On t'aidera", icon: CircleHelp },
+];
+const CHANNEL_TEXT: Record<string, string> = { tiktok: "Clients trouvés surtout via TikTok : accroches courtes et visuelles.", insta: "Clients trouvés surtout via Instagram : rendu très visuel.", ads: "Clients trouvés surtout via des pubs Meta : page produit très orientée achat.", google: "Clients trouvés surtout via Google : textes précis et bien référencés.", word: "Clients trouvés surtout par bouche-à-oreille : ton proche et rassurant.", unknown: "" };
 const PRICE_TEXT: Record<string, string> = { p1: "Prix de vente visé : moins de 20 €.", p2: "Prix de vente visé : entre 20 et 40 €.", p3: "Prix de vente visé : entre 40 et 80 €.", p4: "Prix de vente visé : plus de 80 €, positionnement haut de gamme." };
 const AUDIENCE_TEXT: Record<string, string> = { femmes: "les femmes", hommes: "les hommes", jeunes: "les jeunes de 18 à 25 ans", parents: "les parents", sportifs: "les sportifs", animaux: "les propriétaires d'animaux", seniors: "les plus de 50 ans", tous: "tout le monde" };
 const LEVEL_TEXT: Record<string, string> = {
@@ -63,7 +102,8 @@ const LEVEL_TEXT: Record<string, string> = {
   createur: "Le vendeur crée ses propres produits : mettre en avant le savoir-faire et l'histoire.",
 };
 
-type Step = "level" | "goal" | "time" | "idea" | "big" | "sub" | "product" | "audience" | "price" | "style";
+type Step = "level" | "goal" | "time" | "budget" | "shopify" | "idea" | "big" | "sub" | "product" | "account" | "audience" | "market" | "supply" | "channel" | "price" | "style";
+const STATE_KEY = "vg-quiz-state";
 
 // `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
 export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean } }) {
@@ -79,15 +119,53 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   const [product, setProduct] = useState<string | null>(null);
   const [audience, setAudience] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
+  const [budget, setBudget] = useState<string | null>(null);
+  const [shopify, setShopify] = useState<string | null>(null);
+  const [market, setMarket] = useState<string | null>(null);
+  const [supply, setSupply] = useState<string | null>(null);
+  const [channel, setChannel] = useState<string | null>(null);
+  // Compte : déjà connecté (pas d'étape compte) ou pas. null tant qu'on ne sait pas.
+  const [logged, setLogged] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const b = BIG_NICHES.find((x) => x.id === big);
   const n = NICHES.find((x) => x.id === niche);
 
-  // 10 questions sans idée de produit ; 7 s'il a déjà la sienne. La dernière : les boutiques qu'il aime (cœur / croix).
-  const plan: Step[] = preset ? ["level", "goal", "time", "audience", "price", "style"] : hasIdea ? ["level", "goal", "time", "idea", "audience", "price", "style"] : ["level", "goal", "time", "idea", "big", "sub", "product", "audience", "price", "style"];
+  // 15 questions sans idée de produit (12 avec son idée, 11 avec un lien ou une description de l'accueil).
+  // Au milieu, une fois le produit choisi : création du compte (sautée si déjà connecté).
+  const head: Step[] = ["level", "goal", "time", "budget", "shopify"];
+  const productSteps: Step[] = preset ? [] : hasIdea ? ["idea"] : ["idea", "big", "sub", "product"];
+  const tail: Step[] = ["audience", "market", "supply", "channel", "price", "style"];
+  const plan: Step[] = [...head, ...productSteps, ...(logged ? [] : ["account" as Step]), ...tail];
+  const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
+  const qIndex = questions.indexOf(step);
   const go = (s: Step) => setHistory((h) => [...h, s]);
+  const goNext = () => { const nx = plan[plan.indexOf(step) + 1]; if (nx) go(nx); };
+
+  // Déjà connecté ? (pas d'étape compte)
+  useEffect(() => { api.getMe().then(() => setLogged(true), () => setLogged(false)); }, []);
+  // Réponses gardées dans le navigateur : si la page est rechargée (ou rouverte depuis le lien de l'e-mail), on reprend.
+  const restored = useRef(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      const st = raw ? JSON.parse(raw) : null;
+      if (st && Date.now() - st.t < 3 * 3600_000 && (st.preset ?? "") === (preset?.text ?? "") && Array.isArray(st.history) && st.history.length > 1) {
+        setLevel(st.level); setGoal(st.goal); setTime(st.time); setBudget(st.budget); setShopify(st.shopify);
+        setHasIdea(st.hasIdea); setIdea(st.idea ?? ""); setBig(st.big); setNiche(st.niche); setProduct(st.product);
+        setAudience(st.audience); setMarket(st.market); setSupply(st.supply); setChannel(st.channel); setPrice(st.price);
+        setHistory(st.history);
+      }
+    } catch { /* stockage indisponible */ }
+    restored.current = true;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!restored.current) return;
+    try { localStorage.setItem(STATE_KEY, JSON.stringify({ t: Date.now(), preset: preset?.text ?? "", history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price })); } catch { /* stockage indisponible */ }
+  }, [history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, preset?.text]);
+  // Connecté pendant l'étape compte (ou déjà connecté en y arrivant) : on passe à la suite.
+  useEffect(() => { if (step === "account" && logged) setHistory((h) => [...h.slice(0, -1), "audience"]); }, [step, logged]);
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
   const chosen = preset?.isLink ? "Produit du lien fourni" : hasIdea ? idea.trim() : product;
 
@@ -105,11 +183,12 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
 
   async function finish(style: string | null) {
     if (!chosen || !audience) return;
-    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, price ? PRICE_TEXT[price] : "", level ? LEVEL_TEXT[level] : "", style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
+    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, price ? PRICE_TEXT[price] : "", market ? MARKET_TEXT[market] : "", supply ? SUPPLY_TEXT[supply] : "", channel ? CHANNEL_TEXT[channel] : "", level ? LEVEL_TEXT[level] : "", shopify ? SHOPIFY_TEXT[shopify] : "", budget ? BUDGET_TEXT[budget] : "", style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
     setBusy(true);
     setError("");
     track("fin", plan.length, true);
     try {
+      try { localStorage.removeItem(STATE_KEY); } catch { /* stockage indisponible */ }
       await onFinish(brief);
     } catch (e) {
       setBusy(false);
@@ -118,22 +197,23 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   }
 
   // Question suivante pour chaque étape, une fois la réponse choisie.
-  const next: Record<Exclude<Step, "style">, { ready: boolean; go: () => void }> = {
-    level: { ready: !!level, go: () => go("goal") },
-    goal: { ready: !!goal, go: () => go("time") },
-    time: { ready: !!time, go: () => go(preset ? "audience" : "idea") },
-    idea: { ready: hasIdea === false || (hasIdea === true && idea.trim().length >= 3), go: () => go(hasIdea ? "audience" : "big") },
-    big: { ready: !!big, go: () => go("sub") },
-    sub: { ready: !!niche, go: () => go("product") },
-    product: { ready: !!product, go: () => go("audience") },
-    audience: { ready: !!audience, go: () => go("price") },
-    price: { ready: !!price, go: () => go("style") },
+  const ready: Record<Exclude<Step, "style" | "account">, boolean> = {
+    level: !!level, goal: !!goal, time: !!time, budget: !!budget, shopify: !!shopify,
+    idea: hasIdea === false || (hasIdea === true && idea.trim().length >= 3),
+    big: !!big, sub: !!niche, product: !!product,
+    audience: !!audience, market: !!market, supply: !!supply, channel: !!channel, price: !!price,
   };
 
   const titles: Record<Step, React.ReactNode> = {
     level: <>Où en es-tu en <span className="serif-accent">e-commerce</span> ou en <span className="serif-accent">dropshipping</span> ?</>,
     goal: <>Quel est ton <span className="mark-green">objectif</span> ?</>,
     time: <>Combien de <span className="serif-accent">temps</span> peux-tu y consacrer ?</>,
+    budget: <>Quel <span className="mark-green">budget</span> pour te lancer ?</>,
+    shopify: <>Tu as déjà un compte <span className="serif-accent">Shopify</span> ?</>,
+    account: <>Bien joué ! Crée ton <span className="serif-accent">compte</span> pour garder tes réponses</>,
+    market: <>Dans quels <span className="serif-accent">pays</span> veux-tu vendre ?</>,
+    supply: <>Comment tes clients vont <span className="mark-green">recevoir</span> le produit ?</>,
+    channel: <>Comment vas-tu trouver tes <span className="serif-accent">clients</span> ?</>,
     idea: <>Tu as déjà une <span className="serif-accent">idée</span> de produit ?</>,
     big: <>Qu'est-ce qui t'<span className="mark-green">attire</span> ?</>,
     sub: <>Plutôt <span className="serif-accent">lequel</span> ?</>,
@@ -152,7 +232,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
         {history.length > 1
           ? <button type="button" onClick={back} className="inline-flex items-center gap-1.5 hover:text-white"><ArrowLeft className="h-4 w-4" /> Retour</button>
           : skipHref ? <a href={skipHref} className="underline underline-offset-4 hover:text-white">J'ai déjà mon produit</a> : <span />}
-        <span>Question {index + 1} sur {plan.length}</span>
+        <span>{step === "account" ? "Ton compte" : `Question ${qIndex + 1} sur ${questions.length}`}</span>
       </div>
 
       {preset && step === "level" && (
@@ -166,6 +246,12 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
         {step === "level" && <Grid options={LEVELS} value={level} onPick={setLevel} />}
         {step === "goal" && <Grid options={GOALS} value={goal} onPick={setGoal} />}
         {step === "time" && <Grid options={TIMES} value={time} cols={4} onPick={setTime} />}
+        {step === "budget" && <Grid options={BUDGETS} value={budget} cols={4} onPick={setBudget} />}
+        {step === "shopify" && <Grid options={SHOPIFY} value={shopify} cols={4} onPick={setShopify} />}
+        {step === "account" && <QuizAccount onDone={() => setLogged(true)} />}
+        {step === "market" && <Grid options={MARKETS} value={market} cols={4} onPick={setMarket} />}
+        {step === "supply" && <Grid options={SUPPLY} value={supply} cols={4} onPick={setSupply} />}
+        {step === "channel" && <Grid options={CHANNELS} value={channel} onPick={setChannel} />}
         {step === "idea" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
@@ -175,7 +261,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
             {hasIdea && (
               <div className="rounded-[18px] border border-[#34f0b0]/40 bg-[#34f0b0]/[0.07] p-4 [animation:fade-in_.3s_ease-out_both]">
                 <label htmlFor="quiz-idea" className="flex items-center gap-2 text-sm font-semibold text-white"><PenLine className="h-4 w-4 text-[#86efc9]" /> Ton produit</label>
-                <input id="quiz-idea" autoFocus value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && idea.trim().length >= 3) go("audience"); }} placeholder="Ex. : coussin chauffant pour le dos" className="field mt-2" />
+                <input id="quiz-idea" autoFocus value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && idea.trim().length >= 3) goNext(); }} placeholder="Ex. : coussin chauffant pour le dos" className="field mt-2" />
               </div>
             )}
           </div>
@@ -215,7 +301,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
 
       {error && <p role="alert" className="mt-6 text-center text-sm text-bad">{error}</p>}
       {/* On choisit (la carte s'éclaire en vert), puis « Continuer » : rien ne passe tout seul. */}
-      {step !== "style" && next[step].ready && <NextButton onClick={next[step].go} />}
+      {step !== "style" && step !== "account" && ready[step] && <NextButton onClick={goNext} />}
       {busy && <p className="mt-8 flex items-center justify-center gap-3 text-fg-muted"><Spinner /> Ta boutique se prépare…</p>}
     </div>
   );
