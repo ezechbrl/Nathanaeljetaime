@@ -1,19 +1,40 @@
 "use client";
 
-import { Check, ChevronDown, Sparkles, Timer } from "lucide-react";
+import { Check, Sparkles, Timer } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { PAID_PLANS, SINGLE, SINGLE_FEATURES, euro, type Plan } from "@/lib/content/pricing";
+import { PAID_PLANS, SINGLE, euro, type Plan } from "@/lib/content/pricing";
 import { planPrice, type Interval, type Left } from "./PlanCards";
 
 export type Choice = "pro" | "agency" | "single";
 
-// Résumé d'une ligne par offre (le détail complet s'ouvre sous la liste).
-const SUMMARY: Record<Choice, string> = {
-  pro: "Ta boutique + photos, textes, vrais avis et offres par lot, tout modifiable avec l'IA",
-  agency: "Tout le Starter + 3 boutiques Shopify, 3× plus de photos, 2× plus d'IA, support prioritaire",
-  single: "Ta boutique complète, à toi pour toujours, + 7 jours de retouches avec l'IA",
+// Ce que contient chaque offre, en clair (le Pro a plus de lignes : c'est l'offre la plus complète).
+const POINTS: Record<Choice, string[]> = {
+  pro: [
+    "Ta boutique Shopify prête en 3 minutes, à partir d'un simple lien",
+    "Photos pro, textes qui donnent envie d'acheter et vrais avis clients",
+    "Offres par lot (1, 2, 3 produits) pour vendre plus",
+    "Modifie tout en parlant à l'IA, quand tu veux",
+    "1 boutique Shopify connectée, 100 photos et 150 messages par mois",
+  ],
+  agency: [
+    "Tout ce qu'il y a dans le Starter",
+    "3 boutiques Shopify : teste 3 produits en même temps, garde le gagnant",
+    "300 photos par mois (3× plus que le Starter)",
+    "400 messages à l'IA par mois et 2× plus de crédit IA",
+    "Refais tes photos et tes textes dès qu'un produit change",
+    "Support prioritaire : on te répond en premier",
+  ],
+  single: [
+    "Ta boutique complète créée par l'IA, à toi pour toujours",
+    "Une quinzaine de photos pro et tous les textes de vente",
+    "Les vrais avis clients et les offres par lot, déjà prêts",
+    "Le thème Shopify à tes couleurs, à télécharger",
+    "7 jours pour tout retoucher avec l'IA",
+    "Aucun abonnement, rien à résilier",
+  ],
 };
+const TONE = { pro: "text-[#2ee6a6]", agency: "text-[#7dd3fc]", single: "text-[#fde047]" } as const;
 
 const perDay = (amount: number, interval: Interval) => (amount / (interval === "year" ? 365 : 30)).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -24,7 +45,6 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
   cta: (choice: Choice, interval: Interval) => ReactNode;
 }) {
   const [choice, setChoice] = useState<Choice>("pro");
-  const [details, setDetails] = useState(false);
   const singlePrice = left ? SINGLE.offer : SINGLE.price;
   const rows: { id: Choice; name: string; badge?: { text: string; tone: "green" | "yellow" }; price: ReactNode; right: ReactNode }[] = PAID_PLANS.map((plan: Plan) => {
     const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
@@ -45,8 +65,6 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
   });
 
   const current = rows.find((r) => r.id === choice) ?? rows[0];
-  const plan = PAID_PLANS.find((p) => p.id === current.id);
-  const features = plan ? plan.features.map((f) => (typeof f === "string" ? f : f.text)) : SINGLE_FEATURES;
 
   return (
     <div>
@@ -73,21 +91,13 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
               </span>
               <span className="shrink-0 text-right">{r.right}</span>
               </span>
-              <span className="mt-3 block rounded-[12px] border border-white/10 px-3 py-2 text-[13.5px] leading-snug text-fg-muted sm:ml-11">{SUMMARY[r.id]}</span>
+              <span className="mt-3.5 block space-y-1.5 rounded-[14px] border border-white/10 bg-black/20 px-3.5 py-3 sm:ml-11">
+                {POINTS[r.id].map((t) => <span key={t} className="flex gap-2 text-[13.5px] leading-snug text-fg"><Check className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", TONE[r.id])} strokeWidth={3} />{t}</span>)}
+              </span>
             </button>
           );
         })}
       </div>
-
-      {/* Le détail de l'offre choisie, replié pour garder la page simple. */}
-      <button type="button" onClick={() => setDetails((d) => !d)} aria-expanded={details} className="mx-auto mt-5 flex items-center gap-1.5 text-[13.5px] font-medium text-[#6ee7b7] hover:text-[#a7f3d0]">
-        Tout ce qui est inclus dans {current.name} <ChevronDown className={cn("h-4 w-4 transition-transform", details && "rotate-180")} />
-      </button>
-      {details && (
-        <ul className="mx-auto mt-3 max-w-[560px] space-y-2 text-[14px] [animation:fade-in_.2s_ease-out]">
-          {features.map((f) => <li key={f} className="flex gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2ee6a6]" strokeWidth={3} />{f}</li>)}
-        </ul>
-      )}
 
       {/* Barre du bas : collée en bas de l'écran pendant qu'on choisit. */}
       <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-white/10 bg-[#04100c]/90 px-4 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-[18px] sm:border">
