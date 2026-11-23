@@ -11,6 +11,7 @@ export type Plan = {
   monthly: number; // en euros
   yearly: number;  // prix annuel total
   features: PlanFeature[];
+  missing?: string[]; // options de l'offre supérieure, montrées barrées
   limits: { stores: string; conversations: string; images: string; shops: string; ai: string };
   cta: string;
   featured?: boolean;
@@ -37,6 +38,8 @@ export const PLANS: Plan[] = [
       "Un design à tes couleurs, publié sur Shopify en 1 clic",
       "1 boutique Shopify connectée",
     ],
+    // Ce que le Starter n'a pas : affiché grisé et barré sur sa carte (vraies limites, voir lib/server/quota.ts et budget.ts).
+    missing: ["3 boutiques Shopify connectées (au lieu de 1)", "3× plus de photos par mois (300 au lieu de 100)", "2× plus de crédit IA et 400 messages par mois", "Support prioritaire : on te répond en premier"],
     limits: { stores: "Illimitées", conversations: "150 / mois", images: "100 / mois", shops: "1", ai: "1 € toutes les 5 h, 3 € / semaine" },
     cta: "Commencer", featured: true,
   },
@@ -44,9 +47,8 @@ export const PLANS: Plan[] = [
     id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 158, yearly: 798,
     features: [
       { text: "3 boutiques Shopify : teste 3 produits en même temps et garde les gagnants", preview: "stores" },
-      "2× plus de crédit IA pour créer et améliorer encore plus",
+      "2× plus de crédit IA et 400 messages par mois (au lieu de 150)",
       { text: "3× plus de photos chaque mois (300 au lieu de 100)", preview: "photos-pro" },
-      { text: "Chaque jour, l'IA analyse ta boutique et te dit quoi changer pour vendre plus", preview: "coach" },
       "Support prioritaire : on te répond en premier",
     ],
     limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "3", ai: "2 € toutes les 5 h, 7 € / semaine" },

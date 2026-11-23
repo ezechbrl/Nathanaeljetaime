@@ -42,7 +42,6 @@ const ROWS: { label: string; values: (string | boolean)[] }[] = [
   { label: "Capacité d'IA (crédit rechargé toutes les 5 h)", values: PAID_PLANS.map((p) => p.limits.ai) },
   { label: "Import depuis un lien et vrais avis", values: [true, true] },
   { label: "Refonte de boutique existante", values: [true, true] },
-  { label: "Optimisation quotidienne", values: [false, true] },
   { label: "Support", values: ["E-mail", "Prioritaire"] },
 ];
 

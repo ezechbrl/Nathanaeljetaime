@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Star, Timer } from "lucide-react";
+import { Check, CreditCard, Headphones, ShieldCheck, Sparkles, Star, Timer, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { LAUNCH_OFFER, PAID_PLANS, WAITLIST_PRICES, euro, withOffer, type Plan, type PlanFeature } from "@/lib/content/pricing";
@@ -28,7 +28,7 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
           {v === "month" ? "Mensuel" : "Annuel"}
         </button>
       ))}
-      <span className="rounded-full bg-[#a3e635]/15 px-2.5 py-1 text-[12px] text-[#bef264]">Le moins cher</span>
+      <span className="rounded-full bg-[#a3e635]/15 px-2.5 py-1 text-[12px] text-[#bef264]">−{Math.round((1 - PAID_PLANS[0].yearly / (PAID_PLANS[0].monthly * 12)) * 100)} % à l'année</span>
     </div>
   );
 }
@@ -98,7 +98,7 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
                 {was !== null && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(was)}</span>}
                 <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(billed)}</span>
                 <span className="whitespace-nowrap text-sm text-fg-muted">{interval === "year" ? "/ an" : "/ mois"}</span>
-                {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{Math.round((1 - billed / was) * 100)} %</span>}
+                {was !== null && <span className="ml-1.5 self-center whitespace-nowrap rounded-full bg-[#f87171]/15 px-2 py-0.5 text-[12px] font-bold text-[#fca5a5]">−{Math.round((1 - billed / was) * 100)} % à l'année</span>}
               </p>
               {interval === "year" ? (
                 <p className="mt-2 text-[14px] font-medium leading-snug text-[#6ee7b7]">
@@ -113,6 +113,14 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
               <ul className="mt-3 space-y-2.5 text-[14.5px]">
                 {plan.features.map((f) => <FeatureItem key={typeof f === "string" ? f : f.text} f={f} />)}
               </ul>
+              {/* Ce qui n'est que dans le Pro : grisé et barré. */}
+              {plan.missing?.length ? (
+                <ul className="mt-3 space-y-2.5 border-t border-white/[0.07] pt-3 text-[14.5px] text-fg-faint" aria-label="Non inclus, dans l'offre Pro">
+                  {plan.missing.map((m) => (
+                    <li key={m} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-white/[0.06]"><X className="h-3 w-3" strokeWidth={3} /></span><span className="line-through decoration-white/30">{m}</span></li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </div>
         );

@@ -8,7 +8,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { Globe2, Languages, Layers, Lock, Search, Smartphone } from "lucide-react";
 
-export const metadata: Metadata = { title: "Produit", description: "Stratégie, boutique, éditeur par chat, studio d'images et optimisation quotidienne : tout ce que fait l'IA pour ta boutique Shopify." };
+export const metadata: Metadata = { title: "Produit", description: "Stratégie, boutique, éditeur par chat, studio d'images et idées pour vendre plus : tout ce que fait l'IA pour ta boutique Shopify." };
 
 const SMALL = [
   { icon: Languages, title: "Écrit dans ta langue", text: "Pas une traduction : les textes sont écrits directement pour ton marché." },

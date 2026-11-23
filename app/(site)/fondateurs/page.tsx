@@ -24,7 +24,7 @@ export default function StoryPage() {
         <div className="space-y-6 text-[18px] leading-[1.75] text-fg-muted">
           <Reveal as="p">Lancer une boutique Shopify, c'est des semaines de réglages, de textes à écrire et de choix de design, avant même la première vente. La plupart des gens abandonnent ou publient une boutique qui ne convertit pas.</Reveal>
           <Reveal as="p" delay={60}>Pourtant, les boutiques qui vendent suivent toutes les mêmes règles : une promesse claire, une offre qui donne envie d'acheter maintenant, des réponses aux objections, une fiche produit lisible sur mobile. Ces règles s'appliquent, elles ne s'inventent pas à chaque fois.</Reveal>
-          <Reveal as="p" delay={120}><span className="text-fg">{site.name} applique ces règles pour toi.</span> L'IA pose ta stratégie comme le ferait un expert, construit la boutique entière, puis continue de l'améliorer chaque jour à partir de tes vrais chiffres.</Reveal>
+          <Reveal as="p" delay={120}><span className="text-fg">{site.name} applique ces règles pour toi.</span> L'IA pose ta stratégie comme le ferait un expert, construit la boutique entière, puis t'aide à l'améliorer quand tu veux, en une phrase.</Reveal>
         </div>
       </Container>
 
