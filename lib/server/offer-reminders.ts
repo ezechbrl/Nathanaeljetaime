@@ -2,7 +2,7 @@ import "server-only";
 import { sendEmail } from "./email";
 import { trackEmail } from "./email-tracking";
 import { env } from "./env";
-import { LAUNCH_OFFER } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, PAID_PLANS, WAITLIST_PRICES, withOffer } from "@/lib/content/pricing";
 import { db, must } from "./supabase";
 
 // Rappels de l'offre de lancement (24 h), à chaque inscrit pas encore abonné, un seul e-mail de chaque :
@@ -19,8 +19,12 @@ export async function sendOfferReminders() {
   let reminders = 0;
   for (const r of REMINDERS) {
     const until = r.key === "offer-last" ? LAUNCH_OFFER.hours : LAUNCH_OFFER.hours - 1;
-    const due = must(await db().from("users").select("id, email, first_name, created_at").eq("plan", "free")
-      .lte("created_at", new Date(now - r.after * 3_600_000).toISOString()).gt("created_at", new Date(now - until * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string }[];
+    // Rappel de mi-parcours : jamais la nuit (entre 22 h et 8 h, heure de Paris). Il attend le matin :
+    // il reste valable de 12 h à 23 h après l'inscription, la tâche repasse chaque heure.
+    const parisHour = Number(new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }).format(new Date(now)));
+    if (r.key === "offer-reminder" && (parisHour >= 22 || parisHour < 8)) continue;
+    const due = must(await db().from("users").select("id, email, first_name, created_at, waitlist_member").eq("plan", "free")
+      .lte("created_at", new Date(now - r.after * 3_600_000).toISOString()).gt("created_at", new Date(now - until * 3_600_000).toISOString())) as { id: string; email: string; first_name: string; created_at: string; waitlist_member: boolean | null }[];
     for (const u of due) {
       const { error: dup } = await db().from("webhook_events").insert({ id: `${r.key}:${u.id}` });
       if (dup || !u.email || /@shopify\.com$/i.test(u.email)) continue; // pas de relance aux évaluateurs Shopify
@@ -29,12 +33,17 @@ export async function sendOfferReminders() {
       const last = r.key === "offer-last";
       const name = u.first_name ? ` ${u.first_name}` : "";
       const url = `${env.appUrl()}/app/abonnement`;
+      // Le vrai prix de cette personne : prix « liste d'attente » si elle y a droit, sinon l'offre de lancement.
+      const starter = PAID_PLANS[0];
+      const monthly = u.waitlist_member ? WAITLIST_PRICES.pro.monthly : withOffer(starter.monthly);
+      const yearly = u.waitlist_member ? WAITLIST_PRICES.pro.yearly : withOffer(starter.yearly);
+      const deal = u.waitlist_member ? "ton prix spécial à vie" : "−50 % à vie sur ton abonnement";
       const ok = await sendEmail(
         u.email,
-        last ? `🔥 Dernière heure : ton prix de lancement (−50 % à vie) se termine dans ${left}` : `⏳ Plus que ${left} pour ton prix de lancement (−50 % à vie)`,
-        `Salut${name},\n\n${last ? "C'est la dernière heure : t" : "T"}on offre de lancement Vigenia se termine dans ${left} : −50 % à vie sur ton abonnement (39 € par mois au lieu de 78 € pour Starter, ou 199 € par an).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${url}\n\nÀ tout de suite,\nL'équipe Vigenia`,
+        last ? `🔥 Dernière heure : ton prix de lancement (${monthly} €/mois à vie) se termine dans ${left}` : `⏳ Plus que ${left} pour ton prix de lancement (${monthly} €/mois à vie)`,
+        `Salut${name},\n\n${last ? "C'est la dernière heure : t" : "T"}on offre Vigenia se termine dans ${left} : ${deal} (${monthly} € par mois au lieu de ${starter.monthly} € pour Starter, ou ${yearly} € par an).\n\nAprès, le prix normal s'applique.\n\nChoisir mon offre : ${url}\n\nÀ tout de suite,\nL'équipe Vigenia`,
         undefined,
-        reminderHtml(name, left, url, last),
+        reminderHtml(name, left, url, last, { monthly, yearly, fullMonthly: starter.monthly, fullYearly: starter.yearly, label: u.waitlist_member ? "Prix spécial à vie" : "Offre de lancement · −50 % à vie" }),
       );
       if (ok) {
         reminders++;
@@ -47,7 +56,7 @@ export async function sendOfferReminders() {
 }
 
 // E-mail en HTML (tableaux et styles en ligne pour les messageries) : gros compteur, prix, bouton.
-function reminderHtml(name: string, left: string, url: string, last = false) {
+function reminderHtml(name: string, left: string, url: string, last: boolean, p: { monthly: number; yearly: number; fullMonthly: number; fullYearly: number; label: string }) {
   const price = (label: string, now: string, was: string) =>
     `<td style="padding:14px 16px;background:#0b3a2c;border:1px solid #1f6b52;border-radius:14px;text-align:center"><div style="font-size:13px;color:#a7f3d0">${label}</div><div style="margin-top:4px"><span style="font-size:15px;color:#9ca3af;text-decoration:line-through">${was}</span>&nbsp;<span style="font-size:26px;font-weight:700;color:#ffffff">${now}</span></div></td>`;
   return `<!doctype html><html lang="fr"><body style="margin:0;padding:0;background:#04211a">
@@ -55,11 +64,11 @@ function reminderHtml(name: string, left: string, url: string, last = false) {
 <tr><td align="center"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px">
 <tr><td style="font-size:20px;font-weight:700;color:#ffffff;padding-bottom:18px">Vigenia</td></tr>
 <tr><td style="background:linear-gradient(160deg,#0d5c44,#062e24);background-color:#0a4433;border:1px solid #2ee6a6;border-radius:22px;padding:30px 24px;text-align:center">
-<div style="font-size:13px;font-weight:700;letter-spacing:1.5px;color:#d9f99d;text-transform:uppercase">${last ? "🔥 Dernière heure · −50 % à vie" : "Offre de lancement · −50 % à vie"}</div>
+<div style="font-size:13px;font-weight:700;letter-spacing:1.5px;color:#d9f99d;text-transform:uppercase">${last ? `🔥 Dernière heure · ${p.label}` : p.label}</div>
 <div style="margin:18px 0 4px;font-size:64px;font-weight:800;line-height:1;color:#ffffff">${left}</div>
 <div style="font-size:15px;color:#a7f3d0">avant la fin de ton prix de lancement</div>
-<p style="margin:22px 0 0;font-size:16px;line-height:1.55;color:#e8fff6;text-align:left">Salut${name} 👋<br>Ta boutique t'attend. Si tu t'abonnes maintenant, tu gardes <b>−50 % pour toujours</b>, tant que tu restes abonné. Après le compteur, c'est le prix normal.</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin-top:14px"><tr>${price("Starter / mois", "39 €", "78 €")}${price("Starter / an", "199 €", "398 €")}</tr></table>
+<p style="margin:22px 0 0;font-size:16px;line-height:1.55;color:#e8fff6;text-align:left">Salut${name} 👋<br>Ta boutique t'attend. Si tu t'abonnes maintenant, tu gardes <b>${p.monthly} € par mois pour toujours</b>, tant que tu restes abonné. Après le compteur, c'est le prix normal.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin-top:14px"><tr>${price("Starter / mois", `${p.monthly} €`, `${p.fullMonthly} €`)}${price("Starter / an", `${p.yearly} €`, `${p.fullYearly} €`)}</tr></table>
 <a href="${url}" style="display:inline-block;margin-top:22px;padding:15px 30px;border-radius:999px;background:#2ee6a6;color:#03140d;font-size:16px;font-weight:700;text-decoration:none">J'en profite maintenant →</a>
 <div style="margin-top:14px;font-size:12px;color:#9ca3af">Sans engagement · Annulable en 1 clic · Paiement sécurisé par carte</div>
 </td></tr>
