@@ -134,9 +134,11 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   // 15 questions sans idée de produit (12 avec son idée, 11 avec un lien ou une description de l'accueil).
   // Au milieu, une fois le produit choisi : création du compte (sautée si déjà connecté).
   const head: Step[] = ["level", "goal", "time", "budget", "shopify"];
-  const productSteps: Step[] = preset ? [] : hasIdea ? ["idea"] : ["idea", "big", "sub", "product"];
+  // Le compte arrive tôt (7ᵉ étape), juste après « As-tu une idée ? », pour ne perdre personne avant.
+  const ideaStep: Step[] = preset ? [] : ["idea"];
+  const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
   const tail: Step[] = ["audience", "market", "supply", "channel", "price", "style"];
-  const plan: Step[] = [...head, ...productSteps, ...(logged ? [] : ["account" as Step]), ...tail];
+  const plan: Step[] = [...head, ...ideaStep, ...(logged ? [] : ["account" as Step]), ...productSteps, ...tail];
   const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
   const qIndex = questions.indexOf(step);
@@ -165,7 +167,8 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
     try { localStorage.setItem(STATE_KEY, JSON.stringify({ t: Date.now(), preset: preset?.text ?? "", history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price })); } catch { /* stockage indisponible */ }
   }, [history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, preset?.text]);
   // Connecté pendant l'étape compte (ou déjà connecté en y arrivant) : on passe à la suite.
-  useEffect(() => { if (step === "account" && logged) setHistory((h) => [...h.slice(0, -1), "audience"]); }, [step, logged]);
+  const afterAccount: Step = preset || hasIdea ? "audience" : "big";
+  useEffect(() => { if (step === "account" && logged) setHistory((h) => [...h.slice(0, -1), afterAccount]); }, [step, logged, afterAccount]);
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
   const chosen = preset?.isLink ? "Produit du lien fourni" : hasIdea ? idea.trim() : product;
 
@@ -210,7 +213,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
     time: <>Combien de <span className="serif-accent">temps</span> peux-tu y consacrer ?</>,
     budget: <>Quel <span className="mark-green">budget</span> pour te lancer ?</>,
     shopify: <>Tu as déjà un compte <span className="serif-accent">Shopify</span> ?</>,
-    account: <>Bien joué ! Crée ton <span className="serif-accent">compte</span> pour garder tes réponses</>,
+    account: <>Crée ton <span className="serif-accent">compte</span> pour garder tes réponses</>,
     market: <>Dans quels <span className="serif-accent">pays</span> veux-tu vendre ?</>,
     supply: <>Comment tes clients vont <span className="mark-green">recevoir</span> le produit ?</>,
     channel: <>Comment vas-tu trouver tes <span className="serif-accent">clients</span> ?</>,
@@ -248,7 +251,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
         {step === "time" && <Grid options={TIMES} value={time} cols={4} onPick={setTime} />}
         {step === "budget" && <Grid options={BUDGETS} value={budget} cols={4} onPick={setBudget} />}
         {step === "shopify" && <Grid options={SHOPIFY} value={shopify} cols={4} onPick={setShopify} />}
-        {step === "account" && <QuizAccount onDone={() => setLogged(true)} />}
+        {step === "account" && <QuizAccount onDone={(ok) => (ok ? setLogged(true) : go(afterAccount))} />}
         {step === "market" && <Grid options={MARKETS} value={market} cols={4} onPick={setMarket} />}
         {step === "supply" && <Grid options={SUPPLY} value={supply} cols={4} onPick={setSupply} />}
         {step === "channel" && <Grid options={CHANNELS} value={channel} onPick={setChannel} />}

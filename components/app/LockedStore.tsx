@@ -62,7 +62,7 @@ function teaserStore(store: Store): { store: Store; assets: Asset[] } {
 }
 
 // Deux blocs qui donnent envie d'acheter, sans répéter la photo : les atouts, puis l'offre (prix, points forts, bouton).
-function ConversionBlocks({ store, onUnlock }: { store: Store; onUnlock?: () => void }) {
+function ConversionBlocks({ store }: { store: Store }) {
   const t = store.teaser!;
   const { primary, accent, background } = store.theme.colors;
   const onAccent = onColor(accent);
@@ -105,7 +105,7 @@ function ConversionBlocks({ store, onUnlock }: { store: Store; onUnlock?: () => 
             <p className="shrink-0 rounded-full px-4 py-1.5 text-xl font-bold" style={{ background: `${accent}22`, color: accent }}>{eur(t.price)}</p>
           </div>
           <ul className="mt-5 grid gap-2.5 sm:grid-cols-3">{bullets.map((b) => <li key={b} className="flex items-start gap-2 text-[14.5px]"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: accent }} />{b}</li>)}</ul>
-          <button type="button" onClick={onUnlock} className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold shadow-lg transition-transform hover:scale-[1.01]" style={{ background: accent, color: onAccent }}><ShoppingBag className="h-5 w-5" /> Ajouter au panier · {eur(t.price)}</button>
+          <button type="button" tabIndex={-1} className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold shadow-lg transition-transform hover:scale-[1.01]" style={{ background: accent, color: onAccent }}><ShoppingBag className="h-5 w-5" /> Ajouter au panier · {eur(t.price)}</button>
           <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-xs opacity-75">
             <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> Livraison offerte</span>
             <span className="flex items-center gap-1.5"><RotateCcw className="h-3.5 w-3.5" /> Retours 30 jours</span>
@@ -158,8 +158,20 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
   const data = teaserStore(store);
   return (
     <div className="overflow-hidden rounded-[13px]">
-      <div className="pointer-events-none select-none"><StorePreview store={data.store} assets={data.assets} animate={false} sections={["hero", "marquee", "features"]} footer={false} /></div>
-      {!loginHref && <ConversionBlocks store={store} onUnlock={onUnlock} />}
+      {/* Net : seulement le haut de la boutique (la belle photo et l'accroche). Tout le reste est flouté. */}
+      <div className="pointer-events-none select-none"><StorePreview store={data.store} assets={data.assets} animate={false} sections={["hero", "marquee"]} footer={false} /></div>
+      <div className="relative">
+        <div aria-hidden className="pointer-events-none select-none blur-[7px]">
+          <StorePreview store={data.store} assets={data.assets} animate={false} sections={["features"]} footer={false} />
+          {!loginHref && <ConversionBlocks store={store} />}
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/15 to-black/35" />
+        <div className="absolute inset-x-0 top-16 grid place-items-center p-6">
+          <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-6 py-3.5 text-[15px] font-semibold text-[#03140d] shadow-[0_12px_36px_-8px_rgb(46_230_166/0.8)]">
+            <Lock className="h-4 w-4" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque toute ta boutique"}
+          </a>
+        </div>
+      </div>
       <LockedSections store={store} loginHref={loginHref} onUnlock={onUnlock} />
     </div>
   );

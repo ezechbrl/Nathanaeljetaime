@@ -7,8 +7,9 @@ import * as api from "@/lib/api/client";
 // Les questions du quiz, dans l'ordre (sans idée de produit), avec la création du compte au milieu.
 const STEPS: [string, string][] = [
   ["level", "1. Niveau en e-commerce"], ["goal", "2. Objectif"], ["time", "3. Temps disponible"], ["budget", "4. Budget de départ"], ["shopify", "5. A-t-il Shopify ?"],
-  ["idea", "6. A-t-il une idée ?"], ["big", "7. Grande catégorie"], ["sub", "8. Petite catégorie"], ["product", "9. Choix du produit"],
+  ["idea", "6. A-t-il une idée ?"],
   ["account", "Création du compte (e-mail)"],
+  ["big", "7. Grande catégorie"], ["sub", "8. Petite catégorie"], ["product", "9. Choix du produit"],
   ["audience", "10. À qui vendre"], ["market", "11. Pays de vente"], ["supply", "12. Livraison (dropshipping, stock…)"], ["channel", "13. Où trouver ses clients"], ["price", "14. Prix de vente"], ["style", "15. Boutique préférée (cœur / croix)"],
 ];
 

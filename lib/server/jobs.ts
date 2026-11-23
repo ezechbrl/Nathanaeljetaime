@@ -7,7 +7,7 @@ import { generatePages, generateStrategy, generateTeaser } from "./ai";
 import { UnreadablePageError, readPublicStore, type ProductPage } from "@/lib/fetch-product-page";
 import { supplierReviews } from "./reviews";
 import { cachedProductPage } from "./link-cache";
-import { editImage, editImageCheap, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
+import { editImage, generateImage, slotOf, storeImage, type AspectRatio, type Slot } from "./images";
 import { connectionFor, installTheme, publish, readStoreContent, uploadSceneFiles, type ShopifyIds } from "./shopify";
 import { themeZipUrl } from "./theme/link";
 import { db, must } from "./supabase";
@@ -252,11 +252,23 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
       const c = darkPalette(t.brand.colors); // mêmes couleurs (sombres) que la boutique affichée
       // L'IA d'images suit mal les codes couleur : on décrit le fond et l'accent avec des mots.
       const prompt = `Wide premium product photograph of ${t.productLook || t.productTitle} (${input.brief.slice(0, 160)}). Composition: the product is on the RIGHT side of the frame, centered around 70% from the left edge, standing firmly on a surface with a clear realistic contact shadow, never floating in the air. The whole frame is filled with objects from its world, placed naturally around it and also on the left side (softly out of focus there, slightly darker, so a headline stays readable): ${t.props || "a few small objects related to how the product is used"}. A second, smaller one of the same product stands further back on the left, softly blurred. Rich but tidy composition, no large empty area. ${toneWords(c.background)}, soft spotlight from above, a subtle ${colorWord(c.accent)} glow behind the product. Sharp focus on the product, true-to-life materials and colors, real camera photograph, not a 3D render, no sparkles, no added text, no logos, no brand names, no watermark, no people.`;
-      // 1152 × 648 : ≈ 1,9 centime (aperçu ≤ 2,7 centimes en tout avec le texte).
-      const img = await generateImage(prompt, "16:9", { width: 1152, height: 648 });
+      // Tout le budget de l'aperçu va sur cette photo du haut : FLUX 1.1 Pro (meilleure qualité), 1152 × 648,
+      // 4 centimes (fal.ai : 0,04 $ par mégapixel, arrondi au mégapixel supérieur).
+      const img = await generateImage(prompt, "16:9", { width: 1152, height: 648 }, "fal-ai/flux-pro/v1.1");
       image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
     } catch (e) {
       console.warn("Photo de l'aperçu non générée :", errorMessage(e));
+    }
+  } else if (image && env.falKey()) {
+    // Lien ou photo du produit : la photo du fournisseur devient une belle photo de haut de page, avec le MÊME
+    // produit (retouche Nano Banana, 3,98 centimes). Si ça échoue, on garde la photo d'origine.
+    try {
+      const c = darkPalette(t.brand.colors);
+      const prompt = `Turn this into a wide premium product photo for the top of an online store. Keep the product exactly identical (same shape, colors, materials, details). Place it on the RIGHT side of the frame, standing firmly on a surface with a realistic contact shadow. Fill the rest of the frame with objects from its world, placed naturally and softly out of focus on the left so a headline stays readable: ${t.props || "a few small objects related to how the product is used"}. ${toneWords(c.background)}, soft spotlight, a subtle ${colorWord(c.accent)} glow behind the product. Real camera photograph, not a 3D render. Remove every text, price, badge, watermark, logo, hand and person.`;
+      const img = await editImage(image, prompt, "16:9");
+      image = (await storeImage("teasers", img.bytes, img.contentType, "packshot")).url;
+    } catch (e) {
+      console.warn("Photo du haut de l'aperçu non retouchée, photo d'origine gardée :", errorMessage(e));
     }
   }
   // 3ᵉ photo, montrée floutée (pour donner envie de voir la suite) : modèle rapide FLUX schnell (≈ 0,3 centime).
@@ -266,18 +278,9 @@ export async function buildTeaser(input: { mode: string; sourceUrl: string | nul
         .then((x) => x.url)
         .catch((e) => { console.warn("3ᵉ photo de l'aperçu non générée :", errorMessage(e)); return null; })
     : Promise.resolve(null);
-  // 2ᵉ photo : le MÊME produit (retouche de la 1ʳᵉ), en situation, dans un vrai décor. ≈ 2,3 centimes.
-  // Aperçu ≈ 5,1 centimes en tout (3 photos + texte), budget fixé à 6 centimes.
-  let image2: string | null = null;
-  if (image && env.falKey()) {
-    try {
-      const scene = `Show this exact same product being used in a real everyday setting that fits it (${t.productLook || t.productTitle}), held or used naturally by a person, natural light, realistic lifestyle photo, moody and contrasted. Keep the product exactly identical: same shape, colors, materials and details. Remove any text, price, badge, watermark or logo. No added text.`;
-      const img = await editImageCheap(image, scene);
-      image2 = (await storeImage("teasers", img.bytes, img.contentType, "life1")).url;
-    } catch (e) {
-      console.warn("2ᵉ photo de l'aperçu non générée :", errorMessage(e));
-    }
-  }
+  // Plus de 2ᵉ photo : tout ce qui suit le haut de page est flouté. Aperçu ≈ 4,6 centimes en tout
+  // (photo du haut 4 c, photo floutée 0,3 c, texte), budget fixé à 5 centimes.
+  const image2: string | null = null;
   const image3 = await third;
   const teaser = { tagline: t.brand.tagline, heroTitle: t.heroTitle, heroSubtitle: t.heroSubtitle, productTitle: t.productTitle, price: t.price, benefits: t.benefits.slice(0, 3), description: t.description, bullets: t.bullets.slice(0, 3), image, image2, image3 };
   return { name: t.brand.name, teaser, theme: styledTheme(t.storeStyle, darkPalette(t.brand.colors)) };
