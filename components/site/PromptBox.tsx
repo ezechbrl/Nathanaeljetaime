@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import * as api from "@/lib/api/client";
 import { cn } from "@/lib/cn";
+import { normalizeProductUrl } from "@/lib/product-url";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
 // Mêmes couleurs que les 2 cartes Shopify de la connexion : « Décrire » = vert de « Connecter mon compte
@@ -205,7 +206,7 @@ const hostOf = (u: string) => { try { return new URL(u.trim()).hostname.replace(
 // Version courte d'un lien pour l'affichage : site + identifiant du produit, sans les paramètres de suivi.
 function shortLink(u: string) {
   try {
-    const url = new URL(u.trim());
+    const url = new URL(normalizeProductUrl(u));
     const id = url.pathname.match(/(\d{6,})/)?.[1];
     const host = url.hostname.replace(/^(www|fr|m)\./, "");
     return id ? `${host} · produit ${id}` : `${host}${url.pathname.length > 1 ? url.pathname.slice(0, 40) : ""}`;

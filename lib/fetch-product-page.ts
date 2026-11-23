@@ -1,4 +1,5 @@
 import { lookup } from "node:dns/promises";
+import { normalizeProductUrl } from "./product-url";
 import { isIP } from "node:net";
 
 const MAX_CHARS = 20_000;
@@ -107,11 +108,18 @@ export type ProductPage = { text: string; images: string[]; title: string; url: 
 // et en tire le titre, une description et les photos du produit, pour nourrir la génération.
 export async function fetchProductPage(rawUrl: string): Promise<ProductPage> {
   let html = "";
+  rawUrl = normalizeProductUrl(rawUrl);
   let url = rawUrl;
   try {
     ({ html, url } = await fetchHtml(rawUrl));
   } catch (e) {
     if (!(e instanceof UnreadablePageError) || /non autorisée|pas une page/.test(e.message)) throw e;
+  }
+  // Lien court (a.aliexpress.com/…) qui arrive sur une page « Bundle Deals » : on repart de la vraie fiche produit.
+  const product = normalizeProductUrl(url);
+  if (product !== url && /\/item\/\d{6,}/.test(product)) {
+    url = product;
+    try { ({ html, url } = await fetchHtml(product)); } catch { html = ""; }
   }
   const blocked = () => BLOCKED.test(html.slice(0, 5000)) || html.length < 3000;
   if (blocked()) {
