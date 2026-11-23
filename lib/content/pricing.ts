@@ -29,15 +29,12 @@ export const PLANS: Plan[] = [
   {
     id: "pro", name: "Starter", badge: "Recommandé · débutants", tagline: "Tu débutes ? Une boutique parfaite, créée par l'IA en 3 minutes, sans rien connaître à Shopify.", monthly: 29, yearly: 249, was: 39,
     features: [
-      "Ta boutique prête à vendre en 3 minutes, à partir d'un simple lien",
-      { text: "Des photos dignes d'une grande marque, créées par l'IA", preview: "photos" },
-      { text: "Des textes qui donnent envie d'acheter, écrits pour ton produit", preview: "texts" },
-      { text: "Les vrais avis clients du produit, importés et traduits", preview: "reviews" },
-      { text: "Des offres par lot qui font grimper ton panier moyen", preview: "offers" },
-      "Change de produit quand tu veux, autant de fois que tu veux",
-      "Modifie tout en parlant à l'IA, comme dans une conversation",
-      "Un design à tes couleurs, publié sur Shopify en 1 clic",
-      "1 boutique Shopify connectée",
+      "Ta boutique prête en 3 minutes, à partir d'un simple lien",
+      { text: "Des photos dignes d'une grande marque", preview: "photos" },
+      { text: "Des textes qui donnent envie d'acheter", preview: "texts" },
+      { text: "Les vrais avis clients, importés et traduits", preview: "reviews" },
+      { text: "Des offres par lot pour vendre plus", preview: "offers" },
+      "Modifie tout en parlant à l'IA",
     ],
     // Ce que le Starter n'a pas : affiché grisé et barré sur sa carte (vraies limites, voir lib/server/quota.ts et budget.ts).
     missing: ["3 boutiques Shopify connectées", "Support prioritaire"],
@@ -47,17 +44,13 @@ export const PLANS: Plan[] = [
   {
     id: "agency", name: "Pro", badge: "Vendeurs déjà lancés", tagline: "Tu connais déjà Shopify ? Va beaucoup plus vite : jusqu'à 3 boutiques et 2× plus d'IA.", monthly: 59, yearly: 499, was: 79,
     features: [
-      "Ta boutique prête à vendre en 3 minutes, à partir d'un simple lien",
-      { text: "3 boutiques Shopify : teste 3 produits en même temps et garde les gagnants", preview: "stores" },
-      { text: "3× plus de photos chaque mois (300 au lieu de 100)", preview: "photos-pro" },
-      "2× plus de crédit IA et 400 messages par mois (au lieu de 150)",
-      { text: "Des textes qui donnent envie d'acheter, écrits pour ton produit", preview: "texts" },
-      { text: "Les vrais avis clients du produit, importés et traduits", preview: "reviews" },
-      { text: "Des offres par lot qui font grimper ton panier moyen", preview: "offers" },
-      "Change de produit quand tu veux, autant de fois que tu veux",
-      "Modifie tout en parlant à l'IA, comme dans une conversation",
-      "Un design à tes couleurs, publié sur Shopify en 1 clic",
-      "Refais tes photos et tes textes quand tu veux (dans la limite de ton crédit)",
+      "Ta boutique prête en 3 minutes, à partir d'un simple lien",
+      { text: "3 boutiques Shopify : teste 3 produits en même temps", preview: "stores" },
+      { text: "3× plus de photos (300 par mois)", preview: "photos-pro" },
+      "2× plus de crédit IA (400 messages par mois)",
+      { text: "Des textes qui donnent envie d'acheter", preview: "texts" },
+      { text: "Les vrais avis clients, importés et traduits", preview: "reviews" },
+      { text: "Des offres par lot pour vendre plus", preview: "offers" },
       "Support prioritaire : on te répond en premier",
     ],
     limits: { stores: "Illimitées", conversations: "400 / mois", images: "300 / mois", shops: "3", ai: "2 € toutes les 5 h, 7 € / semaine" },
@@ -78,16 +71,12 @@ export const BARRED_UNTIL = "2026-12-23T23:00:00Z";
 export const showBarred = () => Date.now() < new Date(BARRED_UNTIL).getTime();
 export const SINGLE_MISSING = ["Boutiques illimitées", "Éditeur IA sans limite de temps"];
 export const SINGLE_FEATURES = [
-  "Ta boutique complète, créée par l'IA à partir de ton aperçu",
-  "Une quinzaine de photos pro : photo de haut de page, packshots, scènes de vie",
-  "Tous les textes de vente : accueil, fiche produit, FAQ, garanties",
-  "Les vrais avis clients de ton produit, importés et traduits (avec un lien fournisseur)",
-  "Les offres par lot (1, 2, 3 produits) déjà prêtes",
-  "Le design à tes couleurs, en thème Shopify à télécharger",
-  "Le fichier produit pour Shopify et le guide de mise en ligne pas à pas",
-  "7 jours pour tout retoucher avec l'éditeur IA et refaire tes photos",
-  "Tout est à toi pour toujours, même sans abonnement",
-  "Aucun abonnement, rien à résilier",
+  "Ta boutique complète, créée par l'IA",
+  "Une quinzaine de photos pro",
+  "Tous les textes de vente et les vrais avis",
+  "Le thème Shopify à tes couleurs, à télécharger",
+  "7 jours pour tout retoucher avec l'IA",
+  "À toi pour toujours, sans abonnement",
 ];
 
 // Inscrits de la liste d'attente : un prix encore plus bas que l'offre de lancement, à vie, dans le même délai de 24 h.
