@@ -49,7 +49,7 @@ function PhotoDemo() {
           <span className="absolute top-1/2 grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white text-[13px] font-bold text-[#04110d] shadow-lg">⇆</span>
         </div>
         <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white">Fond blanc</span>
-        <span className="absolute right-3 top-3 rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] font-semibold text-[#03140d] glow-hover">En situation</span>
+        <span className="absolute right-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-[#03140d]">En situation</span>
         <input type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} aria-label="Comparer les deux photos" className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0" />
       </div>
       <p className="mt-3 text-center text-[13px] text-fg-muted">Fais glisser : deux photos du même casque, créées par l'IA de Vigenia.</p>
@@ -80,7 +80,7 @@ function PublishDemo() {
       {done ? (
         <p className="mt-5 text-center text-[15px] font-semibold text-white/80">🎉 En ligne sur norde.myshopify.com</p>
       ) : (
-        <button type="button" onClick={() => setStep(0)} disabled={step >= 0} className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-white glow-hover px-6 py-3 text-[15px] font-semibold text-[#03140d] transition-transform hover:-translate-y-px disabled:opacity-70">
+        <button type="button" onClick={() => setStep(0)} disabled={step >= 0} className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-[#3dff9a] glow-hover px-6 py-3 text-[15px] font-semibold text-[#03140d] transition-transform hover:-translate-y-px disabled:opacity-70">
           <Rocket className="h-4 w-4" /> {step >= 0 ? "Publication…" : "Publier sur Shopify"}
         </button>
       )}

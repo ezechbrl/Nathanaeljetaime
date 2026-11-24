@@ -126,7 +126,7 @@ export default function InstallPage() {
               ) : active ? (
                 <div className="mt-4 sm:pl-12">
                   {paid && live ? (
-                    <button type="button" onClick={() => sendTo(s.file, s.open)} className="group flex w-full items-center justify-center gap-3 rounded-[16px] bg-white glow-hover px-5 py-4 text-base font-semibold text-[#03140d] transition-transform hover:-translate-y-0.5 sm:text-lg">
+                    <button type="button" onClick={() => sendTo(s.file, s.open)} className="group flex w-full items-center justify-center gap-3 rounded-[16px] bg-[#3dff9a] glow-hover px-5 py-4 text-base font-semibold text-[#03140d] transition-transform hover:-translate-y-0.5 sm:text-lg">
                       <ShopifyBag className="h-7 w-7" /> {s.button} <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </button>
                   ) : (

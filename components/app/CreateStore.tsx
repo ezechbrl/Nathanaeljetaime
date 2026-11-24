@@ -250,7 +250,7 @@ export function CreateStore() {
                 </>
               )}
             </div>
-            <button type="submit" disabled={loading} className="inline-flex h-9 items-center gap-2 rounded-ctl border border-white bg-white px-3.5 text-sm font-medium text-black glow-hover disabled:opacity-60">
+            <button type="submit" disabled={loading} className="inline-flex h-9 items-center gap-2 rounded-ctl border border-[#3dff9a] bg-[#3dff9a] px-3.5 text-sm font-medium text-black glow-hover disabled:opacity-60">
               {loading ? <Spinner /> : <Sparkles className="h-4 w-4" />} Générer
             </button>
           </div>

@@ -143,7 +143,7 @@ function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHre
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/45" />
       <div className="absolute inset-x-0 top-24 grid place-items-center p-6">
-        <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-white glow-hover px-6 py-3.5 text-[15px] font-semibold text-[#03140d]">
+        <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[#3dff9a] glow-hover px-6 py-3.5 text-[15px] font-semibold text-[#03140d]">
           <Lock className="h-4 w-4" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque la suite de ta boutique"}
         </a>
         {!loginHref && <p className="mt-3 rounded-full bg-black/55 px-4 py-1.5 text-center text-xs text-white backdrop-blur">+ une dizaine de photos, comment ça marche, FAQ, mise en ligne Shopify</p>}
@@ -168,7 +168,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/15 to-black/35" />
         <div className="absolute inset-x-0 top-16 grid place-items-center p-6">
-          <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-white glow-hover px-6 py-3.5 text-[15px] font-semibold text-[#03140d]">
+          <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[#3dff9a] glow-hover px-6 py-3.5 text-[15px] font-semibold text-[#03140d]">
             <Lock className="h-4 w-4" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque toute ta boutique"}
           </a>
         </div>
@@ -232,7 +232,7 @@ function HesitationAsk({ storeId }: { storeId: string }) {
             ))}
           </div>
           {reason && <input value={details} onChange={(e) => setDetails(e.target.value)} maxLength={500} placeholder="Un mot de plus ? (facultatif)" className="field mt-2 h-10 text-sm" />}
-          <button type="button" disabled={!reason} onClick={send} className="mt-3 h-10 w-full rounded-full bg-white glow-hover text-sm font-semibold text-[#03140d] disabled:opacity-40">Envoyer</button>
+          <button type="button" disabled={!reason} onClick={send} className="mt-3 h-10 w-full rounded-full bg-[#3dff9a] glow-hover text-sm font-semibold text-[#03140d] disabled:opacity-40">Envoyer</button>
         </>
       )}
     </div>
@@ -281,7 +281,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
           </h1>
           <p className="mx-auto mt-2 max-w-xl text-fg-muted">Ton nom, tes couleurs, ton accroche et tes atouts sont prêts et gardés dans ton compte. Quand tu veux, débloque-la : textes, photos et design se créent en quelques minutes.</p>
           {!paid && (
-            <a href="#debloquer" onClick={openPay} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover px-7 text-[15px] font-semibold text-[#03140d] [animation:cta-glow_2.4s_ease-in-out_infinite]">
+            <a href="#debloquer" onClick={openPay} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#3dff9a] glow-hover px-7 text-[15px] font-semibold text-[#03140d] [animation:cta-glow_2.4s_ease-in-out_infinite]">
               Débloquer ma boutique <ArrowDown className="h-4 w-4" />
             </a>
           )}
@@ -293,12 +293,12 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
           <div className="flex flex-col gap-2.5">
             {unlocksFor(store.mode === "link").map(({ icon: I, title, text }) => (
               <div key={title} className="flex items-center gap-3 rounded-[16px] border border-white/10 bg-white/[0.04] p-3.5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-white glow-hover text-[#03140d]"><I className="h-5 w-5" /></span>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[#3dff9a] glow-hover text-[#03140d]"><I className="h-5 w-5" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold">{title}</span><span className="block text-[13px] text-fg-muted">{text}</span></span>
                 <Lock className="h-4 w-4 shrink-0 text-fg-faint" />
               </div>
             ))}
-            <a href="#debloquer" onClick={openPay} className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d]">
+            <a href="#debloquer" onClick={openPay} className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#3dff9a] glow-hover text-[15px] font-semibold text-[#03140d]">
               {busy ? <><Spinner /> Déblocage…</> : <>Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></>}
             </a>
             <p className="text-center text-xs text-fg-muted">Prête en 3 minutes · sans engagement · annulable en un clic</p>
@@ -313,7 +313,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#3dff9a]">Exemple de boutique complète</p>
             <p className="mt-2 text-xl font-semibold leading-snug">Voilà ce que devient ton aperçu une fois débloqué.</p>
             <p className="mt-2 text-sm text-fg-muted">Ici, Maison Ouate : photos, textes, page produit, panier et FAQ, prêts à mettre en ligne sur Shopify. La tienne garde ton nom, tes couleurs et ton produit.</p>
-            <a href="#debloquer" onClick={openPay} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#03140d] glow-hover">Débloquer la mienne <ArrowDown className="h-4 w-4" /></a>
+            <a href="#debloquer" onClick={openPay} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#3dff9a] px-5 text-sm font-semibold text-[#03140d] glow-hover">Débloquer la mienne <ArrowDown className="h-4 w-4" /></a>
           </div>
         </div>
 
@@ -333,7 +333,7 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
         {/* Téléphone : le bouton reste en bas de l'écran tant que l'offre n'est pas ouverte. */}
         {!paid && !showPay && (
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#0d0d0d]/95 p-3 pb-[max(env(safe-area-inset-bottom),12px)] backdrop-blur lg:hidden">
-            <a href="#debloquer" onClick={openPay} className="flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d]">Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></a>
+            <a href="#debloquer" onClick={openPay} className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#3dff9a] glow-hover text-[15px] font-semibold text-[#03140d]">Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></a>
           </div>
         )}
 

@@ -166,7 +166,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             >
               <ImagePlus className="h-4 w-4" /> {photos.length ? `Photo ${photos.length}/${MAX_PHOTOS}` : "Photo du produit"}
             </button>
-            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-full border border-white/15 bg-white px-5 text-[15px] font-bold text-[#03140d] transition-all [animation:cta-glow_2.4s_ease-in-out_infinite] hover:-translate-y-px hover:brightness-110 glow-hover">
+            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-full border border-white/15 bg-[#3dff9a] px-5 text-[15px] font-bold text-[#03140d] transition-all [animation:cta-glow_2.4s_ease-in-out_infinite] hover:-translate-y-px hover:brightness-110 glow-hover">
               <Sparkles className="h-4 w-4" /> Générer
             </button>
           </div>

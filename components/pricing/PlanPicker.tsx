@@ -77,7 +77,7 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
                 on ? "border-white/15 bg-white/[0.06]" : "border-white/10 bg-black/25 hover:border-white/20")}>
               {r.badge && (
                 <span className={cn("absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-[11.5px] font-bold uppercase tracking-[0.08em]",
-                  r.badge.tone === "green" ? "bg-white glow-hover text-[#03140d]" : "border border-[#fde047]/40 bg-[#1f1d0c] text-[#fef08a]")}>
+                  r.badge.tone === "green" ? "bg-[#3dff9a] glow-hover text-[#03140d]" : "border border-[#fde047]/40 bg-[#1f1d0c] text-[#fef08a]")}>
                   {r.badge.tone === "green" && <Sparkles className="h-3.5 w-3.5" />}{r.badge.text}
                 </span>
               )}
@@ -114,4 +114,4 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
 }
 
 // Bouton « Continuer » de la barre du bas.
-export const pickerButtonClass = "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d] transition-all hover:-translate-y-px disabled:opacity-60";
+export const pickerButtonClass = "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#3dff9a] glow-hover text-[15px] font-semibold text-[#03140d] transition-all hover:-translate-y-px disabled:opacity-60";

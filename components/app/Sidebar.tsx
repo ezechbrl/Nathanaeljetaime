@@ -102,7 +102,7 @@ function SidebarBody() {
             <span aria-hidden className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/[0.06] blur-2xl" />
             <p className="relative flex items-center gap-1.5 font-serif text-[17px] italic text-white"><Sparkles className="h-4 w-4 text-[#3dff9a]" /> Débloque ta boutique complète</p>
             <p className="relative mt-1 text-[13px] leading-relaxed text-white/80">Textes, photos, éditeur IA et mise en ligne sur Shopify. Sans engagement.</p>
-            <Link href="/app/abonnement" className="relative mt-3 flex h-10 items-center justify-center rounded-full bg-white glow-hover text-[13.5px] font-semibold text-[#03140d] transition hover:brightness-110">Choisir mon offre</Link>
+            <Link href="/app/abonnement" className="relative mt-3 flex h-10 items-center justify-center rounded-full bg-[#3dff9a] glow-hover text-[13.5px] font-semibold text-[#03140d] transition hover:brightness-110">Choisir mon offre</Link>
           </div>
         ) : (
           <Link href="/app/abonnement" className="block rounded-card border border-white/[0.08] bg-black/20 p-3 transition-colors hover:border-accent/30">

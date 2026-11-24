@@ -29,7 +29,7 @@ export function InstallAnimation() {
       <div className="relative grid h-[170px] place-items-center">
         {/* 1. bouton Vigenia */}
         <Scene on={f === 0}>
-          <span className="relative inline-flex items-center gap-2 rounded-[12px] bg-white glow-hover px-5 py-3 text-sm font-semibold text-[#03140d] [animation:press_2.5s_ease-in-out_infinite]">
+          <span className="relative inline-flex items-center gap-2 rounded-[12px] bg-[#3dff9a] glow-hover px-5 py-3 text-sm font-semibold text-[#03140d] [animation:press_2.5s_ease-in-out_infinite]">
             Envoyer dans Shopify
             <MousePointer2 className="absolute -bottom-4 right-2 h-5 w-5 fill-white text-black [animation:cursor_2.5s_ease-in-out_infinite]" />
           </span>

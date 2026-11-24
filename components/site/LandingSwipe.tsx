@@ -24,7 +24,7 @@ export function LandingSwipe() {
             <p className="text-lg font-semibold">{done ? <>C'est noté : tu aimes le style <span className="serif-accent">{STYLE_NAME[done] ?? done}</span>.</> : "Aucune ne t'a plu ? Pas de souci, on s'adapte à ton produit."}</p>
             <p className="mt-2 text-sm text-fg-muted">Colle le lien de ton produit tout en haut, ou laisse-toi guider par le quiz.</p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Link href="/quiz" className="rounded-full bg-white glow-hover px-5 py-3 text-sm font-semibold text-[#03140d]">Créer ma boutique</Link>
+              <Link href="/quiz" className="rounded-full bg-[#3dff9a] glow-hover px-5 py-3 text-sm font-semibold text-[#03140d]">Créer ma boutique</Link>
               <Link href="/quiz" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Faire le quiz</Link>
               <button type="button" onClick={() => { setDone(undefined); setRound((r) => r + 1); }} className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm text-fg-muted hover:text-fg"><RotateCcw className="h-4 w-4" /> Revoir</button>
             </div>

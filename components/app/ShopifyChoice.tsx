@@ -77,12 +77,12 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
                 <span className="pr-4 text-sm text-fg-faint">.myshopify.com</span>
               </div>
               {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
-              <button type="submit" disabled={loading} className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d] disabled:opacity-60">
+              <button type="submit" disabled={loading} className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#3dff9a] glow-hover text-[15px] font-semibold text-[#03140d] disabled:opacity-60">
                 {loading ? <Spinner /> : <>Connecter <ArrowRight className="h-4 w-4" /></>}
               </button>
             </form>
           ) : (
-            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d] transition-transform hover:-translate-y-px">
+            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#3dff9a] glow-hover text-[15px] font-semibold text-[#03140d] transition-transform hover:-translate-y-px">
               Connecter Vigenia à Shopify <ArrowRight className="h-4 w-4" />
             </button>
           )}

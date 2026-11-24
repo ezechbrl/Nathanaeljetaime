@@ -263,7 +263,7 @@ export default function EditorPage() {
                   placeholder="Demande une modification à l'IA… (ex. « mets un ton plus premium »)"
                   className="max-h-[216px] min-h-[60px] flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-6 placeholder:text-fg-faint focus:outline-none"
                 />
-                <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white glow-hover text-[#03140d] transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"><ArrowUp className="h-5 w-5" /></button>
+                <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#3dff9a] glow-hover text-[#03140d] transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"><ArrowUp className="h-5 w-5" /></button>
               </form></div>
               <p className="mt-2 hidden text-center text-[12px] text-fg-faint sm:block">Entrée pour envoyer · Maj+Entrée pour aller à la ligne</p>
             </div>

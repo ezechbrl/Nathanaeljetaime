@@ -179,7 +179,7 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
           </div>
         )}
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href={`/app/boutiques/${store.id}/apercu`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-white bg-white px-5 text-[15px] font-medium text-black glow-hover">
+          <Link href={`/app/boutiques/${store.id}/apercu`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-[#3dff9a] bg-[#3dff9a] px-5 text-[15px] font-medium text-black glow-hover">
             Voir ma boutique <ExternalLink className="h-4 w-4" />
           </Link>
           {!manual && !live && adminThemes ? (
