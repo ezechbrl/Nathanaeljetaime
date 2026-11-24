@@ -67,7 +67,7 @@ export function NotificationPhone({ className }: { className?: string }) {
           <div className="mt-5 space-y-2 px-2.5">
             {NOTES.slice(0, shown).reverse().slice(0, 4).map((n, i) => (
               <div key={n.b} className="flex items-center gap-2.5 rounded-[17px] bg-white/[0.17] p-2.5 text-left text-white backdrop-blur-xl [animation:rise_.4s_cubic-bezier(.2,.8,.2,1)_both]" style={{ opacity: 1 - i * 0.14 }}>
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-white"><ShopifyBag className="h-6 w-6" /></span>
+                <span className="grid h-9 w-9 shrink-0 place-items-center"><ShopifyBag className="h-8 w-8" /></span>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center justify-between text-[11px]"><span className="font-semibold uppercase tracking-wide opacity-90">Shopify</span><span className="opacity-60">{ago(i)}</span></span>
                   <span className="block truncate text-[12.5px] font-semibold">{n.t}</span>
