@@ -24,8 +24,8 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6 lg:h-[72px] lg:px-10">
         <Logo className="lg:gap-3 lg:text-[22px] lg:font-semibold [&_svg]:lg:h-9 [&_svg]:lg:w-9" />
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <ButtonLink href="/connexion" variant="ghost" size="sm">Connexion</ButtonLink>
-          <ButtonLink href={isWaitlist ? "/inscription" : "/quiz"} size="sm">{CTA.main}</ButtonLink>
+          <ButtonLink href="/connexion" variant="ghost" size="md" className="!h-10 !px-2 !text-[15px] sm:!px-4 lg:!h-11 lg:!px-5 lg:!text-base">Connexion</ButtonLink>
+          <ButtonLink href={isWaitlist ? "/inscription" : "/quiz"} size="md" className="!h-10 !px-3 !text-[14px] font-semibold sm:!px-4 sm:!text-[15px] lg:!h-11 lg:!px-6 lg:!text-base">{CTA.main}</ButtonLink>
         </div>
       </div>
     </header>

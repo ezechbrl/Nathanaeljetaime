@@ -13,6 +13,10 @@ const LIGHTS = [
   { top: "67%", left: "62%", size: "46rem", c: WHITE, a: 0.12 },
   { top: "80%", left: "10%", size: "36rem", c: WHITE, a: 0.13 },
   { top: "93%", left: "86%", size: "34rem", c: GREEN, a: 0.17 },
+  { top: "8%", left: "8%", size: "30rem", c: GREEN, a: 0.14 },
+  { top: "33%", left: "55%", size: "36rem", c: GREEN, a: 0.09 },
+  { top: "73%", left: "92%", size: "28rem", c: GREEN, a: 0.15 },
+  { top: "86%", left: "45%", size: "34rem", c: GREEN, a: 0.1 },
 ];
 
 // Petites étoiles (4 branches) qui scintillent, blanches ou vertes.
@@ -38,7 +42,7 @@ const Star = ({ size, green }: { size: number; green: boolean }) => (
 
 export function PageBackdrop() {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[linear-gradient(180deg,#0f1513_0%,#111a17_40%,#0e1613_100%)]">
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[linear-gradient(180deg,#181b1a_0%,#1c211f_40%,#171b19_100%)]">
       {/* Fines lignes verticales très discrètes. */}
       <div className="absolute inset-0 opacity-50 [background:repeating-linear-gradient(90deg,transparent_0_119px,rgb(255_255_255/0.035)_119px_120px)]" />
 
