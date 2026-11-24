@@ -8,6 +8,7 @@ import { Banknote, BadgeCheck, BookOpen, Glasses, HandCoins, Languages, Map as M
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { normalizeProductUrl } from "@/lib/product-url";
 import * as api from "@/lib/api/client";
 import { QuizAccount } from "./QuizAccount";
 import { BIG_NICHES, NICHES } from "@/lib/niches";
@@ -102,11 +103,11 @@ const LEVEL_TEXT: Record<string, string> = {
   createur: "Le vendeur crée ses propres produits : mettre en avant le savoir-faire et l'histoire.",
 };
 
-type Step = "level" | "goal" | "time" | "budget" | "shopify" | "idea" | "big" | "sub" | "product" | "account" | "audience" | "market" | "supply" | "channel" | "price" | "style";
+type Step = "level" | "goal" | "income" | "time" | "budget" | "shopify" | "idea" | "big" | "sub" | "product" | "account" | "audience" | "market" | "supply" | "channel" | "price" | "style";
 const STATE_KEY = "vg-quiz-state";
 
 // `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
-export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean } }) {
+export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string, draft?: QuizDraft) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean } }) {
   const [history, setHistory] = useState<Step[]>(["level"]);
   const step = history[history.length - 1];
   const [level, setLevel] = useState<string | null>(null);
@@ -124,6 +125,9 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   const [market, setMarket] = useState<string | null>(null);
   const [supply, setSupply] = useState<string | null>(null);
   const [channel, setChannel] = useState<string | null>(null);
+  // Objectif de revenu (curseur) et lien du fournisseur trouvé pendant le quiz (facultatif).
+  const [income, setIncome] = useState(2000);
+  const [supplierUrl, setSupplierUrl] = useState("");
   // Compte : déjà connecté (pas d'étape compte) ou pas. null tant qu'on ne sait pas.
   const [logged, setLogged] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
@@ -133,7 +137,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
 
   // 15 questions sans idée de produit (12 avec son idée, 11 avec un lien ou une description de l'accueil).
   // Au milieu, une fois le produit choisi : création du compte (sautée si déjà connecté).
-  const head: Step[] = ["level", "goal", "time", "budget", "shopify"];
+  const head: Step[] = ["level", "goal", "income", "time", "budget", "shopify"];
   // Le compte arrive tôt (7ᵉ étape), juste après « As-tu une idée ? », pour ne perdre personne avant.
   const ideaStep: Step[] = preset ? [] : ["idea"];
   const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
@@ -156,7 +160,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
       if (st && Date.now() - st.t < 3 * 3600_000 && (st.preset ?? "") === (preset?.text ?? "") && Array.isArray(st.history) && st.history.length > 1) {
         setLevel(st.level); setGoal(st.goal); setTime(st.time); setBudget(st.budget); setShopify(st.shopify);
         setHasIdea(st.hasIdea); setIdea(st.idea ?? ""); setBig(st.big); setNiche(st.niche); setProduct(st.product);
-        setAudience(st.audience); setMarket(st.market); setSupply(st.supply); setChannel(st.channel); setPrice(st.price);
+        if (typeof st.income === "number") setIncome(st.income); if (typeof st.supplierUrl === "string") setSupplierUrl(st.supplierUrl); setAudience(st.audience); setMarket(st.market); setSupply(st.supply); setChannel(st.channel); setPrice(st.price);
         setHistory(st.history);
       }
     } catch { /* stockage indisponible */ }
@@ -164,12 +168,14 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!restored.current) return;
-    try { localStorage.setItem(STATE_KEY, JSON.stringify({ t: Date.now(), preset: preset?.text ?? "", history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price })); } catch { /* stockage indisponible */ }
-  }, [history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, preset?.text]);
+    try { localStorage.setItem(STATE_KEY, JSON.stringify({ t: Date.now(), preset: preset?.text ?? "", history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, income, supplierUrl })); } catch { /* stockage indisponible */ }
+  }, [history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, income, supplierUrl, preset?.text]);
   // Connecté pendant l'étape compte (ou déjà connecté en y arrivant) : on passe à la suite.
   const afterAccount: Step = preset || hasIdea ? "audience" : "big";
   useEffect(() => { if (step === "account" && logged) setHistory((h) => [...h.slice(0, -1), afterAccount]); }, [step, logged, afterAccount]);
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
+  const productName = (hasIdea ? idea.trim() : n?.products.find((p) => p[1] === product)?.[0] ?? "").slice(0, 60);
+  const supplierOk = /^https?:\/\/\S+\.\S+/.test(supplierUrl.trim());
   const chosen = preset?.isLink ? "Produit du lien fourni" : hasIdea ? idea.trim() : product;
 
   // Suivi anonyme (Ventes) : jusqu'à quelle question le visiteur va, et s'il finit le quiz.
@@ -192,13 +198,14 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
 
   async function finish(style: string | null) {
     if (!chosen || !audience) return;
-    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, price ? PRICE_TEXT[price] : "", market ? MARKET_TEXT[market] : "", supply ? SUPPLY_TEXT[supply] : "", channel ? CHANNEL_TEXT[channel] : "", level ? LEVEL_TEXT[level] : "", shopify ? SHOPIFY_TEXT[shopify] : "", budget ? BUDGET_TEXT[budget] : "", style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
+    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, price ? PRICE_TEXT[price] : "", market ? MARKET_TEXT[market] : "", supply ? SUPPLY_TEXT[supply] : "", channel ? CHANNEL_TEXT[channel] : "", level ? LEVEL_TEXT[level] : "", shopify ? SHOPIFY_TEXT[shopify] : "", budget ? BUDGET_TEXT[budget] : "", `Objectif du vendeur : environ ${income.toLocaleString("fr-FR")} € par mois.`, style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
     setBusy(true);
     setError("");
     track("fin", plan.length, true);
     try {
       try { localStorage.removeItem(STATE_KEY); } catch { /* stockage indisponible */ }
-      await onFinish(brief);
+      const link = supplierOk ? normalizeProductUrl(supplierUrl.trim()) : "";
+      await onFinish(brief, link ? { brief, mode: "link", url: link } : undefined);
     } catch (e) {
       setBusy(false);
       setError((e as Error).message || "Une erreur est survenue. Réessaie.");
@@ -207,7 +214,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
 
   // Question suivante pour chaque étape, une fois la réponse choisie.
   const ready: Record<Exclude<Step, "style" | "account">, boolean> = {
-    level: !!level, goal: !!goal, time: !!time, budget: !!budget, shopify: !!shopify,
+    level: !!level, goal: !!goal, income: true, time: !!time, budget: !!budget, shopify: !!shopify,
     idea: hasIdea === false || (hasIdea === true && idea.trim().length >= 3),
     big: !!big, sub: !!niche, product: !!product,
     audience: !!audience, market: !!market, supply: !!supply, channel: !!channel, price: !!price,
@@ -216,6 +223,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   const titles: Record<Step, React.ReactNode> = {
     level: <>Où en es-tu en <span className="serif-accent">e-commerce</span> ou en <span className="serif-accent">dropshipping</span> ?</>,
     goal: <>Quel est ton <span className="mark-green">objectif</span> ?</>,
+    income: <>Combien tu veux <span className="serif-accent">gagner</span> par mois ?</>,
     time: <>Combien de <span className="serif-accent">temps</span> peux-tu y consacrer ?</>,
     budget: <>Quel <span className="mark-green">budget</span> pour te lancer ?</>,
     shopify: <>Tu as déjà un compte <span className="serif-accent">Shopify</span> ?</>,
@@ -254,12 +262,20 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
       <div className="mt-8 [animation:fade-in_.35s_ease-out_both]" key={`${step}-body`}>
         {step === "level" && <Grid options={LEVELS} value={level} onPick={setLevel} />}
         {step === "goal" && <Grid options={GOALS} value={goal} onPick={setGoal} />}
+        {step === "income" && <IncomeSlider value={income} onChange={setIncome} />}
         {step === "time" && <Grid options={TIMES} value={time} cols={4} onPick={setTime} />}
         {step === "budget" && <Grid options={BUDGETS} value={budget} cols={4} onPick={setBudget} />}
         {step === "shopify" && <Grid options={SHOPIFY} value={shopify} cols={4} onPick={setShopify} />}
         {step === "account" && <QuizAccount onDone={(ok) => (ok ? setLogged(true) : go(afterAccount))} />}
         {step === "market" && <Grid options={MARKETS} value={market} cols={4} onPick={setMarket} />}
-        {step === "supply" && <Grid options={SUPPLY} value={supply} cols={4} onPick={setSupply} />}
+        {step === "supply" && (
+          <div className="space-y-4">
+            <Grid options={SUPPLY} value={supply} cols={4} onPick={setSupply} />
+            {(supply === "drop" || supply === "brand") && !preset?.isLink && (
+              <SupplierFinder keyword={productName} brand={supply === "brand"} url={supplierUrl} onUrl={setSupplierUrl} ok={supplierOk} />
+            )}
+          </div>
+        )}
         {step === "channel" && <Grid options={CHANNELS} value={channel} onPick={setChannel} />}
         {step === "idea" && (
           <div className="space-y-3">
@@ -312,6 +328,47 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
       {/* On choisit (la carte s'éclaire en vert), puis « Continuer » : rien ne passe tout seul. */}
       {step !== "style" && step !== "account" && ready[step] && <NextButton onClick={goNext} />}
       {busy && <p className="mt-8 flex items-center justify-center gap-3 text-fg-muted"><Spinner /> Ta boutique se prépare…</p>}
+    </div>
+  );
+}
+
+// Objectif de revenu : un curseur de 500 € à 20 000 € par mois, et le nombre de ventes que ça représente.
+// Calcul indicatif (bénéfice moyen supposé par vente), jamais présenté comme une promesse.
+const PROFIT_PER_SALE = 15;
+function IncomeSlider({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const sales = Math.ceil(value / PROFIT_PER_SALE);
+  const perDay = Math.max(1, Math.round(sales / 30));
+  return (
+    <div className="mx-auto max-w-[560px] rounded-[22px] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+      <p className="text-[clamp(2.8rem,2rem+3vw,4rem)] font-semibold leading-none tracking-[-0.04em] tabular-nums">{value.toLocaleString("fr-FR")} €</p>
+      <p className="mt-1 text-fg-muted">par mois</p>
+      <input type="range" min={500} max={20000} step={500} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label="Revenu visé par mois"
+        className="mt-7 h-2 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#3dff9a] [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#3dff9a] [&::-webkit-slider-thumb]:shadow-[0_0_18px_rgb(61_255_154/0.7)] [&::-moz-range-thumb]:h-7 [&::-moz-range-thumb]:w-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[#3dff9a]" />
+      <div className="mt-2 flex justify-between text-sm text-fg-faint"><span>500 €</span><span>20 000 €</span></div>
+      <div className="my-6 h-px bg-white/10" />
+      <p className="text-[17px] leading-snug">Avec environ {PROFIT_PER_SALE} € de bénéfice par vente, il te faut <span className="font-semibold text-[#3dff9a]">{sales.toLocaleString("fr-FR")} ventes</span> par mois, soit à peu près <span className="font-semibold text-white">{perDay} par jour</span>.</p>
+      <p className="mt-2 text-xs text-fg-faint">C'est ton objectif, pas une promesse : tout dépend de ton produit, de ton prix et de ta pub.</p>
+    </div>
+  );
+}
+
+// Trouver un fournisseur pendant le quiz : recherche du produit chez les fournisseurs, puis le lien collé
+// relie la boutique à ce produit (photos, avis et prix importés depuis ce lien).
+function SupplierFinder({ keyword, brand, url, onUrl, ok }: { keyword: string; brand: boolean; url: string; onUrl: (v: string) => void; ok: boolean }) {
+  const q = encodeURIComponent(keyword || "produit tendance");
+  const links = brand
+    ? [{ name: "Alibaba (fabricants)", href: `https://www.alibaba.com/trade/search?SearchText=${q}` }, { name: "AliExpress", href: `https://www.aliexpress.com/wholesale?SearchText=${q}` }]
+    : [{ name: "AliExpress", href: `https://www.aliexpress.com/wholesale?SearchText=${q}` }, { name: "Alibaba", href: `https://www.alibaba.com/trade/search?SearchText=${q}` }];
+  return (
+    <div className="rounded-[20px] border border-white/10 bg-white/[0.03] p-5 [animation:fade-in_.3s_ease-out_both]">
+      <p className="flex items-center gap-2 text-[16px] font-semibold"><Search className="h-4 w-4 text-[#3dff9a]" /> {brand ? "Trouve un fabricant pour ta marque" : "Trouve ton fournisseur"}</p>
+      <p className="mt-1 text-sm text-fg-muted">{keyword ? <>On cherche « {keyword} » pour toi. </> : null}Ouvre une recherche, choisis un produit bien noté, puis colle son lien ici : ta boutique sera reliée à ce produit (photos, avis et prix).</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {links.map((l) => <a key={l.name} href={l.href} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/20 px-4 text-sm font-medium hover:border-[#3dff9a] hover:text-[#3dff9a]">Chercher sur {l.name} <ArrowRight className="h-3.5 w-3.5 -rotate-45" /></a>)}
+      </div>
+      <label htmlFor="quiz-supplier" className="mt-4 block text-sm font-semibold">Lien du produit chez ton fournisseur <span className="font-normal text-fg-faint">(facultatif)</span></label>
+      <input id="quiz-supplier" type="url" inputMode="url" value={url} onChange={(e) => onUrl(e.target.value)} placeholder="https://fr.aliexpress.com/item/…" className="field mt-2" />
+      {ok && <p className="mt-2 flex items-center gap-1.5 text-sm text-[#3dff9a]"><Check className="h-4 w-4" /> Fournisseur relié : ta boutique partira de ce produit.</p>}
     </div>
   );
 }

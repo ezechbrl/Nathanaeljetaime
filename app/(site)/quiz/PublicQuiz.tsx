@@ -15,8 +15,10 @@ export function PublicQuiz() {
   const isLink = /^https?:\/\//.test(url);
   const preset = isLink ? { text: url, isLink: true } : brief.length >= 3 ? { text: brief, isLink: false } : undefined;
   return (
-    <Quiz preset={preset} skipHref={preset ? undefined : "/#creer"} onFinish={async (quizBrief) => {
-      saveQuizBrief(quizBrief, isLink ? { mode: "link", url } : {});
+    <Quiz preset={preset} skipHref={preset ? undefined : "/#creer"} onFinish={async (quizBrief, draft) => {
+      // Lien du fournisseur trouvé dans le quiz, sinon le lien donné sur l'accueil.
+      const link = draft?.mode === "link" && draft.url ? draft.url : isLink ? url : "";
+      saveQuizBrief(quizBrief, link ? { mode: "link", url: link } : {});
       const logged = await api.getMe().then(() => true, () => false);
       router.push(logged ? "/app/quiz?finish=1" : `/inscription?${new URLSearchParams({ next: "/app/quiz?finish=1" })}`);
     }} />
