@@ -105,7 +105,7 @@ export function UsagePercent({ usage }: { usage: Usage }) {
               <span className={cn("tabular-nums", pct > 85 ? "text-warn" : "text-accent")}>{pct} %</span>
             </div>
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
-              <div className={cn("h-full rounded-full transition-[width] duration-500", pct > 85 ? "bg-warn" : "bg-[linear-gradient(90deg,#10b07f,#6ee7b7)]")} style={{ width: `${Math.max(pct, 2)}%` }} />
+              <div className={cn("h-full rounded-full transition-[width] duration-500", pct > 85 ? "bg-warn" : "bg-[#3dff9a]")} style={{ width: `${Math.max(pct, 2)}%` }} />
             </div>
           </div>
         );

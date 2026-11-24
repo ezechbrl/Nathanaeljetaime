@@ -20,7 +20,7 @@ export function BuyerReviews() {
       <div className="group mt-12 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
         <div className="flex w-max gap-4 [animation:marquee_60s_linear_infinite] group-hover:[animation-play-state:paused] motion-reduce:[animation:none]">
           {row.map((r, i) => (
-            <figure key={i} aria-hidden={i >= BUYER_REVIEWS.length} className="w-[300px] shrink-0 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgb(8_40_31/0.92),rgb(3_16_12/0.96))] p-5 text-left sm:w-[340px]">
+            <figure key={i} aria-hidden={i >= BUYER_REVIEWS.length} className="w-[300px] shrink-0 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgb(20_20_20/0.92),rgb(3_16_12/0.96))] p-5 text-left sm:w-[340px]">
               <div className="flex items-center justify-between">
                 <span className="flex gap-0.5">{[0, 1, 2, 3, 4].map((k) => <Star key={k} className="h-4 w-4 fill-[#f5b301] text-[#f5b301]" />)}</span>
                 <span className="text-lg" title={r.country}>{flag(r.country)}</span>

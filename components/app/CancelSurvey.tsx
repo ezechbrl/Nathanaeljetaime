@@ -11,7 +11,7 @@ export function CancelSurvey({ busy, onConfirm, onKeep }: { busy: boolean; onCon
   const [reason, setReason] = useState<string>();
   const [wish, setWish] = useState<string>();
   const [details, setDetails] = useState("");
-  const chip = (on: boolean) => cn("rounded-[12px] border px-3 py-2.5 text-left text-sm transition-colors", on ? "border-[#34d399] bg-[#34d399]/15 text-white" : "border-white/10 bg-white/[0.04] text-fg-muted hover:border-white/25");
+  const chip = (on: boolean) => cn("rounded-[12px] border px-3 py-2.5 text-left text-sm transition-colors", on ? "border-white/15 bg-white/[0.06] text-white" : "border-white/10 bg-white/[0.04] text-fg-muted hover:border-white/25");
   return (
     <div className="mt-4 rounded-[16px] border border-white/10 bg-white/[0.03] p-4 sm:p-5">
       <p className="font-semibold">Avant de partir, 2 petites questions ?</p>
@@ -22,7 +22,7 @@ export function CancelSurvey({ busy, onConfirm, onKeep }: { busy: boolean; onCon
         {CANCEL_REASONS.filter((r) => !r.id.startsWith("stripe:")).map((r) => <button key={r.id} type="button" onClick={() => setReason(r.id)} className={chip(reason === r.id)}>{r.label}</button>)}
       </div>
       {reason === "shopify" && (
-        <p className="mt-2 rounded-[12px] bg-[#34d399]/10 px-3 py-2 text-sm text-[#a7f3d0]">On peut t'aider gratuitement à la mettre en ligne. Écris-nous depuis la page <Link href="/contact" className="underline">contact</Link>, on te répond vite.</p>
+        <p className="mt-2 rounded-[12px] bg-white/[0.06] px-3 py-2 text-sm text-white/80">On peut t'aider gratuitement à la mettre en ligne. Écris-nous depuis la page <Link href="/contact" className="underline">contact</Link>, on te répond vite.</p>
       )}
 
       <p className="mt-4 text-sm font-medium">2. Qu'est-ce qui t'aurait fait rester ?</p>

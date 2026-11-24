@@ -133,11 +133,11 @@ export function FreeTools({ inApp = false, defaults = {}, only }: { inApp?: bool
               className={cn(
                 "group flex items-start gap-3.5 rounded-[18px] border p-4 text-left backdrop-blur transition-all duration-300",
                 active
-                  ? "border-accent/50 bg-[linear-gradient(160deg,rgb(16_176_127/0.22),rgb(0_0_0/0.25))] shadow-[0_0_28px_-10px_rgb(46_230_166/0.55)]"
-                  : "border-white/[0.08] bg-black/20 hover:-translate-y-0.5 hover:border-accent/35 hover:shadow-[0_0_24px_-12px_rgb(46_230_166/0.5)]",
+                  ? "border-accent/50 bg-white/[0.03]"
+                  : "border-white/[0.08] bg-black/20 hover:-translate-y-0.5 hover:border-accent/35",
               )}
             >
-              <span className={cn("grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-shadow", active ? "border-accent/50 bg-accent/15 text-accent shadow-[0_0_18px_rgb(46_230_166/0.45)]" : "border-white/10 bg-white/[0.04] text-fg-muted group-hover:text-accent")}>
+              <span className={cn("grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-shadow", active ? "border-accent/50 bg-accent/15 text-accent" : "border-white/10 bg-white/[0.04] text-fg-muted group-hover:text-accent")}>
                 <Icon className="h-5 w-5" />
               </span>
               <span className="min-w-0">

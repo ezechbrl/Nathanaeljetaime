@@ -27,7 +27,7 @@ function PhoneVideo({ name, title }: { name: string; title: string }) {
   const { ref, playing, setPlaying } = useAutoplay();
   return (
     <figure className="mx-auto w-full max-w-[300px] sm:hidden">
-      <div className="relative overflow-hidden rounded-[36px] border-[7px] border-[#0b0f12] bg-black shadow-[0_30px_70px_-25px_rgb(0_0_0/.9),0_0_40px_-10px_rgb(46_230_166/.45)]">
+      <div className="relative overflow-hidden rounded-[36px] border-[7px] border-[#0b0f12] bg-black">
         <video ref={ref} muted loop playsInline preload="none" poster={`/videos/${name}.jpg`} onPlay={() => setPlaying(true)} className="block aspect-[390/844] w-full object-cover" aria-label={title}>
           <source src={`/videos/${name}.mp4`} type="video/mp4" />
           <source src={`/videos/${name}.webm`} type="video/webm" />

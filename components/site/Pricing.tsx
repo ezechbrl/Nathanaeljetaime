@@ -14,7 +14,7 @@ export function PricingCards() {
   return (
     <div className="relative isolate mx-auto max-w-[760px] overflow-clip rounded-[28px] border border-white/10 px-4 py-10 sm:px-10">
       <AuroraBackground className="-z-10" />
-      <div className="mx-auto mb-6 max-w-[760px] rounded-[18px] border border-[#2ee6a6]/40 bg-[linear-gradient(90deg,rgb(16_176_127/0.25),rgb(163_230_53/0.12))] px-5 py-3 text-center shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
+      <div className="mx-auto mb-6 max-w-[760px] rounded-[18px] border border-white/15 bg-white/[0.03] px-5 py-3 text-center">
         <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de bienvenue : ta boutique à {SINGLE.offer} € au lieu de {SINGLE.price} €</p>
         <p className="text-[12.5px] text-fg-muted">« Ma boutique », en paiement unique, pendant les {LAUNCH_OFFER.hours} h qui suivent ton inscription (compte à rebours dans ton espace).</p>
       </div>

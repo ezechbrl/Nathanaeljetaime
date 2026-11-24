@@ -34,7 +34,7 @@ const POINTS: Record<Choice, string[]> = {
     "Aucun abonnement, rien à résilier",
   ],
 };
-const TONE = { pro: "text-[#2ee6a6]", agency: "text-[#7dd3fc]", single: "text-[#fde047]" } as const;
+const TONE = { pro: "text-[#3dff9a]", agency: "text-[#7dd3fc]", single: "text-[#fde047]" } as const;
 
 const perDay = (amount: number, interval: Interval) => (amount / (interval === "year" ? 365 : 30)).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -74,15 +74,15 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
           return (
             <button key={r.id} type="button" role="radio" aria-checked={on} onClick={() => setChoice(r.id)}
               className={cn("relative block w-full rounded-[22px] border p-5 text-left transition-all sm:p-6",
-                on ? "border-[#2ee6a6]/70 bg-[#2ee6a6]/[0.07] shadow-[0_0_40px_-12px_rgb(46_230_166/0.6)]" : "border-white/10 bg-black/25 hover:border-white/20")}>
+                on ? "border-white/15 bg-white/[0.06]" : "border-white/10 bg-black/25 hover:border-white/20")}>
               {r.badge && (
                 <span className={cn("absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-[11.5px] font-bold uppercase tracking-[0.08em]",
-                  r.badge.tone === "green" ? "bg-[linear-gradient(180deg,#34f0b0,#10b07f)] text-[#03140d]" : "border border-[#fde047]/40 bg-[#1f1d0c] text-[#fef08a]")}>
+                  r.badge.tone === "green" ? "bg-white glow-hover text-[#03140d]" : "border border-[#fde047]/40 bg-[#1f1d0c] text-[#fef08a]")}>
                   {r.badge.tone === "green" && <Sparkles className="h-3.5 w-3.5" />}{r.badge.text}
                 </span>
               )}
               <span className="flex items-center gap-4">
-              <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 transition-colors", on ? "border-[#2ee6a6] bg-[#2ee6a6]" : "border-white/30")}>
+              <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 transition-colors", on ? "border-white/15 bg-[#3dff9a]" : "border-white/30")}>
                 {on && <Check className="h-4 w-4 text-[#03140d]" strokeWidth={3.5} />}
               </span>
               <span className="min-w-0 flex-1">
@@ -100,7 +100,7 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
       </div>
 
       {/* Barre du bas : collée en bas de l'écran pendant qu'on choisit. */}
-      <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-white/10 bg-[#04100c]/90 px-4 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-[18px] sm:border">
+      <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-white/10 bg-[#0d0d0d]/90 px-4 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-[18px] sm:border">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="whitespace-nowrap text-[1.2rem] font-semibold text-white">{current.price}</p>
@@ -114,4 +114,4 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
 }
 
 // Bouton « Continuer » de la barre du bas.
-export const pickerButtonClass = "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.4),0_10px_30px_-8px_rgb(46_230_166/0.7)] transition-all hover:-translate-y-px disabled:opacity-60";
+export const pickerButtonClass = "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d] transition-all hover:-translate-y-px disabled:opacity-60";

@@ -26,10 +26,10 @@ export function InstallAnimation() {
         {[0, 1, 2].map((i) => <span key={i} className="h-2 w-2 rounded-full bg-white/20" />)}
         <span className="ml-2 truncate text-[11px] text-fg-faint">{f === 0 ? "vigenia.com" : "admin.shopify.com"}</span>
       </div>
-      <div className="relative grid h-[170px] place-items-center bg-[radial-gradient(ellipse_at_center,rgb(46_230_166/0.08),transparent_70%)]">
+      <div className="relative grid h-[170px] place-items-center">
         {/* 1. bouton Vigenia */}
         <Scene on={f === 0}>
-          <span className="relative inline-flex items-center gap-2 rounded-[12px] bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-5 py-3 text-sm font-semibold text-[#03140d] [animation:press_2.5s_ease-in-out_infinite]">
+          <span className="relative inline-flex items-center gap-2 rounded-[12px] bg-white glow-hover px-5 py-3 text-sm font-semibold text-[#03140d] [animation:press_2.5s_ease-in-out_infinite]">
             Envoyer dans Shopify
             <MousePointer2 className="absolute -bottom-4 right-2 h-5 w-5 fill-white text-black [animation:cursor_2.5s_ease-in-out_infinite]" />
           </span>
@@ -52,7 +52,7 @@ export function InstallAnimation() {
           <div className="w-[260px] rounded-[10px] bg-white p-3 text-left text-[#1a1a1a]">
             <p className="text-[12px] font-semibold">Importer</p>
             <div className="mt-2 flex items-center gap-2 rounded-[8px] border-2 border-dashed border-accent/70 p-3 text-[11px] [animation:fade-in_.5s_both]">
-              <Upload className="h-4 w-4 text-[#0fae7c]" /> fichier téléchargé
+              <Upload className="h-4 w-4 text-white/80" /> fichier téléchargé
             </div>
             <div className="mt-2 ml-auto w-fit rounded-[6px] bg-[#1a1a1a] px-2.5 py-1 text-[11px] font-medium text-white">Importer</div>
           </div>

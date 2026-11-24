@@ -101,7 +101,7 @@ export function BeforeAfterSlider() {
         <div role="tablist" aria-label="Produits" className="mx-auto mt-7 flex max-w-full flex-wrap justify-center gap-2">
           {PAIRS.map((y) => (
             <button key={y.id} type="button" role="tab" aria-selected={y.id === p.id} onClick={() => { setId(y.id); setX(50); }}
-              className={cn("rounded-full border px-4 py-2 text-sm font-semibold transition-all", y.id === p.id ? "border-transparent bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_20px_-4px_rgb(46_230_166/0.7)]" : "border-white/15 bg-black/20 text-fg-muted hover:text-fg")}>
+              className={cn("rounded-full border px-4 py-2 text-sm font-semibold transition-all", y.id === p.id ? "border-white bg-white text-black" : "border-white/15 bg-black/20 text-fg-muted hover:text-fg")}>
               {y.tab}
             </button>
           ))}
@@ -117,7 +117,7 @@ export function BeforeAfterSlider() {
             <div className="aspect-[4/3] overflow-hidden rounded-[12px] border border-black/10 sm:aspect-[16/10]"><SupplierPage p={p} /></div>
           </div>
           <span className="pointer-events-none absolute bottom-5 left-4 rounded-full bg-black/75 px-3 py-1 text-xs font-semibold text-white sm:bottom-7 sm:left-6">Avant</span>
-          <span className="pointer-events-none absolute bottom-5 right-4 rounded-full bg-[#34f0b0] px-3 py-1 text-xs font-semibold text-[#03140d] sm:bottom-7 sm:right-6">Avec Vigenia</span>
+          <span className="pointer-events-none absolute bottom-5 right-4 rounded-full bg-[#3dff9a] px-3 py-1 text-xs font-semibold text-[#03140d] sm:bottom-7 sm:right-6">Avec Vigenia</span>
           <div className="pointer-events-none absolute inset-y-0 w-0.5 bg-white shadow-[0_0_12px_rgb(0_0_0/0.4)]" style={{ left: `${x}%` }}>
             <span className="absolute left-1/2 top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white text-[#03140d] shadow-xl"><ChevronsLeftRight className="h-5 w-5" /></span>
           </div>

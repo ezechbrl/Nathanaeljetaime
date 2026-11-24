@@ -5,18 +5,18 @@
 :root {
   color-scheme: dark;
   /* Vert émeraude frais (plus clair et plus bleuté) : fond profond, accents menthe. */
-  --bg: 7 46 35;            /* #072e23 : vert du fond commun */
-  --bg-2: 19 59 53;         /* #133b35 */
-  --bg-3: 26 72 64;         /* #1a4840 */
-  --fg: 238 248 245;
-  --fg-muted: 208 232 225;  /* plus clair : textes secondaires bien lisibles */
-  --fg-faint: 160 196 186;
+  --bg: 10 10 10;            /* #0a0a0a : noir du fond */
+  --bg-2: 20 20 20;
+  --bg-3: 30 30 30;
+  --fg: 245 245 245;
+  --fg-muted: 190 190 190;  /* gris clair : textes secondaires */
+  --fg-faint: 135 135 135;
   --line: 255 255 255;      /* utilisé avec une opacité faible */
-  --accent: 104 230 176;    /* #68e6b0, menthe lisible sur fond sombre */
-  --accent-strong: 0 150 110;/* #00966e, boutons */
-  --accent-deep: 8 96 74;   /* #08604a, fonds teintés */
-  --accent-soft: 14 62 52;  /* #0e3e34 */
-  --brand-leaf: 140 232 200;/* #8ce8c8, touches claires */
+  --accent: 61 255 154;    /* #3dff9a, vert électrique Vigenia */
+  --accent-strong: 61 255 154;
+  --accent-deep: 38 38 38;   /* fonds neutres */
+  --accent-soft: 24 24 24;
+  --brand-leaf: 61 255 154;
   --ink: 2 12 8;
   --good: 94 211 140;
   --warn: 245 190 70;
@@ -25,7 +25,7 @@
 
 @layer base {
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-  html { background: #05261d; }
+  html { background: #0a0a0a; }
   body { @apply font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
   ::selection { background: rgb(var(--brand-leaf) / 0.35); }
   :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; border-radius: 6px; }
@@ -56,6 +56,9 @@
   }
   .field:hover { border-color: rgb(var(--line) / 0.18); }
   .field:focus { outline: none; border-color: rgb(var(--accent) / 0.6); box-shadow: 0 0 0 3px rgb(var(--accent) / 0.12); }
+  /* Boutons : au survol ou à l'appui, le contour s'éclaire en vert électrique. */
+  .glow-hover { transition: box-shadow .2s ease, transform .2s ease; }
+  .glow-hover:hover, .glow-hover:focus-visible, .glow-hover:active { box-shadow: 0 0 0 2px #3dff9a, 0 0 26px -4px rgb(61 255 154 / .6); }
   .eyebrow { @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-fg-muted; border-color: rgb(var(--accent) / 0.2); background: rgb(var(--accent-deep) / 0.25); }
   .text-gradient {
     background: linear-gradient(180deg, rgb(var(--fg)) 30%, rgb(var(--fg) / 0.45));
@@ -63,7 +66,7 @@
   }
   /* Mot mis en avant : italique Bodoni vert, soulignée d'un trait vert feuille. */
   .serif-accent {
-    @apply font-accent italic text-accent;
+    @apply font-accent italic text-white;
     font-weight: 500;
     letter-spacing: -0.03em;
     padding: 0 0.04em;
@@ -71,8 +74,8 @@
     -webkit-box-decoration-break: clone; box-decoration-break: clone;
   }
   /* Autres façons de mettre un mot en avant, pour varier (toujours dans les verts Vigenia). */
-  .ink-green { background: linear-gradient(100deg, #d9fbe9 0%, #6ee7b7 45%, #2ee6a6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 600; }
-  .mark-green { color: #fff; background: linear-gradient(transparent 58%, rgb(46 230 166 / 0.38) 58%, rgb(46 230 166 / 0.38) 92%, transparent 92%); padding: 0 0.08em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .ink-green { color: #3dff9a; font-weight: 600; }
+  .mark-green { color: #fff; background: linear-gradient(transparent 58%, rgb(61 255 154 / 0.3) 58%, rgb(61 255 154 / 0.3) 92%, transparent 92%); padding: 0 0.08em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
   .serif-white { font-family: var(--font-serif), Georgia, serif; font-style: italic; font-weight: 400; color: #fff; letter-spacing: -0.02em; }
   .underline-green { text-decoration: underline; text-decoration-color: #2ee6a6; text-decoration-thickness: 0.09em; text-underline-offset: 0.16em; }
   .prose-store p { @apply mb-2; }
@@ -101,7 +104,7 @@
 @keyframes swipe-float { 0% { transform: translate(calc(var(--x) * .4), 30px) scale(.4); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(calc(var(--x) * 1.6), -200px) scale(1.15) rotate(15deg); opacity: 0; } }
 @keyframes swipe-nope { 0% { transform: scale(.2) rotate(0); opacity: 0; } 30% { transform: scale(1.1) rotate(-8deg); opacity: 1; } 45% { transform: scale(1) rotate(8deg); } 60% { transform: scale(1) rotate(-6deg) translateX(0); opacity: 1; } 100% { transform: scale(.8) rotate(-25deg) translateX(-220px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { [class*="swipe-heart"], [class*="swipe-float"], [class*="swipe-nope"] { animation: none !important; opacity: 0 !important; } }
-@keyframes cta-glow { 0%, 100% { box-shadow: 0 0 18px rgb(46 230 166 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.45); } 50% { box-shadow: 0 0 34px 4px rgb(46 230 166 / 0.85), inset 0 1px 0 rgb(255 255 255 / 0.5); } }
+@keyframes cta-glow { 0%, 100% { box-shadow: 0 0 0 0 rgb(61 255 154 / 0); } 50% { box-shadow: 0 0 0 2px rgb(61 255 154 / 0.55), 0 0 22px -4px rgb(61 255 154 / 0.45); } }
 @keyframes quiz-glow { 0%, 100% { opacity: .55; transform: scale(.98); } 50% { opacity: 1; transform: scale(1.02); } }
 /* Titres mot par mot (voir splitWords dans Reveal.tsx). */
 [data-words] .rw { display: inline-block; overflow: hidden; vertical-align: bottom; padding: 0.06em 0.02em 0.12em; margin: -0.06em -0.02em -0.12em; }
@@ -152,16 +155,16 @@
 @property --frame-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes frame-spin { to { --frame-angle: 360deg; } }
 .glow-frame {
-  background: conic-gradient(from var(--frame-angle), rgb(46 230 166 / 0.35), rgb(167 243 208) 8%, rgb(46 230 166 / 0.35) 18%, rgb(46 230 166 / 0.35) 50%, rgb(110 231 183 / 0.9) 58%, rgb(46 230 166 / 0.35) 68%);
+  background: conic-gradient(from var(--frame-angle), rgb(255 255 255 / 0.12), rgb(61 255 154 / 0.9) 8%, rgb(255 255 255 / 0.12) 18%, rgb(255 255 255 / 0.12) 50%, rgb(255 255 255 / 0.35) 58%, rgb(255 255 255 / 0.12) 68%);
   animation: frame-spin 7s linear infinite;
-  box-shadow: 0 0 22px rgb(46 230 166 / 0.35), 0 0 70px -10px rgb(46 230 166 / 0.45);
+  box-shadow: 0 20px 60px -30px rgb(0 0 0 / 0.8);
   transition: box-shadow .3s;
 }
 .glow-frame-lime {
   background: conic-gradient(from var(--frame-angle), rgb(74 222 128 / 0.35), rgb(220 252 231) 8%, rgb(74 222 128 / 0.35) 18%, rgb(74 222 128 / 0.35) 50%, rgb(134 239 172 / 0.9) 58%, rgb(74 222 128 / 0.35) 68%);
   box-shadow: 0 0 22px rgb(74 222 128 / 0.3), 0 0 70px -10px rgb(74 222 128 / 0.4);
 }
-.glow-frame:focus-within { box-shadow: 0 0 28px rgb(46 230 166 / 0.55), 0 0 90px -10px rgb(46 230 166 / 0.6); }
+.glow-frame:focus-within { box-shadow: 0 0 0 1px rgb(61 255 154 / 0.8), 0 0 30px -6px rgb(61 255 154 / 0.5); }
 
 @media (prefers-reduced-motion: reduce) {
   .glow-frame { animation: none; }

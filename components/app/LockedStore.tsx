@@ -143,7 +143,7 @@ function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHre
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/45" />
       <div className="absolute inset-x-0 top-24 grid place-items-center p-6">
-        <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-6 py-3.5 text-[15px] font-semibold text-[#03140d] shadow-[0_12px_36px_-8px_rgb(46_230_166/0.8)]">
+        <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-white glow-hover px-6 py-3.5 text-[15px] font-semibold text-[#03140d]">
           <Lock className="h-4 w-4" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque la suite de ta boutique"}
         </a>
         {!loginHref && <p className="mt-3 rounded-full bg-black/55 px-4 py-1.5 text-center text-xs text-white backdrop-blur">+ une dizaine de photos, comment ça marche, FAQ, mise en ligne Shopify</p>}
@@ -168,7 +168,7 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/15 to-black/35" />
         <div className="absolute inset-x-0 top-16 grid place-items-center p-6">
-          <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-6 py-3.5 text-[15px] font-semibold text-[#03140d] shadow-[0_12px_36px_-8px_rgb(46_230_166/0.8)]">
+          <a href={loginHref ?? "#debloquer"} onClick={onUnlock} className="flex items-center gap-2 rounded-full bg-white glow-hover px-6 py-3.5 text-[15px] font-semibold text-[#03140d]">
             <Lock className="h-4 w-4" /> {loginHref ? "Connecte-toi pour voir ta boutique" : "Débloque toute ta boutique"}
           </a>
         </div>
@@ -219,7 +219,7 @@ function HesitationAsk({ storeId }: { storeId: string }) {
   };
   if (!open) return null;
   return (
-    <div role="dialog" aria-label="Qu'est-ce qui te fait hésiter ?" className="fixed inset-x-3 bottom-[84px] z-50 mx-auto max-w-[420px] rounded-[18px] border border-white/15 bg-[#06261c]/95 p-4 shadow-2xl backdrop-blur [animation:rise_.4s_cubic-bezier(.2,.8,.2,1)_both] lg:bottom-6 lg:left-auto lg:right-6 lg:mx-0">
+    <div role="dialog" aria-label="Qu'est-ce qui te fait hésiter ?" className="fixed inset-x-3 bottom-[84px] z-50 mx-auto max-w-[420px] rounded-[18px] border border-white/15 bg-[#0d0d0d]/95 p-4 shadow-2xl backdrop-blur [animation:rise_.4s_cubic-bezier(.2,.8,.2,1)_both] lg:bottom-6 lg:left-auto lg:right-6 lg:mx-0">
       <button type="button" onClick={close} aria-label="Fermer" className="absolute right-3 top-3 text-fg-faint hover:text-white"><X className="h-4 w-4" /></button>
       {sent ? <p className="py-2 pr-6 text-sm">Merci, ça nous aide vraiment à améliorer Vigenia 🙏</p> : (
         <>
@@ -228,11 +228,11 @@ function HesitationAsk({ storeId }: { storeId: string }) {
           <div className="mt-3 grid gap-1.5">
             {HESITATIONS.map((h) => (
               <button key={h.id} type="button" onClick={() => setReason(h.id)} aria-pressed={reason === h.id}
-                className={cn("rounded-[11px] border px-3 py-2 text-left text-[13.5px] transition-colors", reason === h.id ? "border-[#3dff9a] bg-[#3dff9a]/15 text-white" : "border-white/10 bg-white/[0.04] text-fg-muted hover:border-white/25")}>{h.label}</button>
+                className={cn("rounded-[11px] border px-3 py-2 text-left text-[13.5px] transition-colors", reason === h.id ? "border-white/15 bg-white/[0.06] text-white" : "border-white/10 bg-white/[0.04] text-fg-muted hover:border-white/25")}>{h.label}</button>
             ))}
           </div>
           {reason && <input value={details} onChange={(e) => setDetails(e.target.value)} maxLength={500} placeholder="Un mot de plus ? (facultatif)" className="field mt-2 h-10 text-sm" />}
-          <button type="button" disabled={!reason} onClick={send} className="mt-3 h-10 w-full rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-sm font-semibold text-[#03140d] disabled:opacity-40">Envoyer</button>
+          <button type="button" disabled={!reason} onClick={send} className="mt-3 h-10 w-full rounded-full bg-white glow-hover text-sm font-semibold text-[#03140d] disabled:opacity-40">Envoyer</button>
         </>
       )}
     </div>
@@ -275,13 +275,13 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
     <div className="px-5 pb-16 pt-8 sm:px-8">
       <div className="mx-auto max-w-[1200px]">
         <div className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 px-3 py-1 text-xs font-medium text-[#a7f3d0]"><Lock className="h-3.5 w-3.5" /> Ton aperçu</span>
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-xs font-medium text-white/80"><Lock className="h-3.5 w-3.5" /> Ton aperçu</span>
           <h1 className="mt-4 text-[clamp(1.9rem,1.3rem+2vw,3rem)] font-semibold leading-tight tracking-[-0.035em]">
             Ta boutique <span className="serif-accent">{store.name}</span> t'attend
           </h1>
           <p className="mx-auto mt-2 max-w-xl text-fg-muted">Ton nom, tes couleurs, ton accroche et tes atouts sont prêts et gardés dans ton compte. Quand tu veux, débloque-la : textes, photos et design se créent en quelques minutes.</p>
           {!paid && (
-            <a href="#debloquer" onClick={openPay} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-7 text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.8)] [animation:cta-glow_2.4s_ease-in-out_infinite]">
+            <a href="#debloquer" onClick={openPay} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover px-7 text-[15px] font-semibold text-[#03140d] [animation:cta-glow_2.4s_ease-in-out_infinite]">
               Débloquer ma boutique <ArrowDown className="h-4 w-4" />
             </a>
           )}
@@ -293,12 +293,12 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
           <div className="flex flex-col gap-2.5">
             {unlocksFor(store.mode === "link").map(({ icon: I, title, text }) => (
               <div key={title} className="flex items-center gap-3 rounded-[16px] border border-white/10 bg-white/[0.04] p-3.5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[linear-gradient(160deg,#34f0b0,#0fae7c)] text-[#03140d]"><I className="h-5 w-5" /></span>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-white glow-hover text-[#03140d]"><I className="h-5 w-5" /></span>
                 <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold">{title}</span><span className="block text-[13px] text-fg-muted">{text}</span></span>
                 <Lock className="h-4 w-4 shrink-0 text-fg-faint" />
               </div>
             ))}
-            <a href="#debloquer" onClick={openPay} className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.8)]">
+            <a href="#debloquer" onClick={openPay} className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d]">
               {busy ? <><Spinner /> Déblocage…</> : <>Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></>}
             </a>
             <p className="text-center text-xs text-fg-muted">Prête en 3 minutes · sans engagement · annulable en un clic</p>
@@ -310,17 +310,17 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/showcase/ouate-store.jpg" alt="Exemple de boutique complète créée avec Vigenia" loading="lazy" className="w-full rounded-[12px] ring-1 ring-white/10" />
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6ee7b7]">Exemple de boutique complète</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#3dff9a]">Exemple de boutique complète</p>
             <p className="mt-2 text-xl font-semibold leading-snug">Voilà ce que devient ton aperçu une fois débloqué.</p>
             <p className="mt-2 text-sm text-fg-muted">Ici, Maison Ouate : photos, textes, page produit, panier et FAQ, prêts à mettre en ligne sur Shopify. La tienne garde ton nom, tes couleurs et ton produit.</p>
-            <a href="#debloquer" onClick={openPay} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#03140d]">Débloquer la mienne <ArrowDown className="h-4 w-4" /></a>
+            <a href="#debloquer" onClick={openPay} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#03140d] glow-hover">Débloquer la mienne <ArrowDown className="h-4 w-4" /></a>
           </div>
         </div>
 
         {/* Un vrai humain derrière Vigenia : on peut poser sa question avant de payer. */}
         {!paid && (
           <div className="mt-6 flex flex-col items-start gap-3 rounded-[20px] border border-white/10 bg-white/[0.03] p-5 sm:flex-row sm:items-center">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15 text-[#a7f3d0]"><Mail className="h-5 w-5" /></span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/[0.06] text-white/80"><Mail className="h-5 w-5" /></span>
             <div className="min-w-0 flex-1">
               <p className="text-[16px] font-semibold">Une question avant de te lancer ?</p>
               <p className="text-sm text-fg-muted">Vigenia est un petit projet indépendant : c&apos;est son créateur qui lit chaque message et qui te répond.</p>
@@ -332,8 +332,8 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
 
         {/* Téléphone : le bouton reste en bas de l'écran tant que l'offre n'est pas ouverte. */}
         {!paid && !showPay && (
-          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#04140f]/95 p-3 pb-[max(env(safe-area-inset-bottom),12px)] backdrop-blur lg:hidden">
-            <a href="#debloquer" onClick={openPay} className="flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d]">Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></a>
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#0d0d0d]/95 p-3 pb-[max(env(safe-area-inset-bottom),12px)] backdrop-blur lg:hidden">
+            <a href="#debloquer" onClick={openPay} className="flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d]">Débloquer ma boutique complète <ArrowDown className="h-4 w-4" /></a>
           </div>
         )}
 

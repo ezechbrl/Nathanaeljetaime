@@ -8,20 +8,19 @@ import { cn } from "@/lib/cn";
 import { normalizeProductUrl } from "@/lib/product-url";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
-// Mêmes couleurs que les 2 cartes Shopify de la connexion : « Décrire » = vert de « Connecter mon compte
-// Shopify », « Coller un lien » = vert clair de « Créer mon compte Shopify ».
+// Le mode choisi est en blanc, l'autre en contour discret.
 export const MODES = [
   {
     id: "start", label: "Décrire", icon: PenLine,
     placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…",
-    on: "border-[#6ee7b7]/60 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_18px_rgb(46_230_166/0.55),inset_0_1px_0_rgb(255_255_255/0.45)]",
-    off: "border-[#34f0b0]/30 text-[#86efc9] hover:bg-[#34f0b0]/10",
+    on: "border-white/15 bg-white glow-hover text-[#03140d]",
+    off: "border-white/15 text-white/70 hover:bg-white/[0.06]",
   },
   {
     id: "link", label: "Coller un lien", icon: Link2,
     placeholder: "Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…) ou ta propre page",
-    on: "border-[#bbf7d0]/60 bg-[linear-gradient(180deg,#6ee7a0,#22c55e)] text-[#052e16] shadow-[0_0_18px_rgb(74_222_128/0.5),inset_0_1px_0_rgb(255_255_255/0.45)]",
-    off: "border-[#4ade80]/30 text-[#a7f3c0] hover:bg-[#4ade80]/10",
+    on: "border-white/15 bg-white glow-hover text-[#03140d]",
+    off: "border-white/15 text-white/70 hover:bg-white/[0.06]",
   },
 ] as const;
 
@@ -111,7 +110,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
   return (
     <div className={cn("w-full max-w-2xl", align === "center" && "mx-auto", className)}>
       <form onSubmit={submit} className="glow-frame group relative rounded-[16px] p-[1.5px]">
-        <div className="rounded-[14.5px] bg-[linear-gradient(180deg,#123d35,#0b2823)] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
+        <div className="rounded-[14.5px] bg-[#111111] shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]">
           <label htmlFor={inputId} className="sr-only">Décris ta boutique</label>
           {linkMode ? (
             // Lien collé : affiché en une ligne courte, avec le produit reconnu (photo + nom) si la page se lit.
@@ -119,11 +118,11 @@ export function PromptBox({ target = "/inscription", className, align = "center"
               {link.state === "ok" && link.image
                 // eslint-disable-next-line @next/next/no-img-element
                 ? <img src={link.image} alt="" className="h-28 w-28 shrink-0 rounded-[14px] border border-white/20 bg-white object-cover shadow-[0_8px_24px_-10px_rgb(0_0_0/0.6)] sm:h-32 sm:w-32" />
-                : <span className="grid h-28 w-28 shrink-0 place-items-center rounded-[14px] bg-[#34f0b0]/10 text-[#86efc9] sm:h-32 sm:w-32">{link.state === "checking" ? <span className="h-7 w-7 animate-spin rounded-full border-2 border-[#86efc9]/30 border-t-[#86efc9]" /> : <Link2 className="h-8 w-8" />}</span>}
+                : <span className="grid h-28 w-28 shrink-0 place-items-center rounded-[14px] bg-white/[0.06] text-white/70 sm:h-32 sm:w-32">{link.state === "checking" ? <span className="h-7 w-7 animate-spin rounded-full border-2 border-white/15 border-t-[#86efc9]" /> : <Link2 className="h-8 w-8" />}</span>}
               <span className="min-w-0 flex-1">
                 <span className="line-clamp-2 text-[16px] font-semibold leading-snug text-fg sm:text-[17px]">{link.state === "ok" && link.title ? link.title : shortLink(value)}</span>
                 <span className="mt-1.5 block truncate text-[13px] text-fg-muted">
-                  {link.state === "checking" ? "Lecture du produit…" : link.state === "ok" ? <span className="text-[#86efc9]">Produit trouvé ✓ · {hostOf(value)}</span> : `Lien produit · ${hostOf(value)}`}
+                  {link.state === "checking" ? "Lecture du produit…" : link.state === "ok" ? <span className="text-white/70">Produit trouvé ✓ · {hostOf(value)}</span> : `Lien produit · ${hostOf(value)}`}
                 </span>
               </span>
               <button type="button" onClick={() => setValue("")} aria-label="Retirer le lien" className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-fg-faint hover:bg-white/5 hover:text-fg"><X className="h-4 w-4" /></button>
@@ -167,7 +166,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             >
               <ImagePlus className="h-4 w-4" /> {photos.length ? `Photo ${photos.length}/${MAX_PHOTOS}` : "Photo du produit"}
             </button>
-            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-full border border-[#a7f3d0]/70 bg-[linear-gradient(180deg,#5ff7c2,#10b981)] px-5 text-[15px] font-bold text-[#03140d] transition-all [animation:cta-glow_2.4s_ease-in-out_infinite] hover:-translate-y-px hover:brightness-110">
+            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-full border border-white/15 bg-white px-5 text-[15px] font-bold text-[#03140d] transition-all [animation:cta-glow_2.4s_ease-in-out_infinite] hover:-translate-y-px hover:brightness-110 glow-hover">
               <Sparkles className="h-4 w-4" /> Générer
             </button>
           </div>
@@ -175,7 +174,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
       </form>
       {/* Pas de produit sous la main : un vrai lien d'exemple, reconnu tout de suite (photo et nom). */}
       {!value.trim() && (
-        <button type="button" onClick={() => setValue(EXAMPLE_LINK)} className={cn("mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#86efc9] underline-offset-4 hover:text-white hover:underline", align === "center" && "mx-auto flex")}>
+        <button type="button" onClick={() => setValue(EXAMPLE_LINK)} className={cn("mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-white/70 underline-offset-4 hover:text-white hover:underline", align === "center" && "mx-auto flex")}>
           <Link2 className="h-4 w-4" /> Essayer avec un exemple
         </button>
       )}

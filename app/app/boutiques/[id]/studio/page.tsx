@@ -151,7 +151,7 @@ export default function StudioPage() {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
                 {job && !regen && <PhotoLoadingTile className="aspect-square" progress={job.progress} />}
                 {list.map((a) => (
-                  <figure key={a.id} className="group relative aspect-square overflow-hidden rounded-card border border-white/[0.07] bg-[linear-gradient(160deg,rgb(10_45_35/0.6),rgb(3_16_12/0.8))]">
+                  <figure key={a.id} className="group relative aspect-square overflow-hidden rounded-card border border-white/[0.07] bg-[linear-gradient(160deg,rgb(20_20_20/0.6),rgb(3_16_12/0.8))]">
                     <FadeImage src={a.url} alt={a.prompt ?? "Visuel de la boutique"} className="h-full w-full object-cover group-hover:scale-[1.03]" />
                     <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-2.5 pt-8 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <span className="truncate text-[11px] text-white/80">{a.prompt ?? KINDS.find((k) => k.id === a.kind)?.label ?? "Importée"}</span>

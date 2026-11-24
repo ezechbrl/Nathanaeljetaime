@@ -42,7 +42,7 @@ export function Hero() {
       <div className="relative px-4 sm:px-6">
         {/* Démonstration : enregistrement réel de l'app, sous les boutiques qui défilent. */}
         <Reveal delay={380} className="relative mx-auto mt-10 max-w-[1320px] sm:mt-14">
-          <div aria-hidden className="absolute -inset-6 rounded-[32px] bg-[radial-gradient(closest-side,rgb(46_230_166/0.35),transparent)] blur-2xl" />
+          <div aria-hidden className="absolute -inset-6 rounded-[32px] blur-2xl" />
           <div className="relative"><DemoVideos /></div>
         </Reveal>
       </div>

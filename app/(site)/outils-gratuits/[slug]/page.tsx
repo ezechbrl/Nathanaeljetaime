@@ -32,12 +32,12 @@ export default async function FreeToolPage({ params }: { params: Promise<{ slug:
       <Container className="max-w-[1050px]">
         <FreeTools only={t.tool} />
 
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-[20px] border border-[#2ee6a6]/30 bg-[linear-gradient(160deg,rgb(16_176_127/0.22),rgb(0_0_0/0.25))] p-6 text-center sm:flex-row sm:text-left">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-[20px] border border-white/15 bg-white/[0.03] p-6 text-center sm:flex-row sm:text-left">
           <div>
             <p className="text-lg font-semibold">Et si l&apos;IA créait toute ta boutique ?</p>
             <p className="mt-1 text-sm text-fg-muted">Nom, design, textes, photos et fiche produit : un aperçu gratuit de ta boutique Shopify en quelques minutes.</p>
           </div>
-          <Link href="/" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-5 py-3 text-sm font-semibold text-[#03140d]">Voir l&apos;aperçu gratuit <ArrowRight className="h-4 w-4" /></Link>
+          <Link href="/" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white glow-hover px-5 py-3 text-sm font-semibold text-[#03140d]">Voir l&apos;aperçu gratuit <ArrowRight className="h-4 w-4" /></Link>
         </div>
 
         <section className="mt-14">

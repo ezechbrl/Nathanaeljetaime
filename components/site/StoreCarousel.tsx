@@ -36,8 +36,8 @@ export function StoreCarousel() {
               </div>
             ))}
           </div>
-          <button type="button" aria-label="Boutique précédente" onClick={() => go(i - 1)} className="absolute left-0 top-1/2 hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white text-[#03140d] shadow-xl sm:grid"><ChevronLeft className="h-5 w-5" /></button>
-          <button type="button" aria-label="Boutique suivante" onClick={() => go(i + 1)} className="absolute right-0 top-1/2 hidden h-10 w-10 -translate-y-1/2 translate-x-1/2 place-items-center rounded-full bg-white text-[#03140d] shadow-xl sm:grid"><ChevronRight className="h-5 w-5" /></button>
+          <button type="button" aria-label="Boutique précédente" onClick={() => go(i - 1)} className="absolute left-0 top-1/2 hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white text-[#03140d] shadow-xl sm:grid glow-hover"><ChevronLeft className="h-5 w-5" /></button>
+          <button type="button" aria-label="Boutique suivante" onClick={() => go(i + 1)} className="absolute right-0 top-1/2 hidden h-10 w-10 -translate-y-1/2 translate-x-1/2 place-items-center rounded-full bg-white text-[#03140d] shadow-xl sm:grid glow-hover"><ChevronRight className="h-5 w-5" /></button>
         </div>
         <div className="mt-4 flex items-center justify-between gap-3 text-white">
           <p className="text-left"><span className="block text-lg font-semibold leading-tight">{s.name}</span><span className="text-xs opacity-80">{s.category} · créée avec Vigenia</span></p>

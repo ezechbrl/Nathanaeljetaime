@@ -59,7 +59,7 @@ export function PhotoStudio({ storeId, running, done, accent, primary, backgroun
           <div className="absolute inset-x-2 bottom-2 grid grid-cols-4 gap-1">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="relative aspect-square overflow-hidden rounded-[4px] border border-white/20 bg-black/40">
-                {photos[i] ? <FadeImage src={photos[i].url} alt="" className="h-full w-full object-cover" /> : <span className="absolute inset-0 [animation:photo-sweep_1.6s_ease-in-out_infinite] bg-[linear-gradient(90deg,transparent,rgb(46_230_166/0.3),transparent)]" style={{ animationDelay: `${i * 200}ms` }} />}
+                {photos[i] ? <FadeImage src={photos[i].url} alt="" className="h-full w-full object-cover" /> : <span className="absolute inset-0 [animation:photo-sweep_1.6s_ease-in-out_infinite] bg-white/[0.03]" style={{ animationDelay: `${i * 200}ms` }} />}
               </div>
             ))}
           </div>

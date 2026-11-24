@@ -24,7 +24,7 @@ export function StickyCta() {
   };
   return (
     <div className={`fixed inset-x-0 bottom-0 z-50 p-3 pb-[max(12px,env(safe-area-inset-bottom))] transition-all duration-300 sm:hidden ${show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0"}`}>
-      <button type="button" onClick={go} className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-8px_rgb(46_230_166/0.7)]">
+      <button type="button" onClick={go} className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d]">
         {CTA.main} {isWaitlist ? <ArrowUp className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
       </button>
     </div>

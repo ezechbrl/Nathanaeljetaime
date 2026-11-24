@@ -72,7 +72,7 @@ export function PreviewView({ id }: { id: string }) {
       <div id="debloquer" className="mx-auto mt-12 max-w-xl scroll-mt-28 rounded-[22px] border border-accent/25 bg-accent-deep/20 p-6 text-center sm:p-8">
         <h2 className="text-[1.6rem] leading-tight tracking-tight">Ta boutique t'attend</h2>
         <p className="mt-2 text-fg-muted">Connecte-toi pour voir sa photo et ses atouts. Elle est gardée dans ton compte.</p>
-        <Link href={unlockUrl} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-8px_rgb(46_230_166/0.6)]">
+        <Link href={unlockUrl} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d]">
           Connecte-toi pour voir ta boutique <ArrowRight className="h-4 w-4" />
         </Link>
         <p className="mt-3 text-xs text-fg-faint">Juste ton e-mail et un code à 6 chiffres. Pas de mot de passe.</p>

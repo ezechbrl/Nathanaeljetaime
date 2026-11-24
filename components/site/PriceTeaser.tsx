@@ -23,7 +23,7 @@ export function PriceTeaser() {
     <section id="tarifs" className="py-16 sm:py-20">
       <div className="mx-auto max-w-[860px] px-4 sm:px-6">
         <Reveal as="h2" className="text-center text-h2">Un prix <span className="serif-white">simple</span></Reveal>
-        <Reveal delay={60} className="mx-auto mt-6 flex max-w-[640px] items-center justify-between gap-3 rounded-[16px] border border-[#2ee6a6]/45 bg-[linear-gradient(90deg,rgb(16_176_127/0.28),rgb(163_230_53/0.14))] px-4 py-3 shadow-[0_0_36px_-14px_rgb(46_230_166/0.7)] sm:px-5">
+        <Reveal delay={60} className="mx-auto mt-6 flex max-w-[640px] items-center justify-between gap-3 rounded-[16px] border border-white/15 bg-white/[0.03] px-4 py-3 sm:px-5">
           {isWaitlist ? (
             <>
               <p className="text-[14px] font-extrabold uppercase tracking-[0.05em] sm:text-[15px]">Prix réservé à vie<span className="hidden font-semibold text-white/70 sm:inline"> · liste d&apos;attente</span></p>
@@ -39,11 +39,11 @@ export function PriceTeaser() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {PAID_PLANS.map((plan, i) => (
             <Reveal key={plan.id} delay={100 + i * 80} className={cn(i > 0 && "hidden sm:block")}>
-              <div className={cn("h-full rounded-[22px] p-px", plan.featured ? "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_50px_-18px_rgb(46_230_166/0.6)]" : "bg-[linear-gradient(160deg,rgb(52_211_153/0.5),rgb(255_255_255/0.06)_50%,rgb(52_211_153/0.2))]")}>
-                <div className="flex h-full flex-col rounded-[21px] bg-[linear-gradient(180deg,rgb(10_40_30/0.9),rgb(4_16_12/0.95))] p-6">
+              <div className={cn("h-full rounded-[22px] p-px", plan.featured ? "bg-white/[0.03]" : "bg-white/[0.03]")}>
+                <div className="flex h-full flex-col rounded-[21px] bg-white/[0.03] p-6">
                   <div className="flex items-center justify-between">
                     <p className="text-[1.4rem] font-semibold tracking-[-0.02em]">{plan.name}</p>
-                    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] font-semibold", plan.featured ? "border-[#a3e635]/40 bg-[#a3e635]/10 text-[#bef264]" : "border-[#2ee6a6]/35 bg-[#2ee6a6]/10 text-[#a7f3d0]")}>{plan.featured && <Sparkles className="h-3 w-3" />} {plan.badge}</span>
+                    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11.5px] font-semibold", plan.featured ? "border-white/15 bg-white/[0.06] text-white/80" : "border-white/15 bg-white/[0.06] text-white/80")}>{plan.featured && <Sparkles className="h-3 w-3" />} {plan.badge}</span>
                   </div>
                   <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">{plan.tagline}</p>
                   <p className="mt-3 flex items-baseline gap-1.5">
@@ -51,10 +51,10 @@ export function PriceTeaser() {
                     <span className="text-[2.6rem] font-semibold leading-none tracking-[-0.04em]">{euro(price(plan.id, "monthly", plan.monthly))}</span>
                     <span className="text-sm text-fg-muted">/ mois</span>
                   </p>
-                  <p className="mt-1.5 text-[13.5px] font-medium text-[#6ee7b7]">ou {euro(price(plan.id, "yearly", plan.yearly))} par an</p>
+                  <p className="mt-1.5 text-[13.5px] font-medium text-[#3dff9a]">ou {euro(price(plan.id, "yearly", plan.yearly))} par an</p>
                   <ul className="mt-5 flex-1 space-y-2 text-[14.5px]">
                     {KEY_FEATURES[plan.id].map((f) => (
-                      <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-[#2ee6a6]/15"><Check className="h-3 w-3 text-[#2ee6a6]" strokeWidth={3} /></span>{f}</li>
+                      <li key={f} className="flex gap-2.5"><span className="mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-white/[0.06]"><Check className="h-3 w-3 text-[#3dff9a]" strokeWidth={3} /></span>{f}</li>
                     ))}
                   </ul>
                   <Link href={`/inscription?plan=${plan.id}`} className={cn(planButtonClass(plan.featured || i === 0), "mt-6")}>{CTA.main} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>
@@ -64,7 +64,7 @@ export function PriceTeaser() {
           ))}
         </div>
         {isWaitlist && <p className="mt-5 text-center text-[13.5px] text-fg-muted">Réservé aux inscrits de la liste d&apos;attente, à prendre dans les {LAUNCH_OFFER.hours} h après la création de ton compte à l&apos;ouverture. Ensuite : {euro(withOffer(PAID_PLANS[0].monthly))}/mois avec l&apos;offre de lancement.</p>}
-        <p className="mt-3 text-center text-[13.5px] text-fg-muted">Sans engagement · Annulable en 1 clic · <Link href="/tarifs" className="text-[#6ee7b7] underline underline-offset-4">Voir le détail des offres{" "}<span className="sm:hidden">et le Pro</span></Link></p>
+        <p className="mt-3 text-center text-[13.5px] text-fg-muted">Sans engagement · Annulable en 1 clic · <Link href="/tarifs" className="text-[#3dff9a] underline underline-offset-4">Voir le détail des offres{" "}<span className="sm:hidden">et le Pro</span></Link></p>
       </div>
     </section>
   );

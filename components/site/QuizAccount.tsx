@@ -27,8 +27,8 @@ export function QuizAccount({ onDone }: { onDone: (loggedIn: boolean) => void })
   }
 
   return (
-    <div className="mx-auto max-w-[460px] rounded-[22px] border border-[#3dff9a]/35 bg-[#3dff9a]/[0.06] p-5 shadow-[0_0_40px_-18px_rgb(61_255_154/0.7)] sm:p-6">
-      <ul className="mb-5 space-y-1.5 text-[14px] text-[#c8ffe2]">
+    <div className="mx-auto max-w-[460px] rounded-[22px] border border-white/15 bg-white/[0.04] p-5 sm:p-6">
+      <ul className="mb-5 space-y-1.5 text-[14px] text-white/80">
         {["Tes réponses sont gardées", "Ton aperçu de boutique est gratuit", "Sans carte bancaire"].map((t) => (
           <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-[#3dff9a]" />{t}</li>
         ))}
@@ -36,7 +36,7 @@ export function QuizAccount({ onDone }: { onDone: (loggedIn: boolean) => void })
       <form onSubmit={submit}>
         <label htmlFor="quiz-email" className="block text-sm font-semibold text-white">Ton adresse e-mail</label>
         <input id="quiz-email" type="email" required autoFocus autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.com" className="field mt-2 h-14 text-[16px]" />
-        <button type="submit" disabled={loading} className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-10px_rgb(46_230_166/0.8)] disabled:opacity-60">
+        <button type="submit" disabled={loading} className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white glow-hover text-[16px] font-semibold text-[#03140d] disabled:opacity-60">
           {loading ? <Spinner /> : <>Continuer le quiz <ArrowRight className="h-5 w-5" /></>}
         </button>
       </form>

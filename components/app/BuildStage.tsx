@@ -77,7 +77,7 @@ function Layer({ built, depth, label, className, children, delay = 0 }: { built:
       }}
     >
       <div className={cn("transition-opacity duration-700", built ? "opacity-100" : "opacity-0")}>{children}</div>
-      <div aria-hidden className={cn("absolute inset-0 rounded-md border border-dashed border-[#5ed38c]/70 bg-[#103a32]/85 transition-opacity duration-500 [background-image:linear-gradient(rgb(94_211_140/.12)_1px,transparent_1px),linear-gradient(90deg,rgb(94_211_140/.12)_1px,transparent_1px)] [background-size:12px_12px]", built ? "opacity-0" : "opacity-100")}>
+      <div aria-hidden className={cn("absolute inset-0 rounded-md border border-dashed border-white/30 bg-[#141414]/85 transition-opacity duration-500 [background-image:linear-gradient(rgb(255_255_255/.12)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/.12)_1px,transparent_1px)] [background-size:12px_12px]", built ? "opacity-0" : "opacity-100")}>
         <span className="absolute left-2 top-1.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[#5ed38c]">{label}</span>
       </div>
     </div>
@@ -137,7 +137,7 @@ export function BuildStage({ store, job, mobile }: { store: Store; job: Job | nu
         >
           <div className={cn("relative space-y-2 rounded-[14px] border border-white/10 bg-[#f7f6f2] p-2 text-[#1d1d22] shadow-[0_60px_100px_-40px_rgb(0_0_0/0.9)] transition-[width] duration-700 [transform-style:preserve-3d]", mobile ? "w-[270px]" : "w-[min(520px,82vw)]")}>
             {/* sol de chantier : la grille s'efface quand le thème est appliqué */}
-            <div aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-[14px] transition-opacity duration-1000 [background-image:linear-gradient(rgb(0_128_96/.12)_1px,transparent_1px),linear-gradient(90deg,rgb(0_128_96/.12)_1px,transparent_1px)] [background-size:16px_16px]", finished ? "opacity-0" : "opacity-100")} />
+            <div aria-hidden className={cn("pointer-events-none absolute inset-0 rounded-[14px] transition-opacity duration-1000 [background-image:linear-gradient(rgb(255_255_255/.12)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/.12)_1px,transparent_1px)] [background-size:16px_16px]", finished ? "opacity-0" : "opacity-100")} />
 
             <Layer built={brand} depth={150} label="Bandeau">
               <div className="rounded-md py-1.5 text-center text-[8px] tracking-wide text-white" style={{ background: primary }}>Livraison offerte · Retours 30 jours</div>
@@ -175,7 +175,7 @@ export function BuildStage({ store, job, mobile }: { store: Store; job: Job | nu
             </div>
 
             {/* faisceau de scan pendant la construction */}
-            {!finished && <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-16 rounded-[14px] [animation:scan_2.8s_ease-in-out_infinite] [background:linear-gradient(180deg,transparent,rgb(94_211_140/.35)_50%,transparent)] [transform:translateZ(40px)]"><span className="absolute inset-x-0 top-1/2 h-px bg-[#5ed38c] shadow-[0_0_14px_2px_rgb(94_211_140)]" /></div>}
+            {!finished && <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-16 rounded-[14px] [animation:scan_2.8s_ease-in-out_infinite] [background:linear-gradient(180deg,transparent,rgb(255_255_255/.35)_50%,transparent)] [transform:translateZ(40px)]"><span className="absolute inset-x-0 top-1/2 h-px bg-[#5ed38c] shadow-[0_0_14px_2px_rgb(94_211_140)]" /></div>}
             {/* reflet final quand tout est en place */}
             {finished && <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-[14px]"><span className="absolute inset-y-0 -left-1/2 w-1/3 skew-x-[-20deg] bg-[linear-gradient(90deg,transparent,rgb(255_255_255/.7),transparent)] [animation:shine_1.4s_.3s_ease-out_both]" /></div>}
           </div>

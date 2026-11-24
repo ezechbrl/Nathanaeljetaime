@@ -167,7 +167,7 @@ export default function EditorPage() {
                   <div className={cn(
                     "max-w-[82%] px-4 py-3 text-[16px] leading-relaxed",
                     m.role === "user"
-                      ? "rounded-[20px] rounded-br-[6px] bg-[linear-gradient(180deg,#1fd197,#0fa877)] text-[#03140d] shadow-[0_8px_24px_-12px_rgb(46_230_166/0.7)]"
+                      ? "rounded-[20px] rounded-br-[6px] bg-[linear-gradient(180deg,#1fd197,#0fa877)] text-[#03140d]"
                       : "rounded-[20px] rounded-bl-[6px] border border-accent/20 bg-white/[0.04] text-fg/90 backdrop-blur",
                   )}>
                     {m.content}
@@ -263,7 +263,7 @@ export default function EditorPage() {
                   placeholder="Demande une modification à l'IA… (ex. « mets un ton plus premium »)"
                   className="max-h-[216px] min-h-[60px] flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-6 placeholder:text-fg-faint focus:outline-none"
                 />
-                <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_0_20px_rgb(46_230_166/0.55)] transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"><ArrowUp className="h-5 w-5" /></button>
+                <button type="submit" disabled={sending || !draft.trim()} aria-label="Envoyer" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white glow-hover text-[#03140d] transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"><ArrowUp className="h-5 w-5" /></button>
               </form></div>
               <p className="mt-2 hidden text-center text-[12px] text-fg-faint sm:block">Entrée pour envoyer · Maj+Entrée pour aller à la ligne</p>
             </div>
@@ -278,7 +278,7 @@ export default function EditorPage() {
             <FullscreenButton target={previewRef} />
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-            <div ref={previewRef} className={cn("preview-fs overflow-hidden rounded-b-card rounded-tr-card ring-1 ring-white/10 transition-shadow duration-700", flash && "shadow-[0_0_0_3px_rgb(0_166_118/0.5)]")}>
+            <div ref={previewRef} className={cn("preview-fs overflow-hidden rounded-b-card rounded-tr-card ring-1 ring-white/10 transition-shadow duration-700", flash && "")}>
               <StorePreview store={store} page={page} onPageChange={setPage} device={device} assets={assets.data?.assets} />
             </div>
           </div>

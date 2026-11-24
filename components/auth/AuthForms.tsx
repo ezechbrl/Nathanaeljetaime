@@ -117,24 +117,24 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
       {/* Deux grands encadrés lumineux : relier son compte Shopify, ou en créer un (lien partenaire). */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <button type="button" onClick={() => setOpen(true)} aria-expanded={open} className="glow-frame group rounded-[22px] p-[1.5px] text-left transition-transform hover:-translate-y-1">
-          <span className={`${inner} pt-9 bg-[linear-gradient(180deg,rgb(10_58_43/0.97),rgb(4_24_18/0.98))] sm:pt-10`}>
-            <span className="absolute inset-x-0 top-0 bg-[linear-gradient(90deg,#10b981,#2ee6a6)] py-1.5 text-center text-[11px] font-bold leading-tight text-[#03140d] sm:text-[12px]">Boutique dès 39 € · offre 24 h</span>
-            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#2ee6a6]/25 blur-2xl transition-opacity group-hover:opacity-100" />
+          <span className={`${inner} pt-9 bg-[#111111] sm:pt-10`}>
+            <span className="absolute inset-x-0 top-0 bg-white py-1.5 text-center text-[11px] font-bold leading-tight text-[#03140d] sm:text-[12px]">Boutique dès 39 € · offre 24 h</span>
+            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-white/[0.06] blur-2xl transition-opacity group-hover:opacity-100" />
             <ShopifyBag className="relative h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
             <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">{withEmail ? "J'ai déjà un compte Shopify" : "Connecter mon compte Shopify"}</span>
-            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-4 text-sm font-semibold text-[#03140d] shadow-[0_8px_24px_-6px_rgb(46_230_166/0.8)]">{withEmail ? "Continuer" : "Connexion"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
+            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-white glow-hover px-4 text-sm font-semibold text-[#03140d]">{withEmail ? "Continuer" : "Connexion"} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
           </span>
         </button>
         <a href={site.shopifySignupUrl} target="_blank" rel="noreferrer sponsored" onClick={() => { setCreated(true); setOpen(true); }} className="glow-frame glow-frame-lime group rounded-[22px] p-[1.5px] transition-transform hover:-translate-y-1">
-          <span className={`${inner} pt-9 bg-[linear-gradient(180deg,rgb(12_60_32/0.96),rgb(4_26_14/0.98))] sm:pt-10`}>
-            <span className="absolute inset-x-0 top-0 bg-[linear-gradient(90deg,#22c55e,#4ade80)] py-1.5 text-center text-[11px] font-bold leading-tight text-[#052e16] sm:text-[12px]">1 €/mois pendant 3 mois</span>
-            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-[#4ade80]/20 blur-2xl" />
+          <span className={`${inner} pt-9 bg-[#111111] sm:pt-10`}>
+            <span className="absolute inset-x-0 top-0 bg-white py-1.5 text-center text-[11px] font-bold leading-tight text-black sm:text-[12px]">1 €/mois pendant 3 mois</span>
+            <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-white/[0.06] blur-2xl" />
             <span className="relative">
               <ShopifyBag className="h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
-              <span className="absolute -bottom-1 -right-2 grid h-7 w-7 place-items-center rounded-full border border-[#4ade80]/40 bg-[#052e16]"><Store className="h-4 w-4 text-[#4ade80]" /></span>
+              <span className="absolute -bottom-1 -right-2 grid h-7 w-7 place-items-center rounded-full border border-white/15 bg-[#052e16]"><Store className="h-4 w-4 text-[#3dff9a]" /></span>
             </span>
             <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">Créer mon compte Shopify</span>
-            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#6ee7a0,#22c55e)] px-3.5 text-sm font-semibold text-[#052e16] shadow-[0_8px_24px_-6px_rgb(74_222_128/0.7)]"><span className="sm:hidden">Création</span><span className="hidden sm:inline">Créer mon compte</span> <ArrowUp className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" /></span>
+            <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-3.5 text-sm font-semibold text-black glow-hover"><span className="sm:hidden">Création</span><span className="hidden sm:inline">Créer mon compte</span> <ArrowUp className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" /></span>
           </span>
         </a>
       </div>
@@ -221,7 +221,7 @@ function GoogleButton({ next }: { next: string }) {
   let ref: string | undefined;
   try { ref = typeof document !== "undefined" ? document.cookie.match(/(?:^|; )ref=([^;]+)/)?.[1] : undefined; } catch { /* cookies indisponibles */ }
   return (
-    <a href={api.googleAuthUrl(next, ref)} onClick={onClick} className="flex h-14 w-full items-center justify-center gap-2.5 rounded-[16px] border border-white/15 bg-white/[0.05] text-base font-medium backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#2ee6a6]/50 hover:bg-white/[0.08]">
+    <a href={api.googleAuthUrl(next, ref)} onClick={onClick} className="flex h-14 w-full items-center justify-center gap-2.5 rounded-[16px] border border-white/15 bg-white/[0.05] text-base font-medium backdrop-blur transition-all hover:-translate-y-0.5 hover:border-white/15 hover:bg-white/[0.08]">
       <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden>
         <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
         <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
@@ -272,7 +272,7 @@ function EmailOption({ next, startOpen = false, primary = false }: { next: strin
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="flex h-14 w-full items-center justify-center gap-2.5 rounded-[16px] border border-white/15 bg-white/[0.05] text-base font-medium backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#2ee6a6]/50 hover:bg-white/[0.08]">
+      <button type="button" onClick={() => setOpen(true)} className="flex h-14 w-full items-center justify-center gap-2.5 rounded-[16px] border border-white/15 bg-white/[0.05] text-base font-medium backdrop-blur transition-all hover:-translate-y-0.5 hover:border-white/15 hover:bg-white/[0.08]">
         <Mail className="h-4 w-4 text-fg-muted" /> Continuer avec mon e-mail
       </button>
     );

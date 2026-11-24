@@ -235,7 +235,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   return (
     <div className="mx-auto max-w-3xl px-5 pb-28 pt-8 sm:px-8 sm:pt-12">
       <div className="flex items-center gap-1.5">
-        {plan.map((s, i) => <span key={s} className={cn("h-1.5 flex-1 rounded-full transition-colors duration-500", i <= index ? "bg-[linear-gradient(90deg,#34f0b0,#10b981)] shadow-[0_0_10px_rgb(46_230_166/0.5)]" : "bg-white/10")} />)}
+        {plan.map((s, i) => <span key={s} className={cn("h-1.5 flex-1 rounded-full transition-colors duration-500", i <= index ? "bg-[#3dff9a]" : "bg-white/10")} />)}
       </div>
       <div className="mt-4 flex items-center justify-between text-sm text-fg-muted">
         {history.length > 1
@@ -245,7 +245,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
       </div>
 
       {preset && step === "level" && (
-        <p className="mx-auto mt-5 w-fit max-w-full truncate rounded-full border border-[#3dff9a]/30 bg-[#3dff9a]/10 px-3.5 py-1.5 text-center text-[13px] text-[#c8ffe2]">
+        <p className="mx-auto mt-5 w-fit max-w-full truncate rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-1.5 text-center text-[13px] text-white/80">
           ✓ {preset.isLink ? "Ton lien produit est gardé" : `Ton idée est gardée : « ${preset.text.slice(0, 60)}${preset.text.length > 60 ? "…" : ""} »`}. Quelques questions pour faire ta boutique sur mesure.
         </p>
       )}
@@ -268,8 +268,8 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
               <Card tint={3} icon={Sparkles} label="Pas encore" hint="Propose-moi des produits" on={hasIdea === false} onClick={() => setHasIdea(false)} />
             </div>
             {hasIdea && (
-              <div className="rounded-[18px] border border-[#34f0b0]/40 bg-[#34f0b0]/[0.07] p-4 [animation:fade-in_.3s_ease-out_both]">
-                <label htmlFor="quiz-idea" className="flex items-center gap-2 text-sm font-semibold text-white"><PenLine className="h-4 w-4 text-[#86efc9]" /> Ton produit</label>
+              <div className="rounded-[18px] border border-white/15 bg-white/[0.05] p-4 [animation:fade-in_.3s_ease-out_both]">
+                <label htmlFor="quiz-idea" className="flex items-center gap-2 text-sm font-semibold text-white"><PenLine className="h-4 w-4 text-white/70" /> Ton produit</label>
                 <input id="quiz-idea" autoFocus value={idea} onChange={(e) => setIdea(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && idea.trim().length >= 3) goNext(); }} placeholder="Ex. : coussin chauffant pour le dos" className="field mt-2" />
               </div>
             )}
@@ -282,8 +282,8 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
             </div>
             {/* « Surprends-moi » en grand, sous toutes les catégories. */}
             <button type="button" onClick={() => { const r = NICHES[Math.floor(Math.random() * NICHES.length)]; setBig(BIG_NICHES.find((x) => (x.subs as readonly string[]).includes(r.id))?.id ?? null); setNiche(r.id); setProduct(null); setHistory((h) => [...h, "sub", "product"]); }}
-              className="flex w-full items-center justify-center gap-3 rounded-[18px] border border-dashed border-[#34f0b0]/45 bg-[linear-gradient(110deg,rgb(52_240_176/0.1),rgb(45_212_191/0.06))] p-5 text-white transition-all hover:-translate-y-0.5 hover:border-[#34f0b0]/80">
-              <span className="grid h-11 w-11 place-items-center rounded-[13px] bg-[linear-gradient(150deg,#34f0b0,#0fae7c)] text-[#03140d]"><Shuffle className="h-5 w-5" /></span>
+              className="flex w-full items-center justify-center gap-3 rounded-[18px] border border-dashed border-white/15 bg-[linear-gradient(110deg,rgb(255_255_255/0.1),rgb(45_212_191/0.06))] p-5 text-white transition-all hover:-translate-y-0.5 hover:border-white/15">
+              <span className="grid h-11 w-11 place-items-center rounded-[13px] bg-white glow-hover text-[#03140d]"><Shuffle className="h-5 w-5" /></span>
               <span className="text-left"><span className="block text-[16px] font-semibold">Surprends-moi</span><span className="block text-xs text-fg-muted">On choisit un univers pour toi</span></span>
             </button>
           </div>
@@ -320,7 +320,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
 function NextButton({ onClick }: { onClick: () => void }) {
   return (
     <div className="sticky bottom-3 z-20 mt-8">
-    <button type="button" onClick={onClick} className="[animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-10px_rgb(46_230_166/0.8),inset_0_1px_0_rgb(255_255_255/0.45)] transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
+    <button type="button" onClick={onClick} className="[animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white glow-hover text-[16px] font-semibold text-[#03140d] transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
       Continuer <ArrowRight className="h-5 w-5" />
     </button>
     </div>
@@ -338,11 +338,12 @@ function Grid({ options, value, onPick, cols = 3 }: { options: Option[]; value: 
 // Même style pour toutes les cartes : icône noire dans un carré vert LED lumineux.
 // Carte choisie : elle s'éclaire en vert (bordure, fond et halo).
 const LED = "#3dff9a";
-const ON = { borderColor: LED, background: "linear-gradient(160deg, rgb(61 255 154 / .2), rgb(61 255 154 / .07))", boxShadow: "0 0 0 1px rgb(61 255 154 / .9), 0 0 34px -6px rgb(61 255 154 / .75), inset 0 0 24px rgb(61 255 154 / .1)" };
-const OFF = { borderColor: "rgb(255 255 255 / .12)", background: "rgb(255 255 255 / .04)" };
-const IconBox = ({ icon: I, size }: { icon: Icon; size: "s" | "m" | "l" }) => (
-  <span style={{ background: `linear-gradient(160deg, #7dffbd, ${LED} 55%, #19e07c)`, boxShadow: "0 0 18px -2px rgb(61 255 154 / .6), inset 0 1px 0 rgb(255 255 255 / .6)" }}
-    className={cn("grid shrink-0 place-items-center text-[#04120b] transition-transform group-hover:scale-105", size === "s" ? "h-11 w-11 rounded-[13px]" : size === "m" ? "h-14 w-14 rounded-[14px]" : "h-16 w-16 rounded-[18px]")}>
+const ON = { borderColor: LED, background: "rgb(61 255 154 / .06)", boxShadow: "0 0 0 1px rgb(61 255 154 / .9), 0 0 30px -8px rgb(61 255 154 / .6)" };
+const OFF = { borderColor: "rgb(255 255 255 / .12)", background: "rgb(255 255 255 / .025)" };
+// Icône noire (trait blanc) ; une fois la réponse choisie, la case devient vert électrique.
+const IconBox = ({ icon: I, size, on = false }: { icon: Icon; size: "s" | "m" | "l"; on?: boolean }) => (
+  <span style={on ? { background: LED, boxShadow: "0 0 22px -2px rgb(61 255 154 / .7)" } : { background: "#0a0a0a", boxShadow: "inset 0 0 0 1px rgb(255 255 255 / .14)" }}
+    className={cn("grid shrink-0 place-items-center transition-all duration-200 group-hover:scale-105", on ? "text-black" : "text-white", size === "s" ? "h-11 w-11 rounded-[13px]" : size === "m" ? "h-14 w-14 rounded-[14px]" : "h-16 w-16 rounded-[18px]")}>
     <I className={size === "s" ? "h-5 w-5" : size === "m" ? "h-7 w-7" : "h-8 w-8"} />
   </span>
 );
@@ -353,7 +354,7 @@ function Card({ icon, label, hint, on, row, onClick }: { icon: Icon; label: stri
   return (
     <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
       className={cn("group relative flex h-full rounded-[18px] border p-4 text-left backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25", row ? "items-center gap-3.5" : "flex-col items-center gap-3 py-6 text-center")}>
-      <IconBox icon={icon} size={row ? "s" : "m"} />
+      <IconBox icon={icon} size={row ? "s" : "m"} on={on} />
       <span className="min-w-0">
         <span className="block text-[15px] font-semibold leading-tight text-white">{label}</span>
         {hint && <span className="mt-1 block text-xs leading-snug text-fg-muted">{hint}</span>}
@@ -368,7 +369,7 @@ function BigCard({ icon, label, hint, on, onClick }: { icon: Icon; label: string
   return (
     <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
       className="group relative flex h-full flex-col items-center gap-3 rounded-[22px] border px-3 py-7 text-center backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-white/25">
-      <IconBox icon={icon} size="l" />
+      <IconBox icon={icon} size="l" on={on} />
       <span className="font-display text-[17px] font-semibold leading-tight tracking-[-0.01em] text-white sm:text-[19px]">{label}</span>
       <span className="text-xs leading-snug text-fg-muted">{hint}</span>
       {on && <Tick />}

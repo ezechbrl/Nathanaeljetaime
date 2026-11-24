@@ -10,8 +10,8 @@ export function FinalCta({ title = <>Ta boutique Shopify, prête en <span classN
     <section className="py-20">
       <Container>
         <div className="relative overflow-hidden rounded-[22px] border border-white/[0.08] bg-bg-2 p-6 sm:p-10 lg:p-14">
-          <div aria-hidden className="absolute inset-0 [background:repeating-linear-gradient(135deg,rgb(94_211_140/0.06)_0_1px,transparent_1px_16px)] [mask-image:linear-gradient(90deg,transparent_40%,black)]" />
-          <div aria-hidden className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgb(0_128_96/0.35),transparent)]" />
+          <div aria-hidden className="absolute inset-0 [background:repeating-linear-gradient(135deg,rgb(255_255_255/0.06)_0_1px,transparent_1px_16px)] [mask-image:linear-gradient(90deg,transparent_40%,black)]" />
+          <div aria-hidden className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgb(255_255_255/0.06),transparent)]" />
           <div className="relative grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
               <Reveal as="h2" className="text-h1">{title}</Reveal>

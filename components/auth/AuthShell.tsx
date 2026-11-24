@@ -9,8 +9,8 @@ export function AuthShell({ title, subtitle, children }: { title: React.ReactNod
       <div className="flex min-w-0 flex-col overflow-x-clip px-5 py-8 sm:px-12 lg:px-20">
         <Logo />
         <div className="relative mx-auto flex w-full max-w-[480px] flex-1 flex-col justify-center py-10 sm:py-12">
-          <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(46_230_166/0.18),transparent)]" />
-          <h1 className="bg-[linear-gradient(180deg,#ffffff_30%,#a7f3d0)] bg-clip-text text-[2.4rem] font-semibold leading-tight tracking-[-0.04em] text-transparent sm:text-[2.8rem]">{title}</h1>
+          <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full" />
+          <h1 className="text-white text-[2.4rem] font-semibold leading-tight tracking-[-0.04em] sm:text-[2.8rem]">{title}</h1>
           {subtitle && <p className="mt-2 text-fg-muted">{subtitle}</p>}
           <div className="mt-8">{children}</div>
         </div>

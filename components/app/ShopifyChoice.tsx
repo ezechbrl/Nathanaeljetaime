@@ -59,11 +59,11 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
           </a>
         </div>
 
-        <div className="flex flex-col rounded-[22px] border border-[#2ee6a6]/30 bg-black/30 p-4 backdrop-blur-xl">
-          <div className="grid h-36 place-items-center rounded-[16px] border border-white/5 bg-[linear-gradient(135deg,rgb(16_176_127/0.35),rgb(4_30_22/0.6))]">
+        <div className="flex flex-col rounded-[22px] border border-white/15 bg-black/30 p-4 backdrop-blur-xl">
+          <div className="grid h-36 place-items-center rounded-[16px] border border-white/5 bg-white/[0.03]">
             <span className="flex items-center gap-4">
               <span className="grid h-14 w-14 place-items-center rounded-2xl border border-white/10 bg-black/40"><LogoMark /></span>
-              <span className="flex items-center gap-1"><span className="h-px w-6 bg-white/50" /><span className="h-1.5 w-1.5 rounded-full bg-[#2ee6a6]" /><span className="h-px w-6 bg-white/50" /></span>
+              <span className="flex items-center gap-1"><span className="h-px w-6 bg-white/50" /><span className="h-1.5 w-1.5 rounded-full bg-[#3dff9a]" /><span className="h-px w-6 bg-white/50" /></span>
               <ShopifyBag className="h-12 w-12" />
             </span>
           </div>
@@ -72,17 +72,17 @@ export function ShopifyChoice({ next, brief }: { next: string; brief?: string })
           {open ? (
             <form onSubmit={connect} className="mt-4">
               {created && <ReturnSteps className="mb-4" />}
-              <div className="flex items-center rounded-full border border-white/15 bg-white/[0.04] focus-within:border-[#2ee6a6]">
+              <div className="flex items-center rounded-full border border-white/15 bg-white/[0.04] focus-within:border-white/15">
                 <input autoFocus value={shop} onChange={(e) => setShop(e.target.value)} autoComplete="off" spellCheck={false} placeholder={created ? "admin.shopify.com/store/…" : "ma-boutique"} aria-label="Adresse de ta boutique" className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[15px] focus:outline-none" />
                 <span className="pr-4 text-sm text-fg-faint">.myshopify.com</span>
               </div>
               {error && <p role="alert" className="mt-2 text-sm text-bad">{error}</p>}
-              <button type="submit" disabled={loading} className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] disabled:opacity-60">
+              <button type="submit" disabled={loading} className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d] disabled:opacity-60">
                 {loading ? <Spinner /> : <>Connecter <ArrowRight className="h-4 w-4" /></>}
               </button>
             </form>
           ) : (
-            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[15px] font-semibold text-[#03140d] shadow-[0_10px_30px_-10px_rgb(46_230_166/0.7)] transition-transform hover:-translate-y-px">
+            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white glow-hover text-[15px] font-semibold text-[#03140d] transition-transform hover:-translate-y-px">
               Connecter Vigenia à Shopify <ArrowRight className="h-4 w-4" />
             </button>
           )}

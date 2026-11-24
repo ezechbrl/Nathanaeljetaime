@@ -10,12 +10,8 @@ export type Interval = "month" | "year";
 // Fond « aurore » vert, commun à la page Tarifs et à l'écran d'abonnement.
 export function AuroraBackground({ className }: { className?: string }) {
   return (
-    <div aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)}>
-      <div className="absolute inset-0 bg-black/10" />
-      <div className="absolute -left-[15%] -top-[25%] h-[70%] w-[65%] rounded-full bg-[radial-gradient(closest-side,rgb(16_176_127/0.35),transparent)] [animation:aurora_14s_ease-in-out_infinite]" />
-      <div className="absolute -right-[10%] top-[20%] h-[70%] w-[55%] rounded-full bg-[radial-gradient(closest-side,rgb(163_230_53/0.14),transparent)] [animation:aurora_18s_ease-in-out_infinite_reverse]" />
-      {/* Rayons de lumière obliques */}
-      <div className="absolute inset-0 opacity-60 [background:repeating-linear-gradient(100deg,transparent_0_70px,rgb(52_211_153/0.05)_70px_120px,transparent_120px_200px)] [mask-image:linear-gradient(180deg,black,transparent_85%)]" />
+    <div aria-hidden className={cn("pointer-events-none absolute inset-0 overflow-hidden bg-[#0d0d0d]", className)}>
+      <div className="absolute inset-0 [background:repeating-linear-gradient(90deg,transparent_0_79px,rgb(255_255_255/0.03)_79px_80px)]" />
     </div>
   );
 }
@@ -24,11 +20,11 @@ export function IntervalToggle({ value, onChange }: { value: Interval; onChange:
   return (
     <div className="mx-auto flex w-fit items-center gap-1 rounded-full border border-white/10 bg-black/30 p-1 text-[13px] font-semibold backdrop-blur" role="radiogroup" aria-label="Période">
       {(["month", "year"] as const).map((v) => (
-        <button key={v} type="button" role="radio" aria-checked={value === v} onClick={() => onChange(v)} className={cn("rounded-full px-4 py-1.5 transition-colors", value === v ? "bg-[linear-gradient(180deg,#2ee6a6,#10b07f)] text-[#03140d] shadow-[0_0_20px_-4px_rgb(46_230_166/0.7)]" : "text-fg-muted hover:text-fg")}>
+        <button key={v} type="button" role="radio" aria-checked={value === v} onClick={() => onChange(v)} className={cn("rounded-full px-4 py-1.5 transition-colors", value === v ? "bg-white glow-hover text-[#03140d]" : "text-fg-muted hover:text-fg")}>
           {v === "month" ? "Mensuel" : "Annuel"}
         </button>
       ))}
-      <span className="rounded-full bg-[#a3e635]/15 px-2.5 py-1 text-[12px] text-[#bef264]">−{Math.round((1 - PAID_PLANS[0].yearly / (PAID_PLANS[0].monthly * 12)) * 100)} % à l'année</span>
+      <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[12px] text-white/80">−{Math.round((1 - PAID_PLANS[0].yearly / (PAID_PLANS[0].monthly * 12)) * 100)} % à l'année</span>
     </div>
   );
 }
@@ -63,7 +59,7 @@ export type Left = NonNullable<ReturnType<typeof useCountdown>>;
 // Bandeau de l'offre de bienvenue (24 h après l'inscription), avec le compte à rebours.
 export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?: boolean }) {
   return (
-    <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#2ee6a6]/40 bg-white/[0.04] px-5 py-3 backdrop-blur shadow-[0_0_40px_-15px_rgb(46_230_166/0.7)]">
+    <div className="mx-auto flex max-w-[760px] flex-wrap items-center justify-between gap-3 rounded-[18px] border border-white/15 bg-white/[0.04] px-5 py-3 backdrop-blur">
       <div>
         <p className="text-[16px] font-bold uppercase tracking-[0.04em] text-white">{waitlist ? `Prix spécial : ${euro(WAITLIST_PRICES.pro.monthly)}/mois à vie` : `Offre de bienvenue : « Ma boutique » à ${euro(SINGLE.offer)} au lieu de ${euro(SINGLE.price)}`}</p>
         <p className="text-[12.5px] text-fg-muted">{waitlist ? "Rien que pour toi. Abonne-toi avant la fin du compteur : ce prix reste le tien tant que tu restes abonné." : "Paiement unique, sans abonnement, valable jusqu'à la fin du compteur."}</p>
@@ -85,7 +81,7 @@ export function OfferBanner({ left, waitlist = false }: { left: Left; waitlist?:
 // Starter vert (mis en avant), Pro bleu, Ma boutique jaune doux.
 type Tone = "green" | "blue" | "yellow";
 const TONE: Record<Tone, { border: string; badge: string; tile: string; check: string; checkBg: string; text: string; inner: string }> = {
-  green: { border: "bg-[linear-gradient(160deg,#2ee6a6,rgb(255_255_255/0.08)_45%,#a3e635)] shadow-[0_0_60px_-18px_rgb(46_230_166/0.55)]", badge: "border-[#a3e635]/40 bg-[#a3e635]/10 text-[#bef264]", tile: "bg-[#2ee6a6]/15 text-[#2ee6a6]", check: "text-[#2ee6a6]", checkBg: "bg-[#2ee6a6]/15", text: "text-[#6ee7b7]", inner: "bg-[linear-gradient(180deg,rgb(10_40_30/0.85),rgb(4_16_12/0.92))]" },
+  green: { border: "bg-white/[0.03]", badge: "border-white/15 bg-white/[0.06] text-white/80", tile: "bg-white/[0.06] text-[#3dff9a]", check: "text-[#3dff9a]", checkBg: "bg-white/[0.06]", text: "text-[#3dff9a]", inner: "bg-white/[0.03]" },
   blue: { border: "bg-[linear-gradient(160deg,rgb(56_189_248/0.55),rgb(255_255_255/0.06)_50%,rgb(56_189_248/0.25))]", badge: "border-[#38bdf8]/35 bg-[#38bdf8]/10 text-[#bae6fd]", tile: "bg-[#38bdf8]/15 text-[#7dd3fc]", check: "text-[#7dd3fc]", checkBg: "bg-[#38bdf8]/15", text: "text-[#7dd3fc]", inner: "bg-[linear-gradient(180deg,rgb(10_32_44/0.88),rgb(4_14_20/0.93))]" },
   yellow: { border: "bg-[linear-gradient(160deg,rgb(253_224_71/0.5),rgb(255_255_255/0.06)_50%,rgb(253_224_71/0.22))]", badge: "border-[#fde047]/35 bg-[#fde047]/10 text-[#fef08a]", tile: "bg-[#fde047]/15 text-[#fde047]", check: "text-[#fde047]", checkBg: "bg-[#fde047]/15", text: "text-[#fef08a]", inner: "bg-[linear-gradient(180deg,rgb(36_34_14/0.86),rgb(14_14_6/0.93))]" },
 };
@@ -121,7 +117,7 @@ export function PlanCards({ interval, action, left, offer = false, waitlist = fa
                   <span className="block text-[12.5px] text-fg-muted">payé une fois par an</span>
                 </p>
               ) : <p className={cn("mt-1.5 min-h-5 text-[14px] font-medium", t.text)}>Sans engagement</p>}
-              {left && waitlist && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#2ee6a6]/30 bg-[#2ee6a6]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#a7f3d0]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
+              {left && waitlist && <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-1 text-[12px] font-semibold tabular-nums text-white/80"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
               <div className="mt-5">{action(plan, interval)}</div>
               <div className="my-5 h-px bg-white/10" />
               <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>
@@ -155,10 +151,10 @@ function FeatureItem({ f, tone = "green" }: { f: PlanFeature; tone?: Tone }) {
     <li className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button type="button" onClick={() => setOpen((o) => !o)} onBlur={() => setOpen(false)} aria-expanded={open} className="flex w-full gap-2.5 text-left">
         {check}
-        <span className="flex-1 underline decoration-[#2ee6a6]/50 decoration-dotted underline-offset-4">{f.text}</span>
+        <span className="flex-1 underline decoration-white/40 decoration-dotted underline-offset-4">{f.text}</span>
       </button>
       {open && (
-        <div role="tooltip" className="absolute bottom-full left-0 right-0 z-30 mb-2 rounded-[14px] border border-[#2ee6a6]/30 bg-[#06261c]/95 p-2.5 shadow-[0_20px_50px_-15px_rgb(0_0_0/0.8),0_0_30px_-10px_rgb(46_230_166/0.5)] backdrop-blur-xl [animation:fade-in_.15s_ease-out]">
+        <div role="tooltip" className="absolute bottom-full left-0 right-0 z-30 mb-2 rounded-[14px] border border-white/15 bg-[#0d0d0d]/95 p-2.5 backdrop-blur-xl [animation:fade-in_.15s_ease-out]">
           <FeaturePreview kind={f.preview} />
         </div>
       )}
@@ -188,7 +184,7 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
             <div key={name} className="overflow-hidden rounded-[8px] bg-white/[0.05]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover" />
-              <p className="px-2 py-1 text-[11.5px] font-semibold">{name} <span className="font-normal text-[#6ee7b7]">· en ligne</span></p>
+              <p className="px-2 py-1 text-[11.5px] font-semibold">{name} <span className="font-normal text-[#3dff9a]">· en ligne</span></p>
             </div>
           ))}
         </div>
@@ -199,9 +195,9 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
   if (kind === "coach") {
     return (
       <div className="space-y-1.5 text-[12px]">
-        <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#6ee7b7]">Idées pour vendre plus · aujourd'hui</p>
+        <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#3dff9a]">Idées pour vendre plus · aujourd'hui</p>
         {["Ajoute une réponse à « Est-ce que ça colle ? » sur l'accueil", "Mets le lot de 2 en avant sur la fiche produit"].map((t) => (
-          <p key={t} className="rounded-[10px] bg-white/[0.05] px-3 py-2">{t} <span className="text-[#2ee6a6]">· Appliquer avec l'IA →</span></p>
+          <p key={t} className="rounded-[10px] bg-white/[0.05] px-3 py-2">{t} <span className="text-[#3dff9a]">· Appliquer avec l'IA →</span></p>
         ))}
       </div>
     );
@@ -222,7 +218,7 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
   if (kind === "reviews") {
     return (
       <div className="space-y-1.5">
-        <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#6ee7b7]">Exemple d'avis importés</p>
+        <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#3dff9a]">Exemple d'avis importés</p>
         {[["Karim B.", "Le micro est super clair."], ["Julie M.", "Confortable même après 4 h de jeu."]].map(([n, t]) => (
           <div key={n} className="rounded-[10px] bg-white/[0.05] px-3 py-2 text-[12.5px]">
             <p className="flex items-center justify-between font-semibold">{n}<span className="flex text-[#fbbf24]">{[0, 1, 2, 3, 4].map((i) => <Star key={i} className="h-3 w-3 fill-current" />)}</span></p>
@@ -236,7 +232,7 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
   if (kind === "texts") {
     return (
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6ee7b7]">Titre de l'accueil · casque gaming</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#3dff9a]">Titre de l'accueil · casque gaming</p>
         <p className="mt-1 text-[17px] font-semibold leading-tight">Entends tout. Avant les autres.</p>
         <p className="mt-1 text-[12px] text-fg-muted">Son spatial, micro antibruit, 40 h d'autonomie.</p>
 
@@ -246,8 +242,8 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
   return (
     <div className="space-y-1.5 text-[12.5px]">
       {[["1 casque", "59,00 €", ""], ["Lot de 2", "100,30 €", "−15 %"], ["Lot de 3", "141,60 €", "−20 %"]].map(([l, p, d], i) => (
-        <div key={l} className={cn("flex items-center justify-between rounded-[10px] border px-3 py-2", i === 1 ? "border-[#2ee6a6]/60 bg-[#2ee6a6]/10" : "border-white/10 bg-white/[0.03]")}>
-          <span className="font-medium">{l}{d && <span className="ml-2 rounded-full bg-[#2ee6a6]/20 px-1.5 py-0.5 text-[10.5px] font-bold text-[#a7f3d0]">{d}</span>}</span>
+        <div key={l} className={cn("flex items-center justify-between rounded-[10px] border px-3 py-2", i === 1 ? "border-white/15 bg-white/[0.06]" : "border-white/10 bg-white/[0.03]")}>
+          <span className="font-medium">{l}{d && <span className="ml-2 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[10.5px] font-bold text-white/80">{d}</span>}</span>
           <span className="tabular-nums">{p}</span>
         </div>
       ))}
@@ -293,8 +289,8 @@ export function TrustRow() {
     {/* Le prix remis en perspective : ordres de grandeur pour une boutique complète. */}
     <div className="mx-auto mt-6 grid max-w-[640px] grid-cols-3 overflow-hidden rounded-[16px] border border-white/10 text-center">
       {[["Une agence", "≈ 2 000 €", "et 3 semaines"], ["Un freelance", "≈ 500 €", "et 1 à 2 semaines"], ["Vigenia", `${euro(SINGLE.price)}`, "et 3 minutes"]].map(([who, price, time], i) => (
-        <div key={who} className={cn("px-2 py-3", i === 2 ? "bg-[#2ee6a6]/12 shadow-[inset_0_0_30px_-10px_rgb(46_230_166/0.5)]" : "bg-black/20", i > 0 && "border-l border-white/10")}>
-          <p className={cn("text-[11.5px] font-semibold uppercase tracking-[0.08em]", i === 2 ? "text-[#6ee7b7]" : "text-fg-faint")}>{who}</p>
+        <div key={who} className={cn("px-2 py-3", i === 2 ? "bg-white/[0.06]" : "bg-black/20", i > 0 && "border-l border-white/10")}>
+          <p className={cn("text-[11.5px] font-semibold uppercase tracking-[0.08em]", i === 2 ? "text-[#3dff9a]" : "text-fg-faint")}>{who}</p>
           <p className={cn("mt-1 whitespace-nowrap text-[16px] font-bold tabular-nums sm:text-[20px]", i === 2 ? "text-white" : "text-fg-muted line-through decoration-[#ef4444]/70")}>{price}</p>
           <p className="text-[11.5px] text-fg-muted">{time}</p>
         </div>
@@ -302,10 +298,10 @@ export function TrustRow() {
     </div>
     <p className="mt-2 text-center text-[11.5px] text-fg-faint">Ordres de grandeur pour une boutique Shopify complète. Avec Vigenia, l'IA la plus récente fait le travail, et tu peux tout modifier.</p>
     <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12.5px] text-fg-muted">
-      <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[#2ee6a6]" /> Annulation en 1 clic</span>
-      <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-[#2ee6a6]" /> Paiement sécurisé par carte (Stripe)</span>
-      <span className="inline-flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5 text-[#2ee6a6]" /> Carte, Apple Pay, Google Pay</span>
-      <span className="inline-flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5 text-[#2ee6a6]" /> Support humain</span>
+      <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-[#3dff9a]" /> Annulation en 1 clic</span>
+      <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-[#3dff9a]" /> Paiement sécurisé par carte (Stripe)</span>
+      <span className="inline-flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5 text-[#3dff9a]" /> Carte, Apple Pay, Google Pay</span>
+      <span className="inline-flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5 text-[#3dff9a]" /> Support humain</span>
     </div>
     </>
   );
@@ -317,12 +313,12 @@ export const planButtonClass = (featured?: boolean, tone?: Tone) =>
   cn(
     "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition-all hover:-translate-y-px disabled:opacity-60",
     featured
-      ? "bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[inset_0_1px_0_rgb(255_255_255/0.4),0_10px_30px_-8px_rgb(46_230_166/0.7)]"
+      ? "bg-white glow-hover text-[#03140d]"
       : tone === "blue"
         ? "border border-[#38bdf8]/40 bg-[#38bdf8]/10 text-[#e0f2fe] shadow-[0_0_24px_-10px_rgb(56_189_248/0.6)] hover:bg-[#38bdf8]/20"
         : tone === "yellow"
           ? "border border-[#fde047]/40 bg-[#fde047]/10 text-[#fef9c3] shadow-[0_0_24px_-10px_rgb(253_224_71/0.5)] hover:bg-[#fde047]/20"
-          : "border border-[#2ee6a6]/40 bg-[#2ee6a6]/10 text-[#d1fae5] shadow-[0_0_24px_-10px_rgb(46_230_166/0.6)] hover:bg-[#2ee6a6]/20",
+          : "border border-white/15 bg-white/[0.06] text-white hover:bg-white/[0.06]",
   );
 
 // Bouton de « Ma boutique » : discret, comme les offres non mises en avant.

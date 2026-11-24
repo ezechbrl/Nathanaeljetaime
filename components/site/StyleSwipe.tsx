@@ -76,7 +76,7 @@ export function StyleSwipe({ onDone, big = false, compact = false }: { onDone: (
             <p className={cn("text-xl font-semibold text-white", big && "sm:text-2xl")}>{s.name}</p>
             <p className="text-xs text-white/75">{s.category}</p>
           </div>
-          {(dx > 30 || fly === "right") && <span className="pointer-events-none absolute left-4 top-4 rotate-[-12deg] rounded-lg border-2 border-[#34f0b0] px-2 py-0.5 text-sm font-bold text-[#34f0b0]">J'AIME</span>}
+          {(dx > 30 || fly === "right") && <span className="pointer-events-none absolute left-4 top-4 rotate-[-12deg] rounded-lg border-2 border-white/15 px-2 py-0.5 text-sm font-bold text-[#3dff9a]">J'AIME</span>}
           {(dx < -30 || fly === "left") && <span className="pointer-events-none absolute right-4 top-4 rotate-[12deg] rounded-lg border-2 border-[#fb7185] px-2 py-0.5 text-sm font-bold text-[#fb7185]">BOF</span>}
         </div>
         {/* Animation du choix : un grand cœur qui s'envole avec des petits cœurs, ou une croix qui part à gauche. */}
@@ -84,7 +84,7 @@ export function StyleSwipe({ onDone, big = false, compact = false }: { onDone: (
           <div key={burst.n} aria-hidden className="pointer-events-none absolute inset-0 z-10 grid place-items-center overflow-visible">
             {burst.like ? (
               <>
-                <Heart className="h-28 w-28 fill-[#34f0b0] text-[#34f0b0] drop-shadow-[0_0_30px_rgb(52_240_176/0.8)] [animation:swipe-heart_.9s_cubic-bezier(.2,.8,.2,1)_forwards]" />
+                <Heart className="h-28 w-28 fill-[#3dff9a] text-[#3dff9a] drop-shadow-[0_0_30px_rgb(255_255_255/0.8)] [animation:swipe-heart_.9s_cubic-bezier(.2,.8,.2,1)_forwards]" />
                 {[-70, -35, 0, 35, 70, -50, 50].map((x, k) => (
                   <Heart key={k} className="absolute h-6 w-6 fill-[#f472b6] text-[#f472b6] [animation:swipe-float_1s_ease-out_forwards]" style={{ ["--x" as string]: `${x}px`, animationDelay: `${k * 50}ms`, opacity: 0 }} />
                 ))}
@@ -97,7 +97,7 @@ export function StyleSwipe({ onDone, big = false, compact = false }: { onDone: (
       </div>
       <div className="mt-6 flex items-center gap-6">
         <button type="button" aria-label="Je n'aime pas" onClick={() => decide(false)} className="grid h-16 w-16 place-items-center rounded-full border border-[#fb7185]/50 bg-[#fb7185]/10 text-[#fb7185] shadow-[0_10px_30px_-10px_rgb(251_113_133/0.7)] transition-transform hover:scale-110 active:scale-95"><X className="h-8 w-8" /></button>
-        <button type="button" aria-label="J'aime" onClick={() => decide(true)} className="grid h-20 w-20 place-items-center rounded-full bg-[linear-gradient(160deg,#34f0b0,#0fae7c)] text-[#03140d] shadow-[0_12px_36px_-8px_rgb(46_230_166/0.8)] transition-transform hover:scale-110 active:scale-95"><Heart className="h-9 w-9 fill-current" /></button>
+        <button type="button" aria-label="J'aime" onClick={() => decide(true)} className="grid h-20 w-20 place-items-center rounded-full bg-white glow-hover text-[#03140d] transition-transform hover:scale-110 active:scale-95"><Heart className="h-9 w-9 fill-current" /></button>
       </div>
     </div>
   );

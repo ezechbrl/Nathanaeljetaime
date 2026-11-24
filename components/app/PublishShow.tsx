@@ -60,7 +60,7 @@ export function PublishProgress({ store, job }: { store: Store; job: Job }) {
     <div role="dialog" aria-modal="true" aria-label="Publication en cours" className="fixed inset-0 z-[60] grid place-items-center overflow-y-auto bg-[#040d0b] p-5 [animation:fade-in_.3s_ease-out]">
       {/* Même fond animé que l'écran de création */}
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-[20%] -top-[30%] h-[80vh] w-[70vw] rounded-full bg-[radial-gradient(closest-side,rgb(16_176_127/0.28),transparent)] [animation:aurora_14s_ease-in-out_infinite]" />
+        <div className="absolute -left-[20%] -top-[30%] h-[80vh] w-[70vw] rounded-full [animation:aurora_14s_ease-in-out_infinite]" />
         <div className="absolute -bottom-[30%] right-[-10%] h-[70vh] w-[60vw] rounded-full bg-[radial-gradient(closest-side,rgb(104_230_176/0.16),transparent)] [animation:aurora_18s_ease-in-out_infinite_reverse]" />
       </div>
       <div className="relative w-full max-w-[600px] text-center [animation:rise_.5s_cubic-bezier(.2,.8,.2,1)_both]">
@@ -154,7 +154,7 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
         <div className="relative mx-auto grid h-24 w-24 place-items-center">
           <span className="absolute inset-0 rounded-full border-2 border-accent [animation:ring-out_1.6s_.3s_ease-out_infinite]" />
           <span className="absolute inset-0 rounded-full border-2 border-accent [animation:ring-out_1.6s_.9s_ease-out_infinite]" />
-          <span className="grid h-20 w-20 place-items-center rounded-full bg-[linear-gradient(160deg,#10b07f,#00876a)] text-white shadow-[0_0_60px_rgb(16_176_127/.6)] [animation:pop-in_.5s_.2s_cubic-bezier(.34,1.56,.64,1)_both]">
+          <span className="grid h-20 w-20 place-items-center rounded-full bg-white/[0.03] text-white [animation:pop-in_.5s_.2s_cubic-bezier(.34,1.56,.64,1)_both]">
             <Globe className="h-10 w-10" />
           </span>
         </div>
@@ -179,7 +179,7 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
           </div>
         )}
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href={`/app/boutiques/${store.id}/apercu`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-accent/40 bg-[linear-gradient(180deg,#10b07f,#00876a)] px-5 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_10px_30px_-8px_rgb(16_176_127/0.7)]">
+          <Link href={`/app/boutiques/${store.id}/apercu`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-white bg-white px-5 text-[15px] font-medium text-black glow-hover">
             Voir ma boutique <ExternalLink className="h-4 w-4" />
           </Link>
           {!manual && !live && adminThemes ? (

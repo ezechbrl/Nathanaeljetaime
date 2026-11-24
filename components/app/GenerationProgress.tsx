@@ -118,7 +118,7 @@ export function GenerationProgress({ store, job: jobProp }: { store: Store; job:
     <div className="fixed inset-0 z-[60] overflow-y-auto bg-[#040d0b] text-fg">
       {/* Fond animé (aurore verte) */}
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-[20%] -top-[30%] h-[80vh] w-[70vw] rounded-full bg-[radial-gradient(closest-side,rgb(16_176_127/0.28),transparent)] [animation:aurora_14s_ease-in-out_infinite]" />
+        <div className="absolute -left-[20%] -top-[30%] h-[80vh] w-[70vw] rounded-full [animation:aurora_14s_ease-in-out_infinite]" />
         <div className="absolute -bottom-[30%] right-[-10%] h-[70vh] w-[60vw] rounded-full bg-[radial-gradient(closest-side,rgb(104_230_176/0.16),transparent)] [animation:aurora_18s_ease-in-out_infinite_reverse]" />
         <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(rgb(255_255_255/.8)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
       </div>
@@ -182,7 +182,7 @@ export function GenerationProgress({ store, job: jobProp }: { store: Store; job:
             </div>
           </div>
           <div className="relative">
-            <div aria-hidden className="absolute -inset-6 rounded-[36px] bg-[radial-gradient(closest-side,rgb(16_176_127/0.22),transparent)] blur-2xl" />
+            <div aria-hidden className="absolute -inset-6 rounded-[36px] blur-2xl" />
             <div className="relative"><BuildStage store={store} job={job} mobile={mobile} /></div>
           </div>
           <p className="mt-4 text-center text-xs text-fg-faint">Tu peux quitter cette page : la création continue et ta boutique t'attendra dans « Mes boutiques ».</p>

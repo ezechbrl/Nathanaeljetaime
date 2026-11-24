@@ -15,7 +15,7 @@ import { useApp } from "./AppContext";
 
 // Une petite couleur par rubrique (pastille d'icône), pour s'y retrouver d'un coup d'œil.
 const TINTS = {
-  green: "bg-[#10b981]/15 text-[#34d399]",
+  green: "bg-white/[0.06] text-[#3dff9a]",
   blue: "bg-[#3b82f6]/15 text-[#7cb2ff]",
   violet: "bg-[#8b5cf6]/15 text-[#b49bff]",
   amber: "bg-[#f59e0b]/15 text-[#fbbf5a]",
@@ -98,11 +98,11 @@ function SidebarBody() {
 
       <div className="mt-auto space-y-3">
         {user.plan === "free" ? (
-          <div className="relative overflow-hidden rounded-card border border-[#2ee6a6]/35 bg-[linear-gradient(160deg,rgb(16_176_127/0.28),rgb(4_30_22/0.6))] p-3.5 shadow-[0_10px_30px_-15px_rgb(46_230_166/0.6)]">
-            <span aria-hidden className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-[#2ee6a6]/25 blur-2xl" />
-            <p className="relative flex items-center gap-1.5 font-serif text-[17px] italic text-white"><Sparkles className="h-4 w-4 text-[#6ee7b7]" /> Débloque ta boutique complète</p>
+          <div className="relative overflow-hidden rounded-card border border-white/15 bg-white/[0.03] p-3.5">
+            <span aria-hidden className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/[0.06] blur-2xl" />
+            <p className="relative flex items-center gap-1.5 font-serif text-[17px] italic text-white"><Sparkles className="h-4 w-4 text-[#3dff9a]" /> Débloque ta boutique complète</p>
             <p className="relative mt-1 text-[13px] leading-relaxed text-white/80">Textes, photos, éditeur IA et mise en ligne sur Shopify. Sans engagement.</p>
-            <Link href="/app/abonnement" className="relative mt-3 flex h-10 items-center justify-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[13.5px] font-semibold text-[#03140d] shadow-[0_8px_24px_-8px_rgb(46_230_166/0.8)] transition hover:brightness-110">Choisir mon offre</Link>
+            <Link href="/app/abonnement" className="relative mt-3 flex h-10 items-center justify-center rounded-full bg-white glow-hover text-[13.5px] font-semibold text-[#03140d] transition hover:brightness-110">Choisir mon offre</Link>
           </div>
         ) : (
           <Link href="/app/abonnement" className="block rounded-card border border-white/[0.08] bg-black/20 p-3 transition-colors hover:border-accent/30">
@@ -116,7 +116,7 @@ function SidebarBody() {
           <NavLink href="/app/parametres" icon={Settings}>Paramètres</NavLink>
         </div>
         <div className="flex items-center gap-2.5 border-t border-white/[0.06] px-1.5 pt-3">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[linear-gradient(160deg,#34f0b0,#0fae7c)] text-sm font-semibold text-[#03140d]">{user.firstName.charAt(0).toUpperCase()}</span>
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white glow-hover text-sm font-semibold text-[#03140d]">{user.firstName.charAt(0).toUpperCase()}</span>
           <div className="min-w-0 flex-1 leading-tight">
             <p className="truncate text-[14px] font-semibold text-white">{user.firstName}</p>
             <p className="truncate text-[11px] text-fg-faint">{user.email}</p>

@@ -85,8 +85,8 @@ function Billing() {
         <div className="grid gap-4 lg:grid-cols-[1.3fr_1fr]">
           {/* Ton abonnement, en grand, avec le prix réellement payé (offre de lancement comprise) */}
           <section className="glow-frame relative overflow-hidden rounded-[22px] p-[1.5px]">
-            <div className="h-full rounded-[21px] bg-[linear-gradient(180deg,rgb(8_40_31/0.95),rgb(4_20_15/0.97))] p-6 sm:p-8">
-              <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6ee7b7]">Ton abonnement</p>
+            <div className="h-full rounded-[21px] bg-[linear-gradient(180deg,rgb(20_20_20/0.95),rgb(14_14_14/0.97))] p-6 sm:p-8">
+              <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#3dff9a]">Ton abonnement</p>
               {sub ? (
                 <>
                   <p className="mt-3 text-[clamp(2.2rem,1.6rem+2vw,3.2rem)] font-semibold leading-none tracking-[-0.03em]">Vigenia {current?.name}</p>
@@ -98,7 +98,7 @@ function Billing() {
                     <span className="text-[2.4rem] font-semibold leading-none tracking-[-0.03em] tabular-nums">{sub.amount ? formatMoney(sub.amount, sub.currency ?? "EUR") : euro(sub.interval === "year" ? current?.yearly ?? 0 : current?.monthly ?? 0)}</span>
                     <span className="text-fg-muted">{sub.interval === "year" ? "/ an" : "/ mois"}</span>
                     {sub.amount != null && current && sub.amount < (sub.interval === "year" ? current.yearly : current.monthly) * 100 && (
-                      <span className="ml-1 rounded-full bg-[#2ee6a6]/15 px-2.5 py-1 text-[12px] font-semibold text-[#a7f3d0]">Prix de lancement à vie</span>
+                      <span className="ml-1 rounded-full bg-white/[0.06] px-2.5 py-1 text-[12px] font-semibold text-white/80">Prix de lancement à vie</span>
                     )}
                   </p>
                   )}
