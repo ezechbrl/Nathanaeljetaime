@@ -74,7 +74,7 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
           return (
             <button key={r.id} type="button" role="radio" aria-checked={on} onClick={() => setChoice(r.id)}
               className={cn("relative block w-full rounded-[22px] border p-5 text-left transition-all sm:p-6",
-                on ? "border-[#14b886] bg-[linear-gradient(90deg,rgb(20_184_134/0.28),rgb(20_184_134/0.04)_22%,rgb(20_184_134/0.04)_78%,rgb(20_184_134/0.28))] shadow-[-14px_0_30px_-16px_#14b886,14px_0_30px_-16px_#14b886]" : "border-white/10 bg-black/25 hover:border-white/20")}>
+                on ? "border-[1.5px] border-[#14b886] bg-[#0f1a17] shadow-[0_0_34px_-8px_rgb(20_184_134/0.75),inset_0_0_24px_-12px_rgb(20_184_134/0.5)]" : "border-white/10 bg-black/25 hover:border-white/20")}>
               {r.badge && (
                 <span className={cn("absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-[11.5px] font-bold uppercase tracking-[0.08em]",
                   r.badge.tone === "green" ? "bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover text-white" : "border border-[#fde047]/40 bg-[#1f1d0c] text-[#fef08a]")}>
@@ -103,10 +103,10 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
       <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-white/10 bg-[#0d0d0d]/90 px-4 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-[18px] sm:border">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="whitespace-nowrap text-[1.2rem] font-semibold text-white">{current.price}</p>
+            <p className="whitespace-nowrap text-[15px] font-semibold text-white sm:text-[1.2rem]">{current.price}</p>
             {left && current.id === "single" && <p className="flex items-center gap-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
           </div>
-          <div className="w-[190px] shrink-0 sm:w-[240px]">{cta(current.id, interval)}</div>
+          <div className="w-[150px] shrink-0 sm:w-[240px]">{cta(current.id, interval)}</div>
         </div>
       </div>
     </div>
