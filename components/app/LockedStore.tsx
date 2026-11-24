@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCountdown } from "@/components/pricing/PlanCards";
 import { useApi } from "@/lib/api/hooks";
 import { HESITATIONS } from "@/lib/content/cancel";
-import { PAID_PLANS, SINGLE, euro } from "@/lib/content/pricing";
+import { PAID_PLANS, SINGLE, euro, showBarred } from "@/lib/content/pricing";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -178,16 +178,14 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
   );
 }
 
-// Le prix, dès l'aperçu (pas de surprise après « Débloquer ») : « Ma boutique » en paiement unique (39 € pendant
-// l'offre de bienvenue, avec son vrai compte à rebours), ou un abonnement dès 29 €/mois.
+// Le prix, dès l'aperçu (pas de surprise après « Débloquer ») : « Ma boutique » en paiement unique (39 €, sans
+// abonnement), ou un abonnement dès 29 €/mois.
 function PriceLine() {
   const billing = useApi(() => api.getBilling(false), []);
-  const left = useCountdown(billing.data?.offerEndsAt);
   if (!billing.data) return null;
   return (
     <p className="mx-auto mt-3 flex max-w-xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-fg-muted">
-      <span>Ta boutique complète : <b className="text-white">{euro(left ? SINGLE.offer : SINGLE.price)} une fois</b>{left && <> <s className="text-fg-faint">{euro(SINGLE.price)}</s></>}</span>
-      {left && <span className="inline-flex items-center gap-1 rounded-full bg-[#fde047]/15 px-2.5 py-0.5 text-[12.5px] font-semibold text-[#fef08a]"><Timer className="h-3.5 w-3.5" />offre de bienvenue, encore {left.h} h {left.m} min</span>}
+      <span>Ta boutique complète : <b className="text-white">{euro(SINGLE.price)} une fois</b>{showBarred() && <> <s className="text-fg-faint">{euro(SINGLE.was)}</s></>}</span>
       <span>· ou un abonnement dès {euro(PAID_PLANS[0].monthly)}/mois</span>
     </p>
   );

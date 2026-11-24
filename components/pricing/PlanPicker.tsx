@@ -3,7 +3,7 @@
 import { Check, Sparkles, Timer } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { PAID_PLANS, SINGLE, euro, type Plan } from "@/lib/content/pricing";
+import { PAID_PLANS, SINGLE, euro, showBarred, type Plan } from "@/lib/content/pricing";
 import { planPrice, type Interval, type Left } from "./PlanCards";
 
 export type Choice = "pro" | "agency" | "single";
@@ -45,7 +45,7 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
   cta: (choice: Choice, interval: Interval) => ReactNode;
 }) {
   const [choice, setChoice] = useState<Choice>("pro");
-  const singlePrice = left ? SINGLE.offer : SINGLE.price;
+  const singlePrice = SINGLE.price;
   const rows: { id: Choice; name: string; badge?: { text: string; tone: "green" | "yellow" }; price: ReactNode; right: ReactNode }[] = PAID_PLANS.map((plan: Plan) => {
     const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
     return {
@@ -60,7 +60,7 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
     id: "single",
     name: "Ma boutique",
     badge: { text: "Recommandé", tone: "yellow" },
-    price: <><span className="font-semibold text-white">{euro(singlePrice)}</span> une fois{left && <span className="ml-1.5 text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(SINGLE.price)}</span>}</>,
+    price: <><span className="font-semibold text-white">{euro(singlePrice)}</span> une fois{showBarred() && <span className="ml-1.5 text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(SINGLE.was)}</span>}</>,
     right: <><span className="block text-[1.35rem] font-semibold leading-none tracking-[-0.03em] text-white">Une fois</span><span className="mt-1 block text-[13px] text-fg-muted">à vie</span></>,
   });
 
@@ -104,7 +104,6 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="whitespace-nowrap text-[15px] font-semibold text-white sm:text-[1.2rem]">{current.price}</p>
-            {left && current.id === "single" && <p className="flex items-center gap-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>}
           </div>
           <div className="w-[150px] shrink-0 sm:w-[240px]">{cta(current.id, interval)}</div>
         </div>

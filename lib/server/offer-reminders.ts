@@ -15,6 +15,9 @@ const REMINDERS = [
 ] as const;
 
 export async function sendOfferReminders() {
+  // Depuis le 24 nov. 2026, « Ma boutique » coûte 39 € pour tout le monde, sans limite de temps :
+  // ces relances (« plus que X h ») ne seraient plus vraies. Elles ne partent donc plus.
+  if (SINGLE.price === SINGLE.offer) return 0;
   const now = Date.now();
   let reminders = 0;
   for (const r of REMINDERS) {

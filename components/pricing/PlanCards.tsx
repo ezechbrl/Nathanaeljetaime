@@ -251,7 +251,7 @@ function FeaturePreview({ kind }: { kind: Extract<PlanFeature, object>["preview"
   );
 }
 
-// Paiement unique « Ma boutique » : une boutique complète, sans abonnement (39 € pendant l'offre de bienvenue).
+// Paiement unique « Ma boutique » : une boutique complète, sans abonnement (39 €, ancien prix 49 € barré).
 // Même format que les cartes d'abonnement, tout à droite sur la même ligne, badge « Recommandé ».
 export function SingleCard({ left, action }: { left?: Left | null; action: ReactNode }) {
   return (
@@ -263,12 +263,11 @@ export function SingleCard({ left, action }: { left?: Left | null; action: React
         </div>
         <p className="mt-2 text-[13.5px] leading-snug text-fg-muted">Tu veux juste ta boutique ? Tu paies une fois, elle est à toi pour toujours.</p>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-1 gap-y-1">
-          {left && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(SINGLE.price)}</span>}
-          <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(left ? SINGLE.offer : SINGLE.price)}</span>
+          {showBarred() && <span className="mr-1.5 whitespace-nowrap text-lg font-semibold text-fg-faint line-through decoration-[#ef4444] decoration-[3px] sm:text-xl">{euro(SINGLE.was)}</span>}
+          <span className="whitespace-nowrap text-[2.4rem] font-semibold leading-none tracking-[-0.04em] tabular-nums sm:text-[2.8rem]">{euro(SINGLE.price)}</span>
           <span className="whitespace-nowrap text-sm text-fg-muted">une seule fois</span>
         </p>
-        {left ? <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#fde047]/30 bg-[#fde047]/10 px-2.5 py-1 text-[12px] font-semibold tabular-nums text-[#fef08a]"><Timer className="h-3.5 w-3.5" /> Ce prix encore {left.h}:{left.m}:{left.s}</p>
-          : <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#fef08a]">Paiement unique, sans abonnement</p>}
+        <p className="mt-1.5 min-h-5 text-[14px] font-medium text-[#fef08a]">Paiement unique, sans abonnement</p>
         <div className="mt-5">{action}</div>
         <div className="my-5 h-px bg-white/10" />
         <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-fg-faint">Ce qui est inclus</p>

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useCountdown } from "@/components/pricing/PlanCards";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
-import { LAUNCH_OFFER, SINGLE, euro } from "@/lib/content/pricing";
+import { LAUNCH_OFFER, WAITLIST_PRICES, euro } from "@/lib/content/pricing";
 import { useApp } from "./AppContext";
 
 // Grand bandeau en haut de l'espace client : compte à rebours de l'offre de lancement tant qu'on n'est pas abonné.
@@ -17,15 +17,16 @@ export function OfferBanner() {
   const onStorePage = path.startsWith("/app/boutiques/") || path === "/app/quiz";
   const billing = useApi(() => (user.plan === "free" ? api.getBilling() : Promise.resolve(null)), [user.plan]);
   const left = useCountdown(billing.data?.offerEndsAt);
-  if (user.plan !== "free" || !left || onStorePage) return null;
+  // Seul le prix réservé de la liste d'attente a une vraie date limite : pas de compte à rebours sinon.
+  if (user.plan !== "free" || !left || onStorePage || billing.data?.offerKind !== "waitlist") return null;
 
   const units = [{ v: left.h, l: "heures" }, { v: left.m, l: "minutes" }, { v: left.s, l: "secondes" }];
   return (
     <Link href="/app/abonnement" className="group relative z-30 block border-b lg:sticky lg:top-0 border-white/[0.08] bg-black/25 px-4 py-2.5 backdrop-blur-xl sm:px-8">
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <div>
-          <p className="text-[16px] font-bold uppercase tracking-[0.03em] text-white sm:text-[18px]">Offre de bienvenue : ta boutique à {euro(SINGLE.offer)}</p>
-          <p className="text-[13px] text-white/85 sm:text-[14px]"><span className="font-semibold text-white">{euro(SINGLE.offer)} une fois</span> au lieu de <span className="line-through decoration-[#ef4444] decoration-2">{euro(SINGLE.price)}</span>, sans abonnement. Valable {LAUNCH_OFFER.hours} h après ton inscription.</p>
+          <p className="text-[16px] font-bold uppercase tracking-[0.03em] text-white sm:text-[18px]">Ton prix réservé : Starter à {euro(WAITLIST_PRICES.pro.monthly)}/mois</p>
+          <p className="text-[13px] text-white/85 sm:text-[14px]">Réservé aux inscrits de la liste d'attente, à vie tant que tu restes abonné. Valable {LAUNCH_OFFER.hours} h après ton inscription.</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-end gap-1.5 tabular-nums" aria-label={`Il reste ${left.h} heures et ${left.m} minutes`}>

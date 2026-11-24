@@ -118,7 +118,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <button type="button" onClick={() => setOpen(true)} aria-expanded={open} className="glow-frame group rounded-[22px] p-[1.5px] text-left transition-transform hover:-translate-y-1">
           <span className={`${inner} pt-9 bg-[#111111] sm:pt-10`}>
-            <span className="absolute inset-x-0 top-0 bg-white py-1.5 text-center text-[11px] font-bold leading-tight text-[#03140d] sm:text-[12px]">Boutique dès 39 € · offre 24 h</span>
+            <span className="absolute inset-x-0 top-0 bg-white py-1.5 text-center text-[11px] font-bold leading-tight text-[#03140d] sm:text-[12px]">Ta boutique dès 39 €</span>
             <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-white/[0.06] blur-2xl transition-opacity group-hover:opacity-100" />
             <ShopifyBag className="relative h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
             <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">{withEmail ? "J'ai déjà un compte Shopify" : "Connecter mon compte Shopify"}</span>

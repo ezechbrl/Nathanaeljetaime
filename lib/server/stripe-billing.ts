@@ -101,10 +101,9 @@ async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | 
   return session.url;
 }
 
-// Paiement unique « Ma boutique » (49 €, ou 39 € pendant les 24 h qui suivent l'inscription) pour une boutique d'aperçu.
+// Paiement unique « Ma boutique » (39 €) pour une boutique d'aperçu.
 export async function singleCheckoutUrl(user: UserRow, storeId: string) {
-  const endsAt = await launchOfferEndsAt(user);
-  const amount = endsAt ? SINGLE.offer : SINGLE.price;
+  const amount = SINGLE.price;
   const create = (customer: string) => stripe().checkout.sessions.create({
     mode: "payment",
     customer,
@@ -116,7 +115,7 @@ export async function singleCheckoutUrl(user: UserRow, storeId: string) {
         unit_amount: amount * 100,
         product_data: {
           name: "Vigenia · Ma boutique",
-          description: `${endsAt ? "Offre de bienvenue. " : ""}Ta boutique complète (textes, photos, design, thème Shopify) et ${SINGLE.days} jours de retouches avec l'IA. Paiement unique, sans abonnement.`,
+          description: `Ta boutique complète (textes, photos, design, thème Shopify) et ${SINGLE.days} jours de retouches avec l'IA. Paiement unique, sans abonnement.`,
           images: [`${env.appUrl()}/brand/icon-512.png`],
         },
       },

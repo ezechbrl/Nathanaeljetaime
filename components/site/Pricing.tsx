@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AuroraBackground, IntervalToggle, TrustRow, type Interval } from "@/components/pricing/PlanCards";
 import { PlanPicker, pickerButtonClass } from "@/components/pricing/PlanPicker";
 import { CTA } from "@/lib/launch";
-import { AI_FAIR_USE, LAUNCH_OFFER, PAID_PLANS, SINGLE } from "@/lib/content/pricing";
+import { AI_FAIR_USE, PAID_PLANS, SINGLE, showBarred } from "@/lib/content/pricing";
 
 // Les deux offres (Starter et Pro), au mois ou à l'année.
 export function PricingCards() {
@@ -15,8 +15,8 @@ export function PricingCards() {
     <div className="relative isolate mx-auto max-w-[760px] overflow-clip rounded-[28px] border border-white/10 px-4 py-10 sm:px-10">
       <AuroraBackground className="-z-10" />
       <div className="mx-auto mb-6 max-w-[760px] rounded-[18px] border border-white/15 bg-white/[0.03] px-5 py-3 text-center">
-        <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Offre de bienvenue : ta boutique à {SINGLE.offer} € au lieu de {SINGLE.price} €</p>
-        <p className="text-[12.5px] text-fg-muted">« Ma boutique », en paiement unique, pendant les {LAUNCH_OFFER.hours} h qui suivent ton inscription (compte à rebours dans ton espace).</p>
+        <p className="text-[15px] font-bold uppercase tracking-[0.04em]">Ta boutique à {SINGLE.price} €{showBarred() ? <> au lieu de <s className="decoration-[#ef4444]">{SINGLE.was} €</s></> : null}</p>
+        <p className="text-[12.5px] text-fg-muted">« Ma boutique », en paiement unique, sans abonnement : elle est à toi pour toujours.</p>
       </div>
       <IntervalToggle value={interval} onChange={setPeriod} />
       <div className="mx-auto mt-10 max-w-[640px]">

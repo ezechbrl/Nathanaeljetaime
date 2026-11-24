@@ -58,13 +58,14 @@ export const PLANS: Plan[] = [
   },
 ];
 
-// Offre de bienvenue, 24 h après l'inscription : « Ma boutique » (paiement unique) à 39 € au lieu de 49 €.
-// Les abonnements n'ont plus de réduction : leur prix affiché est le prix payé.
+// Plus d'offre de bienvenue limitée dans le temps pour « Ma boutique » (39 € pour tout le monde).
+// Les 24 h ne servent plus qu'au prix réservé de la liste d'attente. Les abonnements n'ont plus de réduction : leur prix affiché est le prix payé.
 export const LAUNCH_OFFER = { hours: 24, percent: 0 };
 export const withOffer = (price: number) => price;
 
 // Paiement unique « Ma boutique » : une boutique complète, sans abonnement, et 7 jours de retouches.
-export const SINGLE = { price: 49, offer: 39, days: 7 };
+// 39 € pour tout le monde (depuis le 24 nov. 2026). Barré : 49 €, l'ancien prix, jusqu'à BARRED_UNTIL (règle des 30 jours).
+export const SINGLE = { price: 39, was: 49, offer: 39, days: 7 };
 // Prix barrés des abonnements : les anciens prix réellement payés (39 € et 79 €/mois), pendant 30 jours.
 // La loi demande que le prix barré soit le plus bas des 30 derniers jours : ils disparaissent tout seuls après.
 export const BARRED_UNTIL = "2026-12-23T23:00:00Z";
