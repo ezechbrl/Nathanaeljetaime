@@ -4,10 +4,13 @@ import { Reveal } from "@/components/ui/Reveal";
 import { PromptBox } from "./PromptBox";
 import { DemoVideos } from "./DemoVideos";
 import { StoreMarquee } from "./StoreMarquee";
+import { NotificationPhone } from "./PhoneNotifications";
 
 export function Hero() {
   return (
     <section className="relative pb-16 pt-24 sm:pt-36">
+      {/* Grand écran : le téléphone qui reçoit des commandes, à droite du titre (sur téléphone, il est plus bas). */}
+      <div className="pointer-events-none absolute right-[3%] top-28 z-0 hidden origin-top-right scale-[0.82] xl:block 2xl:right-[6%] 2xl:scale-90"><NotificationPhone /></div>
       <div className="relative mx-auto max-w-[1100px] px-4 text-center sm:px-6">
         {/* Sur téléphone, on va droit au titre (la pastille ne s'affiche que sur grand écran). */}
         <Reveal className="hidden sm:block">

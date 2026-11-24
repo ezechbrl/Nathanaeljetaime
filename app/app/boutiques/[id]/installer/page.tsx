@@ -99,7 +99,7 @@ export default function InstallPage() {
         <div className="mt-6 flex flex-col gap-3 rounded-card border border-accent/30 bg-accent-deep/25 p-5 sm:flex-row sm:items-center">
           <Lock className="h-5 w-5 shrink-0 text-accent" />
           <p className="flex-1 text-sm text-fg-muted">Choisis ton offre pour envoyer ta boutique dans Shopify.</p>
-          <Link href="/app/abonnement" className="inline-flex h-11 items-center justify-center rounded-ctl bg-accent px-5 text-sm font-semibold text-[#03140d]">Voir les offres</Link>
+          <Link href="/app/abonnement" className="inline-flex h-11 items-center justify-center rounded-ctl border border-[#14b886]/60 bg-[linear-gradient(180deg,#14b886,#00876a)] px-5 text-sm font-semibold text-white">Voir les offres</Link>
         </div>
       )}
 
@@ -160,7 +160,7 @@ export default function InstallPage() {
           <PartyPopper className="mx-auto h-8 w-8 text-accent" />
           <h2 className="mt-3 text-xl font-semibold">Ta boutique est dans ton Shopify</h2>
           {domain && (
-            <a href={`https://${domain}`} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-11 items-center gap-2 rounded-ctl bg-accent px-5 text-sm font-semibold text-[#03140d]">Voir ma boutique <ExternalLink className="h-4 w-4" /></a>
+            <a href={`https://${domain}`} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-11 items-center gap-2 rounded-ctl border border-[#14b886]/60 bg-[linear-gradient(180deg,#14b886,#00876a)] px-5 text-sm font-semibold text-white">Voir ma boutique <ExternalLink className="h-4 w-4" /></a>
           )}
         </section>
         <section className="mt-4 rounded-card border border-[#95bf47]/30 bg-[#95bf47]/[0.06] p-5">
@@ -215,7 +215,7 @@ function ShopInput({ initial, onSave, onCancel }: { initial: string | null; onSa
           <input id="shop-handle" value={shop} onChange={(e) => { setShop(e.target.value); setError(""); }} placeholder="ma-boutique" autoComplete="off" spellCheck={false} className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-[15px] focus:outline-none" />
           <span className="pr-3 text-sm text-fg-faint">.myshopify.com</span>
         </div>
-        <button type="submit" disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl bg-accent px-5 text-sm font-semibold text-[#03140d]">Enregistrer</button>
+        <button type="submit" disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-[#14b886]/60 bg-[linear-gradient(180deg,#14b886,#00876a)] px-5 text-sm font-semibold text-white">Enregistrer</button>
         {onCancel && <button type="button" onClick={onCancel} className="h-11 px-3 text-sm text-fg-muted hover:text-fg">Annuler</button>}
       </div>
       {error ? <p className="mt-2 text-xs text-red-300">{error}</p> : <p className="mt-2 text-xs text-fg-faint">Tu peux aussi coller le lien de ton admin Shopify (admin.shopify.com/store/…).</p>}

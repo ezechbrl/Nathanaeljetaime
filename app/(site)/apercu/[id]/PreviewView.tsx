@@ -43,7 +43,7 @@ export function PreviewView({ id }: { id: string }) {
       <section className="mx-auto max-w-xl px-5 pb-24 pt-36 text-center">
         <h1 className="text-h2">Oups, l'aperçu n'a pas pu se faire</h1>
         <p className="mt-4 text-fg-muted">{preview?.error ?? "Cet aperçu est introuvable."}</p>
-        <Link href="/#creer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 font-semibold text-[#03140d]"><RotateCcw className="h-4 w-4" /> Réessayer</Link>
+        <Link href="/#creer" className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#14b886]/60 bg-[linear-gradient(180deg,#14b886,#00876a)] px-6 py-3.5 font-semibold text-white"><RotateCcw className="h-4 w-4" /> Réessayer</Link>
       </section>
     );
   }
@@ -72,7 +72,7 @@ export function PreviewView({ id }: { id: string }) {
       <div id="debloquer" className="mx-auto mt-12 max-w-xl scroll-mt-28 rounded-[22px] border border-accent/25 bg-accent-deep/20 p-6 text-center sm:p-8">
         <h2 className="text-[1.6rem] leading-tight tracking-tight">Ta boutique t'attend</h2>
         <p className="mt-2 text-fg-muted">Connecte-toi pour voir sa photo et ses atouts. Elle est gardée dans ton compte.</p>
-        <Link href={unlockUrl} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-[16px] font-semibold text-[#03140d]">
+        <Link href={unlockUrl} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-[#14b886]/60 bg-[linear-gradient(180deg,#14b886,#00876a)] px-6 py-4 text-[16px] font-semibold text-white">
           Connecte-toi pour voir ta boutique <ArrowRight className="h-4 w-4" />
         </Link>
         <p className="mt-3 text-xs text-fg-faint">Juste ton e-mail et un code à 6 chiffres. Pas de mot de passe.</p>
