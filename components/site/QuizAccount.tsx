@@ -36,7 +36,7 @@ export function QuizAccount({ onDone }: { onDone: (loggedIn: boolean) => void })
       <form onSubmit={submit}>
         <label htmlFor="quiz-email" className="block text-sm font-semibold text-white">Ton adresse e-mail</label>
         <input id="quiz-email" type="email" required autoFocus autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.com" className="field mt-2 h-14 text-[16px]" />
-        <button type="submit" disabled={loading} className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#3dff9a] glow-hover text-[16px] font-semibold text-[#03140d] disabled:opacity-60">
+        <button type="submit" disabled={loading} className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover text-[16px] font-semibold text-[#03140d] disabled:opacity-60">
           {loading ? <Spinner /> : <>Continuer le quiz <ArrowRight className="h-5 w-5" /></>}
         </button>
       </form>

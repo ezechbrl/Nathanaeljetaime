@@ -97,7 +97,7 @@ export function StyleSwipe({ onDone, big = false, compact = false }: { onDone: (
       </div>
       <div className="mt-6 flex items-center gap-6">
         <button type="button" aria-label="Je n'aime pas" onClick={() => decide(false)} className="grid h-16 w-16 place-items-center rounded-full border border-[#fb7185]/50 bg-[#fb7185]/10 text-[#fb7185] shadow-[0_10px_30px_-10px_rgb(251_113_133/0.7)] transition-transform hover:scale-110 active:scale-95"><X className="h-8 w-8" /></button>
-        <button type="button" aria-label="J'aime" onClick={() => decide(true)} className="grid h-20 w-20 place-items-center rounded-full bg-[#3dff9a] glow-hover text-[#03140d] transition-transform hover:scale-110 active:scale-95"><Heart className="h-9 w-9 fill-current" /></button>
+        <button type="button" aria-label="J'aime" onClick={() => decide(true)} className="grid h-20 w-20 place-items-center rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover text-[#03140d] transition-transform hover:scale-110 active:scale-95"><Heart className="h-9 w-9 fill-current" /></button>
       </div>
     </div>
   );

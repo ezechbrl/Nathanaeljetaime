@@ -39,7 +39,7 @@ export function OfferBanner() {
               </div>
             ))}
           </div>
-          <span className="hidden items-center gap-1.5 rounded-full bg-[#3dff9a] glow-hover px-4 py-2 text-[13.5px] font-semibold text-[#03140d] transition-transform group-hover:-translate-y-px md:inline-flex">
+          <span className="hidden items-center gap-1.5 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover px-4 py-2 text-[13.5px] font-semibold text-[#03140d] transition-transform group-hover:-translate-y-px md:inline-flex">
             En profiter <ArrowRight className="h-4 w-4" />
           </span>
         </div>

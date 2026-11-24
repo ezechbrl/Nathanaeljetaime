@@ -70,7 +70,7 @@ export function LaunchCelebration({ store, onClose }: { store: Store; onClose: (
         <h2 className="mt-2 text-h2">Ta boutique <span className="serif-accent">{store.name}</span> est née</h2>
         <p className="mx-auto mt-3 max-w-sm text-fg-muted">Textes, fiche produit, pages et couleurs : tout est en place. Jette un œil, ajuste ce que tu veux, puis publie sur Shopify.</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-[#3dff9a] bg-[#3dff9a] px-5 text-[15px] font-medium text-black glow-hover">
+          <button type="button" autoFocus onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-[#34f0b0]/60 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-5 text-[15px] font-medium text-black glow-hover">
             Découvrir ma boutique <ArrowRight className="h-4 w-4" />
           </button>
           <Link href={`/app/boutiques/${store.id}/editeur`} onClick={onClose} className="inline-flex h-11 items-center justify-center gap-2 rounded-ctl border border-white/15 px-5 text-[15px] text-fg hover:bg-white/5">
