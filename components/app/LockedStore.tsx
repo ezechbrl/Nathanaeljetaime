@@ -157,7 +157,8 @@ function LockedSections({ store, loginHref, onUnlock }: { store: Store; loginHre
 export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; loginHref?: string; onUnlock?: () => void }) {
   const data = teaserStore(store);
   return (
-    <div className="overflow-hidden rounded-[13px]">
+    // [contain:inline-size] : la boutique ne peut jamais élargir la page (sinon, sur téléphone, tout se dézoome).
+    <div className="overflow-hidden rounded-[13px] [contain:inline-size]">
       {/* Net : seulement le haut de la boutique (la belle photo et l'accroche). Tout le reste est flouté. */}
       <div className="pointer-events-none select-none"><StorePreview store={data.store} assets={data.assets} animate={false} sections={["hero", "marquee"]} footer={false} /></div>
       <div className="relative">
@@ -287,8 +288,8 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
           {!paid && <PriceLine />}
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-          <div className="glow-frame rounded-[14px] p-[1.5px]"><TeaserPreview store={store} onUnlock={openPay} /></div>
+        <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <div className="glow-frame min-w-0 rounded-[14px] p-[1.5px]"><TeaserPreview store={store} onUnlock={openPay} /></div>
           <div className="flex flex-col gap-2.5">
             {unlocksFor(store.mode === "link").map(({ icon: I, title, text }) => (
               <div key={title} className="flex items-center gap-3 rounded-[16px] border border-white/10 bg-white/[0.04] p-3.5">

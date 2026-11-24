@@ -4,7 +4,7 @@
 // Profil (où il en est, objectif, temps), puis son idée ou une grande catégorie → un univers → un produit,
 // ses clients, et enfin les boutiques qu'il aime (cœur / croix) pour choisir le style.
 // Toujours un nombre pair de réponses, pour des grilles bien alignées sur téléphone.
-import { ArrowLeft, ArrowRight, Baby, BadgeEuro, Camera, CircleHelp, Coins, Crown, Factory, Globe, Hammer, Landmark, MapPin, Megaphone, MessageCircle, Package, PiggyBank, Search, ShoppingBag, Truck, Video, Wallet, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
+import { Banknote, BadgeCheck, BookOpen, Glasses, HandCoins, Languages, Map as MapIcon, Scissors, UserPlus, ArrowLeft, ArrowRight, Baby, BadgeEuro, Camera, CircleHelp, Coins, Crown, Factory, Globe, Hammer, Landmark, MapPin, Megaphone, MessageCircle, Package, PiggyBank, Search, ShoppingBag, Truck, Video, Wallet, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
@@ -29,7 +29,7 @@ const GOALS: Option[] = [
   { id: "activite", label: "En faire mon activité", hint: "Je veux en vivre", icon: Rocket },
   { id: "tester", label: "Tester une idée", hint: "Voir si ça marche", icon: Lightbulb },
   { id: "marque", label: "Lancer ma marque", hint: "Un nom qu'on retient", icon: Gem },
-  { id: "creations", label: "Vendre mes créations", hint: "Ce que je fabrique", icon: Palette },
+  { id: "creations", label: "Vendre mes créations", hint: "Ce que je fabrique", icon: Scissors },
   { id: "maison", label: "Travailler de chez moi", hint: "À mon rythme", icon: Home },
 ];
 const TIMES: Option[] = [
@@ -45,7 +45,7 @@ const AUDIENCES: Option[] = [
   { id: "parents", label: "Les parents", icon: Baby },
   { id: "sportifs", label: "Les sportifs", icon: Bike },
   { id: "animaux", label: "Ceux qui ont un animal", icon: PawPrint },
-  { id: "seniors", label: "Les plus de 50 ans", icon: UserRound },
+  { id: "seniors", label: "Les plus de 50 ans", icon: Glasses },
   { id: "tous", label: "Tout le monde", icon: Users },
 ];
 const PRICES: Option[] = [
@@ -55,23 +55,23 @@ const PRICES: Option[] = [
   { id: "p4", label: "Plus de 80 €", hint: "Haut de gamme", icon: Crown },
 ];
 const BUDGETS: Option[] = [
-  { id: "b1", label: "Moins de 100 €", hint: "Je teste avec peu", icon: Coins },
+  { id: "b1", label: "Moins de 100 €", hint: "Je teste avec peu", icon: HandCoins },
   { id: "b2", label: "100 à 300 €", hint: "Pour la pub et un premier stock", icon: PiggyBank },
-  { id: "b3", label: "300 à 1 000 €", hint: "Je peux investir un peu", icon: Wallet },
+  { id: "b3", label: "300 à 1 000 €", hint: "Je peux investir un peu", icon: Banknote },
   { id: "b4", label: "Plus de 1 000 €", hint: "Je veux aller vite", icon: Landmark },
 ];
 const BUDGET_TEXT: Record<string, string> = { b1: "Budget de départ : moins de 100 €.", b2: "Budget de départ : 100 à 300 €.", b3: "Budget de départ : 300 à 1 000 €.", b4: "Budget de départ : plus de 1 000 €." };
 const SHOPIFY: Option[] = [
-  { id: "s1", label: "Oui, j'ai une boutique", hint: "Déjà en ligne sur Shopify", icon: Store },
+  { id: "s1", label: "Oui, j'ai une boutique", hint: "Déjà en ligne sur Shopify", icon: BadgeCheck },
   { id: "s2", label: "J'ai un compte", hint: "Mais pas encore de boutique", icon: ShoppingBag },
-  { id: "s3", label: "Non, pas encore", hint: "Je n'ai pas de compte", icon: Sprout },
-  { id: "s4", label: "C'est quoi Shopify ?", hint: "Je ne connais pas", icon: CircleHelp },
+  { id: "s3", label: "Non, pas encore", hint: "Je n'ai pas de compte", icon: UserPlus },
+  { id: "s4", label: "C'est quoi Shopify ?", hint: "Je ne connais pas", icon: BookOpen },
 ];
 const SHOPIFY_TEXT: Record<string, string> = { s1: "Le vendeur a déjà une boutique Shopify.", s2: "Le vendeur a un compte Shopify sans boutique.", s3: "Le vendeur n'a pas encore de compte Shopify.", s4: "Le vendeur ne connaît pas Shopify : tout expliquer très simplement." };
 const MARKETS: Option[] = [
   { id: "fr", label: "En France", hint: "Seulement la France", icon: MapPin },
-  { id: "be", label: "France, Belgique, Suisse", hint: "Pays francophones", icon: Globe },
-  { id: "eu", label: "Toute l'Europe", hint: "Plusieurs langues", icon: Globe },
+  { id: "be", label: "France, Belgique, Suisse", hint: "Pays francophones", icon: Languages },
+  { id: "eu", label: "Toute l'Europe", hint: "Plusieurs langues", icon: MapIcon },
   { id: "world", label: "Le monde entier", hint: "Partout", icon: Globe },
 ];
 const MARKET_TEXT: Record<string, string> = { fr: "Pays de vente : France.", be: "Pays de vente : France, Belgique et Suisse.", eu: "Pays de vente : toute l'Europe.", world: "Pays de vente : le monde entier." };
@@ -183,6 +183,12 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
     } catch { /* suivi facultatif */ }
   };
   useEffect(() => { track(step, Math.max(0, index)); }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Nouvelle question : on remonte en haut, pour voir la question et toutes les réponses.
+  const firstStep = useRef(true);
+  useEffect(() => {
+    if (firstStep.current) { firstStep.current = false; return; }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
 
   async function finish(style: string | null) {
     if (!chosen || !audience) return;
@@ -310,11 +316,14 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string)
   );
 }
 
+// Collé en bas de l'écran : sur téléphone, plus besoin de descendre pour continuer.
 function NextButton({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="mt-8 [animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-10px_rgb(46_230_166/0.8),inset_0_1px_0_rgb(255_255_255/0.45)] transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
+    <div className="sticky bottom-3 z-20 mt-8">
+    <button type="button" onClick={onClick} className="[animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] text-[16px] font-semibold text-[#03140d] shadow-[0_12px_40px_-10px_rgb(46_230_166/0.8),inset_0_1px_0_rgb(255_255_255/0.45)] transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
       Continuer <ArrowRight className="h-5 w-5" />
     </button>
+    </div>
   );
 }
 
