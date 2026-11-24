@@ -46,13 +46,14 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
 }) {
   const [choice, setChoice] = useState<Choice>("pro");
   const singlePrice = SINGLE.price;
-  const rows: { id: Choice; name: string; badge?: { text: string; tone: "green" | "yellow" }; price: ReactNode; right: ReactNode }[] = PAID_PLANS.map((plan: Plan) => {
+  const rows: { id: Choice; name: string; badge?: { text: string; tone: "green" | "yellow" }; price: ReactNode; short?: ReactNode; right: ReactNode }[] = PAID_PLANS.map((plan: Plan) => {
     const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
     return {
       id: plan.id as Choice,
       name: plan.name,
       badge: plan.featured ? { text: "Le plus avantageux", tone: "green" as const } : undefined,
-      price: <><span className="font-semibold text-white">{euro(billed)}</span> {interval === "year" ? "/ an" : "/ mois"}{was !== null && <span className="ml-1.5 text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(was)}</span>}</>,
+      short: <><span className="font-semibold text-white">{euro(billed)}</span> {interval === "year" ? "/ an" : "/ mois"}{was !== null && <span className="ml-1.5 text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(was)}</span>}</>,
+      price: <><span className="font-semibold text-white">{euro(billed)}</span> {interval === "year" ? "/ an" : "/ mois"}{was !== null && <span className="ml-1.5 text-fg-faint line-through decoration-[#ef4444] decoration-2">{euro(was)}</span>}{was !== null && interval === "year" && <span className="ml-1 whitespace-nowrap text-[12px] text-fg-faint">au mois</span>}{was !== null && <span className="ml-1.5 rounded-full bg-[#f87171]/15 px-1.5 py-0.5 text-[11px] font-bold text-[#fca5a5]">−{Math.round((1 - billed / was) * 100)} %</span>}</>,
       right: <><span className="block text-[1.55rem] font-semibold leading-none tracking-[-0.03em] tabular-nums text-white">{perDay(billed, interval)} €</span><span className="mt-1 block text-[13px] text-fg-muted">/ jour</span></>,
     };
   });
@@ -103,7 +104,7 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
       <div className="sticky bottom-0 z-20 -mx-4 mt-6 border-t border-white/10 bg-[#0d0d0d]/90 px-4 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-[18px] sm:border">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="whitespace-nowrap text-[15px] font-semibold text-white sm:text-[1.2rem]">{current.price}</p>
+            <p className="whitespace-nowrap text-[15px] font-semibold text-white sm:text-[1.2rem]">{current.short ?? current.price}</p>
           </div>
           <div className="w-[150px] shrink-0 sm:w-[240px]">{cta(current.id, interval)}</div>
         </div>

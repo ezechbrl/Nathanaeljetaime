@@ -35,7 +35,9 @@ export function planPrice(plan: Plan, interval: Interval, offer = false, waitlis
   const billed = interval === "year" ? plan.yearly : plan.monthly;
   if (offer && waitlist && plan.id !== "free") return { billed: WAITLIST_PRICES[plan.id][interval === "year" ? "yearly" : "monthly"], was: withOffer(billed) }; // barré : le prix des autres (offre de lancement)
   // Prix barré : l'ancien prix réellement payé (39 € / 79 € par mois), pendant 30 jours seulement.
-  return { billed: withOffer(billed), was: interval === "month" && plan.was && showBarred() ? plan.was : null };
+  // À l'année : on barre le prix de 12 mois payés au mois (comparaison réelle entre nos deux formules, pas un ancien prix).
+  if (interval === "year") return { billed: withOffer(billed), was: plan.monthly * 12 > billed ? plan.monthly * 12 : null };
+  return { billed: withOffer(billed), was: plan.was && showBarred() ? plan.was : null };
 }
 
 // Temps restant avant `endsAt`, mis à jour chaque seconde (null une fois écoulé).
