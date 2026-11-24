@@ -332,21 +332,21 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string,
   );
 }
 
-// Objectif de revenu : un curseur de 500 € à 20 000 € par mois, et le nombre de ventes que ça représente.
+// Objectif de revenu : un curseur de 500 € à 30 000 € par mois, et le nombre de ventes que ça représente.
 // Calcul indicatif (bénéfice moyen supposé par vente), jamais présenté comme une promesse.
-const PROFIT_PER_SALE = 15;
+const PROFIT_PER_SALE = 100;
 function IncomeSlider({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   const sales = Math.ceil(value / PROFIT_PER_SALE);
-  const perDay = Math.max(1, Math.round(sales / 30));
+  const perDay = Math.round((sales / 30) * 10) / 10;
   return (
     <div className="mx-auto max-w-[560px] rounded-[22px] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
       <p className="text-[clamp(2.8rem,2rem+3vw,4rem)] font-semibold leading-none tracking-[-0.04em] tabular-nums">{value.toLocaleString("fr-FR")} €</p>
       <p className="mt-1 text-fg-muted">par mois</p>
-      <input type="range" min={500} max={20000} step={500} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label="Revenu visé par mois"
+      <input type="range" min={500} max={30000} step={500} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label="Revenu visé par mois"
         className="mt-7 h-2 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#3dff9a] [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#3dff9a] [&::-webkit-slider-thumb]:shadow-[0_0_18px_rgb(61_255_154/0.7)] [&::-moz-range-thumb]:h-7 [&::-moz-range-thumb]:w-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[#3dff9a]" />
-      <div className="mt-2 flex justify-between text-sm text-fg-faint"><span>500 €</span><span>20 000 €</span></div>
+      <div className="mt-2 flex justify-between text-sm text-fg-faint"><span>500 €</span><span>30 000 €</span></div>
       <div className="my-6 h-px bg-white/10" />
-      <p className="text-[17px] leading-snug">Avec environ {PROFIT_PER_SALE} € de bénéfice par vente, il te faut <span className="font-semibold text-[#3dff9a]">{sales.toLocaleString("fr-FR")} ventes</span> par mois, soit à peu près <span className="font-semibold text-white">{perDay} par jour</span>.</p>
+      <p className="text-[17px] leading-snug">Avec environ {PROFIT_PER_SALE} € de bénéfice par vente, il te faut <span className="font-semibold text-[#3dff9a]">{sales.toLocaleString("fr-FR")} ventes</span> par mois, soit à peu près <span className="font-semibold text-white">{perDay < 1 ? "moins d'une" : perDay.toLocaleString("fr-FR")} par jour</span>.</p>
       <p className="mt-2 text-xs text-fg-faint">C'est ton objectif, pas une promesse : tout dépend de ton produit, de ton prix et de ta pub.</p>
     </div>
   );

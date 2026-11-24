@@ -28,7 +28,7 @@ function PhoneVideo({ name, title }: { name: string; title: string }) {
   return (
     <figure className="mx-auto w-full max-w-[300px] sm:hidden">
       <div className="relative overflow-hidden rounded-[36px] border-[7px] border-[#0b0f12] bg-black">
-        <video ref={ref} muted loop playsInline preload="none" poster={`/videos/${name}.jpg`} onPlay={() => setPlaying(true)} className="block aspect-[390/844] w-full object-cover" aria-label={title}>
+        <video ref={ref} muted loop playsInline preload="none" poster={`/videos/${name}.jpg`} onPlay={() => setPlaying(true)} className="block aspect-[390/844] w-full object-cover grayscale" aria-label={title}>
           <source src={`/videos/${name}.mp4`} type="video/mp4" />
           <source src={`/videos/${name}.webm`} type="video/webm" />
         </video>
@@ -67,7 +67,7 @@ export function TutorialVideo({ name, title, speed, className, mobile }: { name:
             poster={`/videos/${name}.jpg`}
             onPlay={() => setPlaying(true)}
            
-            className="block aspect-video w-full bg-black object-cover"
+            className="block aspect-video w-full bg-black object-cover grayscale"
             aria-label={title}
           >
             <source src={`/videos/${name}.mp4`} type="video/mp4" />

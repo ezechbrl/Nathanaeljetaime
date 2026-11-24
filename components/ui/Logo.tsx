@@ -1,23 +1,15 @@
 import Link from "next/link";
-import { useId } from "react";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
-// Vigenia : un sac de boutique (notre forme, pas celle de Shopify) avec le V au milieu,
-// et une pastille « commande validée ».
+// Vigenia : un V net et moderne, blanc avec la branche droite en vert électrique, sur un carré noir.
 export function LogoMark({ className }: { className?: string }) {
-  const id = useId().replace(/:/g, "");
   return (
     <svg viewBox="0 0 32 32" aria-hidden className={cn("h-7 w-7", className)}>
-      <defs>
-        <linearGradient id={`${id}g`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#6ee7b7" /><stop offset=".55" stopColor="#10b07f" /><stop offset="1" stopColor="#047857" /></linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="#04211a" />
-      <path d="M11.2 11.5V9.8a3.8 3.8 0 0 1 7.6 0v1.7" fill="none" stroke="#a7f3d0" strokeWidth="2" strokeLinecap="round" />
-      <path d="M6.4 13c.1-.9.8-1.5 1.7-1.5h13.8c.9 0 1.6.6 1.7 1.5l.8 11.3A2.5 2.5 0 0 1 21.9 27H8.1a2.5 2.5 0 0 1-2.5-2.7z" fill={`url(#${id}g)`} />
-      <path d="M10.6 15.6l4.4 7.6 4.4-7.6" fill="none" stroke="#04211a" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="24.5" cy="8.5" r="4.3" fill="#d9f99d" stroke="#04211a" strokeWidth="1.5" />
-      <path d="M22.6 8.6l1.3 1.3 2.4-2.6" fill="none" stroke="#04211a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x=".5" y=".5" width="31" height="31" rx="9" fill="#0a0a0a" stroke="rgb(255 255 255 / .18)" />
+      <path d="M9 10.5l7 12.5" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" />
+      <path d="M16 23l7-12.5" fill="none" stroke="#3dff9a" strokeWidth="3.4" strokeLinecap="round" />
+      <circle cx="24.6" cy="6.9" r="1.7" fill="#3dff9a" />
     </svg>
   );
 }

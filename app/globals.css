@@ -26,7 +26,7 @@
 @layer base {
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   html { background: #0a0a0a; }
-  body { @apply font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
+  body { position: relative; min-height: 100dvh; @apply font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
   ::selection { background: rgb(var(--brand-leaf) / 0.35); }
   :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; border-radius: 6px; }
   h1, h2, h3, .text-display, .text-h1, .text-h2 { @apply font-display; font-weight: 500; text-wrap: balance; }

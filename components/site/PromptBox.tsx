@@ -8,18 +8,18 @@ import { cn } from "@/lib/cn";
 import { normalizeProductUrl } from "@/lib/product-url";
 import { compressImage, saveLandingPhotos } from "@/lib/compress-image";
 
-// Le mode choisi est en blanc, l'autre en contour discret.
+// Le mode choisi est en vert électrique, l'autre en contour discret.
 export const MODES = [
   {
     id: "start", label: "Décrire", icon: PenLine,
     placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…",
-    on: "border-white/15 bg-white glow-hover text-[#03140d]",
+    on: "border-[#3dff9a] bg-[#3dff9a] glow-hover text-[#03140d]",
     off: "border-white/15 text-white/70 hover:bg-white/[0.06]",
   },
   {
     id: "link", label: "Coller un lien", icon: Link2,
     placeholder: "Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…) ou ta propre page",
-    on: "border-white/15 bg-white glow-hover text-[#03140d]",
+    on: "border-[#3dff9a] bg-[#3dff9a] glow-hover text-[#03140d]",
     off: "border-white/15 text-white/70 hover:bg-white/[0.06]",
   },
 ] as const;
