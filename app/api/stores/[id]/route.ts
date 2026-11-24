@@ -33,13 +33,14 @@ const Patch = z.object({
   name: z.string().trim().min(1).max(80).optional(),
   theme: z.object({ colors: z.object({ primary: HEX, accent: HEX, background: HEX }), headingFont: z.string().max(60), bodyFont: z.string().max(60), heroLayout: z.enum(["left", "right", "center"]).optional(), style: z.enum(STORE_STYLES).optional() }).optional(),
   plan: StorePlanSchema.optional(),
+  supplierUrl: z.string().trim().url("Lien invalide.").max(800).nullable().optional(),
 });
 
 export const PATCH = route<Ctx>(async (req, { params }) => {
   const user = await requireUser();
   const store = await ownedStore(user.id, (await params).id);
-  const input = await body(req, Patch);
-  const updated = must(await db().from("stores").update({ ...input, updated_at: new Date().toISOString() }).eq("id", store.id).select("*").single());
+  const { supplierUrl, ...input } = await body(req, Patch);
+  const updated = must(await db().from("stores").update({ ...input, ...(supplierUrl !== undefined ? { supplier_url: supplierUrl } : {}), updated_at: new Date().toISOString() }).eq("id", store.id).select("*").single());
   await db().from("store_versions").insert({ store_id: store.id, label: "Modification manuelle", snapshot: { plan: updated.plan, theme: updated.theme } });
   return json({ store: toStore(updated) });
 });

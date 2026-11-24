@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload } from "lucide-react";
+import { ShopifyBag } from "@/components/auth/AuthForms";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { useStore } from "./StoreContext";
@@ -12,9 +12,10 @@ export function PublishButton({ size = "md" }: { size?: "sm" | "md" }) {
   return (
     <Link
       href={`/app/boutiques/${store.id}/installer`}
-      className={cn("inline-flex items-center gap-2 rounded-ctl bg-white/[0.03] font-medium text-black glow-hover transition-transform hover:-translate-y-0.5", size === "sm" ? "h-9 px-3 text-sm" : "h-10 px-4 text-sm")}
+      aria-label="Publier sur Shopify"
+      className={cn("inline-flex items-center gap-2 rounded-ctl border border-[#14b886]/60 bg-[linear-gradient(180deg,#14b886,#00876a)] font-semibold text-white glow-hover transition-transform hover:-translate-y-0.5", size === "sm" ? "h-9 px-3 text-sm" : "h-10 px-4 text-sm")}
     >
-      <Upload className="h-4 w-4" /> Mettre en ligne sur Shopify
+      Publier <ShopifyBag className="h-5 w-5" />
     </Link>
   );
 }

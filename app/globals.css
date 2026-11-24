@@ -164,7 +164,7 @@
   background: conic-gradient(from var(--frame-angle), rgb(74 222 128 / 0.35), rgb(220 252 231) 8%, rgb(74 222 128 / 0.35) 18%, rgb(74 222 128 / 0.35) 50%, rgb(134 239 172 / 0.9) 58%, rgb(74 222 128 / 0.35) 68%);
   box-shadow: 0 0 22px rgb(74 222 128 / 0.3), 0 0 70px -10px rgb(74 222 128 / 0.4);
 }
-.glow-frame:focus-within { box-shadow: 0 0 0 1px rgb(61 255 154 / 0.8), 0 0 30px -6px rgb(61 255 154 / 0.5); }
+.glow-frame:focus-within { box-shadow: 0 0 34px -8px rgb(61 255 154 / 0.45); }
 
 @media (prefers-reduced-motion: reduce) {
   .glow-frame { animation: none; }

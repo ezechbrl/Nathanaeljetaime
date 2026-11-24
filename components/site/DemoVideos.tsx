@@ -18,7 +18,7 @@ export function DemoVideos({ className }: { className?: string }) {
     <div className={className}>
       <div role="tablist" aria-label="Démonstrations" className="mx-auto mb-4 flex w-fit gap-1 rounded-full border border-white/10 bg-black/25 p-1 backdrop-blur">
         {DEMOS.map(({ id, label, icon: I }) => (
-          <button key={id} type="button" role="tab" aria-selected={demo === id} onClick={() => setDemo(id)} className={cn("inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all", demo === id ? "bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover text-[#03140d]" : "text-fg-muted hover:text-fg")}>
+          <button key={id} type="button" role="tab" aria-selected={demo === id} onClick={() => setDemo(id)} className={cn("inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all", demo === id ? "bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover text-white" : "text-fg-muted hover:text-fg")}>
             <I className="h-4 w-4" /> {label}
           </button>
         ))}

@@ -80,7 +80,7 @@ function PublishDemo() {
       {done ? (
         <p className="mt-5 text-center text-[15px] font-semibold text-white/80">🎉 En ligne sur norde.myshopify.com</p>
       ) : (
-        <button type="button" onClick={() => setStep(0)} disabled={step >= 0} className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover px-6 py-3 text-[15px] font-semibold text-[#03140d] transition-transform hover:-translate-y-px disabled:opacity-70">
+        <button type="button" onClick={() => setStep(0)} disabled={step >= 0} className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover px-6 py-3 text-[15px] font-semibold text-white transition-transform hover:-translate-y-px disabled:opacity-70">
           <Rocket className="h-4 w-4" /> {step >= 0 ? "Publication…" : "Publier sur Shopify"}
         </button>
       )}

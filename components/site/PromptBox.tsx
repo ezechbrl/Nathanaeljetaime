@@ -13,13 +13,13 @@ export const MODES = [
   {
     id: "start", label: "Décrire", icon: PenLine,
     placeholder: "Je vends des chaussons bébé en laine mérinos, pour les jeunes parents qui veulent du fait main…",
-    on: "border-[#34f0b0] bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover text-[#03140d]",
+    on: "border-[#14b886] bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover text-white",
     off: "border-white/15 text-white/70 hover:bg-white/[0.06]",
   },
   {
     id: "link", label: "Coller un lien", icon: Link2,
     placeholder: "Colle le lien de ton produit chez ton fournisseur (AliExpress, CJ…) ou ta propre page",
-    on: "border-[#34f0b0] bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover text-[#03140d]",
+    on: "border-[#14b886] bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover text-white",
     off: "border-white/15 text-white/70 hover:bg-white/[0.06]",
   },
 ] as const;
@@ -166,7 +166,7 @@ export function PromptBox({ target = "/inscription", className, align = "center"
             >
               <ImagePlus className="h-4 w-4" /> {photos.length ? `Photo ${photos.length}/${MAX_PHOTOS}` : "Photo du produit"}
             </button>
-            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-full border border-white/15 bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-5 text-[15px] font-bold text-[#03140d] transition-all [animation:cta-glow_2.4s_ease-in-out_infinite] hover:-translate-y-px hover:brightness-110 glow-hover">
+            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-full border border-white/15 bg-[linear-gradient(180deg,#14b886,#00876a)] px-5 text-[15px] font-bold text-white transition-all [animation:cta-glow_2.4s_ease-in-out_infinite] hover:-translate-y-px hover:brightness-110 glow-hover">
               <Sparkles className="h-4 w-4" /> Générer
             </button>
           </div>

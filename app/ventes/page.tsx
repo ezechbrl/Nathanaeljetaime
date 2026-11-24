@@ -90,7 +90,7 @@ const TONES = {
 function Live({ count }: { count: number }) {
   return (
     <Card className="flex h-[140px] flex-col">
-      <span className="flex h-8 items-center gap-2"><span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#10b981]" /></span><span className="text-xs font-medium text-[#0a8f5f]">En direct</span></span>
+      <span className="flex h-8 items-center gap-2"><span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3dff9a] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#3dff9a]" /></span><span className="text-xs font-medium text-[#0a8f5f]">En direct</span></span>
       <p className="mt-auto truncate text-[13px] text-[#616161]">En ce moment</p>
       <p className="mt-1 truncate text-[1.5rem] font-semibold leading-none tracking-[-0.02em] tabular-nums">{count}</p>
       <p className="mt-1.5 truncate text-[11.5px] leading-tight text-[#8a8a8a]">visiteur{count > 1 ? "s" : ""} sur le site</p>
@@ -294,7 +294,7 @@ function MoneyHero({ s }: { s: OwnerStats }) {
           <span className="font-semibold text-[#111]">Objectif {eur(next * 100)} / mois</span>
         </div>
         <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-[#e6f4ec]">
-          <div className="h-full rounded-full bg-[linear-gradient(90deg,#10b981,#0a8f5f)] transition-[width] duration-700" style={{ width: `${Math.max(2, progress * 100)}%` }} />
+          <div className="h-full rounded-full bg-[linear-gradient(90deg,#14b886,#00876a)] transition-[width] duration-700" style={{ width: `${Math.max(2, progress * 100)}%` }} />
         </div>
         <p className="mt-1.5 text-[11.5px] text-[#8a8a8a]">Encore {eur(Math.max(0, next * 100 - s.mrr))} par mois pour l'atteindre</p>
       </div>
@@ -342,7 +342,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
   return (
     <div className="space-y-3 pb-10">
-      <div role="tablist" aria-label="Période" className="sticky top-[max(env(safe-area-inset-top),8px)] z-20 grid grid-cols-4 rounded-full bg-[#0b2a20]/95 p-1 shadow-lg backdrop-blur">
+      <div role="tablist" aria-label="Période" className="sticky top-[max(env(safe-area-inset-top),8px)] z-20 grid grid-cols-4 rounded-full bg-[#121514]/95 p-1 shadow-lg backdrop-blur">
         {PERIODS.map((x) => (
           <button key={x.id} type="button" role="tab" aria-selected={period === x.id} onClick={() => setPeriod(x.id)} className={cn("rounded-full py-2 text-[13px] font-medium transition-colors", period === x.id ? "bg-white text-[#111]" : "text-white/75")}>
             {x.label}

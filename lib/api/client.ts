@@ -68,7 +68,7 @@ export type LinkCheck = { ok: true; title: string; image: string | null } | { ok
 export const checkLink = (url: string) =>
   live ? request<LinkCheck>("/api/links/check", { method: "POST", json: { url } }) : mock.checkLink(url);
 export const getStore = (id: string) => (live ? request<{ store: Store; activeJob: Job | null; lastError?: string | null; lastPublishError?: string | null }>(`/api/stores/${id}`) : mock.getStore(id));
-export const updateStore = (id: string, input: Partial<Pick<Store, "name" | "theme" | "plan">>) =>
+export const updateStore = (id: string, input: Partial<Pick<Store, "name" | "theme" | "plan" | "supplierUrl">>) =>
   live ? request<{ store: Store }>(`/api/stores/${id}`, { method: "PATCH", json: input }) : mock.updateStore(id, input);
 export const deleteStore = (id: string) => (live ? request<void>(`/api/stores/${id}`, { method: "DELETE" }) : mock.deleteStore(id));
 export const publishStore = (id: string, publishTheme: boolean) =>

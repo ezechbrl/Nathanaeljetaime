@@ -21,17 +21,9 @@ const LIGHTS = [
 
 // Petites étoiles (4 branches) qui scintillent, blanches ou vertes.
 const STARS = [
-  { top: "6%", left: "14%", s: 10, g: false, d: 0 },
   { top: "9%", left: "79%", s: 14, g: true, d: 1.2 },
-  { top: "19%", left: "93%", s: 8, g: false, d: 2.1 },
-  { top: "31%", left: "22%", s: 12, g: true, d: 0.6 },
-  { top: "37%", left: "70%", s: 9, g: false, d: 1.8 },
-  { top: "48%", left: "92%", s: 13, g: false, d: 0.3 },
-  { top: "58%", left: "5%", s: 10, g: true, d: 2.5 },
-  { top: "64%", left: "38%", s: 8, g: false, d: 1.1 },
-  { top: "74%", left: "88%", s: 12, g: true, d: 0.9 },
-  { top: "86%", left: "30%", s: 9, g: false, d: 2.2 },
-  { top: "91%", left: "58%", s: 13, g: true, d: 0.4 },
+  { top: "37%", left: "8%", s: 11, g: false, d: 0.4 },
+  { top: "74%", left: "88%", s: 12, g: true, d: 2.1 },
 ];
 
 const Star = ({ size, green }: { size: number; green: boolean }) => (

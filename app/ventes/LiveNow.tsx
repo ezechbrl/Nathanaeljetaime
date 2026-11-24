@@ -24,7 +24,7 @@ export function LiveNow() {
   return (
     <section className="min-w-0 overflow-hidden rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5">
       <h2 className="flex items-center gap-2 text-[17px] font-semibold">
-        <span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#10b981]" /></span>
+        <span className="relative flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3dff9a] opacity-60" /><span className="relative inline-flex h-3 w-3 rounded-full bg-[#3dff9a]" /></span>
         En direct <span className="font-normal text-[#8a8a8a]">· {people ? `${people.length} personne${people.length > 1 ? "s" : ""} sur le site` : "chargement…"}</span>
       </h2>
       {people && !people.length && <p className="mt-2 text-sm text-[#8a8a8a]">Personne sur le site en ce moment (actif dans les 3 dernières minutes).</p>}
@@ -34,7 +34,7 @@ export function LiveNow() {
             <li key={p.id} className="py-3">
               <p className="text-[15px] font-semibold leading-snug">{p.doing}</p>
               {p.quiz && !p.quiz.finished && (
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-[#f1f1f1]"><div className="h-full rounded-full bg-[#10b981]" style={{ width: `${Math.round(((p.quiz.index + 1) / (p.quiz.total || 15)) * 100)}%` }} /></div>
+                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-[#f1f1f1]"><div className="h-full rounded-full bg-[#3dff9a]" style={{ width: `${Math.round(((p.quiz.index + 1) / (p.quiz.total || 15)) * 100)}%` }} /></div>
               )}
               <p className="mt-1 text-[13px] text-[#555]">
                 {p.email ? <b className="text-[#111]">{p.email}</b> : "Visiteur sans compte"} · {sourceName(p.source)} · {p.device === "mobile" ? "téléphone" : p.device ?? "?"}{p.country ? ` · ${p.country}` : ""}

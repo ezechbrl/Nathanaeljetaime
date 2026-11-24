@@ -313,7 +313,7 @@ export const planButtonClass = (featured?: boolean, tone?: Tone) =>
   cn(
     "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition-all hover:-translate-y-px disabled:opacity-60",
     featured
-      ? "bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover text-[#03140d]"
+      ? "bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover text-white"
       : tone === "blue"
         ? "border border-[#38bdf8]/40 bg-[#38bdf8]/10 text-[#e0f2fe] shadow-[0_0_24px_-10px_rgb(56_189_248/0.6)] hover:bg-[#38bdf8]/20"
         : tone === "yellow"

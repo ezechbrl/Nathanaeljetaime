@@ -39,6 +39,8 @@ export const toStore = (s: StoreRow): Store => ({
   liveUrl: s.live_url,
   themeStatus: (s.shopify as { themeId?: string; themeManual?: boolean } | null)?.themeManual ? "manual" : (s.shopify as { themeId?: string } | null)?.themeId ? "installed" : null,
   singlePaid: !!s.single_paid_at,
+  // Boutique créée depuis un lien fournisseur : ce lien est le fournisseur, sauf si un autre a été choisi.
+  supplierUrl: s.supplier_url ?? (s.mode === "link" && s.source_url && /aliexpress|alibaba|cjdropshipping|temu|1688|dhgate/i.test(s.source_url) ? s.source_url : null),
   createdAt: s.created_at,
   updatedAt: s.updated_at,
 });

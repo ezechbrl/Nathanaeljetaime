@@ -8,8 +8,8 @@ export function LogoMark({ className }: { className?: string }) {
     <svg viewBox="0 0 32 32" aria-hidden className={cn("h-7 w-7", className)}>
       <rect x=".5" y=".5" width="31" height="31" rx="9" fill="#0a0a0a" stroke="rgb(255 255 255 / .18)" />
       <path d="M9 10.5l7 12.5" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" />
-      <path d="M16 23l7-12.5" fill="none" stroke="#3dff9a" strokeWidth="3.4" strokeLinecap="round" />
-      <circle cx="24.6" cy="6.9" r="1.7" fill="#3dff9a" />
+      <path d="M16 23l7-12.5" fill="none" stroke="#14b886" strokeWidth="3.4" strokeLinecap="round" />
+      <circle cx="24.6" cy="6.9" r="1.7" fill="#14b886" />
     </svg>
   );
 }

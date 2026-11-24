@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -118,9 +119,11 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
           interval={interval}
           left={left}
           waitlist={waitlist}
-          withSingle={!!unlockStoreId}
+          withSingle
           cta={(choice, iv) => {
             const plan = PAID_PLANS.find((p) => p.id === choice);
+            // « Ma boutique » sans aperçu à débloquer : on crée d'abord l'aperçu gratuit, puis on paie dessus.
+            if (choice === "single" && !unlockStoreId) return <Link href="/app" className={pickerButtonClass}>Créer mon aperçu <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></Link>;
             return choice === "single" || !plan ? (
               <button type="button" onClick={buySingle} onPointerEnter={prepareSingle} onFocus={prepareSingle} disabled={!!busy} className={pickerButtonClass}>
                 {busy === "single" ? <Spinner /> : <>Continuer <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>}

@@ -77,6 +77,7 @@ export type StoreRow = {
   brief: string;
   teaser?: Record<string, unknown> | null;
   source_url: string | null;
+  supplier_url?: string | null; // fournisseur relié (lien du produit)
   theme: Record<string, unknown>;
   plan: Record<string, unknown> | null;
   shopify: Record<string, unknown>;

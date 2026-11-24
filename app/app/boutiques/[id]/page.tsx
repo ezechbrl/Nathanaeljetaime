@@ -1,5 +1,6 @@
 "use client";
 
+import { SupplierCard } from "@/components/app/SupplierCard";
 import { ExternalLink, History, RotateCcw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -79,7 +80,7 @@ export default function StoreDashboard() {
             <FullscreenButton target={previewRef} />
           </div>
           {/* Grand encadré lumineux, comme sur la page d'accueil. */}
-          <div className="glow-frame rounded-b-[14px] rounded-tr-[14px] p-[1.5px]">
+          <div className="bg-white/10 rounded-b-[14px] rounded-tr-[14px] p-[1.5px]">
             <div ref={previewRef} className="preview-fs max-h-[720px] overflow-y-auto rounded-b-[13px] rounded-tr-[13px] bg-white">
               <StorePreview store={store} page={page} onPageChange={setPage} assets={assets.data?.assets} />
             </div>
@@ -88,6 +89,7 @@ export default function StoreDashboard() {
 
         <aside className="space-y-4">
           <StoreCoach store={store} assets={assets.data?.assets} />
+          <SupplierCard store={store} onSaved={setStore} />
           <ThemeColorsCard store={store} />
           {store.status === "published" && <TestimonialCard />}
           <section className="surface rounded-card p-5">

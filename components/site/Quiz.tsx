@@ -377,7 +377,7 @@ function SupplierFinder({ keyword, brand, url, onUrl, ok }: { keyword: string; b
 function NextButton({ onClick }: { onClick: () => void }) {
   return (
     <div className="sticky bottom-3 z-20 mt-8">
-    <button type="button" onClick={onClick} className="[animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] glow-hover text-[16px] font-semibold text-[#03140d] transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
+    <button type="button" onClick={onClick} className="[animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover text-[16px] font-semibold text-white transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
       Continuer <ArrowRight className="h-5 w-5" />
     </button>
     </div>

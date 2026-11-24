@@ -357,7 +357,7 @@ export async function getStore(id: string) {
   return { store: clone(store), activeJob: active ? (clone(active) as Job) : null };
 }
 
-export async function updateStore(id: string, input: Partial<Pick<Store, "name" | "theme" | "plan">>) {
+export async function updateStore(id: string, input: Partial<Pick<Store, "name" | "theme" | "plan" | "supplierUrl">>) {
   await wait();
   const s = load();
   const store = s.stores.find((x) => x.id === id) ?? notFound();

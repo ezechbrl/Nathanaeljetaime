@@ -1,3 +1,4 @@
+import { PhoneNotifications } from "@/components/site/PhoneNotifications";
 import { BuyerReviews } from "@/components/site/BuyerReviews";
 import { BeforeAfterSlider } from "@/components/site/BeforeAfterSlider";
 import { FaqSection } from "@/components/site/Faq";
@@ -17,6 +18,7 @@ export default function HomePage() {
       <Hero />
       <BeforeAfterSlider />
       <ShowcaseGrid />
+      <PhoneNotifications />
       <BuyerReviews />
       <Reviews />
       <div className="hidden sm:block"><FinalCta /></div>

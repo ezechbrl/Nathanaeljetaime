@@ -72,7 +72,7 @@ export default function AppHome() {
           <Suspense><Welcome /><CreateStore /></Suspense>
           <div className="mx-auto mt-14 max-w-[1100px]">
             <p className="mb-4 text-center text-[15px] font-medium text-fg-muted">Comment ça marche, en 15 secondes</p>
-            <div className="glow-frame rounded-[17px] p-[1.5px]">
+            <div className="rounded-[17px] bg-white/10 p-[1.5px]">
               <DemoVideos />
             </div>
           </div>
