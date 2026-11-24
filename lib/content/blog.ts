@@ -10,6 +10,65 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "trouver-fournisseur-dropshipping",
+    title: "Trouver un fournisseur en dropshipping : comment choisir un fournisseur fiable",
+    excerpt: "AliExpress, Alibaba, fournisseur européen : où chercher, quoi vérifier avant de commander et comment éviter les mauvaises surprises avec tes clients.",
+    category: "Guide",
+    date: "2026-11-24",
+    readingMinutes: 7,
+    sections: [
+      { paragraphs: [
+        "En dropshipping, tu ne gardes pas de stock : quand un client commande sur ta boutique, tu passes la commande chez ton fournisseur, et c'est lui qui envoie le colis directement chez ton client. Ton fournisseur, c'est donc la moitié de ton expérience client. Un bon produit avec un mauvais fournisseur, c'est des retards, des colis abîmés et des clients mécontents.",
+        "La bonne nouvelle : choisir un fournisseur fiable n'a rien de compliqué. Il suffit de savoir où chercher et quoi vérifier avant de lancer ta boutique.",
+      ] },
+      { heading: "Où chercher un fournisseur", paragraphs: ["Il existe plusieurs grandes familles de fournisseurs. Chacune a ses avantages :"], list: [
+        "AliExpress : le plus simple pour débuter. Tu peux commander à l'unité, sans minimum, et tu vois les avis des acheteurs. Les délais de livraison varient beaucoup selon le vendeur et l'entrepôt d'expédition.",
+        "Alibaba : plutôt pour acheter en quantité ou faire fabriquer un produit à ton nom. Utile quand tu veux lancer ta propre marque, moins adapté pour envoyer une seule pièce à un client.",
+        "Les plateformes spécialisées dans le dropshipping (comme CJ Dropshipping) : elles proposent souvent des entrepôts dans plusieurs pays et des services en plus, comme l'emballage personnalisé.",
+        "Les fournisseurs européens : souvent plus chers, mais avec des délais plus courts pour tes clients en France. Un vrai plus si ton produit est un cadeau ou un achat « urgent ».",
+      ] },
+      { heading: "Les 6 points à vérifier avant de choisir", paragraphs: ["Avant d'ajouter un produit à ta boutique, prends dix minutes pour regarder ces éléments sur la page du fournisseur :"], list: [
+        "Les avis des acheteurs : lis surtout les avis avec photos et les avis négatifs. Ils te disent ce qui peut mal se passer (taille, qualité, emballage).",
+        "Le nombre de commandes : un produit déjà commandé souvent a été testé par d'autres. Ce n'est pas une garantie, mais c'est un bon signe.",
+        "L'ancienneté et la note du vendeur : un vendeur présent depuis longtemps avec une bonne note est en général plus sérieux.",
+        "Les options de livraison vers la France : regarde le délai annoncé et l'entrepôt d'expédition. Certains vendeurs expédient depuis l'Europe.",
+        "Les photos et la description : elles doivent correspondre au produit que tu vas vendre. Méfie-toi des photos trop parfaites sans aucune photo d'acheteur.",
+        "La réactivité : envoie un message au vendeur avec une question simple. Un fournisseur qui répond vite et clairement sera plus facile à gérer en cas de problème.",
+      ] },
+      { heading: "Commande toujours un échantillon", paragraphs: [
+        "C'est l'étape que beaucoup de débutants sautent, et c'est une erreur. Commande le produit pour toi, comme si tu étais un client. Tu vas voir le vrai délai de livraison, l'état du colis à l'arrivée et la vraie qualité du produit.",
+        "Cet échantillon te sert aussi pour tes vidéos TikTok ou Instagram : rien ne vaut un produit que tu as vraiment en main pour montrer comment il marche. Et si le produit te déçoit, tu as évité de le vendre à des dizaines de personnes.",
+      ] },
+      { heading: "Sois honnête sur les délais de livraison", paragraphs: [
+        "Ton client ne sait pas que le colis part de chez un fournisseur. Pour lui, c'est ta boutique qui livre. Si tu annonces « livré en 3 jours » alors que le colis met deux ou trois semaines, tu vas recevoir des messages inquiets, des demandes de remboursement et de mauvais avis.",
+        "Annonce clairement le délai réel sur ta fiche produit et dans ta FAQ. Un client prévenu est beaucoup plus patient qu'un client surpris. Pense aussi à donner le numéro de suivi dès que tu l'as.",
+      ] },
+      { heading: "Calcule ta marge avec le vrai prix", paragraphs: ["Le prix affiché chez le fournisseur n'est pas ton seul coût. Pour savoir à quel prix vendre, additionne :"], list: [
+        "le prix du produit chez le fournisseur",
+        "les frais de livraison jusqu'à ton client",
+        "les frais de paiement de ta boutique",
+        "le coût de ta publicité ou de ton temps pour trouver des clients",
+        "une petite réserve pour les retours et les colis perdus",
+      ] },
+      { paragraphs: ["Une fois tout ça additionné, il doit te rester une marge suffisante pour que chaque vente vaille le coup. Si ce n'est pas le cas, cherche un autre fournisseur, propose des lots (2 ou 3 produits) ou choisis un autre produit."] },
+      { heading: "Les signaux qui doivent t'alerter", paragraphs: ["Passe ton chemin si tu vois l'un de ces signaux :"], list: [
+        "Un prix beaucoup plus bas que tous les autres vendeurs pour le même produit",
+        "Aucun avis, ou seulement des avis très courts et tous identiques",
+        "Des produits de grandes marques vendus à petit prix : ce sont souvent des contrefaçons, et tu n'as pas le droit de les revendre",
+        "Un vendeur qui ne répond jamais à tes messages",
+        "Des délais de livraison qui changent sans arrêt ou qui ne sont pas indiqués",
+      ] },
+      { heading: "Garde toujours un plan B", paragraphs: [
+        "Même un bon fournisseur peut tomber en rupture de stock ou augmenter ses prix. Une fois ton produit choisi, note un ou deux autres vendeurs qui proposent le même article. Si ton fournisseur principal a un souci, tu pourras changer rapidement sans bloquer tes commandes.",
+      ] },
+      { heading: "Relier ton fournisseur à ta boutique avec Vigenia", paragraphs: [
+        "Avec Vigenia, tu peux partir directement du lien de ton produit chez le fournisseur : tu colles le lien AliExpress ou Alibaba, et ta boutique se crée autour de ce produit, avec ses photos, ses avis et une page produit claire. Le fournisseur reste relié à ta boutique : quand une commande arrive, tu sais tout de suite où commander le produit.",
+        "Tu n'as pas encore de fournisseur ? Pendant le quiz, Vigenia te propose de chercher ton produit sur AliExpress ou Alibaba, puis de coller le lien de celui que tu as choisi. Tu peux essayer gratuitement et voir l'aperçu de ta boutique sur vigenia.com.",
+      ] },
+      { heading: "En résumé", paragraphs: ["Pour choisir un fournisseur fiable : regarde les avis et les photos d'acheteurs, vérifie les délais vers la France, commande un échantillon, annonce des délais honnêtes et garde un fournisseur de secours. Ce sont des gestes simples, mais ce sont eux qui font revenir tes clients."] },
+    ],
+  },
+  {
     slug: "trouver-produit-gagnant-dropshipping",
     title: "Trouver un produit gagnant en dropshipping : la méthode simple pour débuter",
     excerpt: "Où chercher, comment savoir si un produit peut se vendre et quels pièges éviter : la méthode pas à pas pour choisir ton premier produit.",
