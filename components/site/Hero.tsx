@@ -9,9 +9,8 @@ import { NotificationPhone } from "./PhoneNotifications";
 export function Hero() {
   return (
     <section className="relative pb-16 pt-24 sm:pt-36">
-      {/* Grand écran : le téléphone qui reçoit des commandes, à droite du titre (sur téléphone, il est plus bas). */}
-      <div className="pointer-events-none absolute right-[3%] top-28 z-0 hidden origin-top-right scale-[0.82] xl:block 2xl:right-[6%] 2xl:scale-90"><NotificationPhone /></div>
-      <div className="relative mx-auto max-w-[1100px] px-4 text-center sm:px-6">
+      <div className="relative mx-auto max-w-[1100px] px-4 sm:px-6 xl:grid xl:max-w-[1320px] xl:grid-cols-[minmax(0,1fr)_300px] xl:items-center xl:gap-14">
+        <div className="min-w-0 text-center">
         {/* Sur téléphone, on va droit au titre (la pastille ne s'affiche que sur grand écran). */}
         <Reveal className="hidden sm:block">
           <span className="eyebrow mx-auto">
@@ -40,8 +39,11 @@ export function Hero() {
             <li key={t} className={`${mobile ? "flex" : "hidden sm:flex"} items-center gap-1.5 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-fg/85`}><Check className="h-3.5 w-3.5 text-accent" /> {t}</li>
           ))}</ul>
         </Reveal>
-        <StoreMarquee />
+        </div>
+        {/* Grand écran : le téléphone qui reçoit des commandes, aligné avec le titre (sur téléphone, il est plus bas). */}
+        <NotificationPhone className="hidden xl:block" />
       </div>
+      <div className="relative mx-auto max-w-[1100px] px-4 sm:px-6"><StoreMarquee /></div>
       <div className="relative px-4 sm:px-6">
         {/* Démonstration : enregistrement réel de l'app, sous les boutiques qui défilent. */}
         <Reveal delay={380} className="relative mx-auto mt-10 max-w-[1320px] sm:mt-14">
