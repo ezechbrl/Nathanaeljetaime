@@ -190,7 +190,7 @@ export function CreateStore() {
   return (
     <div className="mx-auto w-full max-w-[720px]">
       <form onSubmit={submit} onPaste={(e) => { if (mode !== "recraft" && e.clipboardData.files.length) { e.preventDefault(); addShots(e.clipboardData.files); } }} className="glow-frame rounded-[16px] p-[1.5px]">
-        <div className="rounded-[15px] bg-[linear-gradient(180deg,#0d3a2d,#062419)]">
+        <div className="rounded-[15px] bg-[#121514]">
           {mode === "recraft" && (
             <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3.5">
               <Store className="h-5 w-5 shrink-0 text-[#fbbf24]" />

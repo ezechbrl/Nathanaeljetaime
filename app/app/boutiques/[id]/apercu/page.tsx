@@ -19,7 +19,7 @@ export default function StoreFullPreview() {
   useEffect(() => { scroller.current?.scrollTo({ top: 0 }); }, [page, device]); // chaque page s'ouvre en haut
   const tab = (on: boolean) => cn("rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors", on ? "bg-white text-[#0b1f1b]" : "text-white/70 hover:text-white");
   return (
-    <div className="fixed inset-0 z-[70] flex flex-col bg-[#0b1f1b]">
+    <div className="fixed inset-0 z-[70] flex flex-col bg-[#121514]">
       <div className="flex items-center gap-2 px-3 py-2 text-white">
         <Link href={`/app/boutiques/${store.id}`} aria-label="Fermer l'aperçu" className="grid h-9 w-9 place-items-center rounded-full hover:bg-white/10"><X className="h-5 w-5" /></Link>
         <div className="flex gap-1 rounded-full bg-white/10 p-1">

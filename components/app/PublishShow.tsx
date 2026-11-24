@@ -148,7 +148,7 @@ export function PublishedCelebration({ store, live, onClose }: { store: Store; l
   }, [onClose]);
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Boutique publiée" onClick={onClose} className="fixed inset-0 z-50 grid place-items-center bg-[#061815]/85 p-5 backdrop-blur-md [animation:fade-in_.4s_ease-out]">
+    <div role="dialog" aria-modal="true" aria-label="Boutique publiée" onClick={onClose} className="fixed inset-0 z-50 grid place-items-center bg-[#121514]/85 p-5 backdrop-blur-md [animation:fade-in_.4s_ease-out]">
       {live && <Confetti colors={[c.accent, c.primary, "#68e6b0", "#ffffff", "#f5c451"]} />}
       <div onClick={(e) => e.stopPropagation()} className={cn("relative max-h-[92dvh] w-full overflow-y-auto text-center [animation:rise_.6s_.1s_cubic-bezier(.2,.8,.2,1)_both]", manual ? "max-w-[560px]" : "max-w-[480px]")}>
         <div className="relative mx-auto grid h-24 w-24 place-items-center">

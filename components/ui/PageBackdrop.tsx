@@ -5,13 +5,13 @@ const GREEN = "61 255 154";
 const WHITE = "255 255 255";
 
 const LIGHTS = [
-  { top: "2%", left: "50%", size: "70rem", c: WHITE, a: 0.16 },
+  { top: "2%", left: "50%", size: "70rem", c: WHITE, a: 0.08 },
   { top: "12%", left: "90%", size: "32rem", c: GREEN, a: 0.2 },
-  { top: "26%", left: "6%", size: "40rem", c: WHITE, a: 0.13 },
+  { top: "26%", left: "6%", size: "40rem", c: WHITE, a: 0.07 },
   { top: "40%", left: "82%", size: "42rem", c: GREEN, a: 0.13 },
   { top: "54%", left: "16%", size: "30rem", c: GREEN, a: 0.17 },
-  { top: "67%", left: "62%", size: "46rem", c: WHITE, a: 0.12 },
-  { top: "80%", left: "10%", size: "36rem", c: WHITE, a: 0.13 },
+  { top: "67%", left: "62%", size: "46rem", c: WHITE, a: 0.065 },
+  { top: "80%", left: "10%", size: "36rem", c: WHITE, a: 0.07 },
   { top: "93%", left: "86%", size: "34rem", c: GREEN, a: 0.17 },
   { top: "8%", left: "8%", size: "30rem", c: GREEN, a: 0.14 },
   { top: "33%", left: "55%", size: "36rem", c: GREEN, a: 0.09 },
@@ -42,7 +42,7 @@ const Star = ({ size, green }: { size: number; green: boolean }) => (
 
 export function PageBackdrop() {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[linear-gradient(180deg,#181b1a_0%,#1c211f_40%,#171b19_100%)]">
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[linear-gradient(180deg,#151817_0%,#181c1a_40%,#141716_100%)]">
       {/* Fines lignes verticales très discrètes. */}
       <div className="absolute inset-0 opacity-50 [background:repeating-linear-gradient(90deg,transparent_0_119px,rgb(255_255_255/0.035)_119px_120px)]" />
 

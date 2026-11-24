@@ -131,7 +131,7 @@ export function ShopifyForm({ next, cta = "Connecter", onBeforeRedirect, withEma
             <span aria-hidden className="absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full bg-white/[0.06] blur-2xl" />
             <span className="relative">
               <ShopifyBag className="h-14 w-14 drop-shadow-[0_6px_18px_rgb(149_191_71/0.55)] transition-transform group-hover:scale-110 sm:h-16 sm:w-16" />
-              <span className="absolute -bottom-1 -right-2 grid h-7 w-7 place-items-center rounded-full border border-white/15 bg-[#052e16]"><Store className="h-4 w-4 text-[#3dff9a]" /></span>
+              <span className="absolute -bottom-1 -right-2 grid h-7 w-7 place-items-center rounded-full border border-white/15 bg-[#121514]"><Store className="h-4 w-4 text-[#3dff9a]" /></span>
             </span>
             <span className="relative text-[15px] font-semibold leading-snug sm:text-[17px]">Créer mon compte Shopify</span>
             <span className="relative inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#34f0b0,#0fae7c)] px-3.5 text-sm font-semibold text-black glow-hover"><span className="sm:hidden">Création</span><span className="hidden sm:inline">Créer mon compte</span> <ArrowUp className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" /></span>

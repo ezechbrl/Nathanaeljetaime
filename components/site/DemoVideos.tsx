@@ -23,7 +23,7 @@ export function DemoVideos({ className }: { className?: string }) {
           </button>
         ))}
       </div>
-      <TutorialVideo key={demo} name={`demo-${demo}`} title={cur.title} speed="pendant les chargements" className="max-w-none" />
+      <TutorialVideo key={demo} name={`demo-${demo}`} title={cur.title} className="max-w-none" />
     </div>
   );
 }

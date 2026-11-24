@@ -56,7 +56,7 @@ export function LaunchCelebration({ store, onClose }: { store: Store; onClose: (
   }, [onClose]);
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Ta boutique est prête" onClick={onClose} className="fixed inset-0 z-50 grid place-items-center bg-[#061815]/80 p-5 backdrop-blur-md [animation:fade-in_.4s_ease-out]">
+    <div role="dialog" aria-modal="true" aria-label="Ta boutique est prête" onClick={onClose} className="fixed inset-0 z-50 grid place-items-center bg-[#121514]/80 p-5 backdrop-blur-md [animation:fade-in_.4s_ease-out]">
       <Confetti colors={[c.accent, c.primary, "#5ed38c", "#ffffff", "#f5c451"]} />
       <div onClick={(e) => e.stopPropagation()} className="relative w-full max-w-[460px] text-center [animation:rise_.6s_.15s_cubic-bezier(.2,.8,.2,1)_both]">
         <div className="relative mx-auto grid h-24 w-24 place-items-center">

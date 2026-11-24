@@ -251,7 +251,7 @@ export default function EditorPage() {
                   <button key={s} onClick={() => send(s)} disabled={sending} className="shrink-0 rounded-full border border-white/[0.1] bg-white/[0.02] px-3.5 py-1.5 text-[13.5px] text-fg-muted transition-colors hover:border-accent/40 hover:text-fg disabled:opacity-50">{s}</button>
                 ))}
               </div>}
-              <div className="glow-frame rounded-[23px] p-[1.5px]"><form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-[22px] bg-[linear-gradient(180deg,#0d3a2d,#062419)] p-2.5">
+              <div className="glow-frame rounded-[23px] p-[1.5px]"><form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex items-end gap-2 rounded-[22px] bg-[#121514] p-2.5">
                 <label htmlFor="msg" className="sr-only">Ta demande</label>
                 <textarea
                   ref={inputRef}
