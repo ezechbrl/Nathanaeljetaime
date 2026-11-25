@@ -1,6 +1,7 @@
 import { requireUser } from "@/lib/server/auth";
 import { billingFor, launchOffer, syncFromStripe } from "@/lib/server/billing";
 import { json, route } from "@/lib/server/http";
+import { activeDiscount } from "@/lib/server/stripe-billing";
 import { getUsage } from "@/lib/server/quota";
 
 export const GET = route(async (req) => {
@@ -11,5 +12,6 @@ export const GET = route(async (req) => {
     user = await requireUser();
   }
   const [{ subscription, invoices, billingUrl }, usage, offer] = await Promise.all([billingFor(user), getUsage(user.id, user.plan), launchOffer(user, req.headers.get("cookie"))]);
-  return json({ subscription, usage, invoices, offerEndsAt: offer.endsAt, offerKind: offer.kind, billingUrl });
+  const discountPercent = activeDiscount(user);
+  return json({ subscription, usage, invoices, offerEndsAt: offer.endsAt, offerKind: offer.kind, billingUrl, discountPercent, discountUntil: discountPercent ? user.discount_until : null });
 });

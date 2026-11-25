@@ -16,6 +16,8 @@ export type UserRow = {
   created_at: string;
   // Paiement unique « Ma boutique » : accès comme un abonné Starter, pour cette boutique, jusqu'à cette date.
   single_until?: string | null;
+  discount_percent?: number | null; // réduction personnelle sur les abonnements
+  discount_until?: string | null;
   single_store_id?: string | null;
   single?: boolean; // calculé : achat « Ma boutique » encore valable (et pas d'abonnement)
 };

@@ -40,14 +40,17 @@ const perDay = (amount: number, interval: Interval) => (amount / (interval === "
 
 // Choix de l'offre, version minimaliste : une liste à cocher, le prix par jour à droite,
 // et une barre en bas (collée à l'écran sur téléphone) avec le prix choisi et « Continuer ».
-export function PlanPicker({ interval, left, offer = false, waitlist = false, withSingle = false, cta }: {
-  interval: Interval; left?: Left | null; offer?: boolean; waitlist?: boolean; withSingle?: boolean;
+export function PlanPicker({ interval, left, offer = false, waitlist = false, withSingle = false, percent = 0, cta }: {
+  interval: Interval; left?: Left | null; offer?: boolean; waitlist?: boolean; withSingle?: boolean; percent?: number;
   cta: (choice: Choice, interval: Interval) => ReactNode;
 }) {
   const [choice, setChoice] = useState<Choice>("pro");
   const singlePrice = SINGLE.price;
   const rows: { id: Choice; name: string; badge?: { text: string; tone: "green" | "yellow" }; price: ReactNode; short?: ReactNode; right: ReactNode }[] = PAID_PLANS.map((plan: Plan) => {
-    const { billed, was } = planPrice(plan, interval, offer || !!left, waitlist);
+    const std = planPrice(plan, interval, offer || !!left, waitlist);
+    // Réduction personnelle (envoyée par e-mail) : prix réduit, et le prix normal barré.
+    const base = interval === "year" ? plan.yearly : plan.monthly;
+    const { billed, was } = percent ? { billed: Math.min(std.billed, Math.round(base * (1 - percent / 100))), was: base } : std;
     return {
       id: plan.id as Choice,
       name: plan.name,

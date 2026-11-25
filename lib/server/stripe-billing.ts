@@ -40,6 +40,12 @@ export async function launchOffer(user: UserRow, cookie?: string | null) {
 }
 
 // Prix payé à chaque période, en euros, selon l'offre (le même que celui affiché sur le site).
+// Réduction personnelle encore valable (ex. −15 % envoyée par e-mail), en %, ou 0.
+export const activeDiscount = (user: Pick<UserRow, "discount_percent" | "discount_until">) =>
+  user.discount_percent && user.discount_until && new Date(user.discount_until).getTime() > Date.now() ? user.discount_percent : 0;
+// Prix avec la réduction personnelle (arrondi à l'euro), pour le site et pour Stripe.
+export const discounted = (base: number, percent: number) => Math.round(base * (1 - percent / 100));
+
 export function priceFor(plan: PaidPlan, interval: "month" | "year", offer: "waitlist" | "launch" | null) {
   const info = PLANS.find((p) => p.id === plan)!;
   const base = interval === "year" ? info.yearly : info.monthly;
@@ -71,7 +77,10 @@ export async function checkoutUrl(user: UserRow, plan: PaidPlan, interval: "mont
 }
 
 async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | "year", offer: "waitlist" | "launch" | null, customer: string) {
-  const amount = priceFor(plan, interval, offer);
+  const percent = activeDiscount(user);
+  const base = (interval === "year" ? PLANS.find((p) => p.id === plan)!.yearly : PLANS.find((p) => p.id === plan)!.monthly);
+  // Réduction personnelle : on garde le prix le plus bas (elle reste valable à vie sur cet abonnement).
+  const amount = percent ? Math.min(priceFor(plan, interval, offer), discounted(base, percent)) : priceFor(plan, interval, offer);
   const session = await stripe().checkout.sessions.create({
     mode: "subscription",
     customer,
@@ -84,13 +93,13 @@ async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | 
         recurring: { interval },
         product_data: {
           name: NAMES[plan],
-          description: `${offer === "waitlist" ? "Prix spécial à vie. " : ""}Ta boutique Shopify complète : textes, photos, éditeur IA et mise en ligne guidée. Sans engagement.`,
+          description: `${percent ? `Réduction personnelle −${percent} % à vie. ` : offer === "waitlist" ? "Prix spécial à vie. " : ""}Ta boutique Shopify complète : textes, photos, éditeur IA et mise en ligne guidée. Sans engagement.`,
           images: [`${env.appUrl()}/brand/icon-512.png`],
         },
       },
     }],
-    subscription_data: { metadata: { user_id: user.id, plan, interval, offer: offer ?? "none" } },
-    ...(offer ? {} : { allow_promotion_codes: true }),
+    subscription_data: { metadata: { user_id: user.id, plan, interval, offer: percent ? `discount-${percent}` : offer ?? "none" } },
+    ...(offer || percent ? {} : { allow_promotion_codes: true }),
     locale: "fr",
     // Rassure juste au-dessus du bouton de paiement.
     custom_text: { submit: { message: "Sans engagement : tu peux arrêter ton abonnement en un clic depuis ton compte Vigenia. Ta boutique se crée juste après le paiement." } },

@@ -110,6 +110,12 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
     <div className="relative isolate overflow-clip rounded-[26px] border border-white/10 px-4 py-8 sm:px-8 sm:py-10">
       <AuroraBackground className="-z-10" />
       {left && waitlist && <div className="mb-6"><OfferBanner left={left} waitlist /></div>}
+      {!!billing.data?.discountPercent && billing.data.discountUntil && (
+        <div className="mx-auto mb-6 max-w-[640px] rounded-[18px] border border-[#14b886]/50 bg-[#14b886]/10 px-5 py-3 text-center">
+          <p className="text-[15px] font-bold">Ta réduction personnelle : −{billing.data.discountPercent} % à vie sur ton abonnement</p>
+          <p className="text-[12.5px] text-fg-muted">Déjà appliquée aux prix ci-dessous. Valable jusqu'au {new Date(billing.data.discountUntil).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })} inclus.</p>
+        </div>
+      )}
       {text && !unlockStoreId && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{unlockStoreId ? "Débloque ta boutique" : draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
       <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 3 minutes.</p>
@@ -120,6 +126,7 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
           left={left}
           waitlist={waitlist}
           withSingle
+          percent={billing.data?.discountPercent ?? 0}
           cta={(choice, iv) => {
             const plan = PAID_PLANS.find((p) => p.id === choice);
             // « Ma boutique » sans aperçu à débloquer : on crée d'abord l'aperçu gratuit, puis on paie dessus.
