@@ -10,6 +10,74 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "preparer-boutique-en-ligne-noel",
+    title: "Préparer sa boutique en ligne pour Noël : la checklist complète",
+    excerpt: "Livraison, offres, page produit, service client : tout ce qu'il faut vérifier sur ta boutique en ligne avant les fêtes pour ne rater aucune commande.",
+    category: "Guide",
+    date: "2026-11-25",
+    readingMinutes: 7,
+    sections: [
+      { paragraphs: [
+        "Noël, c'est la période où beaucoup de gens achètent en ligne : des cadeaux, souvent au dernier moment, et souvent sur téléphone. Pour une petite boutique, c'est une belle occasion… à condition d'être prêt avant que tout le monde commence ses achats.",
+        "Voici une checklist simple pour préparer ta boutique en ligne pour Noël, étape par étape. Tu n'as pas besoin de tout faire : commence par ce qui a le plus d'impact pour toi.",
+      ] },
+      { heading: "1. Vérifie (et annonce) tes délais de livraison", paragraphs: [
+        "À Noël, la vraie question de tes clients, c'est : « Est-ce que ça arrivera à temps ? ». Si tu fais du dropshipping, regarde les délais réels de ton fournisseur vers la France, et compte large : en fin d'année, les transporteurs sont très chargés.",
+        "Ensuite, affiche clairement une date limite de commande pour une livraison avant Noël, en haut de ta boutique et sur tes fiches produits. Si ton fournisseur ne peut pas livrer à temps, dis-le honnêtement et propose autre chose (une carte cadeau, par exemple). Un client prévenu reste un client content.",
+      ] },
+      { heading: "2. Mets ton produit en avant comme un cadeau", paragraphs: ["Pendant les fêtes, les gens n'achètent pas pour eux, ils achètent pour quelqu'un. Adapte ton message :"], list: [
+        "Une accroche orientée cadeau : « Le cadeau parfait pour ceux qui… »",
+        "Des photos dans une ambiance de fêtes (sapin, papier cadeau, lumière chaude)",
+        "Une section « Pour qui ? » : pour un papa sportif, une amie qui adore cuisiner…",
+        "Un bandeau en haut de la boutique avec ton offre de Noël et ta date limite",
+      ] },
+      { heading: "3. Prépare une offre claire (et honnête)", paragraphs: [
+        "Pas besoin de casser tes prix. Les offres qui marchent bien à Noël sont souvent simples à comprendre :",
+      ], list: [
+        "Un lot de 2 ou 3 produits avec une petite réduction : idéal pour offrir à plusieurs personnes",
+        "La livraison offerte à partir d'un certain montant",
+        "Un petit cadeau ou un emballage offert",
+      ] },
+      { paragraphs: ["Attention aux prix barrés : en France, le prix barré doit correspondre au prix le plus bas pratiqué dans les 30 jours avant la réduction. Pas de fausse promo gonflée, ça se voit et c'est interdit."] },
+      { heading: "4. Soigne ta page produit pour le téléphone", paragraphs: ["Une grande partie des achats de Noël se fait sur mobile, souvent entre deux occupations. Ouvre ta boutique sur ton téléphone et vérifie :"], list: [
+        "Que la photo principale et le prix se voient tout de suite",
+        "Que le bouton « Ajouter au panier » est bien visible sans chercher",
+        "Que la page se charge vite, même avec une connexion moyenne",
+        "Que les infos de livraison et de retour sont faciles à trouver",
+      ] },
+      { heading: "5. Rassure tes clients", paragraphs: ["Un client qui ne connaît pas ta boutique a besoin d'être rassuré, surtout pour un cadeau. Pense à :"], list: [
+        "Afficher les vrais avis de tes clients ou de ton produit",
+        "Expliquer clairement ta politique de retour (et rappeler qu'un cadeau peut être échangé)",
+        "Montrer les moyens de paiement acceptés",
+        "Donner un moyen simple de te contacter (e-mail ou formulaire)",
+      ] },
+      { heading: "6. Prépare ton service client", paragraphs: [
+        "Pendant les fêtes, tu vas recevoir plus de questions : « où est ma commande ? », « est-ce que je peux changer l'adresse ? », « c'est possible d'avoir un emballage cadeau ? ». Prépare quelques réponses types à l'avance pour répondre vite, et ajoute une petite FAQ « Spécial Noël » sur ta boutique avec les questions les plus fréquentes.",
+        "Pense aussi à envoyer le numéro de suivi dès que tu l'as : c'est ce qui rassure le plus un client qui attend un cadeau.",
+      ] },
+      { heading: "7. Fais connaître ta boutique avant les fêtes", paragraphs: [
+        "Les gens commencent à chercher leurs cadeaux plusieurs semaines avant Noël. Commence à publier tôt : des vidéos courtes qui montrent ton produit comme une idée cadeau, un avant/après, un déballage. Sur TikTok ou Instagram, une vidéo simple et régulière vaut mieux qu'une seule vidéo parfaite publiée trop tard.",
+      ] },
+      { heading: "8. Prévois l'après-Noël", paragraphs: ["Les fêtes ne s'arrêtent pas le 25 décembre :"], list: [
+        "Les cartes cadeaux reçues à Noël sont souvent dépensées juste après",
+        "Certaines personnes cherchent à se faire plaisir avec l'argent reçu",
+        "Les retours et échanges arrivent en janvier : prépare-toi à les traiter rapidement",
+      ] },
+      { heading: "La checklist en résumé", paragraphs: [], list: [
+        "Délais de livraison vérifiés et date limite affichée",
+        "Message « cadeau » sur la page d'accueil et les fiches produits",
+        "Une offre simple et honnête (lot, livraison offerte, petit cadeau)",
+        "Boutique testée sur téléphone",
+        "Avis, retours et paiement bien visibles",
+        "Réponses types prêtes pour le service client",
+        "Vidéos publiées tôt, plusieurs semaines avant Noël",
+      ] },
+      { heading: "Être prêt à temps avec Vigenia", paragraphs: [
+        "Si ta boutique n'est pas encore prête, Vigenia peut te faire gagner beaucoup de temps : à partir de ton produit (ou d'un lien fournisseur), elle crée en quelques minutes une boutique Shopify complète avec photos, textes, vrais avis et offres par lot. Tu peux ensuite tout modifier, par exemple pour ajouter ton message de Noël. L'aperçu de ta boutique est gratuit sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
     slug: "trouver-nom-boutique-en-ligne",
     title: "Trouver un nom de boutique en ligne : 7 méthodes simples pour un nom qui marque",
     excerpt: "Un bon nom de boutique se retient, se prononce facilement et donne envie. Voici comment en trouver un, le vérifier et éviter les erreurs de débutant.",
