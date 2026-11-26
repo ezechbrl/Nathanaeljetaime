@@ -11,7 +11,7 @@ export type Choice = "pro" | "agency" | "single";
 // Ce que contient chaque offre, en clair (le Pro a plus de lignes : c'est l'offre la plus complète).
 const POINTS: Record<Choice, string[]> = {
   pro: [
-    "Ta boutique Shopify prête en 3 minutes, à partir d'un simple lien",
+    "Ta boutique Shopify prête en 3 minutes, à partir de ton idée ou d'un lien",
     "Photos pro, textes qui donnent envie d'acheter et vrais avis clients",
     "Offres par lot (1, 2, 3 produits) pour vendre plus",
     "Modifie tout en parlant à l'IA, quand tu veux",
@@ -108,8 +108,7 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="whitespace-nowrap text-[15px] font-semibold text-white sm:text-[1.2rem]">{current.short ?? current.price}</p>
-            {/* Promesse réelle des CGV (lib/content/legal.ts) : 1er paiement remboursé sur simple demande sous 14 jours. */}
-            <p className="mt-0.5 whitespace-nowrap text-[11px] text-[#3dff9a] sm:text-xs">🛡️ Remboursé sous 14 jours si pas satisfait</p>
+            <p className="mt-0.5 whitespace-nowrap text-[11px] text-[#3dff9a] sm:text-xs">🔒 Paiement sécurisé · ta boutique en 3 min</p>
           </div>
           <div className="w-[150px] shrink-0 sm:w-[240px]">{cta(current.id, interval)}</div>
         </div>

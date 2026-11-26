@@ -118,7 +118,21 @@ export function Paywall({ brief, draft, unlockStoreId, initialInterval = "month"
       )}
       {text && !unlockStoreId && <p className="mx-auto max-w-xl truncate text-center text-[13px] text-fg-muted">Ton projet est gardé : <span className="italic text-fg">« {text} »</span></p>}
       <h2 className="mt-3 text-center text-[clamp(1.7rem,1.2rem+1.6vw,2.4rem)] font-semibold tracking-[-0.03em]">{unlockStoreId ? "Débloque ta boutique" : draft ? "Ta boutique t'attend 🚀" : "Choisis ton offre"}</h2>
-      <p className="mt-1.5 text-center text-sm text-fg-muted">Une boutique Shopify complète, prête à vendre en 3 minutes.</p>
+      <p className="mt-1.5 text-center text-sm text-fg-muted">{unlockStoreId ? "Ton aperçu est déjà fait : il ne reste qu'à terminer ta boutique et la mettre en ligne." : "Une boutique Shopify complète, prête à vendre en 3 minutes."}</p>
+      {/* Mettre en confiance avant de choisir : uniquement des promesses vraies (voir FAQ et CGV). */}
+      <ul className="mx-auto mt-6 grid max-w-[640px] gap-2 sm:grid-cols-2">
+        {[
+          ["⚡", "Prête en 3 minutes", "Textes, photos, design et fiche produit se créent tout seuls."],
+          ["🏠", "Elle est à toi", "Ta boutique reste sur ton compte Shopify, même si tu arrêtes."],
+          ["🔒", "Paiement sécurisé", "Par carte, Apple Pay ou Google Pay, via Stripe."],
+          ["🙋", "Tu n'es pas seul", "Le créateur de Vigenia lit chaque message et t'aide si tu bloques."],
+        ].map(([e, t, d]) => (
+          <li key={t} className="flex items-start gap-3 rounded-[14px] border border-white/10 bg-black/20 px-3.5 py-3">
+            <span aria-hidden className="text-[20px] leading-none">{e}</span>
+            <span><span className="block text-[14px] font-semibold">{t}</span><span className="block text-[12.5px] leading-snug text-fg-muted">{d}</span></span>
+          </li>
+        ))}
+      </ul>
       <div className="mt-6"><IntervalToggle value={interval} onChange={setPeriod} /></div>
       <div className="mx-auto mt-9 max-w-[640px]">
         <PlanPicker

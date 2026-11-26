@@ -16,7 +16,6 @@ const PRICING_FAQ = [
   { q: "Puis-je arrêter à tout moment ?", a: "Oui. Si tu arrêtes, ta boutique et tout son contenu restent sur ton compte Shopify." },
   { q: "Que se passe-t-il si j'utilise beaucoup l'IA ?", a: "L'IA fonctionne avec un crédit qui se recharge toutes les 5 heures, et une limite par semaine. Tu vois ton crédit restant en permanence dans ton espace, et on te prévient avant la limite. Si tu l'atteins, l'IA se met en pause quelques heures (24 h pour la limite de la semaine), puis repart. Un usage normal ne l'atteint pas. Tu as un besoin plus important (agence, nombreuses boutiques) ? Écris-nous." },
   { q: "L'abonnement Shopify est-il inclus ?", a: "Non. Shopify facture son propre abonnement pour héberger ta boutique. Notre offre couvre la création, l'édition et l'optimisation par l'IA." },
-  { q: "Proposez-vous un remboursement ?", a: "Oui : si tu n'es pas satisfait dans les 14 jours suivant ton premier paiement, on te rembourse intégralement." },
 ];
 
 export default function PricingPage() {
@@ -26,7 +25,7 @@ export default function PricingPage() {
         {/* Beaucoup arrivent directement ici et repartent : on leur montre d'abord l'aperçu gratuit. */}
         <div className="flex flex-col items-center gap-2">
           <Link href="/quiz" className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover px-6 py-3.5 text-[15px] font-semibold text-white">Voir l&apos;aperçu gratuit de ma boutique <ArrowRight className="h-4 w-4" /></Link>
-          <p className="text-xs text-fg-faint">2 minutes · sans carte bancaire · remboursé sous 14 jours si tu paies et n&apos;es pas satisfait</p>
+          <p className="text-xs text-fg-faint">2 minutes · gratuit · sans carte bancaire</p>
         </div>
       </PageHero>
       <Container><PricingCards /></Container>

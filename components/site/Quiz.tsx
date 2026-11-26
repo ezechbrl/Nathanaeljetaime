@@ -17,7 +17,7 @@ import { STYLE_TEXT } from "./StyleSwipe";
 type Icon = React.ComponentType<{ className?: string }>;
 type Option = { id: string; label: string; hint?: string; icon: Icon };
 
-// Emoji en couleur dans chaque case (plus vivant et plus rapide à lire que des pictos au trait).
+// Emoji en couleur, seulement pour choisir quoi vendre (univers, produits, idée) : le reste garde des pictos sobres.
 const EMOJI: Record<string, string> = {
   debut: "🌱", apprendre: "🎓", essai: "🧭", ailleurs: "🛍️", boutique: "📈", createur: "🎨",
   complement: "💶", activite: "🚀", tester: "💡", marque: "💎", creations: "✂️", maison: "🏠",
@@ -404,7 +404,7 @@ function NextButton({ onClick, label = "Continuer" }: { onClick: () => void; lab
 function Grid({ options, value, onPick, cols = 3 }: { options: Option[]; value: string | null; onPick: (id: string) => void; cols?: 3 | 4 }) {
   return (
     <div className={cn("grid grid-cols-2 gap-3", cols === 3 ? "sm:grid-cols-3" : "sm:grid-cols-4")}>
-      {options.map((o, i) => <Card key={o.id} tint={i} icon={o.icon} emoji={EMOJI[o.id]} label={o.label} hint={o.hint} on={value === o.id} onClick={() => onPick(o.id)} />)}
+      {options.map((o, i) => <Card key={o.id} tint={i} icon={o.icon} label={o.label} hint={o.hint} on={value === o.id} onClick={() => onPick(o.id)} />)}
     </div>
   );
 }

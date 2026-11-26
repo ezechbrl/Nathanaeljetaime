@@ -3,9 +3,7 @@
 import { ArrowDown, Camera, Check, HelpCircle, Lock, Mail, MessageSquare, PenLine, Rocket, RotateCcw, ShieldCheck, ShoppingBag, Star, Timer, Truck, X } from "lucide-react";
 import Link from "next/link";
 import { useCountdown } from "@/components/pricing/PlanCards";
-import { useApi } from "@/lib/api/hooks";
 import { HESITATIONS } from "@/lib/content/cancel";
-import { PAID_PLANS, SINGLE, euro, showBarred } from "@/lib/content/pricing";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -178,19 +176,6 @@ export function TeaserPreview({ store, loginHref, onUnlock }: { store: Store; lo
   );
 }
 
-// Le prix, dès l'aperçu (pas de surprise après « Débloquer ») : « Ma boutique » en paiement unique (39 €, sans
-// abonnement), ou un abonnement dès 29 €/mois.
-function PriceLine() {
-  const billing = useApi(() => api.getBilling(false), []);
-  if (!billing.data) return null;
-  return (
-    <p className="mx-auto mt-3 flex max-w-xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-fg-muted">
-      <span>Ta boutique complète : <b className="text-white">{euro(SINGLE.price)} une fois</b>{showBarred() && <> <s className="text-fg-faint">{euro(SINGLE.was)}</s></>}</span>
-      <span>· ou un abonnement dès {euro(PAID_PLANS[0].monthly)}/mois</span>
-    </p>
-  );
-}
-
 // « Qu'est-ce qui te fait hésiter ? » : petite carte qui apparaît après un moment sur l'aperçu (ou quand la souris
 // quitte la page sur ordinateur), une seule fois par aperçu. La réponse arrive dans Ventes et dans les topos.
 function HesitationAsk({ storeId }: { storeId: string }) {
@@ -272,21 +257,16 @@ export function LockedStore({ store, onUnlocked }: { store: Store; onUnlocked: (
   return (
     <div className="px-5 pb-16 pt-8 sm:px-8">
       <div className="mx-auto max-w-[1200px]">
+        {/* D'abord l'aperçu de la boutique (demandé par Ezechiel) : un titre court, puis la boutique elle-même.
+            Le bas est flou avec « Débloquer ma boutique » ; les offres n'arrivent qu'après le clic. */}
         <div className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-xs font-medium text-white/80"><Lock className="h-3.5 w-3.5" /> Ton aperçu</span>
-          <h1 className="mt-4 text-[clamp(1.9rem,1.3rem+2vw,3rem)] font-semibold leading-tight tracking-[-0.035em]">
-            Ta boutique <span className="serif-accent">{store.name}</span> t'attend
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#3dff9a]/30 bg-[#3dff9a]/[0.08] px-3 py-1 text-xs font-medium text-[#3dff9a]"><Check className="h-3.5 w-3.5" /> Ta boutique est prête</span>
+          <h1 className="mt-3 text-[clamp(1.6rem,1.2rem+1.6vw,2.5rem)] font-semibold leading-tight tracking-[-0.035em]">
+            Voici <span className="serif-accent">{store.name}</span>
           </h1>
-          <p className="mx-auto mt-2 max-w-xl text-fg-muted">Ton nom, tes couleurs, ton accroche et tes atouts sont prêts et gardés dans ton compte. Quand tu veux, débloque-la : textes, photos et design se créent en quelques minutes.</p>
-          {!paid && (
-            <a href="#debloquer" onClick={openPay} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover px-7 text-[15px] font-semibold text-white [animation:cta-glow_2.4s_ease-in-out_infinite]">
-              Débloquer ma boutique <ArrowDown className="h-4 w-4" />
-            </a>
-          )}
-          {!paid && <PriceLine />}
         </div>
 
-        <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <div className="glow-frame min-w-0 rounded-[14px] p-[1.5px]"><TeaserPreview store={store} onUnlock={openPay} /></div>
           <div className="flex flex-col gap-2.5">
             {unlocksFor(store.mode === "link").map(({ icon: I, title, text }) => (
