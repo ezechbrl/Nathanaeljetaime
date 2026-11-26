@@ -6,7 +6,7 @@ import { IDEA_PAGES } from "@/lib/content/product-ideas";
 import { NICHES } from "@/lib/niches";
 
 export const metadata: Metadata = {
-  title: "Idées de produits à vendre en ligne (72 idées par univers)",
+  title: "Idées de produits à vendre en ligne : 72 idées en 12 univers",
   description: "Quoi vendre sur ta boutique en ligne ? 72 idées de produits classées en 12 univers, avec à qui les vendre, à quel prix et les erreurs à éviter.",
   alternates: { canonical: "/idees-produits" },
 };

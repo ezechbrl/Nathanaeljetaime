@@ -7,7 +7,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { FOUNDERS } from "@/lib/content/team";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Notre histoire", description: `Pourquoi on construit ${site.name}, et comment on travaille.` };
+export const metadata: Metadata = { title: "Notre histoire", alternates: { canonical: "/fondateurs" }, description: `Pourquoi on construit ${site.name}, et comment on travaille.` };
 
 const PRINCIPLES = [
   { title: "La vente avant le design", text: "Une belle boutique qui ne vend pas est un échec. On part toujours du client, de la promesse et de l'offre." },

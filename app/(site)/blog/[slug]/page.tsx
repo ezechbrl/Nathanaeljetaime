@@ -51,6 +51,17 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               </section>
             ))}
           </div>
+          {/* Maillage interne : chaque article mène vers les idées de produits et le quiz (pages qui convertissent). */}
+          <div className="mt-12 grid gap-3 sm:grid-cols-2">
+            <Link href="/idees-produits" className="surface rounded-card p-5 transition-colors hover:border-white/25">
+              <p className="font-semibold text-fg">💡 72 idées de produits à vendre</p>
+              <p className="mt-1 text-sm text-fg-muted">Rangées en 12 univers, avec à qui vendre et à quel prix.</p>
+            </Link>
+            <Link href="/quiz" className="surface rounded-card p-5 transition-colors hover:border-white/25">
+              <p className="font-semibold text-fg">🎯 Crée l&apos;aperçu de ta boutique</p>
+              <p className="mt-1 text-sm text-fg-muted">Quelques questions (2 min), aperçu gratuit de ta boutique Shopify.</p>
+            </Link>
+          </div>
         </Container>
       </article>
       <Container className="mt-24 max-w-[760px]">

@@ -7,7 +7,13 @@ import { Hero } from "@/components/site/Hero";
 import { ShowcaseGrid } from "@/components/site/ShowcaseGrid";
 import { Reviews } from "@/components/site/Reviews";
 import { StickyCta } from "@/components/site/StickyCta";
+import type { Metadata } from "next";
 import { HOME_FAQ } from "@/lib/content/faq";
+
+export const metadata: Metadata = {
+  title: { absolute: "Créer une boutique Shopify avec l'IA en 3 minutes · Vigenia" },
+  alternates: { canonical: "/" },
+};
 
 // Les avis approuvés sont relus toutes les 10 minutes.
 export const revalidate = 600;

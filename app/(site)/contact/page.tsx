@@ -6,7 +6,7 @@ import { ContactForm } from "@/components/site/ContactForm";
 import { PageHero } from "@/components/site/PageHero";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Contact", description: "Une question sur le produit, ta boutique ou un partenariat ? On répond sous 24 h ouvrées." };
+export const metadata: Metadata = { title: "Contact", alternates: { canonical: "/contact" }, description: "Une question sur le produit, ta boutique ou un partenariat ? On répond sous 24 h ouvrées." };
 
 export default function ContactPage() {
   const channels = [

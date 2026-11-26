@@ -9,7 +9,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { AFFILIATE } from "@/lib/content/affiliate";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Programme d'affiliation", description: `Gagne ${AFFILIATE.rate * 100} % de commission récurrente pendant ${AFFILIATE.months} mois sur chaque client que tu recommandes.` };
+export const metadata: Metadata = { title: "Programme d'affiliation", alternates: { canonical: "/affiliation" }, description: `Gagne ${AFFILIATE.rate * 100} % de commission récurrente pendant ${AFFILIATE.months} mois sur chaque client que tu recommandes.` };
 
 const FAQ = [
   { q: "Qui peut devenir affilié ?", a: `Tout le monde : créateurs de contenu, formateurs e-commerce, agences, clients de ${site.name}. Il suffit d'un compte.` },

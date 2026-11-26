@@ -5,7 +5,7 @@ import { FinalCta } from "@/components/site/FinalCta";
 import { PageHero } from "@/components/site/PageHero";
 import { PricingCards } from "@/components/site/Pricing";
 
-export const metadata: Metadata = { title: "Tarifs", description: "Vigenia : ta boutique en paiement unique à 39 €, ou un abonnement Starter à 29 € par mois et Pro à 59 € par mois (249 € et 499 € par an). Sans engagement." };
+export const metadata: Metadata = { title: "Prix : ta boutique Shopify créée par l'IA dès 39 €", alternates: { canonical: "/tarifs" }, description: "Vigenia : ta boutique en paiement unique à 39 €, ou un abonnement Starter à 29 € par mois et Pro à 59 € par mois (249 € et 499 € par an). Sans engagement." };
 
 const PRICING_FAQ = [
   { q: "Comment je paie ?", a: "Par carte bancaire, sur une page de paiement sécurisée (Stripe). Tes factures sont disponibles dans ton espace Abonnement, et tu peux arrêter quand tu veux." },

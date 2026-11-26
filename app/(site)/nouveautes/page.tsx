@@ -5,7 +5,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { CHANGELOG } from "@/lib/content/changelog";
 import { cn } from "@/lib/cn";
 
-export const metadata: Metadata = { title: "Nouveautés", description: "Ce qui est disponible, ce qu'on construit, et ce qui arrive ensuite." };
+export const metadata: Metadata = { title: "Nouveautés", alternates: { canonical: "/nouveautes" }, description: "Ce qui est disponible, ce qu'on construit, et ce qui arrive ensuite." };
 
 const STYLE = {
   Disponible: "border-good/30 text-good",

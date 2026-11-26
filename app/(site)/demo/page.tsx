@@ -6,7 +6,7 @@ import { DemoVideos } from "@/components/site/DemoVideos";
 import { PageHero } from "@/components/site/PageHero";
 import { FinalCta } from "@/components/site/FinalCta";
 
-export const metadata: Metadata = { title: "Comment ça marche", description: "Regarde un brief de deux lignes devenir une boutique Shopify complète." };
+export const metadata: Metadata = { title: "Comment créer une boutique Shopify avec l'IA", alternates: { canonical: "/demo" }, description: "Regarde un brief de deux lignes devenir une boutique Shopify complète." };
 
 const TIMELINE = [
   { t: "0:00", title: "Le brief", text: "Deux lignes : ton produit, ta cible, l'ambiance voulue. Ou le lien d'une page produit." },

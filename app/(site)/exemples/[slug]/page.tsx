@@ -16,7 +16,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const s = SHOWCASE.find((x) => x.slug === slug);
-  return s ? { title: `${s.name} · Exemple`, description: s.brief } : {};
+  return s ? { title: `${s.name} : exemple de boutique Shopify créée avec l'IA`, description: s.brief, alternates: { canonical: `/exemples/${s.slug}` } } : {};
 }
 
 export default async function ExamplePage({ params }: { params: Promise<{ slug: string }> }) {

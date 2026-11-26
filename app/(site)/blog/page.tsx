@@ -6,7 +6,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { POSTS } from "@/lib/content/blog";
 import { formatDate } from "@/lib/format";
 
-export const metadata: Metadata = { title: "Blog", description: "Guides concrets pour créer, lancer et faire vendre une boutique Shopify." };
+export const metadata: Metadata = { title: "Blog e-commerce : guides pour créer et lancer ta boutique en ligne", description: "Guides simples pour débutants : trouver quoi vendre, créer ta boutique Shopify, fixer tes prix, trouver un fournisseur et tes premiers clients.", alternates: { canonical: "/blog" } };
 
 export default function BlogPage() {
   const [first, ...rest] = POSTS;

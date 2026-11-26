@@ -8,7 +8,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { StoreFrame } from "@/components/site/StoreFrame";
 import { SHOWCASE } from "@/lib/content/showcase";
 
-export const metadata: Metadata = { title: "Exemples de boutiques", description: "Des boutiques Shopify générées par l'IA à partir d'un brief de deux lignes." };
+export const metadata: Metadata = { title: "Exemples de boutiques Shopify créées avec l'IA", description: "Des boutiques Shopify générées par l'IA à partir d'un brief de deux lignes : design, textes, photos et fiche produit.", alternates: { canonical: "/exemples" } };
 
 export default function ExamplesPage() {
   return (

@@ -10,7 +10,8 @@ import { PageHero } from "@/components/site/PageHero";
 import { PromptBox } from "@/components/site/PromptBox";
 
 export const metadata: Metadata = {
-  title: "Boutique Shopify clé en main",
+  title: "Boutique Shopify clé en main, créée par l'IA en 3 minutes",
+  alternates: { canonical: "/boutique-shopify-cle-en-main" },
   description: "Une boutique Shopify complète, prête à vendre, générée par l'IA en quelques minutes : stratégie, design, fiches produits, pages et SEO.",
 };
 
