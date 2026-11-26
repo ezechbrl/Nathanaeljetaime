@@ -630,6 +630,8 @@ export default function SalesApp() {
           <img src="/brand/icon-192.png" alt="" className="h-8 w-8 rounded-[10px]" /> Ventes
         </span>
         <span className="flex items-center gap-2">
+          {/* Démo pour filmer les vidéos (quiz court → animation → une vraie boutique). */}
+          <Link href="/app/demo" onClick={() => { try { sessionStorage.setItem("vg-stay", "1"); } catch {} }} className="rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] px-3 py-2 text-xs font-semibold text-white">🎬 Démo vidéo</Link>
           {/* Aller dans Vigenia sans être renvoyé ici (voir StandaloneHome). */}
           <Link href="/app" onClick={() => { try { sessionStorage.setItem("vg-stay", "1"); } catch {} }} className="rounded-full bg-white/10 px-3 py-2 text-xs text-white">Vigenia</Link>
           <button type="button" onClick={load} aria-label="Actualiser" className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white">
