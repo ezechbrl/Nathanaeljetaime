@@ -1,5 +1,5 @@
-import { Check } from "lucide-react";
-import { CTA } from "@/lib/launch";
+import { ArrowRight, Check } from "lucide-react";
+import { CTA, isWaitlist } from "@/lib/launch";
 import { Reveal } from "@/components/ui/Reveal";
 import { PromptBox } from "./PromptBox";
 import { DemoVideos } from "./DemoVideos";
@@ -28,6 +28,19 @@ export function Hero() {
         <Reveal delay={260} className="mt-9">
           <div id="creer" className="scroll-mt-28"><PromptBox align="center" /></div>
         </Reveal>
+        {/* Beaucoup de visiteurs (TikTok) n'ont pas encore d'idée : une porte d'entrée claire vers le quiz. */}
+        {!isWaitlist && (
+          <Reveal delay={300} className="mt-4">
+            <a href="/quiz" className="group mx-auto flex w-full max-w-[560px] items-center gap-3 rounded-[18px] border border-[#3dff9a]/35 bg-[#3dff9a]/[0.06] px-4 py-3.5 text-left transition-all hover:-translate-y-0.5 hover:border-[#3dff9a]/70 hover:bg-[#3dff9a]/[0.1]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[#3dff9a] text-[18px]">🎯</span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-semibold text-white">Pas encore d'idée de produit ?</span>
+                <span className="block text-[13px] text-white/65">Réponds à quelques questions (2 min) : on te propose les produits et on crée ta boutique.</span>
+              </span>
+              <ArrowRight className="h-5 w-5 shrink-0 text-[#3dff9a] transition-transform group-hover:translate-x-0.5" />
+            </a>
+          </Reveal>
+        )}
         {/* Petits arguments vérifiables (pas de prix ici : il vient plus tard) (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
         <Reveal delay={320} className="mt-6"><ul className="flex flex-wrap justify-center gap-2 text-[13px] sm:text-sm">
           {[

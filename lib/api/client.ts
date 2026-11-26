@@ -204,3 +204,5 @@ export const getOwnerJourneys = () => request<JourneysData>("/api/owner/journeys
 export type LivePerson = { id: string; doing: string; email: string | null; source: string | null; device: string | null; country: string | null; pages: number | null; since: string; lastSeen: string; store: { id: string; name: string; status: string } | null; quiz: { step: string; index: number; total: number | null; finished: boolean } | null; checkout: boolean };
 export const getOwnerLive = () => request<{ people: LivePerson[] }>("/api/owner/live", { headers: ownerHeaders() });
 export const getOwnerQuiz = () => request<{ started: number; finished: number; stops: Record<string, number> }>("/api/owner/quiz", { headers: ownerHeaders() });
+export type CheckoutPerson = { userId: string; email: string; discount: number | null; opens: number; plans: Record<string, number>; first: string; last: string; paid: boolean; stores: { id: string; name: string; status: string }[]; hesitation: { reason: string; details: string | null } | null };
+export const getOwnerCheckouts = () => request<{ people: CheckoutPerson[] }>("/api/owner/checkouts", { headers: ownerHeaders() });

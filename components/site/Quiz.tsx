@@ -12,7 +12,7 @@ import { normalizeProductUrl } from "@/lib/product-url";
 import * as api from "@/lib/api/client";
 import { QuizAccount } from "./QuizAccount";
 import { BIG_NICHES, NICHES } from "@/lib/niches";
-import { STYLE_TEXT, StyleSwipe } from "./StyleSwipe";
+import { STYLE_TEXT } from "./StyleSwipe";
 
 type Icon = React.ComponentType<{ className?: string }>;
 type Option = { id: string; label: string; hint?: string; icon: Icon };
@@ -104,12 +104,12 @@ const LEVEL_TEXT: Record<string, string> = {
 };
 
 type Step = "level" | "goal" | "income" | "time" | "budget" | "shopify" | "idea" | "big" | "sub" | "product" | "account" | "audience" | "market" | "supply" | "channel" | "price" | "style";
-const STATE_KEY = "vg-quiz-state";
+const STATE_KEY = "vg-quiz-state2";
 
 // `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
 // `demo` : version courte pour les vidéos (quelques questions, rien n'est gardé ni compté dans les stats).
 export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (brief: string, draft?: QuizDraft) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean }; demo?: boolean }) {
-  const [history, setHistory] = useState<Step[]>([demo ? "goal" : "level"]);
+  const [history, setHistory] = useState<Step[]>([demo ? "goal" : "income"]);
   const step = history[history.length - 1];
   const [level, setLevel] = useState<string | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
@@ -138,11 +138,13 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
 
   // 15 questions sans idée de produit (12 avec son idée, 11 avec un lien ou une description de l'accueil).
   // Au milieu, une fois le produit choisi : création du compte (sautée si déjà connecté).
-  const head: Step[] = demo ? ["goal", "income", "budget"] : ["level", "goal", "income", "time", "budget", "shopify"];
+  // On commence par le curseur de revenu (ludique, rien à choisir) : avant, 1 visiteur sur 5 partait dès la 1re question.
+  const head: Step[] = demo ? ["goal", "income", "budget"] : ["income", "goal", "level", "budget", "shopify"];
   // Le compte arrive tôt (7ᵉ étape), juste après « As-tu une idée ? », pour ne perdre personne avant.
   const ideaStep: Step[] = preset ? [] : ["idea"];
   const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
-  const tail: Step[] = demo ? ["channel", "style"] : ["audience", "market", "supply", "channel", "price", "style"];
+  // Plus de cœur / croix à la fin : la dernière question lance directement la création.
+  const tail: Step[] = demo ? ["channel"] : ["audience", "market", "supply", "channel", "price"];
   const plan: Step[] = [...head, ...ideaStep, ...(logged ? [] : ["account" as Step]), ...productSteps, ...tail];
   const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
@@ -251,10 +253,15 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         {history.length > 1
           ? <button type="button" onClick={back} className="inline-flex items-center gap-1.5 hover:text-white"><ArrowLeft className="h-4 w-4" /> Retour</button>
           : skipHref ? <a href={skipHref} className="underline underline-offset-4 hover:text-white">J'ai déjà mon produit</a> : <span />}
-        <span>{step === "account" ? "Ton compte" : `Question ${qIndex + 1} sur ${questions.length}`}</span>
+        <span>{step === "account" ? "Ton compte" : questions.length - qIndex <= 3 ? (questions.length - qIndex === 1 ? "Dernière question 🎉" : `Plus que ${questions.length - qIndex} questions 🔥`) : `Question ${qIndex + 1} sur ${questions.length}`}</span>
       </div>
 
-      {preset && step === "level" && (
+      {step === plan[0] && !demo && (
+        <p className="mx-auto mt-5 flex w-fit flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-white/70">
+          <span>⏱ 2 minutes</span><span>🎁 100 % gratuit</span><span className="text-[#3dff9a]">✨ Ton aperçu de boutique à la fin</span>
+        </p>
+      )}
+      {preset && step === plan[0] && (
         <p className="mx-auto mt-5 w-fit max-w-full truncate rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-1.5 text-center text-[13px] text-white/80">
           ✓ {preset.isLink ? "Ton lien produit est gardé" : `Ton idée est gardée : « ${preset.text.slice(0, 60)}${preset.text.length > 60 ? "…" : ""} »`}. Quelques questions pour faire ta boutique sur mesure.
         </p>
@@ -318,17 +325,13 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         )}
         {step === "audience" && <Grid options={AUDIENCES} value={audience} cols={4} onPick={setAudience} />}
         {step === "price" && <Grid options={PRICES} value={price} cols={4} onPick={setPrice} />}
-        {step === "style" && !busy && (
-          <>
-            <p className="-mt-4 mb-4 text-center text-sm text-fg-muted">Un cœur si tu aimes, une croix sinon : ta boutique prendra le style que tu préfères. Ensuite, ton aperçu est gratuit.</p>
-            <StyleSwipe big compact onDone={finish} />
-          </>
-        )}
       </div>
 
       {error && <p role="alert" className="mt-6 text-center text-sm text-bad">{error}</p>}
       {/* On choisit (la carte s'éclaire en vert), puis « Continuer » : rien ne passe tout seul. */}
-      {step !== "style" && step !== "account" && ready[step] && <NextButton onClick={goNext} />}
+      {step !== "style" && step !== "account" && ready[step] && !busy && (step === plan[plan.length - 1]
+        ? <NextButton label="Créer ma boutique" onClick={() => finish(null)} />
+        : <NextButton onClick={goNext} />)}
       {busy && <p className="mt-8 flex items-center justify-center gap-3 text-fg-muted"><Spinner /> Ta boutique se prépare…</p>}
     </div>
   );
@@ -376,11 +379,11 @@ function SupplierFinder({ keyword, brand, url, onUrl, ok }: { keyword: string; b
 }
 
 // Collé en bas de l'écran : sur téléphone, plus besoin de descendre pour continuer.
-function NextButton({ onClick }: { onClick: () => void }) {
+function NextButton({ onClick, label = "Continuer" }: { onClick: () => void; label?: string }) {
   return (
     <div className="sticky bottom-3 z-20 mt-8">
     <button type="button" onClick={onClick} className="[animation:rise_.35s_cubic-bezier(.2,.8,.2,1)_both] flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover text-[16px] font-semibold text-white transition-all hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40">
-      Continuer <ArrowRight className="h-5 w-5" />
+      {label} <ArrowRight className="h-5 w-5" />
     </button>
     </div>
   );

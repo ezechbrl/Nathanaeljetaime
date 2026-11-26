@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import * as api from "@/lib/api/client";
 import { Journeys } from "./Journeys";
 import { QuizFunnel } from "./QuizFunnel";
+import { Checkouts } from "./Checkouts";
 import { LiveNow } from "./LiveNow";
 import { ApiClientError } from "@/lib/api/errors";
 import type { OwnerStats } from "@/lib/api/types";
@@ -408,6 +409,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
           </ul>
         </Card>
       )}
+
+      {/* Qui a ouvert la page de paiement, pour quelle offre, combien de fois. */}
+      <Checkouts />
 
       {/* Grand tableau : d'où vient chaque inscrit, sa boutique et où il s'est arrêté. */}
       <Journeys />

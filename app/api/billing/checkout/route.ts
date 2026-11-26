@@ -8,9 +8,9 @@ import { body, json, noContent, route } from "@/lib/server/http";
 import { db } from "@/lib/server/supabase";
 
 // Entonnoir du tableau de bord : la personne a ouvert la page de paiement (enregistré après la réponse).
-const logOpened = (userId: string, plan: string) =>
+const logOpened = (userId: string, plan: string, interval?: string) =>
   after(async () => {
-    await db().from("revenue_events").insert({ user_id: userId, kind: "checkout", plan }).then(() => {}, () => {});
+    await db().from("revenue_events").insert({ user_id: userId, kind: "checkout", plan, billing_interval: interval ?? null }).then(() => {}, () => {});
   });
 
 // Renvoie la page de paiement Stripe pour l'offre choisie (Starter ou Pro, au mois ou à l'année).
@@ -20,7 +20,7 @@ export const POST = route(async (req) => {
   const user = await requireUser();
   const input = await body(req, z.object({ plan: z.enum(["pro", "agency", "single"]), interval: z.enum(["month", "year"]).default("month"), storeId: z.string().uuid().optional(), prefetch: z.boolean().optional(), opened: z.boolean().optional() }));
   if (input.opened) {
-    logOpened(user.id, input.plan);
+    logOpened(user.id, input.plan, input.interval);
     return noContent();
   }
   // Paiement unique « Ma boutique » : pour une boutique d'aperçu (pas encore débloquée).
@@ -33,6 +33,6 @@ export const POST = route(async (req) => {
     return json({ url });
   }
   const url = await checkoutUrl(user, input.plan, input.interval, req.headers.get("cookie"));
-  if (!input.prefetch) logOpened(user.id, input.plan);
+  if (!input.prefetch) logOpened(user.id, input.plan, input.interval);
   return json({ url });
 });
