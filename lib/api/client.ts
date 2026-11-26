@@ -122,8 +122,9 @@ export const dismissRecommendation = (id: string) =>
   live ? request<{ recommendation: Recommendation }>(`/api/recommendations/${id}/dismiss`, { method: "POST" }) : mock.setRecommendation(id, "dismissed");
 
 // Facturation
-export const getBilling = (sync = false) =>
-  live ? request<{ subscription: Subscription; usage: Usage; invoices: Invoice[]; offerEndsAt: string | null; offerKind?: "waitlist" | "launch" | null; discountPercent?: number; discountUntil?: string | null }>(`/api/billing${sync ? "?sync=1" : ""}`) : mock.getBilling();
+export type Billing = { subscription: Subscription; usage: Usage; invoices: Invoice[]; offerEndsAt: string | null; offerKind?: "waitlist" | "launch" | null; discountPercent?: number; discountUntil?: string | null };
+export const getBilling = (sync = false): Promise<Billing> =>
+  live ? request<Billing>(`/api/billing${sync ? "?sync=1" : ""}`) : mock.getBilling();
 // Paiement unique « Ma boutique » pour une boutique d'aperçu.
 export const startSingleCheckout = (storeId: string, prefetch = false) =>
   live ? request<{ url: string }>("/api/billing/checkout", { method: "POST", json: { plan: "single", storeId, prefetch } }) : mock.checkout("pro");
