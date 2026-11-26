@@ -3,13 +3,15 @@ import { Container } from "@/components/ui/Section";
 import { FaqSection } from "@/components/site/Faq";
 import { FinalCta } from "@/components/site/FinalCta";
 import { PageHero } from "@/components/site/PageHero";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { PricingCards } from "@/components/site/Pricing";
 
 export const metadata: Metadata = { title: "Prix : ta boutique Shopify créée par l'IA dès 39 €", alternates: { canonical: "/tarifs" }, description: "Vigenia : ta boutique en paiement unique à 39 €, ou un abonnement Starter à 29 € par mois et Pro à 59 € par mois (249 € et 499 € par an). Sans engagement." };
 
 const PRICING_FAQ = [
   { q: "Comment je paie ?", a: "Par carte bancaire, sur une page de paiement sécurisée (Stripe). Tes factures sont disponibles dans ton espace Abonnement, et tu peux arrêter quand tu veux." },
-  { q: "Y a-t-il une version gratuite ?", a: "Tu peux voir gratuitement un aperçu de ta boutique (nom, couleurs, accroche) avant de payer. La boutique complète (textes, photos et design à installer dans ton Shopify) demande un abonnement, sans engagement : tu peux arrêter en un clic." },
+  { q: "Y a-t-il une version gratuite ?", a: "Tu peux voir gratuitement un aperçu de ta boutique (nom, couleurs, accroche) avant de payer. La boutique complète (textes, photos et design à installer dans ton Shopify) se débloque avec « Ma boutique » (paiement unique) ou un abonnement sans engagement." },
   { q: "Starter ou Pro ?", a: "Starter est fait pour débuter : 1 boutique Shopify, avec un produit que tu peux changer quand tu veux. Pro est fait pour les vendeurs déjà lancés : jusqu'à 3 boutiques pour tester plusieurs produits en même temps, et 2× plus de crédit IA. Tu peux changer d'offre à tout moment." },
   { q: "Puis-je arrêter à tout moment ?", a: "Oui. Si tu arrêtes, ta boutique et tout son contenu restent sur ton compte Shopify." },
   { q: "Que se passe-t-il si j'utilise beaucoup l'IA ?", a: "L'IA fonctionne avec un crédit qui se recharge toutes les 5 heures, et une limite par semaine. Tu vois ton crédit restant en permanence dans ton espace, et on te prévient avant la limite. Si tu l'atteins, l'IA se met en pause quelques heures (24 h pour la limite de la semaine), puis repart. Un usage normal ne l'atteint pas. Tu as un besoin plus important (agence, nombreuses boutiques) ? Écris-nous." },
@@ -20,7 +22,13 @@ const PRICING_FAQ = [
 export default function PricingPage() {
   return (
     <>
-      <PageHero eyebrow="Tarifs" title={<>Un prix <span className="serif-accent">clair</span>, sans engagement</>} subtitle="Deux abonnements sans engagement, ou ta boutique seule en paiement unique." />
+      <PageHero eyebrow="Tarifs" title={<>Un prix <span className="serif-accent">clair</span>, sans engagement</>} subtitle="Commence gratuitement : tu vois l'aperçu de ta boutique avant de payer quoi que ce soit.">
+        {/* Beaucoup arrivent directement ici et repartent : on leur montre d'abord l'aperçu gratuit. */}
+        <div className="flex flex-col items-center gap-2">
+          <Link href="/quiz" className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover px-6 py-3.5 text-[15px] font-semibold text-white">Voir l&apos;aperçu gratuit de ma boutique <ArrowRight className="h-4 w-4" /></Link>
+          <p className="text-xs text-fg-faint">2 minutes · sans carte bancaire · remboursé sous 14 jours si tu paies et n&apos;es pas satisfait</p>
+        </div>
+      </PageHero>
       <Container><PricingCards /></Container>
       <FaqSection title="Questions sur les tarifs" items={PRICING_FAQ} />
       <FinalCta />

@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, RotateCcw, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Check, RotateCcw, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { StorePreview } from "@/components/app/StorePreview";
@@ -12,7 +13,7 @@ import type { Store } from "@/lib/api/types";
 // Démo pour les vidéos marketing (réservée au compte d'Ezechiel) : un quiz court, une animation de création,
 // puis une de ses vraies boutiques déjà créées. Rien n'est généré, rien n'est payé, rien n'entre dans les stats.
 const STEPS = ["Analyse de ton marché", "Nom et identité de ta marque", "Photos de ton produit", "Textes qui donnent envie d'acheter", "Vrais avis clients", "Offres par lot", "Design et mise en page"];
-const BUILD_MS = 14_000;
+const BUILD_MS = 8_000; // moins de 10 secondes, pour les vidéos
 
 export default function DemoPage() {
   const { user, stores } = useApp();
@@ -26,6 +27,8 @@ export default function DemoPage() {
   if (!user.isOwner) return <p className="p-8 text-fg-muted">Page réservée.</p>;
   return (
     <div className="min-h-dvh">
+      {/* Sortir de la démo (sinon il faut relancer l'application). */}
+      <Link href="/ventes" className="fixed left-3 top-[max(env(safe-area-inset-top),12px)] z-50 grid h-9 w-9 place-items-center rounded-full bg-black/40 text-white/70 backdrop-blur hover:bg-black/60 hover:text-white" aria-label="Quitter la démo"><X className="h-4 w-4" /></Link>
       {phase === "quiz" && (
         <>
           {/* Réglage discret avant de filmer : la boutique montrée à la fin. */}

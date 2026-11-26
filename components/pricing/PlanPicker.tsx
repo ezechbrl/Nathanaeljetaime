@@ -108,6 +108,8 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="whitespace-nowrap text-[15px] font-semibold text-white sm:text-[1.2rem]">{current.short ?? current.price}</p>
+            {/* Promesse réelle des CGV (lib/content/legal.ts) : 1er paiement remboursé sur simple demande sous 14 jours. */}
+            <p className="mt-0.5 whitespace-nowrap text-[11px] text-[#3dff9a] sm:text-xs">🛡️ Remboursé sous 14 jours si pas satisfait</p>
           </div>
           <div className="w-[150px] shrink-0 sm:w-[240px]">{cta(current.id, interval)}</div>
         </div>

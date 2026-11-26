@@ -17,6 +17,19 @@ import { STYLE_TEXT } from "./StyleSwipe";
 type Icon = React.ComponentType<{ className?: string }>;
 type Option = { id: string; label: string; hint?: string; icon: Icon };
 
+// Emoji en couleur dans chaque case (plus vivant et plus rapide à lire que des pictos au trait).
+const EMOJI: Record<string, string> = {
+  debut: "🌱", apprendre: "🎓", essai: "🧭", ailleurs: "🛍️", boutique: "📈", createur: "🎨",
+  complement: "💶", activite: "🚀", tester: "💡", marque: "💎", creations: "✂️", maison: "🏠",
+  b1: "🪙", b2: "🐷", b3: "💵", b4: "🏦", s1: "✅", s2: "🛒", s3: "🆕", s4: "🤔",
+  fr: "🇫🇷", be: "🇧🇪", eu: "🇪🇺", world: "🌍", drop: "🚚", stock: "📦", make: "🔨", brand: "🏭",
+  tiktok: "🎵", insta: "📸", ads: "📣", google: "🔎", word: "💬", unknown: "🤷",
+  p1: "🎁", p2: "👛", p3: "💳", p4: "👑",
+  femmes: "👩", hommes: "👨", jeunes: "⚡", parents: "👶", sportifs: "🚴", animaux: "🐶", seniors: "👓", tous: "👥",
+  beaute: "✨", cuisine: "🍳", tech: "🎧", auto: "🚗", mode: "💍", jardin: "🌳", gaming: "🎮", voyage: "🧳", bebe: "🍼", sport: "🏋️",
+  famille: "🐾", evasion: "🗺️", "1": "⏱️", "2": "⏳", "3": "🔥", "4": "💪",
+};
+
 const LEVELS: Option[] = [
   { id: "debut", label: "Je débute complètement", hint: "Jamais vendu en ligne", icon: Sprout },
   { id: "apprendre", label: "J'apprends l'e-commerce ou le dropshipping", hint: "Vidéos, formations…", icon: GraduationCap },
@@ -114,7 +127,7 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   const [level, setLevel] = useState<string | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
   const [time, setTime] = useState<string | null>(null);
-  const [hasIdea, setHasIdea] = useState<boolean | null>(preset ? true : null);
+  const [hasIdea, setHasIdea] = useState<boolean | null>(preset ? true : demo ? false : null);
   const [idea, setIdea] = useState(preset && !preset.isLink ? preset.text : "");
   const [big, setBig] = useState<string | null>(null);
   const [niche, setNiche] = useState<string | null>(null);
@@ -136,16 +149,15 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   const b = BIG_NICHES.find((x) => x.id === big);
   const n = NICHES.find((x) => x.id === niche);
 
-  // 15 questions sans idée de produit (12 avec son idée, 11 avec un lien ou une description de l'accueil).
-  // Au milieu, une fois le produit choisi : création du compte (sautée si déjà connecté).
-  // On commence par le curseur de revenu (ludique, rien à choisir) : avant, 1 visiteur sur 5 partait dès la 1re question.
-  const head: Step[] = demo ? ["goal", "income", "budget"] : ["income", "goal", "level", "budget", "shopify"];
-  // Le compte arrive tôt (7ᵉ étape), juste après « As-tu une idée ? », pour ne perdre personne avant.
-  const ideaStep: Step[] = preset ? [] : ["idea"];
+  // Ordre revu le 26 nov. 2026 d'après les abandons : d'abord le plus excitant (combien gagner, quoi vendre),
+  // puis le compte une fois le produit choisi, et seulement ensuite les questions de profil.
+  // 13 questions sans idée (10 avec son idée, 9 avec un lien ou une description de l'accueil).
+  const head: Step[] = demo ? ["income", "goal"] : ["income"];
+  const ideaStep: Step[] = preset || demo ? [] : ["idea"];
   const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
-  // Plus de cœur / croix à la fin : la dernière question lance directement la création.
+  const profile: Step[] = demo ? [] : ["level", "budget", "shopify"];
   const tail: Step[] = demo ? ["channel"] : ["audience", "market", "supply", "channel", "price"];
-  const plan: Step[] = [...head, ...ideaStep, ...(logged ? [] : ["account" as Step]), ...productSteps, ...tail];
+  const plan: Step[] = [...head, ...ideaStep, ...productSteps, ...(logged ? [] : ["account" as Step]), ...profile, ...tail];
   const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
   const qIndex = questions.indexOf(step);
@@ -174,7 +186,7 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
     try { localStorage.setItem(STATE_KEY, JSON.stringify({ t: Date.now(), preset: preset?.text ?? "", history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, income, supplierUrl })); } catch { /* stockage indisponible */ }
   }, [history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, income, supplierUrl, preset?.text]);
   // Connecté pendant l'étape compte (ou déjà connecté en y arrivant) : on passe à la suite.
-  const afterAccount: Step = preset || hasIdea ? "audience" : "big";
+  const afterAccount: Step = plan[plan.indexOf("account") + 1] ?? "level";
   useEffect(() => { if (step === "account" && logged) setHistory((h) => [...h.slice(0, -1), afterAccount]); }, [step, logged, afterAccount]);
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
   const productName = (hasIdea ? idea.trim() : n?.products.find((p) => p[1] === product)?.[0] ?? "").slice(0, 60);
@@ -231,7 +243,7 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
     time: <>Combien de <span className="serif-accent">temps</span> peux-tu y consacrer ?</>,
     budget: <>Quel <span className="mark-green">budget</span> pour te lancer ?</>,
     shopify: <>Tu as déjà un compte <span className="serif-accent">Shopify</span> ?</>,
-    account: <>Crée ton <span className="serif-accent">compte</span> pour garder tes réponses</>,
+    account: <>Super choix ! Crée ton <span className="serif-accent">compte</span> pour voir ta boutique</>,
     market: <>Dans quels <span className="serif-accent">pays</span> veux-tu vendre ?</>,
     supply: <>Comment tes clients vont <span className="mark-green">recevoir</span> le produit ?</>,
     channel: <>Comment vas-tu trouver tes <span className="serif-accent">clients</span> ?</>,
@@ -289,8 +301,8 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         {step === "idea" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <Card tint={0} icon={Lightbulb} label="Oui, j'ai mon idée" hint="Je l'écris juste en dessous" on={hasIdea === true} onClick={() => setHasIdea(true)} />
-              <Card tint={3} icon={Sparkles} label="Pas encore" hint="Propose-moi des produits" on={hasIdea === false} onClick={() => setHasIdea(false)} />
+              <Card tint={0} icon={Lightbulb} emoji="💡" label="Oui, j'ai mon idée" hint="Je l'écris juste en dessous" on={hasIdea === true} onClick={() => setHasIdea(true)} />
+              <Card tint={3} icon={Sparkles} emoji="✨" label="Pas encore" hint="Propose-moi des produits" on={hasIdea === false} onClick={() => setHasIdea(false)} />
             </div>
             {hasIdea && (
               <div className="rounded-[18px] border border-white/15 bg-white/[0.05] p-4 [animation:fade-in_.3s_ease-out_both]">
@@ -303,7 +315,7 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         {step === "big" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {BIG_NICHES.map((x, i) => <BigCard key={x.id} tint={i} icon={x.icon} label={x.label} hint={x.hint} on={big === x.id} onClick={() => { if (x.id !== big) { setNiche(null); setProduct(null); } setBig(x.id); }} />)}
+              {BIG_NICHES.map((x, i) => <BigCard key={x.id} tint={i} icon={x.icon} emoji={EMOJI[x.id]} label={x.label} hint={x.hint} on={big === x.id} onClick={() => { if (x.id !== big) { setNiche(null); setProduct(null); } setBig(x.id); }} />)}
             </div>
             {/* « Surprends-moi » en grand, sous toutes les catégories. */}
             <button type="button" onClick={() => { const r = NICHES[Math.floor(Math.random() * NICHES.length)]; setBig(BIG_NICHES.find((x) => (x.subs as readonly string[]).includes(r.id))?.id ?? null); setNiche(r.id); setProduct(null); setHistory((h) => [...h, "sub", "product"]); }}
@@ -315,12 +327,12 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         )}
         {step === "sub" && b && (
           <div className="grid grid-cols-2 gap-3">
-            {b.subs.map((id, i) => { const x = NICHES.find((y) => y.id === id)!; return <BigCard key={id} tint={i + 2} icon={x.icon} label={x.label} hint={x.products.slice(0, 2).map((p) => p[0]).join(", ") + "…"} on={niche === id} onClick={() => { if (id !== niche) setProduct(null); setNiche(id); }} />; })}
+            {b.subs.map((id, i) => { const x = NICHES.find((y) => y.id === id)!; return <BigCard key={id} tint={i + 2} icon={x.icon} emoji={EMOJI[id]} label={x.label} hint={x.products.slice(0, 2).map((p) => p[0]).join(", ") + "…"} on={niche === id} onClick={() => { if (id !== niche) setProduct(null); setNiche(id); }} />; })}
           </div>
         )}
         {step === "product" && n && (
           <div className="grid gap-3 sm:grid-cols-2">
-            {n.products.map(([name, brief], i) => <Card key={name} tint={i} row icon={n.icon} label={name} hint={brief} on={product === brief} onClick={() => setProduct(brief)} />)}
+            {n.products.map(([name, brief], i) => <Card key={name} tint={i} row icon={n.icon} emoji={EMOJI[n.id]} label={name} hint={brief} on={product === brief} onClick={() => setProduct(brief)} />)}
           </div>
         )}
         {step === "audience" && <Grid options={AUDIENCES} value={audience} cols={4} onPick={setAudience} />}
@@ -392,7 +404,7 @@ function NextButton({ onClick, label = "Continuer" }: { onClick: () => void; lab
 function Grid({ options, value, onPick, cols = 3 }: { options: Option[]; value: string | null; onPick: (id: string) => void; cols?: 3 | 4 }) {
   return (
     <div className={cn("grid grid-cols-2 gap-3", cols === 3 ? "sm:grid-cols-3" : "sm:grid-cols-4")}>
-      {options.map((o, i) => <Card key={o.id} tint={i} icon={o.icon} label={o.label} hint={o.hint} on={value === o.id} onClick={() => onPick(o.id)} />)}
+      {options.map((o, i) => <Card key={o.id} tint={i} icon={o.icon} emoji={EMOJI[o.id]} label={o.label} hint={o.hint} on={value === o.id} onClick={() => onPick(o.id)} />)}
     </div>
   );
 }
@@ -403,20 +415,22 @@ const LED = "#3dff9a";
 const ON = { borderColor: LED, background: "rgb(61 255 154 / .06)", boxShadow: "0 0 0 1px rgb(61 255 154 / .9), 0 0 30px -8px rgb(61 255 154 / .6)" };
 const OFF = { borderColor: "rgb(255 255 255 / .12)", background: "rgb(255 255 255 / .025)" };
 // Icône noire (trait blanc) ; une fois la réponse choisie, la case devient vert électrique.
-const IconBox = ({ icon: I, size, on = false }: { icon: Icon; size: "s" | "m" | "l"; on?: boolean }) => (
-  <span style={on ? { background: LED, boxShadow: "0 0 22px -2px rgb(61 255 154 / .7)" } : { background: "#0a0a0a", boxShadow: "inset 0 0 0 1px rgb(255 255 255 / .14)" }}
+const IconBox = ({ icon: I, emoji, size, on = false }: { icon: Icon; emoji?: string; size: "s" | "m" | "l"; on?: boolean }) => (
+  <span style={on ? { background: emoji ? "rgb(61 255 154 / .22)" : LED, boxShadow: "0 0 0 2px #3dff9a, 0 0 22px -2px rgb(61 255 154 / .7)" } : { background: emoji ? "rgb(255 255 255 / .07)" : "#0a0a0a", boxShadow: "inset 0 0 0 1px rgb(255 255 255 / .14)" }}
     className={cn("grid shrink-0 place-items-center transition-all duration-200 group-hover:scale-105", on ? "text-black" : "text-white", size === "s" ? "h-11 w-11 rounded-[13px]" : size === "m" ? "h-14 w-14 rounded-[14px]" : "h-16 w-16 rounded-[18px]")}>
-    <I className={size === "s" ? "h-5 w-5" : size === "m" ? "h-7 w-7" : "h-8 w-8"} />
+    {emoji
+      ? <span aria-hidden className={cn("leading-none transition-transform duration-200", on && "scale-110", size === "s" ? "text-[22px]" : size === "m" ? "text-[30px]" : "text-[36px]")}>{emoji}</span>
+      : <I className={size === "s" ? "h-5 w-5" : size === "m" ? "h-7 w-7" : "h-8 w-8"} />}
   </span>
 );
 const Tick = () => <span className="absolute right-2.5 top-2.5 grid h-5 w-5 place-items-center rounded-full text-[#04120b] [animation:fade-in_.2s_ease-out_both]" style={{ background: LED }}><Check className="h-3 w-3" /></span>;
 
 // `tint` est gardé pour compatibilité, il n'a plus d'effet : toutes les cartes ont les mêmes couleurs.
-function Card({ icon, label, hint, on, row, onClick }: { icon: Icon; label: string; hint?: string; on: boolean; row?: boolean; tint?: number; onClick: () => void }) {
+function Card({ icon, emoji, label, hint, on, row, onClick }: { icon: Icon; emoji?: string; label: string; hint?: string; on: boolean; row?: boolean; tint?: number; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
       className={cn("group relative flex h-full rounded-[18px] border p-4 text-left backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25", row ? "items-center gap-3.5" : "flex-col items-center gap-3 py-6 text-center")}>
-      <IconBox icon={icon} size={row ? "s" : "m"} on={on} />
+      <IconBox icon={icon} emoji={emoji} size={row ? "s" : "m"} on={on} />
       <span className="min-w-0">
         <span className="block text-[15px] font-semibold leading-tight text-white">{label}</span>
         {hint && <span className="mt-1 block text-xs leading-snug text-fg-muted">{hint}</span>}
@@ -427,11 +441,11 @@ function Card({ icon, label, hint, on, row, onClick }: { icon: Icon; label: stri
 }
 
 // Grande carte (catégories) : icône plus grande, titre en belle typographie.
-function BigCard({ icon, label, hint, on, onClick }: { icon: Icon; label: string; hint: string; on: boolean; tint?: number; onClick: () => void }) {
+function BigCard({ icon, emoji, label, hint, on, onClick }: { icon: Icon; emoji?: string; label: string; hint: string; on: boolean; tint?: number; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
       className="group relative flex h-full flex-col items-center gap-3 rounded-[22px] border px-3 py-7 text-center backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-white/25">
-      <IconBox icon={icon} size="l" on={on} />
+      <IconBox icon={icon} emoji={emoji} size="l" on={on} />
       <span className="font-display text-[17px] font-semibold leading-tight tracking-[-0.01em] text-white sm:text-[19px]">{label}</span>
       <span className="text-xs leading-snug text-fg-muted">{hint}</span>
       {on && <Tick />}

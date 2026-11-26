@@ -6,13 +6,13 @@ import * as api from "@/lib/api/client";
 
 // Les questions du quiz, dans l'ordre (sans idée de produit), avec la création du compte au milieu.
 const STEPS: [string, string][] = [
-  ["income", "1. Revenu visé (curseur)"], ["goal", "2. Objectif"], ["level", "3. Niveau en e-commerce"], ["budget", "4. Budget de départ"], ["shopify", "5. A-t-il Shopify ?"],
-  ["idea", "6. A-t-il une idée ?"],
+  ["income", "1. Revenu visé (curseur)"], ["idea", "2. A-t-il une idée ?"],
+  ["big", "3. Grande catégorie"], ["sub", "4. Petite catégorie"], ["product", "5. Choix du produit"],
   ["account", "Création du compte (e-mail)"],
-  ["big", "7. Grande catégorie"], ["sub", "8. Petite catégorie"], ["product", "9. Choix du produit"],
-  ["audience", "10. À qui vendre"], ["market", "11. Pays de vente"], ["supply", "12. Livraison + fournisseur"], ["channel", "13. Où trouver ses clients"], ["price", "14. Prix de vente (dernière)"],
+  ["level", "6. Niveau en e-commerce"], ["budget", "7. Budget de départ"], ["shopify", "8. A-t-il Shopify ?"],
+  ["audience", "9. À qui vendre"], ["market", "10. Pays de vente"], ["supply", "11. Livraison + fournisseur"], ["channel", "12. Où trouver ses clients"], ["price", "13. Prix de vente (dernière)"],
   // Anciennes questions (quiz d'avant le 26 novembre) : encore visibles tant qu'elles sont dans les 7 derniers jours.
-  ["time", "Ancien : temps disponible"], ["style", "Ancien : cœur / croix"],
+  ["goal", "Ancien : objectif"], ["time", "Ancien : temps disponible"], ["style", "Ancien : cœur / croix"],
 ];
 
 // Ventes : où les visiteurs s'arrêtent dans le quiz (7 derniers jours).
@@ -46,7 +46,7 @@ export function QuizFunnel() {
               );
             })}
           </div>
-          <p className="mt-2 text-xs text-[#8a8a8a]">Avec une idée de produit, le quiz saute les questions 7 à 9.</p>
+          <p className="mt-2 text-xs text-[#8a8a8a]">Avec une idée de produit, le quiz saute les questions 3 à 5.</p>
         </>
       ) : <p className="mt-2 text-sm text-[#8a8a8a]">Personne n&apos;a encore commencé le quiz depuis la mise en place du suivi.</p>)}
     </section>
