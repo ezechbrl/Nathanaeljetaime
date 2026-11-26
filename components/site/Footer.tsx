@@ -5,7 +5,7 @@ import { NewsletterForm } from "./NewsletterForm";
 
 const COLUMNS = [
   { title: "Produit", links: [["/produit", "Fonctionnalités"], ["/demo", "Comment ça marche"], ["/tarifs", "Tarifs"], ["/exemples", "Exemples"], ["/nouveautes", "Feuille de route"]] },
-  { title: "Solutions", desktop: true, links: [["/boutique-shopify-cle-en-main", "Boutique prête à vendre"], ["/outils-gratuits", "Outils gratuits"], ["/affiliation", "Devenir partenaire"]] },
+  { title: "Solutions", desktop: true, links: [["/boutique-shopify-cle-en-main", "Boutique prête à vendre"], ["/outils-gratuits", "Outils gratuits"], ["/idees-produits", "Idées de produits"], ["/affiliation", "Devenir partenaire"]] },
   { title: "Entreprise", desktop: true, links: [["/fondateurs", "Notre histoire"], ["/blog", "Blog"], ["/contact", "Contact"]] },
   { title: "Légal", links: [["/legal/mentions-legales", "Mentions légales"], ["/legal/confidentialite", "Confidentialité"], ["/legal/cgv", "CGV"], ["/legal/cgu", "CGU"], ["/legal/conditions-affiliation", "Conditions d'affiliation"]] },
 ] as const;
@@ -37,7 +37,7 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-8 text-sm sm:hidden"><Link href="/contact" className="text-fg-muted">Contact</Link> · <Link href="/blog" className="text-fg-muted">Blog</Link> · <Link href="/outils-gratuits" className="text-fg-muted">Outils gratuits</Link> · <Link href="/affiliation" className="text-fg-muted">Devenir partenaire</Link></p>
+        <p className="mt-8 text-sm sm:hidden"><Link href="/contact" className="text-fg-muted">Contact</Link> · <Link href="/blog" className="text-fg-muted">Blog</Link> · <Link href="/outils-gratuits" className="text-fg-muted">Outils gratuits</Link> · <Link href="/idees-produits" className="text-fg-muted">Idées de produits</Link> · <Link href="/affiliation" className="text-fg-muted">Devenir partenaire</Link></p>
         <div className="mt-8 flex flex-col sm:mt-16 gap-3 border-t border-white/[0.06] pt-8 text-xs text-fg-faint sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {site.name}. Shopify est une marque de Shopify Inc. {site.name} est un service indépendant, ni édité ni approuvé par Shopify, et membre du programme d'affiliation Shopify.</p>
           <p>Fait en France</p>
