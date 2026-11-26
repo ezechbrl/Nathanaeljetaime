@@ -112,6 +112,8 @@ export function PlanPicker({ interval, left, offer = false, waitlist = false, wi
           </div>
           <div className="w-[150px] shrink-0 sm:w-[240px]">{cta(current.id, interval)}</div>
         </div>
+        {/* Accord exprès pour l'exécution immédiate (pas de droit de rétractation une fois la boutique créée). */}
+        <p className="mt-2 text-center text-[10.5px] leading-snug text-fg-faint">En continuant, tu demandes la création immédiate de ta boutique et tu renonces à ton droit de rétractation.</p>
       </div>
     </div>
   );

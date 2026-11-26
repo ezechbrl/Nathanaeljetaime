@@ -64,7 +64,7 @@ export const LEGAL: LegalDoc[] = [
       { heading: "Offres et prix", body: ["Les offres et prix en vigueur sont indiqués sur la page Tarifs, en euros hors taxes pour les professionnels et toutes taxes comprises pour les particuliers. L'abonnement Shopify n'est pas inclus."] },
       { heading: "Paiement", body: ["L'abonnement est payé par carte bancaire via Stripe, à chaque période (mois ou année). Il peut être changé ou arrêté à tout moment depuis la page Abonnement ; l'arrêt prend effet à la fin de la période déjà payée."] },
       { heading: "Renouvellement et résiliation", body: ["L'abonnement se renouvelle automatiquement. Tu peux le résilier à tout moment depuis ton espace ; il reste actif jusqu'à la fin de la période payée."] },
-      { heading: "Rétractation et remboursement", body: ["Si tu es un consommateur, tu disposes d'un délai de rétractation de 14 jours. En commençant à utiliser le service pendant ce délai, tu reconnais que l'exécution a commencé. Nous remboursons néanmoins intégralement le premier paiement sur simple demande dans les 14 jours."] },
+      { heading: "Rétractation", body: ["La création de ta boutique par l'IA commence juste après le paiement. En payant, tu demandes expressément cette exécution immédiate et tu reconnais perdre ton droit de rétractation de 14 jours une fois le service fourni (article L221-28 du Code de la consommation). Les paiements ne sont donc pas remboursés, sauf obligation légale (par exemple si le service n'a pas pu être fourni). Tu peux arrêter ton abonnement à tout moment : il ne se renouvelle plus, sans frais."] },
       { heading: "Factures", body: ["Les factures sont disponibles dans ton espace, rubrique Abonnement."] },
     ],
   },

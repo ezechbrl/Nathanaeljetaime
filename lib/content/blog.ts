@@ -10,6 +10,98 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "vendre-en-ligne-sans-stock",
+    title: "Vendre en ligne sans stock : les 4 façons de faire quand on débute",
+    excerpt: "Dropshipping, impression à la demande, produits numériques, précommande : comment vendre en ligne sans acheter de stock, avec les avantages et les limites de chaque méthode.",
+    category: "Guide",
+    date: "2026-11-26",
+    readingMinutes: 6,
+    sections: [
+      { paragraphs: [
+        "Acheter du stock avant d'avoir vendu quoi que ce soit, c'est le plus gros risque quand on lance une boutique : si le produit ne plaît pas, l'argent est bloqué dans des cartons.",
+        "Heureusement, il existe plusieurs façons de vendre en ligne sans stock. Chacune a ses avantages et ses limites. Voici les 4 principales, expliquées simplement.",
+      ] },
+      { heading: "1. Le dropshipping", paragraphs: [
+        "Tu vends un produit sur ta boutique, et c'est ton fournisseur qui l'envoie directement à ton client. Tu ne paies le produit qu'après l'avoir vendu.",
+        "C'est la méthode la plus connue pour débuter. Ses limites : les délais de livraison peuvent être longs selon le fournisseur, tu ne contrôles pas l'emballage, et beaucoup de vendeurs proposent les mêmes produits. Commande toujours un échantillon avant de vendre.",
+      ] },
+      { heading: "2. L'impression à la demande", paragraphs: [
+        "Tu crées des designs (t-shirts, sweats, mugs, affiches, coques…) et un imprimeur les fabrique seulement quand un client commande, puis les envoie.",
+        "C'est idéal si tu as une communauté, un humour ou un univers à toi. La difficulté : les marges sont souvent plus serrées, et il faut des designs vraiment originaux pour se démarquer. Attention à ne jamais utiliser de logos, de personnages ou d'images qui ne t'appartiennent pas.",
+      ] },
+      { heading: "3. Les produits numériques", paragraphs: [
+        "Guides, modèles, fichiers à imprimer, presets photo, formations : tu crées le produit une fois, et tu peux le vendre autant de fois que tu veux, sans livraison.",
+        "C'est la méthode avec le moins de frais, mais il faut une vraie compétence à partager et du temps pour créer un produit de qualité. Les clients achètent surtout quand ils te font déjà confiance.",
+      ] },
+      { heading: "4. La précommande", paragraphs: [
+        "Tu présentes ton produit, tu prends les commandes, puis tu fais fabriquer ou tu achètes la quantité vendue. C'est utile pour tester une idée avant de commander un gros stock.",
+        "Il faut être très clair avec tes clients sur la date de livraison prévue. Une précommande qui arrive en retard sans explication, c'est des remboursements et de mauvais avis.",
+      ] },
+      { heading: "Laquelle choisir ?", paragraphs: ["Pour t'aider à décider :"], list: [
+        "Tu veux tester des produits rapidement : le dropshipping",
+        "Tu as une communauté ou un univers créatif : l'impression à la demande",
+        "Tu as une compétence à partager : les produits numériques",
+        "Tu as un produit à toi mais pas le budget pour un stock : la précommande",
+      ] },
+      { heading: "Ce qui ne change pas, quelle que soit la méthode", paragraphs: [
+        "Sans stock ou pas, tu restes un vendeur : il te faut une boutique qui inspire confiance, des prix qui te laissent une marge, des délais annoncés honnêtement, et un statut pour vendre régulièrement. Et surtout, il faut faire connaître ton produit : vidéos, réseaux sociaux, bouche-à-oreille.",
+        "Tu cherches encore quoi vendre ? Jette un œil aux 72 idées de produits classées par univers sur vigenia.com/idees-produits.",
+      ] },
+      { heading: "Comment Vigenia peut t'aider", paragraphs: [
+        "Vigenia crée ta boutique Shopify avec l'IA : tu décris ton produit ou tu colles le lien de ton fournisseur, et tu obtiens un aperçu gratuit avec le nom, le design, les textes et les photos. C'est fait pour le dropshipping comme pour tes propres produits.",
+      ] },
+    ],
+  },
+  {
+    slug: "creer-boutique-en-ligne-debutant",
+    title: "Créer sa boutique en ligne quand on débute : le guide complet, étape par étape",
+    excerpt: "De l'idée à la première commande : choisir son produit, sa plateforme, créer les pages, fixer ses prix, se mettre en règle et trouver ses premiers clients. Le guide simple pour débutant.",
+    category: "Guide",
+    date: "2026-11-26",
+    readingMinutes: 8,
+    sections: [
+      { paragraphs: [
+        "Créer une boutique en ligne n'a jamais été aussi accessible. Mais quand on débute, on ne sait pas par où commencer, et on se perd vite entre les vidéos, les outils et les conseils contradictoires.",
+        "Voici les étapes dans l'ordre, de l'idée à la première commande. Garde ce guide sous la main et avance une étape à la fois.",
+      ] },
+      { heading: "Étape 1 : choisir ce que tu vas vendre", paragraphs: [
+        "Commence par un seul produit, ou une petite gamme autour d'un même univers. Un bon premier produit règle un petit problème ou fait plaisir, se comprend en quelques secondes de vidéo, et te laisse une marge correcte.",
+        "Si tu bloques, notre article « Quoi vendre en ligne quand on débute ? » détaille la méthode, et la page Idées de produits de Vigenia propose 72 idées classées par univers.",
+      ] },
+      { heading: "Étape 2 : trouver ton fournisseur", paragraphs: [
+        "Selon ton modèle, tu travailleras avec un fournisseur en dropshipping, un grossiste, un imprimeur à la demande, ou tu fabriqueras toi-même. Dans tous les cas : commande un échantillon, vérifie la qualité, les délais de livraison réels et la façon dont le fournisseur gère les problèmes.",
+      ] },
+      { heading: "Étape 3 : choisir ta plateforme", paragraphs: [
+        "Shopify est la plateforme la plus utilisée pour créer une boutique en ligne : elle gère le paiement, les commandes et l'hébergement, sans avoir à coder. D'autres solutions existent, mais pour un débutant, l'important est de choisir un outil simple et de s'y tenir.",
+        "Pense à vérifier les tarifs à jour directement sur le site de la plateforme : ils changent régulièrement.",
+      ] },
+      { heading: "Étape 4 : créer les pages essentielles", paragraphs: ["Une boutique qui inspire confiance a au minimum :"], list: [
+        "Une page d'accueil claire : ce que tu vends, pour qui, et pourquoi c'est utile",
+        "Une fiche produit complète : photos, description simple, prix, délais de livraison, questions fréquentes",
+        "Une page contact avec une vraie adresse e-mail",
+        "Les pages légales : mentions légales, conditions générales de vente, politique de retour, confidentialité",
+      ] },
+      { heading: "Étape 5 : fixer tes prix", paragraphs: [
+        "Ton prix doit couvrir le produit, la livraison, les frais de paiement, les éventuels retours, la publicité, et te laisser une marge. Beaucoup de débutants vendent trop bas et travaillent pour rien. Notre article sur le calcul du prix de vente en dropshipping t'explique la méthode pas à pas.",
+      ] },
+      { heading: "Étape 6 : te mettre en règle", paragraphs: [
+        "Pour vendre régulièrement en France, il faut un statut, souvent la micro-entreprise pour démarrer. Tu dois aussi respecter les règles de la vente en ligne : informations claires sur les prix et les délais, droit de rétractation de tes clients, et produits conformes. Si tu es mineur ou si tu as un doute, renseigne-toi auprès d'un organisme officiel avant de te lancer.",
+      ] },
+      { heading: "Étape 7 : trouver tes premiers clients", paragraphs: ["Une boutique sans visiteurs ne vend rien. Les pistes les plus simples pour commencer :"], list: [
+        "Des vidéos courtes sur TikTok et Instagram qui montrent ton produit en action",
+        "Ton entourage et les groupes en ligne autour de ton univers",
+        "Des contenus utiles (articles, conseils) pour être trouvé sur Google à long terme",
+        "La publicité payante, seulement quand ta boutique et ta marge sont prêtes",
+      ] },
+      { heading: "Étape 8 : analyser et améliorer", paragraphs: [
+        "Regarde ce qui marche : quelles vidéos amènent des visiteurs, où les visiteurs quittent ta boutique, quelles questions reviennent. Améliore une chose à la fois. La plupart des boutiques qui vendent bien ont été améliorées des dizaines de fois.",
+      ] },
+      { heading: "Aller plus vite avec Vigenia", paragraphs: [
+        "Les étapes 3 et 4 sont souvent celles qui prennent le plus de temps. Avec Vigenia, tu réponds à quelques questions ou tu colles le lien de ton produit, et l'IA crée ta boutique Shopify : nom, design, textes, photos et pages. L'aperçu est gratuit sur vigenia.com, et tu peux ensuite tout modifier.",
+      ] },
+    ],
+  },
+  {
     slug: "quoi-vendre-en-ligne",
     title: "Quoi vendre en ligne quand on débute ? La méthode simple pour trouver ton produit",
     excerpt: "Tu veux lancer ta boutique mais tu ne sais pas quoi vendre ? Voici les critères d'un bon premier produit, des idées par univers et la méthode pour te décider sans y passer des semaines.",

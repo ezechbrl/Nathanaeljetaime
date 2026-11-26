@@ -102,7 +102,7 @@ async function createSession(user: UserRow, plan: PaidPlan, interval: "month" | 
     ...(offer || percent ? {} : { allow_promotion_codes: true }),
     locale: "fr",
     // Rassure juste au-dessus du bouton de paiement.
-    custom_text: { submit: { message: "Sans engagement : tu peux arrêter ton abonnement en un clic depuis ton compte Vigenia. Ta boutique se crée juste après le paiement." } },
+    custom_text: { submit: { message: "Sans engagement : tu peux arrêter ton abonnement en un clic depuis ton compte Vigenia. Ta boutique se crée juste après le paiement. En payant, tu demandes que ta boutique soit créée tout de suite et tu renonces à ton droit de rétractation (article L221-28 du Code de la consommation)." } },
     success_url: `${env.appUrl()}/app/abonnement?checkout=success`,
     cancel_url: `${env.appUrl()}/app/abonnement`,
   });
@@ -132,7 +132,7 @@ export async function singleCheckoutUrl(user: UserRow, storeId: string) {
     metadata: { kind: "single", user_id: user.id, store_id: storeId },
     payment_intent_data: { metadata: { kind: "single", user_id: user.id, store_id: storeId } },
     locale: "fr",
-    custom_text: { submit: { message: "Paiement unique, sans abonnement. Ta boutique complète se crée juste après le paiement." } },
+    custom_text: { submit: { message: "Paiement unique, sans abonnement. Ta boutique complète se crée juste après le paiement. En payant, tu demandes que ta boutique soit créée tout de suite et tu renonces à ton droit de rétractation (article L221-28 du Code de la consommation)." } },
     success_url: `${env.appUrl()}/app/abonnement?checkout=success`,
     cancel_url: `${env.appUrl()}/app/boutiques/${storeId}`,
   });
