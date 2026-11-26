@@ -2,7 +2,7 @@
 
 import {
   ChevronsUpDown, CreditCard, Gift, HelpCircle, Home, Image as ImageIcon, LayoutGrid, LogOut,
-  Menu, MessageSquare, Plus, Settings, Sparkles, Store as StoreIcon, TrendingUp, Wand2, X,
+  Menu, MessageSquare, Plus, Settings, Sparkles, Store as StoreIcon, TrendingUp, Video, Wand2, X,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -82,6 +82,7 @@ function SidebarBody() {
       <NavLink href="/app" icon={Home} exact tint="green">Accueil</NavLink>
       <NavLink href="/app/boutiques" icon={StoreIcon} exact>Mes boutiques</NavLink>
       {user.isOwner && <NavLink href="/ventes" icon={TrendingUp} tint="amber">Mes ventes</NavLink>}
+      {user.isOwner && <NavLink href="/app/demo" icon={Video} tint="amber">Démo vidéo</NavLink>}
 
       {storeId && (
         <>
@@ -132,6 +133,8 @@ export function Sidebar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   useEffect(() => setOpen(false), [pathname]);
+  // Démo vidéo : écran plein, sans menu, pour filmer.
+  if (pathname.startsWith("/app/demo")) return null;
 
   return (
     <>

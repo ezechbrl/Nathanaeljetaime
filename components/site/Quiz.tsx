@@ -107,8 +107,9 @@ type Step = "level" | "goal" | "income" | "time" | "budget" | "shopify" | "idea"
 const STATE_KEY = "vg-quiz-state";
 
 // `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
-export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string, draft?: QuizDraft) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean } }) {
-  const [history, setHistory] = useState<Step[]>(["level"]);
+// `demo` : version courte pour les vidéos (quelques questions, rien n'est gardé ni compté dans les stats).
+export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (brief: string, draft?: QuizDraft) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean }; demo?: boolean }) {
+  const [history, setHistory] = useState<Step[]>([demo ? "goal" : "level"]);
   const step = history[history.length - 1];
   const [level, setLevel] = useState<string | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
@@ -137,11 +138,11 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string,
 
   // 15 questions sans idée de produit (12 avec son idée, 11 avec un lien ou une description de l'accueil).
   // Au milieu, une fois le produit choisi : création du compte (sautée si déjà connecté).
-  const head: Step[] = ["level", "goal", "income", "time", "budget", "shopify"];
+  const head: Step[] = demo ? ["goal", "income", "budget"] : ["level", "goal", "income", "time", "budget", "shopify"];
   // Le compte arrive tôt (7ᵉ étape), juste après « As-tu une idée ? », pour ne perdre personne avant.
   const ideaStep: Step[] = preset ? [] : ["idea"];
   const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
-  const tail: Step[] = ["audience", "market", "supply", "channel", "price", "style"];
+  const tail: Step[] = demo ? ["channel", "style"] : ["audience", "market", "supply", "channel", "price", "style"];
   const plan: Step[] = [...head, ...ideaStep, ...(logged ? [] : ["account" as Step]), ...productSteps, ...tail];
   const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
@@ -155,7 +156,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string,
   const restored = useRef(false);
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STATE_KEY);
+      const raw = demo ? null : localStorage.getItem(STATE_KEY);
       const st = raw ? JSON.parse(raw) : null;
       if (st && Date.now() - st.t < 3 * 3600_000 && (st.preset ?? "") === (preset?.text ?? "") && Array.isArray(st.history) && st.history.length > 1) {
         setLevel(st.level); setGoal(st.goal); setTime(st.time); setBudget(st.budget); setShopify(st.shopify);
@@ -167,7 +168,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string,
     restored.current = true;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!restored.current) return;
+    if (!restored.current || demo) return;
     try { localStorage.setItem(STATE_KEY, JSON.stringify({ t: Date.now(), preset: preset?.text ?? "", history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, income, supplierUrl })); } catch { /* stockage indisponible */ }
   }, [history, level, goal, time, budget, shopify, hasIdea, idea, big, niche, product, audience, market, supply, channel, price, income, supplierUrl, preset?.text]);
   // Connecté pendant l'étape compte (ou déjà connecté en y arrivant) : on passe à la suite.
@@ -181,6 +182,7 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string,
   // Suivi anonyme (Ventes) : jusqu'à quelle question le visiteur va, et s'il finit le quiz.
   const run = useRef("");
   const track = (s: Step | "fin", i: number, done = false) => {
+    if (demo) return;
     try {
       if (!run.current) run.current = Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 20);
       if (localStorage.getItem("vg-owner") || navigator.webdriver) return;
@@ -197,8 +199,8 @@ export function Quiz({ onFinish, skipHref, preset }: { onFinish: (brief: string,
   }, [step]);
 
   async function finish(style: string | null) {
-    if (!chosen || !audience) return;
-    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, `Pour ${AUDIENCE_TEXT[audience]}.`, price ? PRICE_TEXT[price] : "", market ? MARKET_TEXT[market] : "", supply ? SUPPLY_TEXT[supply] : "", channel ? CHANNEL_TEXT[channel] : "", level ? LEVEL_TEXT[level] : "", shopify ? SHOPIFY_TEXT[shopify] : "", budget ? BUDGET_TEXT[budget] : "", `Objectif du vendeur : environ ${income.toLocaleString("fr-FR")} € par mois.`, style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
+    if (!chosen || (!audience && !demo)) return;
+    const brief = [`${chosen.replace(/[.\s]+$/, "")}.`, audience ? `Pour ${AUDIENCE_TEXT[audience]}.` : "", price ? PRICE_TEXT[price] : "", market ? MARKET_TEXT[market] : "", supply ? SUPPLY_TEXT[supply] : "", channel ? CHANNEL_TEXT[channel] : "", level ? LEVEL_TEXT[level] : "", shopify ? SHOPIFY_TEXT[shopify] : "", budget ? BUDGET_TEXT[budget] : "", `Objectif du vendeur : environ ${income.toLocaleString("fr-FR")} € par mois.`, style ? STYLE_TEXT[style] : ""].filter(Boolean).join(" ");
     setBusy(true);
     setError("");
     track("fin", plan.length, true);
