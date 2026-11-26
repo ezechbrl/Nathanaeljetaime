@@ -1,4 +1,4 @@
-# Plan du blog Vigenia (4 articles par semaine : lundi, mercredi, vendredi, dimanche)
+# Plan du blog Vigenia (1 article par jour, vers 15 h 23)
 
 Ordre de publication. La tâche automatique prend le premier sujet pas encore publié (slug absent de lib/content/blog.ts).
 Quand la liste est finie, elle choisit un nouveau sujet et l'ajoute ici.
@@ -6,6 +6,8 @@ Quand la liste est finie, elle choisit un nouveau sujet et l'ajoute ici.
 | Jour prévu | Titre prévu | Mot-clé visé | Slug |
 |---|---|---|---|
 | mer. 25 nov. | Préparer sa boutique en ligne pour Noël : la checklist | boutique en ligne Noël | preparer-boutique-en-ligne-noel |
+| jeu. 26 nov. (en plus) | Quoi vendre en ligne quand on débute ? | quoi vendre en ligne | quoi-vendre-en-ligne |
+| jeu. 26 nov. (en plus) | Le dropshipping, c'est quoi ? | dropshipping c'est quoi | dropshipping-c-est-quoi |
 | ven. 27 nov. | Délais de livraison en dropshipping : comment les annoncer et rassurer tes clients | délais livraison dropshipping | delais-livraison-dropshipping |
 | dim. 29 nov. | Obtenir des avis clients sur sa boutique en ligne (sans tricher) | avis clients boutique en ligne | obtenir-avis-clients-boutique-en-ligne |
 | lun. 30 nov. | Photos produit au téléphone : faire de belles photos pour sa boutique | photos produit boutique en ligne | photos-produit-telephone-boutique |

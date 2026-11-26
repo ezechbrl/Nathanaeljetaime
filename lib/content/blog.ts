@@ -10,6 +10,107 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "quoi-vendre-en-ligne",
+    title: "Quoi vendre en ligne quand on débute ? La méthode simple pour trouver ton produit",
+    excerpt: "Tu veux lancer ta boutique mais tu ne sais pas quoi vendre ? Voici les critères d'un bon premier produit, des idées par univers et la méthode pour te décider sans y passer des semaines.",
+    category: "Guide",
+    date: "2026-11-26",
+    readingMinutes: 7,
+    sections: [
+      { paragraphs: [
+        "« Quoi vendre ? » est la question qui bloque le plus de débutants. On ouvre AliExpress, on voit des milliers de produits, on regarde des vidéos qui parlent de « produit gagnant »… et au bout d'une semaine, on n'a toujours rien choisi.",
+        "La bonne nouvelle : tu n'as pas besoin du produit parfait pour commencer. Tu as besoin d'un produit correct, que tu comprends, et que tu sais montrer. Voici une méthode simple pour le trouver.",
+      ] },
+      { heading: "Les critères d'un bon premier produit", paragraphs: ["Un premier produit n'a pas à être original. Il doit surtout cocher la plupart de ces cases :"], list: [
+        "Il règle un petit problème du quotidien, ou il fait plaisir (un cadeau, une ambiance, un gain de temps)",
+        "On comprend à quoi il sert en quelques secondes de vidéo",
+        "Il est léger et solide : moins cher à livrer, moins de casse",
+        "Il ne se trouve pas au même prix au supermarché du coin",
+        "Il te laisse une marge correcte une fois tous les frais payés",
+        "Il ne pose pas de problème légal : pas de contrefaçon, pas de marque connue, pas de promesse médicale",
+      ] },
+      { heading: "Ce qu'il vaut mieux éviter au début", paragraphs: ["Certains produits sont des pièges pour une première boutique :"], list: [
+        "Les produits de grandes marques ou sous licence (personnages, clubs, jeux vidéo) : tu n'as pas le droit de les vendre sans autorisation",
+        "Les produits lourds, encombrants ou fragiles : la livraison coûte cher et les retours aussi",
+        "Les produits qui promettent un effet sur la santé ou la minceur : tu risques des ennuis et de mauvais avis",
+        "Les produits avec beaucoup de tailles ou de couleurs : plus de risques d'erreur et de retours",
+        "Les produits électriques sans marquage CE : vérifie toujours avant de vendre",
+      ] },
+      { heading: "Des idées par univers", paragraphs: [
+        "Pour ne pas partir de zéro, commence par un univers qui te parle : beauté, maison, animaux, sport, bébé, cuisine, tech, auto, mode, jardin, gaming ou voyage. Quand tu connais un peu le sujet, c'est beaucoup plus facile de parler du produit et de faire des vidéos.",
+        "On a rassemblé 72 idées de produits, 6 par univers, avec à qui les vendre, à quel prix et l'erreur à éviter, sur la page Idées de produits de Vigenia (vigenia.com/idees-produits).",
+      ] },
+      { heading: "La méthode en 4 étapes pour te décider", paragraphs: ["Pour ne pas tourner en rond, donne-toi une semaine maximum :"], list: [
+        "Choisis un univers qui t'intéresse vraiment",
+        "Note 5 produits de cet univers qui respectent les critères ci-dessus",
+        "Pour chacun, cherche des vidéos de ce produit sur TikTok et Instagram : si personne n'en parle, c'est peut-être qu'il intéresse peu de monde ; si tout le monde en parle, il faudra te démarquer",
+        "Calcule ta marge pour chacun (prix de vente moins prix d'achat, livraison, frais de paiement et publicité), puis garde celui qui laisse la meilleure marge et que tu sais le mieux montrer",
+      ] },
+      { heading: "Tester vite plutôt que chercher longtemps", paragraphs: [
+        "Personne ne sait à l'avance si un produit va se vendre. Les vendeurs qui réussissent ne sont pas ceux qui trouvent le produit parfait du premier coup, ce sont ceux qui testent, regardent ce qui marche, et ajustent.",
+        "Concrètement : lance ta boutique avec un produit, publie plusieurs vidéos, regarde les réactions pendant quelques semaines. Si rien ne bouge, change d'angle (une autre accroche, une autre cible) avant de changer de produit.",
+      ] },
+      { heading: "Comment Vigenia peut t'aider", paragraphs: [
+        "Si tu n'as pas encore d'idée, le quiz de Vigenia te propose des produits selon ce qui t'attire, ton budget et tes clients, puis crée l'aperçu de ta boutique Shopify gratuitement. Tu vois tout de suite à quoi ressemblerait ta boutique avec ce produit, avant de dépenser quoi que ce soit.",
+        "Ça ne remplace pas le test : aucune boutique n'est sûre de vendre. Mais ça t'évite de passer des semaines sur la création, pour te concentrer sur l'essentiel : montrer ton produit et trouver tes premiers clients.",
+      ] },
+    ],
+  },
+  {
+    slug: "dropshipping-c-est-quoi",
+    title: "Le dropshipping, c'est quoi ? Explication simple pour débutant",
+    excerpt: "Le dropshipping permet de vendre en ligne sans acheter de stock. Comment ça marche vraiment, ce que ça coûte, les avantages, les pièges et les règles à respecter en France.",
+    category: "Guide",
+    date: "2026-11-26",
+    readingMinutes: 7,
+    sections: [
+      { paragraphs: [
+        "Le dropshipping, c'est une façon de vendre en ligne sans avoir de stock chez toi. Tu crées une boutique, tu vends un produit, et c'est ton fournisseur qui l'envoie directement à ton client.",
+        "C'est souvent présenté comme un moyen facile de gagner de l'argent. La réalité est plus nuancée : c'est un vrai commerce, avec des règles, des coûts et du travail. Voici comment ça marche, sans promesse magique.",
+      ] },
+      { heading: "Comment ça marche, étape par étape", paragraphs: ["Le principe est simple :"], list: [
+        "Tu choisis un produit chez un fournisseur (par exemple sur AliExpress, CJ Dropshipping ou un grossiste européen)",
+        "Tu le mets en vente sur ta boutique en ligne, à ton prix",
+        "Un client commande et paie sur ta boutique",
+        "Tu passes la commande chez ton fournisseur, avec l'adresse de ton client",
+        "Le fournisseur envoie le colis directement au client",
+        "Ta marge, c'est la différence entre ce que le client t'a payé et tout ce que tu as dépensé",
+      ] },
+      { heading: "Les avantages", paragraphs: ["C'est pour ça que beaucoup de débutants commencent par là :"], list: [
+        "Pas besoin d'acheter de stock à l'avance : tu achètes seulement ce que tu as vendu",
+        "Tu peux tester plusieurs produits sans risquer beaucoup d'argent",
+        "Pas de colis à préparer chez toi",
+        "Tu peux le faire depuis ton téléphone ou ton ordinateur, à ton rythme",
+      ] },
+      { heading: "Les inconvénients (à connaître avant de te lancer)", paragraphs: ["Le dropshipping a aussi de vrais points faibles :"], list: [
+        "Les délais de livraison peuvent être longs quand le fournisseur est loin : il faut les annoncer honnêtement",
+        "Tu ne vois pas le produit avant ton client : commande toujours un échantillon pour vérifier la qualité",
+        "Les marges sont souvent plus faibles qu'avec du stock, surtout si tu paies de la publicité",
+        "Beaucoup de vendeurs proposent les mêmes produits : il faut une boutique qui inspire confiance et une bonne façon de présenter ton produit",
+        "C'est toi qui gères le service client, les retours et les colis perdus, même si tu n'as jamais touché le produit",
+      ] },
+      { heading: "Ce que ça coûte pour démarrer", paragraphs: [
+        "Les principaux frais sont : l'abonnement de ta boutique (Shopify ou une autre plateforme), un nom de domaine si tu en veux un, l'échantillon de ton produit, et éventuellement de la publicité. Tu peux aussi commencer sans publicité, avec des vidéos sur TikTok ou Instagram, mais ça demande plus de temps.",
+        "Prévois aussi une petite réserve pour les remboursements et les colis perdus : ça arrive à tous les vendeurs.",
+      ] },
+      { heading: "Est-ce légal en France ?", paragraphs: [
+        "Oui, le dropshipping est légal. Mais tu es un vendeur comme un autre : tu dois respecter les règles de la vente en ligne. En pratique, il faut un statut pour vendre régulièrement (souvent la micro-entreprise), des mentions légales et des conditions de vente sur ta boutique, et respecter le droit de rétractation de tes clients.",
+        "Tu es aussi responsable de ce que tu vends : pas de contrefaçon, des produits conformes aux normes européennes, et des délais de livraison annoncés honnêtement. Si tu as un doute sur ta situation, renseigne-toi auprès d'un organisme officiel ou d'un comptable.",
+      ] },
+      { heading: "Par où commencer ?", paragraphs: ["Si tu veux te lancer, voici un ordre simple :"], list: [
+        "Choisis un produit qui règle un problème et qui se montre bien en vidéo",
+        "Trouve un fournisseur sérieux et commande un échantillon",
+        "Calcule ta marge en comptant tous les frais",
+        "Crée une boutique claire, qui inspire confiance",
+        "Publie des vidéos de ton produit et regarde ce qui marche",
+      ] },
+      { heading: "Comment Vigenia peut t'aider", paragraphs: [
+        "La création de la boutique est l'étape qui prend souvent le plus de temps aux débutants. Avec Vigenia, tu réponds à quelques questions (ou tu colles le lien de ton produit) et l'IA crée l'aperçu de ta boutique Shopify : nom, design, textes et photos. L'aperçu est gratuit, sur vigenia.com.",
+        "Tu restes le vendeur : c'est toi qui choisis ton produit, ton fournisseur et tes prix. Vigenia te fait gagner du temps sur la boutique pour que tu puisses te concentrer sur tes clients.",
+      ] },
+    ],
+  },
+  {
     slug: "preparer-boutique-en-ligne-noel",
     title: "Préparer sa boutique en ligne pour Noël : la checklist complète",
     excerpt: "Livraison, offres, page produit, service client : tout ce qu'il faut vérifier sur ta boutique en ligne avant les fêtes pour ne rater aucune commande.",
