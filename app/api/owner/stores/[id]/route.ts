@@ -9,7 +9,7 @@ export const GET = route<{ params: Promise<{ id: string }> }>(async (_req, { par
   await requireOwner();
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) throw notFound();
-  const row = must(await db().from("stores").select("*, users(email)").eq("id", id).maybeSingle()) as Record<string, any> | null;
+  const row = must(await db().from("stores").select("*, users!stores_user_id_fkey(email)").eq("id", id).maybeSingle()) as Record<string, any> | null;
   if (!row) throw notFound();
   const [assets, jobs] = await Promise.all([
     db().from("assets").select("*").eq("store_id", id).order("created_at"),
