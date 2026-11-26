@@ -10,6 +10,157 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "shopify-c-est-quoi",
+    title: "Shopify, c'est quoi ? Comment ça marche et est-ce fait pour toi",
+    excerpt: "Shopify est la plateforme la plus utilisée pour créer une boutique en ligne sans coder. Ce qu'elle fait, comment elle marche, ce qu'il faut prévoir et pour qui elle est faite.",
+    category: "Shopify",
+    date: "2026-11-26",
+    readingMinutes: 6,
+    sections: [
+      { paragraphs: [
+        "Si tu t'intéresses au e-commerce, tu as forcément entendu parler de Shopify. Mais concrètement, c'est quoi ? Un site ? Une appli ? Un hébergeur ? Voici une explication simple, sans jargon.",
+      ] },
+      { heading: "Shopify en une phrase", paragraphs: [
+        "Shopify est une plateforme en ligne qui te permet de créer ta propre boutique sur internet, de vendre des produits et d'encaisser les paiements, sans savoir coder. C'est une entreprise canadienne, utilisée par des vendeurs du monde entier, des débutants aux grandes marques.",
+      ] },
+      { heading: "Ce que Shopify fait pour toi", paragraphs: ["En t'inscrivant, tu obtiens tout ce qu'il faut pour vendre :"], list: [
+        "Ta boutique en ligne, avec une adresse web, hébergée et sécurisée",
+        "Des thèmes (modèles de design) que tu personnalises",
+        "Un système de paiement pour encaisser par carte",
+        "La gestion des commandes, des clients et des stocks",
+        "Des applications pour ajouter des fonctions (avis, e-mails, dropshipping…)",
+        "Une appli mobile pour suivre tes ventes depuis ton téléphone",
+      ] },
+      { heading: "Comment ça marche, concrètement", paragraphs: ["Le parcours classique :"], list: [
+        "Tu crées un compte sur Shopify et tu choisis un nom de boutique",
+        "Tu choisis un thème et tu le personnalises (couleurs, logo, textes)",
+        "Tu ajoutes tes produits : photos, description, prix",
+        "Tu crées les pages importantes : contact, livraison, conditions de vente, mentions légales",
+        "Tu configures les paiements et la livraison",
+        "Tu publies ta boutique et tu commences à la faire connaître",
+      ] },
+      { heading: "Ce qu'il faut prévoir", paragraphs: [
+        "Shopify fonctionne avec un abonnement mensuel, auquel s'ajoutent des frais sur chaque paiement et, parfois, le prix de certaines applications ou d'un thème premium. Les tarifs changent régulièrement : vérifie toujours les prix à jour directement sur le site de Shopify avant de te lancer.",
+        "Le temps est aussi un coût : créer une boutique propre (design, textes, photos, pages) peut prendre plusieurs jours quand on débute.",
+      ] },
+      { heading: "Les avantages", paragraphs: ["Pourquoi tant de vendeurs choisissent Shopify :"], list: [
+        "Pas besoin de coder ni de gérer un serveur",
+        "Le paiement et la sécurité sont gérés pour toi",
+        "Beaucoup de thèmes et d'applications",
+        "Une boutique qui fonctionne bien sur téléphone",
+        "Beaucoup de tutoriels et d'aide disponibles",
+      ] },
+      { heading: "Les limites", paragraphs: ["Shopify n'est pas parfait :"], list: [
+        "Un abonnement à payer chaque mois, même quand tu ne vends pas encore",
+        "Les applications payantes peuvent vite s'additionner",
+        "Une boutique « par défaut » ressemble à beaucoup d'autres : il faut la personnaliser pour inspirer confiance",
+      ] },
+      { heading: "Shopify, c'est fait pour toi si…", paragraphs: [
+        "Tu veux vendre des produits physiques (en stock ou en dropshipping) et tu veux une boutique sérieuse, que tu contrôles, sans dépendre d'une plateforme comme Vinted ou Etsy. Si tu veux juste vendre quelques objets d'occasion, une plateforme de vente entre particuliers sera plus simple.",
+      ] },
+      { heading: "Créer ta boutique Shopify plus vite avec Vigenia", paragraphs: [
+        "L'étape la plus longue, c'est souvent de transformer une boutique vide en boutique qui donne envie d'acheter. Vigenia crée ta boutique Shopify avec l'IA : nom, design, textes, photos et fiche produit, à partir de ton idée ou du lien de ton produit. L'aperçu est gratuit sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
+    slug: "idee-business-en-ligne",
+    title: "Idée de business en ligne : 8 idées réalistes pour débuter (et comment choisir)",
+    excerpt: "Tu veux lancer un business en ligne mais tu ne sais pas lequel ? 8 idées réalistes quand on débute, ce qu'elles demandent vraiment, et une méthode simple pour choisir la tienne.",
+    category: "Guide",
+    date: "2026-11-26",
+    readingMinutes: 7,
+    sections: [
+      { paragraphs: [
+        "Sur internet, on voit passer des centaines d'« idées de business » qui promettent de l'argent facile. La vérité : aucun business n'est facile, et aucun n'est garanti. Mais certains sont beaucoup plus accessibles que d'autres quand on débute avec peu d'argent.",
+        "Voici 8 idées réalistes, avec ce qu'elles demandent vraiment.",
+      ] },
+      { heading: "1. Une boutique en ligne avec un produit", paragraphs: [
+        "Tu choisis un produit qui règle un problème, tu crées ta boutique et tu le fais connaître avec des vidéos. Ça demande de trouver un bon produit, un fournisseur fiable et de la régularité sur les réseaux.",
+      ] },
+      { heading: "2. Le dropshipping", paragraphs: [
+        "Une variante de la boutique en ligne, sans stock : ton fournisseur envoie les colis à tes clients. Peu d'argent au départ, mais des marges souvent plus faibles et des délais à bien gérer.",
+      ] },
+      { heading: "3. Vendre tes créations", paragraphs: [
+        "Bijoux, bougies, illustrations, vêtements customisés : si tu fabriques quelque chose, tu peux le vendre en ligne. Ton histoire et ton savoir-faire deviennent ton meilleur argument.",
+      ] },
+      { heading: "4. L'impression à la demande", paragraphs: [
+        "Tu crées des designs et un imprimeur fabrique t-shirts, mugs ou affiches à chaque commande. Idéal si tu as une communauté ou un univers original. Attention aux droits : jamais de logos ou de personnages qui ne t'appartiennent pas.",
+      ] },
+      { heading: "5. Les produits numériques", paragraphs: [
+        "Guides, modèles, fichiers à imprimer : tu crées une fois, tu vends sans livraison. Il faut une vraie compétence à partager.",
+      ] },
+      { heading: "6. Le revendeur de seconde main", paragraphs: [
+        "Acheter des objets d'occasion (vêtements, jeux, électronique) et les revendre plus cher après les avoir nettoyés et bien photographiés. Ça demande du temps et de l'œil, et il faut se renseigner sur les règles quand l'activité devient régulière.",
+      ] },
+      { heading: "7. Les services en ligne", paragraphs: [
+        "Montage vidéo, design, gestion de réseaux sociaux, rédaction : si tu sais faire quelque chose, d'autres sont prêts à payer pour gagner du temps. Pas de stock, mais tu échanges ton temps contre de l'argent.",
+      ] },
+      { heading: "8. Créer du contenu", paragraphs: [
+        "Vidéos, blog, newsletter sur un sujet qui te passionne. C'est souvent long avant de gagner quoi que ce soit, mais l'audience que tu construis peut ensuite servir à vendre tes propres produits.",
+      ] },
+      { heading: "Comment choisir la tienne", paragraphs: ["Pose-toi ces 4 questions :"], list: [
+        "Combien d'argent puis-je mettre au départ sans me mettre en difficulté ?",
+        "Combien de temps par semaine puis-je vraiment y consacrer ?",
+        "Qu'est-ce que je sais déjà faire, ou qu'est-ce qui m'intéresse vraiment ?",
+        "Est-ce que je suis prêt à me montrer (vidéos, réseaux) pour faire connaître mon business ?",
+      ] },
+      { heading: "Avant de te lancer", paragraphs: [
+        "Quel que soit ton choix, renseigne-toi sur le statut à prendre pour vendre régulièrement (souvent la micro-entreprise en France) et sur les règles de ton activité. Si tu es mineur, parles-en avec tes parents : certaines démarches demandent leur accord.",
+      ] },
+      { heading: "Si tu choisis la boutique en ligne", paragraphs: [
+        "Pour les idées 1 à 4, Vigenia peut te faire gagner beaucoup de temps : le quiz te propose des produits si tu n'as pas encore d'idée, puis l'IA crée l'aperçu de ta boutique Shopify gratuitement. Tu trouveras aussi 72 idées de produits sur vigenia.com/idees-produits.",
+      ] },
+    ],
+  },
+  {
+    slug: "boutique-en-ligne-rentable",
+    title: "Une boutique en ligne, c'est rentable ? La réponse honnête (avec le calcul)",
+    excerpt: "Est-ce qu'une boutique en ligne peut être rentable quand on débute ? Ce qui fait gagner ou perdre de l'argent, le calcul simple à faire avant de se lancer, et les erreurs qui coûtent cher.",
+    category: "Guide",
+    date: "2026-11-26",
+    readingMinutes: 6,
+    sections: [
+      { paragraphs: [
+        "« Est-ce que c'est rentable ? » C'est la bonne question à se poser avant de lancer une boutique en ligne. La réponse honnête : ça peut l'être, mais ce n'est jamais automatique. Beaucoup de boutiques ne gagnent rien, souvent pour les mêmes raisons. Voici comment savoir si la tienne a une chance.",
+      ] },
+      { heading: "Chiffre d'affaires n'est pas bénéfice", paragraphs: [
+        "C'est l'erreur la plus courante. Si tu vends un produit 30 €, tu ne gagnes pas 30 €. Il faut retirer le prix d'achat du produit, la livraison, les frais de paiement, les abonnements (boutique, applications), la publicité, et une réserve pour les retours et les colis perdus. Ce qui reste, c'est ton bénéfice.",
+      ] },
+      { heading: "Le calcul à faire avant de te lancer", paragraphs: ["Pour un produit, fais ce calcul simple :"], list: [
+        "Prix de vente",
+        "moins le prix d'achat du produit",
+        "moins la livraison",
+        "moins les frais de paiement",
+        "moins le coût moyen pour obtenir une vente (publicité ou temps passé)",
+        "= ta marge par vente",
+      ] },
+      { heading: "Puis le calcul du mois", paragraphs: [
+        "Prends ta marge par vente, multiplie-la par le nombre de ventes que tu penses faire dans le mois, puis retire tes frais fixes (abonnements, applications). Si le résultat est négatif avec des hypothèses raisonnables, change quelque chose avant de te lancer : le produit, le prix ou ta façon de trouver des clients.",
+      ] },
+      { heading: "Ce qui rend une boutique rentable", paragraphs: ["Les boutiques qui gagnent de l'argent ont souvent ces points en commun :"], list: [
+        "Un produit avec une vraie marge, pas un produit vendu à peine plus cher qu'à l'achat",
+        "Une boutique qui inspire confiance, ce qui fait acheter plus de visiteurs",
+        "Des clients trouvés sans trop dépenser : vidéos, contenu, bouche-à-oreille",
+        "Des offres qui augmentent le panier moyen, comme les lots de 2 ou 3",
+        "Des clients satisfaits qui reviennent et recommandent",
+      ] },
+      { heading: "Les erreurs qui font perdre de l'argent", paragraphs: ["À éviter absolument :"], list: [
+        "Lancer de la publicité payante avant d'avoir vérifié que la boutique convertit",
+        "Vendre trop bas pour « être le moins cher »",
+        "Oublier les frais cachés dans le calcul",
+        "Promettre des délais de livraison qu'on ne peut pas tenir",
+        "Abandonner après une semaine sans avoir testé plusieurs vidéos ou angles",
+      ] },
+      { heading: "Combien de temps avant d'être rentable ?", paragraphs: [
+        "Personne ne peut te donner un délai sérieux : ça dépend du produit, du temps que tu y consacres et de ta façon de trouver des clients. Méfie-toi de ceux qui promettent des résultats rapides. Fixe-toi plutôt un budget et une durée de test, et décide ensuite selon les chiffres réels.",
+      ] },
+      { heading: "Réduire le coût de départ avec Vigenia", paragraphs: [
+        "Moins tu dépenses pour créer ta boutique, plus vite tu peux devenir rentable. Vigenia crée ta boutique Shopify avec l'IA au lieu de payer une agence ou un freelance, et tu peux voir l'aperçu gratuitement sur vigenia.com avant de décider.",
+      ] },
+    ],
+  },
+  {
     slug: "vendre-en-ligne-sans-stock",
     title: "Vendre en ligne sans stock : les 4 façons de faire quand on débute",
     excerpt: "Dropshipping, impression à la demande, produits numériques, précommande : comment vendre en ligne sans acheter de stock, avec les avantages et les limites de chaque méthode.",
