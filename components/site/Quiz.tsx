@@ -123,7 +123,7 @@ const STATE_KEY = "vg-quiz-state3";
 // `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
 // `demo` : version courte pour les vidéos (quelques questions, rien n'est gardé ni compté dans les stats).
 export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (brief: string, draft?: QuizDraft) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean }; demo?: boolean }) {
-  const [history, setHistory] = useState<Step[]>([demo ? "goal" : "income"]);
+  const [history, setHistory] = useState<Step[]>(["income"]);
   const step = history[history.length - 1];
   const [level, setLevel] = useState<string | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
