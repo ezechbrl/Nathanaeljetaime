@@ -300,7 +300,13 @@ export async function runTeaser(job: Record<string, any>, store: StoreRow) {
   const step = tracker(job.id, steps, TEASER_WEIGHTS);
   try {
     await step("strategy", 3000);
-    const out = await buildTeaser({ mode: store.mode, sourceUrl: store.source_url, brief: store.brief, language: store.language, screenshots: (job.input as { screenshots?: string[] } | null)?.screenshots }, (k, est) => step(k, est));
+    const input = { mode: store.mode, sourceUrl: store.source_url, brief: store.brief, language: store.language, screenshots: (job.input as { screenshots?: string[] } | null)?.screenshots };
+    // Réponse de l'IA coupée (JSON illisible) : arrive rarement, un 2ᵉ essai suffit presque toujours.
+    const out = await buildTeaser(input, (k, est) => step(k, est)).catch((e) => {
+      if (!/structured output|JSON/i.test(String((e as Error)?.message))) throw e;
+      console.warn("Aperçu : réponse de l'IA illisible, 2e essai", (e as Error).message);
+      return buildTeaser(input, (k, est) => step(k, est));
+    });
     await db().from("stores").update({ ...out, status: "locked", updated_at: new Date().toISOString() }).eq("id", store.id);
     await finish(job.id, steps, undefined, step);
   } catch (e) {
