@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  ChevronsUpDown, CreditCard, Gift, HelpCircle, Home, Image as ImageIcon, LayoutGrid, LogOut,
+  ChevronsUpDown, CreditCard, Gift, HelpCircle, Home, Image as ImageIcon, LayoutGrid, Lightbulb, LogOut,
   Menu, MessageSquare, Plus, Settings, Sparkles, Store as StoreIcon, TrendingUp, Video, Wand2, X,
 } from "lucide-react";
 import Link from "next/link";
@@ -81,6 +81,7 @@ function SidebarBody() {
       <div className="hidden px-1.5 pb-4 pt-1 lg:block"><Logo href="/app" /></div>
       <NavLink href="/app" icon={Home} exact tint="green">Accueil</NavLink>
       <NavLink href="/app/boutiques" icon={StoreIcon} exact>Mes boutiques</NavLink>
+      <NavLink href="/app/idees" icon={Lightbulb} tint="amber">Idées de produits</NavLink>
       {user.isOwner && <NavLink href="/ventes" icon={TrendingUp} tint="amber">Mes ventes</NavLink>}
       {user.isOwner && <NavLink href="/app/demo" icon={Video} tint="amber">Démo vidéo</NavLink>}
 
