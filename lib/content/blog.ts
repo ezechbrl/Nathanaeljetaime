@@ -10,6 +10,125 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "obtenir-avis-clients-boutique-en-ligne",
+    title: "Obtenir des avis clients sur sa boutique en ligne (sans tricher)",
+    excerpt: "Les avis rassurent les visiteurs, mais une boutique qui démarre n'en a pas. Comment obtenir tes premiers vrais avis, les afficher, répondre aux avis négatifs, et ce qui est interdit.",
+    category: "Conversion",
+    date: "2026-11-27",
+    readingMinutes: 6,
+    sections: [
+      { paragraphs: [
+        "Avant d'acheter sur une boutique qu'il ne connaît pas, un visiteur cherche presque toujours ce qu'en pensent les autres. Les avis rassurent. Le problème : quand tu démarres, tu n'en as aucun. Voici comment obtenir tes premiers avis, honnêtement.",
+      ] },
+      { heading: "Ce qui est interdit", paragraphs: [
+        "Commençons par l'essentiel : inventer des avis, en acheter, ou les écrire toi-même est une pratique commerciale trompeuse, interdite en France et dans l'Union européenne. Supprimer uniquement les avis négatifs pour ne garder que les bons pose aussi problème. Et si un client a reçu une réduction ou un cadeau en échange de son avis, il faut l'indiquer.",
+        "Au-delà de la loi, les faux avis se repèrent facilement et détruisent la confiance. Mieux vaut trois vrais avis que trente faux.",
+      ] },
+      { heading: "Demander au bon moment", paragraphs: [
+        "Le meilleur moment pour demander un avis, c'est quelques jours après la réception du produit, quand le client a eu le temps de l'utiliser. Un e-mail court et personnel marche mieux qu'un long formulaire : « Ton colis est bien arrivé ? Tu as 30 secondes pour me dire ce que tu en penses ? »",
+      ] },
+      { heading: "Rendre l'avis facile à laisser", paragraphs: [], list: [
+        "Un lien direct vers le formulaire, sans connexion compliquée",
+        "Une ou deux questions simples, plus une note",
+        "La possibilité d'ajouter une photo du produit",
+        "Un rappel unique si le client n'a pas répondu, pas plus",
+      ] },
+      { heading: "Tes tout premiers avis", paragraphs: [
+        "Quand personne n'a encore commandé, tu peux envoyer le produit à quelques personnes (proches, petits créateurs de ton univers) en leur demandant un avis honnête. Dans ce cas, indique clairement que le produit a été offert. Les avis de tes proches doivent rester sincères : un avis trop parfait sonne faux.",
+      ] },
+      { heading: "Répondre aux avis négatifs", paragraphs: [
+        "Un avis négatif n'est pas une catastrophe : la façon dont tu y réponds compte beaucoup. Réponds poliment, sans te justifier pendant des lignes, propose une solution concrète, et règle le problème en privé si besoin. Un visiteur qui voit un vendeur réactif et honnête est souvent rassuré.",
+      ] },
+      { heading: "Où afficher tes avis", paragraphs: [], list: [
+        "Sur la fiche produit, près du bouton d'achat",
+        "Avec les photos envoyées par les clients, plus parlantes qu'un texte",
+        "Sur la page d'accueil, une sélection représentative (pas seulement les meilleurs)",
+      ] },
+      { heading: "Avec Vigenia", paragraphs: [
+        "Vigenia ne crée jamais de faux avis. Ta boutique est prête à accueillir les vrais avis de tes clients, et l'IA t'indique quoi collecter pour prouver ce que tu avances. Aperçu gratuit de ta boutique sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
+    slug: "photos-produit-telephone-boutique",
+    title: "Faire de belles photos produit avec son téléphone pour sa boutique en ligne",
+    excerpt: "Pas besoin d'un appareil photo pro : avec ton téléphone, de la lumière naturelle et quelques astuces, tu peux faire des photos produit qui donnent envie d'acheter.",
+    category: "Conversion",
+    date: "2026-11-27",
+    readingMinutes: 6,
+    sections: [
+      { paragraphs: [
+        "En ligne, le client ne peut pas toucher ton produit : les photos font tout le travail. Bonne nouvelle, les téléphones récents suffisent largement pour faire de belles photos produit, à condition de soigner quelques détails.",
+      ] },
+      { heading: "La lumière avant tout", paragraphs: [
+        "La lumière naturelle est ta meilleure alliée. Place-toi près d'une fenêtre, en journée, sans soleil direct sur le produit (il crée des ombres dures). Éteins les lampes de la pièce pour éviter les couleurs bizarres. Une feuille blanche placée de l'autre côté du produit renvoie la lumière et adoucit les ombres.",
+      ] },
+      { heading: "Un fond simple", paragraphs: [
+        "Pour les photos principales, un fond uni et clair met le produit en valeur : une grande feuille blanche ou crème, posée en courbe contre un mur pour éviter la ligne du coin. Pour les photos d'ambiance, montre le produit dans son vrai environnement (une cuisine, une chambre, un bureau).",
+      ] },
+      { heading: "Les réglages du téléphone", paragraphs: [], list: [
+        "Nettoie l'objectif (souvent oublié, et ça change tout)",
+        "N'utilise pas le flash",
+        "Évite le zoom numérique : rapproche-toi plutôt",
+        "Touche l'écran sur le produit pour faire la mise au point, puis baisse un peu la luminosité si c'est trop clair",
+        "Tiens le téléphone bien droit, ou pose-le sur une pile de livres",
+      ] },
+      { heading: "Les photos à faire pour chaque produit", paragraphs: [], list: [
+        "Le produit seul, de face, sur fond clair",
+        "Plusieurs angles (côté, dos, dessus)",
+        "Un gros plan sur un détail (matière, finition)",
+        "Le produit en utilisation, dans la main ou dans son décor",
+        "Une photo qui montre la taille réelle (à côté d'un objet connu)",
+      ] },
+      { heading: "Les retouches", paragraphs: [
+        "Une retouche légère suffit : recadrer, redresser, éclaircir un peu. Ne change jamais la couleur ou l'aspect du produit : le client doit recevoir exactement ce qu'il a vu, sinon c'est des retours assurés.",
+      ] },
+      { heading: "En dropshipping", paragraphs: [
+        "Les photos du fournisseur sont souvent les mêmes que chez tous les autres vendeurs. Commande un échantillon et fais tes propres photos : c'est un vrai moyen de te démarquer, et tu vérifies la qualité au passage.",
+      ] },
+      { heading: "Avec Vigenia", paragraphs: [
+        "Vigenia crée des photos de ton produit pour ta boutique, à partir de tes photos ou de celles du lien fournisseur, avec des fonds naturels et des mises en scène. Tu peux les mélanger avec tes propres photos. Aperçu gratuit sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
+    slug: "creer-logo-boutique-en-ligne",
+    title: "Créer un logo pour sa boutique en ligne gratuitement : la méthode simple",
+    excerpt: "Pas besoin d'un graphiste pour démarrer : comment créer un logo simple et propre pour ta boutique en ligne, les règles à suivre, les outils gratuits et les erreurs à éviter.",
+    category: "Marque",
+    date: "2026-11-27",
+    readingMinutes: 5,
+    sections: [
+      { paragraphs: [
+        "Quand on lance sa boutique, on pense souvent qu'il faut un logo parfait. En réalité, pour démarrer, un logo simple, lisible et cohérent avec ta boutique suffit largement. Tu pourras toujours le faire évoluer quand tu vendras.",
+      ] },
+      { heading: "Ce qui fait un bon logo de boutique", paragraphs: [], list: [
+        "Lisible en petit (sur un téléphone, dans l'onglet du navigateur)",
+        "Simple : une police, une ou deux couleurs",
+        "Cohérent avec ton produit et ta cible",
+        "Utilisable sur fond clair et sur fond foncé",
+      ] },
+      { heading: "Commencer par un logo texte", paragraphs: [
+        "Beaucoup de marques connues utilisent simplement leur nom dans une belle police. C'est la solution la plus sûre pour débuter : choisis une police qui correspond à ton univers (arrondie et douce pour le bébé, fine et élégante pour les bijoux, épaisse pour le sport), écris ton nom, et c'est tout.",
+      ] },
+      { heading: "Choisir tes couleurs", paragraphs: [
+        "Choisis une couleur principale et une couleur secondaire, et garde-les partout : logo, boutique, réseaux sociaux. Évite d'en mettre trop : deux couleurs bien choisies font plus professionnel que cinq.",
+      ] },
+      { heading: "Les outils gratuits", paragraphs: [
+        "Des outils de design en ligne comme Canva proposent une version gratuite avec des polices et des modèles. Vérifie toujours les conditions d'utilisation des éléments que tu utilises : certains modèles ou icônes ne peuvent pas être déposés comme marque.",
+      ] },
+      { heading: "Les erreurs à éviter", paragraphs: [], list: [
+        "Copier ou s'inspirer de trop près du logo d'une marque connue",
+        "Utiliser une image trouvée sur internet sans en avoir les droits",
+        "Un logo trop détaillé, illisible en petit",
+        "Changer de logo tous les mois : la cohérence aide à être reconnu",
+      ] },
+      { heading: "Avec Vigenia", paragraphs: [
+        "Quand Vigenia crée ta boutique, l'IA propose un nom de marque, des couleurs et une typographie cohérents avec ton produit. C'est une bonne base pour ton logo texte. Aperçu gratuit sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
     slug: "delais-livraison-dropshipping",
     title: "Délais de livraison en dropshipping : comment les annoncer et rassurer tes clients",
     excerpt: "En dropshipping, les délais de livraison font peur aux clients et causent beaucoup de remboursements. Comment les connaître vraiment, les annoncer honnêtement et rassurer avant et après l'achat.",
