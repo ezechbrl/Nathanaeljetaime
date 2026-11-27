@@ -122,7 +122,9 @@ const STATE_KEY = "vg-quiz-state3";
 
 // `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
 // `demo` : version courte pour les vidéos (quelques questions, rien n'est gardé ni compté dans les stats).
-export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (brief: string, draft?: QuizDraft) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean }; demo?: boolean }) {
+// `demoProducts` : dans la démo, les produits proposés sont ceux de tes vraies boutiques (`onDemoPick` dit lequel est choisi).
+export type DemoProduct = { id: string; name: string; hint: string; photo?: string };
+export function Quiz({ onFinish, skipHref, preset, demo = false, demoProducts, onDemoPick }: { onFinish: (brief: string, draft?: QuizDraft) => Promise<void>; skipHref?: string; preset?: { text: string; isLink: boolean }; demo?: boolean; demoProducts?: DemoProduct[]; onDemoPick?: (id: string) => void }) {
   const [history, setHistory] = useState<Step[]>(["income"]);
   const step = history[history.length - 1];
   const [level, setLevel] = useState<string | null>(null);
@@ -160,7 +162,7 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   // Démo vidéo : revenu visé, objectif, choix du produit en photos, puis à qui et à quel prix.
   const head: Step[] = demo ? ["income", "goal"] : ["income"];
   const ideaStep: Step[] = preset || demo ? [] : ["idea"];
-  const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
+  const productSteps: Step[] = demoProducts?.length ? ["product"] : preset || hasIdea ? [] : ["big", "sub", "product"];
   const profile: Step[] = demo ? [] : ["level", "budget", "shopify"];
   // Démo : seulement les 2 questions qui parlent le plus à l'écran (à qui vendre, à quel prix).
   const tail: Step[] = demo ? ["audience", "price"] : ["audience", "market", "supply", "channel", "price"];
@@ -349,7 +351,12 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
             {b.subs.map((id, i) => { const x = NICHES.find((y) => y.id === id)!; return <BigCard key={id} tint={i + 2} icon={x.icon} emoji={EMOJI[id]} photo={photos[id]} label={x.label} hint={x.products.slice(0, 2).map((p) => p[0]).join(", ") + "…"} on={niche === id} onClick={() => { if (id !== niche) setProduct(null); setNiche(id); }} />; })}
           </div>
         )}
-        {step === "product" && n && (
+        {step === "product" && demoProducts?.length && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {demoProducts.map((d, i) => <Card key={d.id} tint={i} row icon={Package} emoji="🛍️" photo={d.photo} label={d.name} hint={d.hint} on={product === d.id} onClick={() => { setProduct(d.id); onDemoPick?.(d.id); }} />)}
+          </div>
+        )}
+        {step === "product" && !demoProducts?.length && n && (
           <div className="grid gap-3 sm:grid-cols-2">
             {n.products.map(([name, brief], i) => <Card key={name} tint={i} row icon={n.icon} emoji={EMOJI[n.id]} photo={photos[`p:${productSlug(name)}`]} label={name} hint={brief} on={product === brief} onClick={() => setProduct(brief)} />)}
           </div>

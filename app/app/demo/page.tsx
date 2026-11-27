@@ -5,7 +5,7 @@ import { Check, RotateCcw, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useApp } from "@/components/app/AppContext";
 import { StorePreview } from "@/components/app/StorePreview";
-import { Quiz } from "@/components/site/Quiz";
+import { Quiz, type DemoProduct } from "@/components/site/Quiz";
 import * as api from "@/lib/api/client";
 import { useApi } from "@/lib/api/hooks";
 import type { Store } from "@/lib/api/types";
@@ -23,6 +23,16 @@ export default function DemoPage() {
   const [run, setRun] = useState(0);
   useEffect(() => { if (!pick && ready.length) setPick(ready[Math.floor(Math.random() * ready.length)].id); }, [ready, pick]);
   const store = ready.find((s) => s.id === pick) ?? null;
+  // Produits proposés dans le quiz de la démo : ceux de tes vraies boutiques, avec leur photo produit.
+  const [products, setProducts] = useState<DemoProduct[]>([]);
+  useEffect(() => {
+    let alive = true;
+    Promise.all(ready.map(async (s) => {
+      const photo = await api.listAssets(s.id).then((r) => r.assets.find((a) => a.kind === "product")?.url ?? r.assets[0]?.url, () => undefined);
+      return { id: s.id, name: s.plan?.product?.title || s.name, hint: `Boutique ${s.name}`, photo: photo ?? s.teaser?.image ?? undefined };
+    })).then((list) => { if (alive) setProducts(list); });
+    return () => { alive = false; };
+  }, [ready]);
 
   if (!user.isOwner) return <p className="p-8 text-fg-muted">Page réservée.</p>;
   return (
@@ -37,9 +47,8 @@ export default function DemoPage() {
             <select id="demo-store" value={pick} onChange={(e) => setPick(e.target.value)} className="rounded-ctl border border-white/10 bg-black/30 px-2 py-1 text-fg-muted">
               {ready.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
-            <PhotosButton />
           </div>
-          <Quiz key={run} demo onFinish={async () => { setPhase("build"); }} />
+          <Quiz key={`${run}-${products.length}`} demo demoProducts={products} onDemoPick={setPick} onFinish={async () => { setPhase("build"); }} />
         </>
       )}
       {phase === "build" && <Build onDone={() => setPhase("done")} />}
@@ -95,19 +104,4 @@ function Reveal({ store, onAgain }: { store: Store; onAgain: () => void }) {
       </div>
     </div>
   );
-}
-
-// Réglage discret : crée les photos des univers et produits du quiz qui manquent encore (12 à la fois).
-function PhotosButton() {
-  const [state, setState] = useState<string>("");
-  const run = async () => {
-    setState("Création des photos… (1 à 2 min)");
-    try {
-      const r = await api.fillQuizPhotos();
-      setState(`Photos : ${r.have}/${r.total}${r.have < r.total ? " · reclique pour la suite" : " ✓"}`);
-    } catch (e) {
-      setState((e as Error).message);
-    }
-  };
-  return <button type="button" onClick={run} className="rounded-ctl border border-white/10 bg-black/30 px-2 py-1 text-fg-muted hover:text-white">{state || "Photos des produits"}</button>;
 }
