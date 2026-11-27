@@ -10,6 +10,128 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "trouver-premiers-clients-boutique-en-ligne",
+    title: "Trouver ses premiers clients quand on lance sa boutique en ligne (sans gros budget)",
+    excerpt: "Ta boutique est en ligne mais personne n'achète ? 7 façons concrètes de trouver tes premiers clients sans gros budget publicitaire, et les erreurs qui font fuir les visiteurs.",
+    category: "Conversion",
+    date: "2026-11-27",
+    readingMinutes: 7,
+    sections: [
+      { paragraphs: [
+        "Une boutique en ligne sans visiteurs, c'est comme un magasin dans une rue où personne ne passe. Le plus dur au début, ce n'est pas de créer la boutique : c'est de faire venir les premières personnes, puis de les convaincre d'acheter.",
+        "Bonne nouvelle : pour les premières ventes, tu n'as pas forcément besoin d'un gros budget publicitaire. Voici 7 pistes concrètes.",
+      ] },
+      { heading: "1. Les vidéos courtes (TikTok, Reels, Shorts)", paragraphs: [
+        "C'est la piste la plus accessible quand on débute. Montre ton produit en action dans les premières secondes : le problème, puis la solution. Publie souvent, teste plusieurs accroches, et regarde lesquelles retiennent les gens. Une seule vidéo ne suffit presque jamais : c'est la régularité qui compte.",
+      ] },
+      { heading: "2. Ton entourage, mais intelligemment", paragraphs: [
+        "Tes proches peuvent être tes premiers clients ou tes premiers ambassadeurs. Ne leur demande pas juste d'acheter : demande-leur un avis honnête sur ta boutique, et s'ils connaissent quelqu'un que ton produit pourrait intéresser.",
+      ] },
+      { heading: "3. Les groupes et communautés de ton univers", paragraphs: [
+        "Groupes Facebook, forums, serveurs Discord, communautés Reddit : il existe des groupes pour presque tous les sujets (animaux, sport, parents, déco…). Participe d'abord en aidant, sans spammer. Quand ton produit répond vraiment à une question, tu pourras en parler naturellement, en respectant les règles du groupe.",
+      ] },
+      { heading: "4. Les petits créateurs de contenu", paragraphs: [
+        "Plutôt qu'un influenceur connu et cher, contacte des créateurs avec une petite communauté engagée dans ton univers. Propose-leur ton produit en échange d'une vidéo honnête. Si c'est une collaboration, elle doit être clairement indiquée comme telle.",
+      ] },
+      { heading: "5. Être trouvé sur Google", paragraphs: [
+        "Des articles utiles sur ton sujet (conseils, guides, comparatifs) peuvent t'amener des visiteurs gratuitement pendant des mois. C'est plus lent que les réseaux sociaux, mais ça travaille pour toi même quand tu ne publies pas.",
+      ] },
+      { heading: "6. Une offre de lancement honnête", paragraphs: [
+        "Une petite réduction pour les premiers clients, ou un lot à prix doux, peut aider à démarrer. Elle doit être vraie : un faux compte à rebours ou un faux prix barré, c'est interdit et ça détruit la confiance.",
+      ] },
+      { heading: "7. La publicité payante, au bon moment", paragraphs: [
+        "La publicité (Meta, TikTok, Google) peut accélérer les choses, mais seulement quand ta boutique est prête : une fiche produit claire, des prix qui laissent une marge, et quelques vidéos qui ont déjà bien marché gratuitement. Sinon, tu paies pour envoyer des visiteurs vers une boutique qui ne convertit pas.",
+      ] },
+      { heading: "Pourquoi les visiteurs repartent sans acheter", paragraphs: ["Si tu as des visites mais pas de ventes, vérifie ces points :"], list: [
+        "La boutique n'inspire pas confiance : pas de page contact, design bâclé, fautes",
+        "On ne comprend pas tout de suite ce que fait le produit",
+        "Les délais et frais de livraison ne sont pas clairs, ou découverts trop tard",
+        "Les photos ne montrent pas bien le produit",
+        "Le prix paraît trop élevé par rapport à ce qui est montré",
+      ] },
+      { heading: "Une boutique qui donne envie d'acheter avec Vigenia", paragraphs: [
+        "Faire venir des visiteurs ne sert à rien si la boutique ne les convainc pas. Vigenia crée ta boutique Shopify avec l'IA : textes qui expliquent clairement le produit, photos, pages rassurantes et offres par lot. Tu peux voir l'aperçu gratuitement sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
+    slug: "nom-de-domaine-boutique-en-ligne",
+    title: "Nom de domaine pour sa boutique en ligne : comment le choisir (et l'erreur à éviter)",
+    excerpt: "Faut-il un nom de domaine pour sa boutique en ligne ? .com ou .fr ? Comment le choisir, le vérifier et le relier à Shopify, expliqué simplement pour débutant.",
+    category: "Marque",
+    date: "2026-11-27",
+    readingMinutes: 5,
+    sections: [
+      { paragraphs: [
+        "Le nom de domaine, c'est l'adresse de ta boutique sur internet, par exemple « maboutique.com ». Ça paraît être un détail, mais une bonne adresse inspire confiance et se retient plus facilement.",
+      ] },
+      { heading: "Est-ce vraiment nécessaire ?", paragraphs: [
+        "Quand tu crées une boutique sur Shopify, tu reçois une adresse gratuite qui se termine par « myshopify.com ». Elle fonctionne, mais elle fait moins professionnel. Pour une boutique sérieuse, un nom de domaine à toi vaut le petit coût annuel qu'il représente.",
+      ] },
+      { heading: ".com, .fr ou autre ?", paragraphs: ["Quelques repères simples :"], list: [
+        ".fr : rassurant pour une clientèle française",
+        ".com : le plus connu, idéal si tu vends dans plusieurs pays",
+        "Les extensions originales (.shop, .store…) : possibles, mais parfois moins faciles à retenir",
+        "Si tu peux, réserve le .fr et le .com pour éviter qu'un autre les prenne",
+      ] },
+      { heading: "Les règles d'un bon nom de domaine", paragraphs: [], list: [
+        "Le même nom que ta boutique, pour ne pas embrouiller tes clients",
+        "Court et facile à taper sur un téléphone",
+        "Sans tirets ni chiffres si possible",
+        "Facile à épeler après l'avoir entendu (pense aux vidéos)",
+        "Jamais le nom d'une marque connue : tu risques de devoir l'abandonner",
+      ] },
+      { heading: "L'erreur à éviter", paragraphs: [
+        "Acheter le nom de domaine avant d'avoir vérifié le reste. Avant de payer, vérifie que le nom est libre sur les réseaux sociaux que tu vas utiliser, qu'il n'appartient pas déjà à une marque déposée (tu peux faire une recherche sur la base de l'INPI), et qu'il ne ressemble pas trop à une boutique concurrente.",
+      ] },
+      { heading: "Le relier à ta boutique Shopify", paragraphs: [
+        "Tu peux acheter ton domaine directement dans Shopify (c'est le plus simple, la connexion se fait toute seule) ou chez un registrar externe puis le connecter en suivant le guide de Shopify. Dans les deux cas, garde bien l'accès au compte où il est enregistré : c'est un élément important de ta marque.",
+      ] },
+      { heading: "Trouver le nom avec Vigenia", paragraphs: [
+        "Pas encore de nom ? Vigenia propose un nom de marque pour ta boutique quand il crée ton aperçu gratuit, et le site propose aussi un générateur de nom de boutique gratuit dans ses outils. Pense ensuite à vérifier que le domaine est disponible.",
+      ] },
+    ],
+  },
+  {
+    slug: "page-a-propos-boutique-en-ligne",
+    title: "Page « À propos » d'une boutique en ligne : quoi écrire pour donner confiance",
+    excerpt: "La page « À propos » est l'une des plus visitées avant un premier achat. Quoi y écrire, la structure simple à suivre et un exemple pour donner confiance sans en faire trop.",
+    category: "Conversion",
+    date: "2026-11-27",
+    readingMinutes: 5,
+    sections: [
+      { paragraphs: [
+        "Avant d'acheter sur une boutique qu'il ne connaît pas, un client se pose une question simple : « Est-ce que je peux faire confiance à ce site ? ». La page « À propos » est souvent là où il va chercher la réponse.",
+      ] },
+      { heading: "À quoi sert la page « À propos »", paragraphs: [
+        "Elle montre qu'il y a une vraie personne ou une vraie équipe derrière la boutique, explique pourquoi elle existe, et rassure sur le sérieux. Pas besoin d'un roman : quelques paragraphes sincères suffisent.",
+      ] },
+      { heading: "La structure simple à suivre", paragraphs: [], list: [
+        "Qui tu es, en une ou deux phrases (tu n'es pas obligé de donner ton nom complet ni ton adresse)",
+        "Pourquoi tu as lancé cette boutique : le problème que tu as voulu régler",
+        "Ce que tu proposes et ce qui te distingue",
+        "Tes engagements concrets : délais annoncés honnêtement, service client qui répond, produits vérifiés",
+        "Comment te contacter",
+      ] },
+      { heading: "Un exemple", paragraphs: [
+        "« Lueur Douce est née d'un constat simple : trouver une veilleuse douce pour la chambre d'un enfant, sans lumière agressive, était plus compliqué qu'il n'y paraît. On a testé plusieurs modèles avant de choisir celui qu'on propose aujourd'hui. On répond à chaque message sous 24 h, et on t'indique toujours le délai de livraison réel avant ta commande. »",
+        "Cet exemple (inventé pour l'article) est court, concret, et ne promet rien d'impossible.",
+      ] },
+      { heading: "Ce qu'il ne faut pas faire", paragraphs: [], list: [
+        "Inventer une histoire, des années d'expérience ou une équipe qui n'existe pas",
+        "Mettre des chiffres ou des avis qu'on ne peut pas prouver",
+        "Copier la page d'une autre boutique",
+        "Écrire un texte générique qui pourrait être sur n'importe quel site",
+      ] },
+      { heading: "Où la mettre", paragraphs: [
+        "Ajoute un lien vers ta page « À propos » dans le menu ou le pied de page de ta boutique. Tu peux aussi reprendre une phrase de ton histoire sur la page d'accueil ou la fiche produit : c'est souvent ce qui fait la différence avec une boutique « sans visage ».",
+      ] },
+      { heading: "Avec Vigenia", paragraphs: [
+        "Quand Vigenia crée ta boutique Shopify, l'IA prépare les pages importantes et les textes rassurants à partir de ton produit et de ta cible. Tu les relis et tu ajoutes ta touche personnelle : c'est elle qui donne confiance. L'aperçu est gratuit sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
     slug: "shopify-c-est-quoi",
     title: "Shopify, c'est quoi ? Comment ça marche et est-ce fait pour toi",
     excerpt: "Shopify est la plateforme la plus utilisée pour créer une boutique en ligne sans coder. Ce qu'elle fait, comment elle marche, ce qu'il faut prévoir et pour qui elle est faite.",

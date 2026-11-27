@@ -13,6 +13,9 @@ Quand la liste est finie, elle choisit un nouveau sujet et l'ajoute ici.
 | jeu. 26 nov. (en plus) | Shopify, c'est quoi ? | shopify c'est quoi | shopify-c-est-quoi |
 | jeu. 26 nov. (en plus) | Idée de business en ligne | idée business en ligne | idee-business-en-ligne |
 | jeu. 26 nov. (en plus) | Une boutique en ligne, c'est rentable ? | boutique en ligne rentable | boutique-en-ligne-rentable |
+| ven. 27 nov. (en plus) | Trouver ses premiers clients | trouver clients boutique en ligne | trouver-premiers-clients-boutique-en-ligne |
+| ven. 27 nov. (en plus) | Nom de domaine pour sa boutique en ligne | nom de domaine boutique en ligne | nom-de-domaine-boutique-en-ligne |
+| ven. 27 nov. (en plus) | Page « À propos » d'une boutique en ligne | page à propos boutique en ligne | page-a-propos-boutique-en-ligne |
 | ven. 27 nov. | Délais de livraison en dropshipping : comment les annoncer et rassurer tes clients | délais livraison dropshipping | delais-livraison-dropshipping |
 | dim. 29 nov. | Obtenir des avis clients sur sa boutique en ligne (sans tricher) | avis clients boutique en ligne | obtenir-avis-clients-boutique-en-ligne |
 | lun. 30 nov. | Photos produit au téléphone : faire de belles photos pour sa boutique | photos produit boutique en ligne | photos-produit-telephone-boutique |
