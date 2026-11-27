@@ -10,6 +10,60 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "delais-livraison-dropshipping",
+    title: "Délais de livraison en dropshipping : comment les annoncer et rassurer tes clients",
+    excerpt: "En dropshipping, les délais de livraison font peur aux clients et causent beaucoup de remboursements. Comment les connaître vraiment, les annoncer honnêtement et rassurer avant et après l'achat.",
+    category: "Conversion",
+    date: "2026-11-27",
+    readingMinutes: 7,
+    sections: [
+      { paragraphs: [
+        "En dropshipping, ce n'est pas toi qui envoies les colis : c'est ton fournisseur. Et quand il est loin, la livraison peut prendre du temps. C'est l'une des premières causes de messages inquiets, de demandes de remboursement et de mauvais avis.",
+        "La bonne nouvelle : un délai un peu long n'est pas forcément un problème. Ce qui pose problème, c'est un délai mal annoncé. Voici comment connaître tes vrais délais, les afficher honnêtement et garder tes clients sereins.",
+      ] },
+      { heading: "Pourquoi les délais sont si importants", paragraphs: [
+        "Un client qui achète en ligne compare sans le savoir avec les grandes plateformes qui livrent très vite. S'il ne sait pas quand son colis arrivera, il s'inquiète. S'il découvre après coup que c'est plus long que prévu, il se sent trompé.",
+        "En plus, la loi demande d'informer clairement le client sur les délais de livraison avant qu'il commande. Être transparent n'est donc pas seulement une bonne pratique : c'est une obligation.",
+      ] },
+      { heading: "Connaître tes vrais délais", paragraphs: ["Ne te fie pas seulement à ce qu'affiche la page du fournisseur. Pour connaître le délai réel :"], list: [
+        "Commande un échantillon chez toi et note le nombre de jours entre la commande et la réception",
+        "Distingue le délai de préparation (le fournisseur prépare le colis) et le délai de transport",
+        "Demande au fournisseur s'il a un entrepôt plus proche (en Europe par exemple) et quelles méthodes d'envoi il propose",
+        "Garde une marge : si ton échantillon a mis 10 jours, annonce plutôt une fourchette un peu plus large",
+        "Pense aux périodes chargées (fêtes, soldes) où tout ralentit",
+      ] },
+      { heading: "Annoncer les délais clairement", paragraphs: ["Les délais doivent être visibles avant l'achat, pas cachés :"], list: [
+        "Sur la fiche produit, près du bouton d'achat : « Livraison estimée : entre le X et le Y »",
+        "Sur une page « Livraison » simple : délais, prix, pays livrés, suivi",
+        "Dans la FAQ : « Pourquoi la livraison prend-elle ce temps ? »",
+        "Dans l'e-mail de confirmation de commande, avec la date estimée",
+      ] },
+      { heading: "Expliquer sans t'excuser", paragraphs: [
+        "Tu n'as pas à cacher que ton produit vient de loin, mais tu peux l'expliquer positivement et honnêtement. Par exemple : « Chaque commande est préparée spécialement pour toi et expédiée avec un numéro de suivi. Compte entre X et Y jours ouvrés. » C'est clair, ça ne promet pas l'impossible, et ça montre que tu as pensé au client.",
+        "À éviter absolument : afficher « livré en 48 h » alors que le colis met deux semaines. Le client le découvrira, et tu perdras sa confiance, ton argent (remboursement) et peut-être d'autres clients avec un mauvais avis.",
+      ] },
+      { heading: "Rassurer après la commande", paragraphs: ["La période entre la commande et la réception est celle où le client doute le plus. Pour le rassurer :"], list: [
+        "Envoie un e-mail de confirmation clair, avec le délai estimé",
+        "Partage le numéro de suivi dès qu'il est disponible",
+        "Préviens toi-même le client si un retard arrive, avant qu'il ne te le demande",
+        "Réponds vite aux messages, même pour dire « je vérifie et je reviens vers toi »",
+      ] },
+      { heading: "Réduire les délais quand c'est possible", paragraphs: ["Quelques pistes pour livrer plus vite :"], list: [
+        "Choisir un fournisseur qui a un entrepôt en Europe",
+        "Choisir une méthode d'envoi plus rapide, même un peu plus chère, et l'intégrer dans ton prix",
+        "Proposer deux options au client : standard et rapide",
+        "Quand un produit se vend bien, envisager un petit stock local",
+      ] },
+      { heading: "Le lien avec les remboursements et les retours", paragraphs: [
+        "Un retard non expliqué se transforme souvent en demande de remboursement, voire en litige avec la banque du client. Une communication claire réduit beaucoup ces situations. Prévois quand même une petite réserve d'argent pour les colis perdus ou très en retard : ça arrive à tous les vendeurs. Pour les règles de base sur les retours, lis notre article sur la politique de retour d'une boutique en ligne.",
+      ] },
+      { heading: "Comment Vigenia peut t'aider", paragraphs: [
+        "Quand Vigenia crée ta boutique Shopify, les textes de livraison sont pensés pour le dropshipping : délais annoncés honnêtement, page et FAQ qui rassurent. Tu indiques tes vrais délais et tu peux tout ajuster en discutant avec l'IA. L'aperçu de ta boutique est gratuit sur vigenia.com.",
+        "Tu cherches encore ton produit ? Les 72 idées de produits par univers sont sur vigenia.com/idees-produits.",
+      ] },
+    ],
+  },
+  {
     slug: "livraison-gratuite-boutique-en-ligne",
     title: "Livraison gratuite sur sa boutique en ligne : bonne idée ou piège ?",
     excerpt: "Offrir la livraison fait vendre, mais ça a un coût. Comment décider, les 3 façons de l'offrir sans perdre d'argent, et comment l'afficher clairement sur ta boutique.",
