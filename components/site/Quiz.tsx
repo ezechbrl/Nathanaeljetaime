@@ -12,6 +12,7 @@ import { normalizeProductUrl } from "@/lib/product-url";
 import * as api from "@/lib/api/client";
 import { QuizAccount } from "./QuizAccount";
 import { BIG_NICHES, NICHES } from "@/lib/niches";
+import { productSlug } from "@/lib/content/product-pages";
 import { STYLE_TEXT } from "./StyleSwipe";
 
 type Icon = React.ComponentType<{ className?: string }>;
@@ -145,6 +146,9 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   // Compte : déjà connecté (pas d'étape compte) ou pas. null tant qu'on ne sait pas.
   const [logged, setLogged] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
+  // Photos des univers et produits (générées côté serveur) ; à défaut, l'emoji reste affiché.
+  const [photos, setPhotos] = useState<Record<string, string>>({});
+  useEffect(() => { fetch("/api/quiz-photos").then((r) => (r.ok ? r.json() : {})).then(setPhotos, () => {}); }, []);
   const [error, setError] = useState("");
   const b = BIG_NICHES.find((x) => x.id === big);
   const n = NICHES.find((x) => x.id === niche);
@@ -152,11 +156,12 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   // Ordre revu le 26 nov. 2026 d'après les abandons : d'abord le plus excitant (combien gagner, quoi vendre),
   // puis le compte une fois le produit choisi, et seulement ensuite les questions de profil.
   // 13 questions sans idée (10 avec son idée, 9 avec un lien ou une description de l'accueil).
-  const head: Step[] = demo ? ["income", "goal"] : ["income"];
+  // Démo vidéo : seulement le revenu visé puis le choix du produit en photos (le reste n'apporte rien à l'écran).
+  const head: Step[] = ["income"];
   const ideaStep: Step[] = preset || demo ? [] : ["idea"];
   const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
   const profile: Step[] = demo ? [] : ["level", "budget", "shopify"];
-  const tail: Step[] = demo ? ["channel"] : ["audience", "market", "supply", "channel", "price"];
+  const tail: Step[] = demo ? [] : ["audience", "market", "supply", "channel", "price"];
   const plan: Step[] = [...head, ...ideaStep, ...productSteps, ...(logged ? [] : ["account" as Step]), ...profile, ...tail];
   const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
@@ -315,7 +320,7 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         {step === "big" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {BIG_NICHES.map((x, i) => <BigCard key={x.id} tint={i} icon={x.icon} emoji={EMOJI[x.id]} label={x.label} hint={x.hint} on={big === x.id} onClick={() => { if (x.id !== big) { setNiche(null); setProduct(null); } setBig(x.id); }} />)}
+              {BIG_NICHES.map((x, i) => <BigCard key={x.id} tint={i} icon={x.icon} emoji={EMOJI[x.id]} photo={photos[x.subs[0]]} label={x.label} hint={x.hint} on={big === x.id} onClick={() => { if (x.id !== big) { setNiche(null); setProduct(null); } setBig(x.id); }} />)}
             </div>
             {/* « Surprends-moi » en grand, sous toutes les catégories. */}
             <button type="button" onClick={() => { const r = NICHES[Math.floor(Math.random() * NICHES.length)]; setBig(BIG_NICHES.find((x) => (x.subs as readonly string[]).includes(r.id))?.id ?? null); setNiche(r.id); setProduct(null); setHistory((h) => [...h, "sub", "product"]); }}
@@ -327,12 +332,12 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         )}
         {step === "sub" && b && (
           <div className="grid grid-cols-2 gap-3">
-            {b.subs.map((id, i) => { const x = NICHES.find((y) => y.id === id)!; return <BigCard key={id} tint={i + 2} icon={x.icon} emoji={EMOJI[id]} label={x.label} hint={x.products.slice(0, 2).map((p) => p[0]).join(", ") + "…"} on={niche === id} onClick={() => { if (id !== niche) setProduct(null); setNiche(id); }} />; })}
+            {b.subs.map((id, i) => { const x = NICHES.find((y) => y.id === id)!; return <BigCard key={id} tint={i + 2} icon={x.icon} emoji={EMOJI[id]} photo={photos[id]} label={x.label} hint={x.products.slice(0, 2).map((p) => p[0]).join(", ") + "…"} on={niche === id} onClick={() => { if (id !== niche) setProduct(null); setNiche(id); }} />; })}
           </div>
         )}
         {step === "product" && n && (
           <div className="grid gap-3 sm:grid-cols-2">
-            {n.products.map(([name, brief], i) => <Card key={name} tint={i} row icon={n.icon} emoji={EMOJI[n.id]} label={name} hint={brief} on={product === brief} onClick={() => setProduct(brief)} />)}
+            {n.products.map(([name, brief], i) => <Card key={name} tint={i} row icon={n.icon} emoji={EMOJI[n.id]} photo={photos[`p:${productSlug(name)}`]} label={name} hint={brief} on={product === brief} onClick={() => setProduct(brief)} />)}
           </div>
         )}
         {step === "audience" && <Grid options={AUDIENCES} value={audience} cols={4} onPick={setAudience} />}
@@ -426,11 +431,14 @@ const IconBox = ({ icon: I, emoji, size, on = false }: { icon: Icon; emoji?: str
 const Tick = () => <span className="absolute right-2.5 top-2.5 grid h-5 w-5 place-items-center rounded-full text-[#04120b] [animation:fade-in_.2s_ease-out_both]" style={{ background: LED }}><Check className="h-3 w-3" /></span>;
 
 // `tint` est gardé pour compatibilité, il n'a plus d'effet : toutes les cartes ont les mêmes couleurs.
-function Card({ icon, emoji, label, hint, on, row, onClick }: { icon: Icon; emoji?: string; label: string; hint?: string; on: boolean; row?: boolean; tint?: number; onClick: () => void }) {
+function Card({ icon, emoji, photo, label, hint, on, row, onClick }: { icon: Icon; emoji?: string; photo?: string; label: string; hint?: string; on: boolean; row?: boolean; tint?: number; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
       className={cn("group relative flex h-full rounded-[18px] border p-4 text-left backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25", row ? "items-center gap-3.5" : "flex-col items-center gap-3 py-6 text-center")}>
-      <IconBox icon={icon} emoji={emoji} size={row ? "s" : "m"} on={on} />
+      {photo
+        // eslint-disable-next-line @next/next/no-img-element
+        ? <img src={photo} alt="" loading="lazy" className={cn("shrink-0 rounded-[14px] object-cover", row ? "h-16 w-16" : "h-20 w-20", on && "ring-2 ring-[#3dff9a]")} />
+        : <IconBox icon={icon} emoji={emoji} size={row ? "s" : "m"} on={on} />}
       <span className="min-w-0">
         <span className="block text-[15px] font-semibold leading-tight text-white">{label}</span>
         {hint && <span className="mt-1 block text-xs leading-snug text-fg-muted">{hint}</span>}
@@ -441,11 +449,14 @@ function Card({ icon, emoji, label, hint, on, row, onClick }: { icon: Icon; emoj
 }
 
 // Grande carte (catégories) : icône plus grande, titre en belle typographie.
-function BigCard({ icon, emoji, label, hint, on, onClick }: { icon: Icon; emoji?: string; label: string; hint: string; on: boolean; tint?: number; onClick: () => void }) {
+function BigCard({ icon, emoji, photo, label, hint, on, onClick }: { icon: Icon; emoji?: string; photo?: string; label: string; hint: string; on: boolean; tint?: number; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-pressed={on} style={on ? ON : OFF}
-      className="group relative flex h-full flex-col items-center gap-3 rounded-[22px] border px-3 py-7 text-center backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-white/25">
-      <IconBox icon={icon} emoji={emoji} size="l" on={on} />
+      className={cn("group relative flex h-full flex-col items-center gap-3 rounded-[22px] border text-center backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-white/25", photo ? "p-2.5 pb-4" : "px-3 py-7")}>
+      {photo
+        // eslint-disable-next-line @next/next/no-img-element
+        ? <img src={photo} alt="" loading="lazy" className={cn("aspect-[4/3] w-full rounded-[16px] object-cover", on && "ring-2 ring-[#3dff9a]")} />
+        : <IconBox icon={icon} emoji={emoji} size="l" on={on} />}
       <span className="font-display text-[17px] font-semibold leading-tight tracking-[-0.01em] text-white sm:text-[19px]">{label}</span>
       <span className="text-xs leading-snug text-fg-muted">{hint}</span>
       {on && <Tick />}

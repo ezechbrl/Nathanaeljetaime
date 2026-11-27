@@ -37,6 +37,7 @@ export default function DemoPage() {
             <select id="demo-store" value={pick} onChange={(e) => setPick(e.target.value)} className="rounded-ctl border border-white/10 bg-black/30 px-2 py-1 text-fg-muted">
               {ready.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
+            <PhotosButton />
           </div>
           <Quiz key={run} demo onFinish={async () => { setPhase("build"); }} />
         </>
@@ -94,4 +95,19 @@ function Reveal({ store, onAgain }: { store: Store; onAgain: () => void }) {
       </div>
     </div>
   );
+}
+
+// Réglage discret : crée les photos des univers et produits du quiz qui manquent encore (12 à la fois).
+function PhotosButton() {
+  const [state, setState] = useState<string>("");
+  const run = async () => {
+    setState("Création des photos… (1 à 2 min)");
+    try {
+      const r = await api.fillQuizPhotos();
+      setState(`Photos : ${r.have}/${r.total}${r.have < r.total ? " · reclique pour la suite" : " ✓"}`);
+    } catch (e) {
+      setState((e as Error).message);
+    }
+  };
+  return <button type="button" onClick={run} className="rounded-ctl border border-white/10 bg-black/30 px-2 py-1 text-fg-muted hover:text-white">{state || "Photos des produits"}</button>;
 }
