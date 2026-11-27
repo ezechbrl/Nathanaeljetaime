@@ -16,6 +16,9 @@ Quand la liste est finie, elle choisit un nouveau sujet et l'ajoute ici.
 | ven. 27 nov. (en plus) | Trouver ses premiers clients | trouver clients boutique en ligne | trouver-premiers-clients-boutique-en-ligne |
 | ven. 27 nov. (en plus) | Nom de domaine pour sa boutique en ligne | nom de domaine boutique en ligne | nom-de-domaine-boutique-en-ligne |
 | ven. 27 nov. (en plus) | Page « À propos » d'une boutique en ligne | page à propos boutique en ligne | page-a-propos-boutique-en-ligne |
+| ven. 27 nov. (en plus) | Livraison gratuite : bonne idée ou piège ? | livraison gratuite boutique en ligne | livraison-gratuite-boutique-en-ligne |
+| ven. 27 nov. (en plus) | Politique de retour d'une boutique en ligne | politique de retour boutique en ligne | politique-de-retour-boutique-en-ligne |
+| ven. 27 nov. (en plus) | Idées de produits à vendre pour Noël | produits à vendre Noël | idees-produits-noel-boutique-en-ligne |
 | ven. 27 nov. | Délais de livraison en dropshipping : comment les annoncer et rassurer tes clients | délais livraison dropshipping | delais-livraison-dropshipping |
 | dim. 29 nov. | Obtenir des avis clients sur sa boutique en ligne (sans tricher) | avis clients boutique en ligne | obtenir-avis-clients-boutique-en-ligne |
 | lun. 30 nov. | Photos produit au téléphone : faire de belles photos pour sa boutique | photos produit boutique en ligne | photos-produit-telephone-boutique |

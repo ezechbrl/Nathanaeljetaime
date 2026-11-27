@@ -10,6 +10,114 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "livraison-gratuite-boutique-en-ligne",
+    title: "Livraison gratuite sur sa boutique en ligne : bonne idée ou piège ?",
+    excerpt: "Offrir la livraison fait vendre, mais ça a un coût. Comment décider, les 3 façons de l'offrir sans perdre d'argent, et comment l'afficher clairement sur ta boutique.",
+    category: "Conversion",
+    date: "2026-11-27",
+    readingMinutes: 5,
+    sections: [
+      { paragraphs: [
+        "Les frais de livraison découverts au dernier moment font partie des raisons qui font abandonner un panier. Beaucoup de vendeurs se demandent donc s'ils doivent offrir la livraison. La réponse : souvent oui, mais jamais sans faire le calcul.",
+      ] },
+      { heading: "La livraison n'est jamais vraiment gratuite", paragraphs: [
+        "Quand tu offres la livraison, quelqu'un la paie : toi. Si tu ne l'intègres pas dans ton prix, elle mange ta marge. Avant de décider, calcule ce que te coûte réellement l'envoi d'une commande.",
+      ] },
+      { heading: "Les 3 façons de l'offrir sans perdre d'argent", paragraphs: [], list: [
+        "L'inclure dans le prix : ton produit coûte un peu plus cher, mais le client ne voit pas de frais en plus au moment de payer",
+        "La rendre gratuite à partir d'un montant : par exemple dès 2 produits, ce qui pousse aussi à acheter plus",
+        "L'offrir pendant une période précise : une vraie offre limitée (pas un faux compte à rebours)",
+      ] },
+      { heading: "Quand garder des frais de livraison", paragraphs: [
+        "Si ton produit est lourd, volumineux, ou si ta marge est déjà très serrée, des frais de livraison clairs et justes valent mieux qu'une « livraison gratuite » qui te fait perdre de l'argent à chaque commande.",
+      ] },
+      { heading: "L'afficher clairement", paragraphs: ["Le plus important, c'est la transparence :"], list: [
+        "Indique les frais (ou la gratuité) dès la fiche produit, pas seulement au paiement",
+        "Annonce un délai de livraison réaliste, surtout en dropshipping",
+        "Crée une page « Livraison » simple : délais, prix, pays livrés, suivi du colis",
+      ] },
+      { heading: "Avec Vigenia", paragraphs: [
+        "Les boutiques créées par Vigenia affichent clairement la livraison et les délais, et proposent des offres par lot qui augmentent le panier moyen. De quoi offrir la livraison à partir de 2 produits sans y perdre. Aperçu gratuit sur vigenia.com.",
+      ] },
+    ],
+  },
+  {
+    slug: "politique-de-retour-boutique-en-ligne",
+    title: "Politique de retour d'une boutique en ligne : ce qu'il faut savoir et quoi écrire",
+    excerpt: "Droit de rétractation de 14 jours, frais de retour, remboursement : les règles de base à connaître en France et comment écrire une politique de retour claire qui rassure tes clients.",
+    category: "Guide",
+    date: "2026-11-27",
+    readingMinutes: 6,
+    sections: [
+      { paragraphs: [
+        "Quand on vend en ligne à des particuliers, on ne peut pas faire ce qu'on veut avec les retours. La loi protège les acheteurs, et une politique de retour claire est aussi un argument de confiance. Voici les bases, expliquées simplement.",
+        "Cet article donne des repères généraux : pour ta situation précise, vérifie sur les sites officiels (comme service-public.fr) ou auprès d'un professionnel.",
+      ] },
+      { heading: "Le droit de rétractation de 14 jours", paragraphs: [
+        "En France et dans l'Union européenne, un particulier qui achète en ligne dispose en principe de 14 jours pour changer d'avis, sans avoir à se justifier. Pour un produit, ce délai commence en général à la réception de la commande. Certains produits font exception (par exemple les produits personnalisés ou les produits descellés pour des raisons d'hygiène).",
+      ] },
+      { heading: "Le remboursement", paragraphs: [
+        "Quand un client se rétracte, tu dois le rembourser, en général dans les 14 jours suivant sa décision. Tu peux attendre d'avoir récupéré le produit (ou une preuve d'envoi) avant de rembourser.",
+      ] },
+      { heading: "Qui paie le retour ?", paragraphs: [
+        "Les frais de retour peuvent rester à la charge du client, à condition de l'avoir clairement indiqué avant l'achat. Si tu ne l'as pas indiqué, c'est à toi de les payer. Certaines boutiques offrent le retour pour rassurer : c'est un choix commercial, pas une obligation.",
+      ] },
+      { heading: "Les produits défectueux", paragraphs: [
+        "Indépendamment de la rétractation, un produit défectueux ou non conforme est couvert par la garantie légale de conformité. Dans ce cas, c'est au vendeur de trouver une solution (réparation, remplacement ou remboursement).",
+      ] },
+      { heading: "Le cas du dropshipping", paragraphs: [
+        "En dropshipping, c'est toi le vendeur, même si tu n'as jamais touché le produit. Avant de choisir un fournisseur, vérifie comment il gère les retours et les produits défectueux, et prévois une petite réserve d'argent pour les cas où tu devras rembourser.",
+      ] },
+      { heading: "Que mettre dans ta politique de retour", paragraphs: [], list: [
+        "Le délai pour se rétracter et à partir de quand il compte",
+        "Comment faire la demande (adresse e-mail, formulaire)",
+        "Où renvoyer le produit et dans quel état",
+        "Qui paie les frais de retour",
+        "Le délai et le moyen de remboursement",
+        "Les produits exclus, s'il y en a",
+      ] },
+      { heading: "Avec Vigenia", paragraphs: [
+        "Vigenia propose des modèles de pages (dont la politique de retour) à adapter à ta boutique, avec les champs à compléter. Relis-les toujours et adapte-les à ta situation réelle.",
+      ] },
+    ],
+  },
+  {
+    slug: "idees-produits-noel-boutique-en-ligne",
+    title: "Idées de produits à vendre pour Noël sur sa boutique en ligne",
+    excerpt: "Quels produits vendre pour Noël ? Des idées par univers qui font de bons cadeaux, comment les présenter, et le calendrier à respecter pour ne pas rater les commandes.",
+    category: "Guide",
+    date: "2026-11-27",
+    readingMinutes: 5,
+    sections: [
+      { paragraphs: [
+        "Noël est la période où les gens cherchent le plus d'idées de cadeaux. Pour une boutique en ligne, c'est une belle occasion, à condition d'avoir le bon produit et de tenir les délais.",
+      ] },
+      { heading: "Ce qui fait un bon produit de Noël", paragraphs: [], list: [
+        "Il fait plaisir à quelqu'un d'autre : c'est un cadeau, pas un achat pour soi",
+        "Il est facile à offrir : joli, compréhensible, sans taille compliquée",
+        "Il a un prix « cadeau », souvent entre 20 € et 50 €",
+        "Il peut arriver à temps avant le 25 décembre",
+      ] },
+      { heading: "Des idées par univers", paragraphs: [], list: [
+        "Maison : lampes d'ambiance, diffuseurs, objets déco qui changent une chambre",
+        "Beauté : coffrets soin, accessoires cheveux, organisateurs",
+        "Animaux : jouets, lits douillets, accessoires de promenade",
+        "Gaming : éclairage du setup, accessoires de confort",
+        "Cuisine : ustensiles malins, accessoires pour les gourmands",
+        "Bébé et parents : cadeaux de naissance, veilleuses, accessoires pratiques",
+      ] },
+      { heading: "Le calendrier à respecter", paragraphs: [
+        "Les délais sont la clé. Si ton fournisseur est loin, les commandes passées trop tard n'arriveront pas avant Noël. Calcule la date limite de commande avec ton fournisseur, affiche-la clairement sur ta boutique, et préviens tes clients honnêtement après cette date.",
+      ] },
+      { heading: "Présenter ton produit comme un cadeau", paragraphs: [
+        "Montre-le emballé, dans une ambiance de fête, et dis pour qui c'est un bon cadeau (« pour ta sœur qui adore… »). Les offres par lot (2 achetés, le 3e à prix doux) marchent bien quand on a plusieurs cadeaux à faire.",
+      ] },
+      { heading: "Aller plus loin", paragraphs: [
+        "Retrouve 72 idées de produits par univers sur vigenia.com/idees-produits, et notre checklist pour préparer ta boutique en ligne pour Noël sur le blog. Avec Vigenia, tu peux aussi créer l'aperçu de ta boutique gratuitement en quelques minutes.",
+      ] },
+    ],
+  },
+  {
     slug: "trouver-premiers-clients-boutique-en-ligne",
     title: "Trouver ses premiers clients quand on lance sa boutique en ligne (sans gros budget)",
     excerpt: "Ta boutique est en ligne mais personne n'achète ? 7 façons concrètes de trouver tes premiers clients sans gros budget publicitaire, et les erreurs qui font fuir les visiteurs.",
