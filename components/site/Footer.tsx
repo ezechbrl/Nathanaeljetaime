@@ -5,7 +5,7 @@ import { NewsletterForm } from "./NewsletterForm";
 
 const COLUMNS = [
   { title: "Produit", links: [["/produit", "Fonctionnalités"], ["/demo", "Comment ça marche"], ["/tarifs", "Tarifs"], ["/exemples", "Exemples"], ["/nouveautes", "Feuille de route"]] },
-  { title: "Solutions", desktop: true, links: [["/boutique-shopify-cle-en-main", "Boutique prête à vendre"], ["/outils-gratuits", "Outils gratuits"], ["/idees-produits", "Idées de produits"], ["/affiliation", "Devenir partenaire"]] },
+  { title: "Solutions", desktop: true, links: [["/boutique-shopify-cle-en-main", "Boutique prête à vendre"], ["/outils-gratuits", "Outils gratuits"], ["/idees-produits", "Idées de produits"], ["/lexique", "Lexique"], ["/affiliation", "Devenir partenaire"]] },
   { title: "Entreprise", desktop: true, links: [["/fondateurs", "Notre histoire"], ["/blog", "Blog"], ["/contact", "Contact"]] },
   { title: "Légal", links: [["/legal/mentions-legales", "Mentions légales"], ["/legal/confidentialite", "Confidentialité"], ["/legal/cgv", "CGV"], ["/legal/cgu", "CGU"], ["/legal/conditions-affiliation", "Conditions d'affiliation"]] },
 ] as const;
