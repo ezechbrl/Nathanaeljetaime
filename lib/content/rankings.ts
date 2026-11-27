@@ -111,3 +111,7 @@ export const RANKINGS: Ranking[] = [
     ],
   },
 ];
+
+// Tous les classements : ceux écrits à la main + une tier list par univers.
+import { NICHE_RANKINGS } from "./niche-rankings";
+export const ALL_RANKINGS: Ranking[] = [...RANKINGS, ...NICHE_RANKINGS];

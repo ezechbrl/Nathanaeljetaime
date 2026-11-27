@@ -4,8 +4,13 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Section";
 import { PageHero } from "@/components/site/PageHero";
-import { RANKINGS, type Tier } from "@/lib/content/rankings";
-import { productSlug } from "@/lib/content/product-pages";
+import { ALL_RANKINGS as RANKINGS, type Tier } from "@/lib/content/rankings";
+import { PRODUCT_PAGES, productSlug } from "@/lib/content/product-pages";
+import { EXTRA_PRODUCTS } from "@/lib/content/product-pages-extra";
+
+const ALL_PRODUCTS = [...PRODUCT_PAGES, ...EXTRA_PRODUCTS];
+// Raison affichée : celle du classement, ou à défaut celle de la page du produit.
+const whyOf = (i: { why: string; product?: string }) => i.why || ALL_PRODUCTS.find((p) => p.name === i.product)?.why || "";
 
 const TIER: Record<Tier, { label: string; color: string }> = {
   S: { label: "S", color: "#ff5c7a" },
@@ -61,7 +66,7 @@ export default async function RankingPage({ params }: { params: Promise<{ slug: 
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] text-lg font-black text-black" style={{ background: TIER[i.tier].color }}>{i.tier}</span>
                 <h3 className="text-lg font-semibold">{i.name}</h3>
               </div>
-              <p className="mt-2 text-[15px] text-fg-muted">{i.why}</p>
+              <p className="mt-2 text-[15px] text-fg-muted">{whyOf(i)}</p>
               {i.examples && <p className="mt-2 flex flex-wrap gap-1.5">{i.examples.map((e) => <Link key={e} href={`/vendre/${productSlug(e)}`} className="rounded-full border border-white/15 px-3 py-1 text-xs hover:text-accent">{e}</Link>)}</p>}
               {i.product && <Link href={`/vendre/${productSlug(i.product)}`} className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline">Voir comment le vendre <ArrowRight className="h-4 w-4" /></Link>}
             </div>
@@ -81,7 +86,7 @@ export default async function RankingPage({ params }: { params: Promise<{ slug: 
         <section className="mt-12">
           <h2 className="text-h2">Les autres classements</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {RANKINGS.filter((x) => x.slug !== r.slug).map((x) => <Link key={x.slug} href={`/classements/${x.slug}`} className="surface rounded-card p-4 text-[15px] hover:text-accent">{x.h1} →</Link>)}
+            {RANKINGS.filter((x) => x.slug !== r.slug).slice(0, 9).map((x) => <Link key={x.slug} href={`/classements/${x.slug}`} className="surface rounded-card p-4 text-[15px] hover:text-accent">{x.h1} →</Link>)}
             <Link href="/idees-cadeaux/cadeau-noel-original" className="surface rounded-card p-4 text-[15px] hover:text-accent">Idées cadeaux de Noël originales →</Link>
           </div>
         </section>

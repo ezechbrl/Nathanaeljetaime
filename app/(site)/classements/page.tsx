@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/Section";
 import { PageHero } from "@/components/site/PageHero";
-import { RANKINGS } from "@/lib/content/rankings";
+import { ALL_RANKINGS as RANKINGS } from "@/lib/content/rankings";
 
 export const metadata: Metadata = { title: "Classements : les meilleurs produits et boutiques à lancer", description: "Nos tier lists des meilleurs produits à vendre (Noël, débutant) et des meilleures boutiques à lancer, avec nos critères.", alternates: { canonical: "/classements" } };
 

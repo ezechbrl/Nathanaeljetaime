@@ -6,7 +6,7 @@ import { FREE_TOOL_PAGES } from "@/lib/content/free-tools";
 import { IDEA_PAGES } from "@/lib/content/product-ideas";
 import { GLOSSARY, termSlug } from "@/lib/content/glossary";
 import { GIFT_GUIDES } from "@/lib/content/gift-guides";
-import { RANKINGS } from "@/lib/content/rankings";
+import { ALL_RANKINGS as RANKINGS } from "@/lib/content/rankings";
 import { PRODUCT_PAGES, productSlug } from "@/lib/content/product-pages";
 import { EXTRA_PRODUCTS } from "@/lib/content/product-pages-extra";
 

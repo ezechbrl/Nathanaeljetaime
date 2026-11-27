@@ -12,7 +12,9 @@ export default function BlogPage() {
   const [first, ...rest] = POSTS;
   return (
     <>
-      <PageHero eyebrow="Blog" title={<>Vendre sur Shopify, <span className="serif-accent">concrètement</span></>} subtitle="Des guides courts et actionnables, sans jargon." />
+      <PageHero eyebrow="Blog" title={<>Vendre sur Shopify, <span className="serif-accent">concrètement</span></>} subtitle="Des guides courts et actionnables, sans jargon.">
+        <a href="/classements/meilleurs-produits-a-vendre-noel" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-4 py-2 text-sm hover:border-white/35">🎄 Tier list : les meilleurs produits à vendre pour Noël →</a>
+      </PageHero>
       <Container className="max-w-[1050px]">
         <Reveal>
           <Link href={`/blog/${first.slug}`} className="surface group grid gap-8 rounded-card p-7 sm:p-10 lg:grid-cols-[1.4fr_1fr]">
