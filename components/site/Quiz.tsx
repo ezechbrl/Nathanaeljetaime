@@ -148,7 +148,8 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   const [busy, setBusy] = useState(false);
   // Photos des univers et produits (générées côté serveur) ; à défaut, l'emoji reste affiché.
   const [photos, setPhotos] = useState<Record<string, string>>({});
-  useEffect(() => { fetch("/api/quiz-photos").then((r) => (r.ok ? r.json() : {})).then(setPhotos, () => {}); }, []);
+  // Photos seulement dans la démo vidéo (le vrai quiz garde les emojis, plus légers).
+  useEffect(() => { if (demo) fetch("/api/quiz-photos").then((r) => (r.ok ? r.json() : {})).then(setPhotos, () => {}); }, [demo]);
   const [error, setError] = useState("");
   const b = BIG_NICHES.find((x) => x.id === big);
   const n = NICHES.find((x) => x.id === niche);
@@ -156,12 +157,13 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   // Ordre revu le 26 nov. 2026 d'après les abandons : d'abord le plus excitant (combien gagner, quoi vendre),
   // puis le compte une fois le produit choisi, et seulement ensuite les questions de profil.
   // 13 questions sans idée (10 avec son idée, 9 avec un lien ou une description de l'accueil).
-  // Démo vidéo : seulement le revenu visé puis le choix du produit en photos (le reste n'apporte rien à l'écran).
-  const head: Step[] = ["income"];
+  // Démo vidéo : revenu visé, objectif, choix du produit en photos, puis à qui et à quel prix.
+  const head: Step[] = demo ? ["income", "goal"] : ["income"];
   const ideaStep: Step[] = preset || demo ? [] : ["idea"];
   const productSteps: Step[] = preset || hasIdea ? [] : ["big", "sub", "product"];
   const profile: Step[] = demo ? [] : ["level", "budget", "shopify"];
-  const tail: Step[] = demo ? [] : ["audience", "market", "supply", "channel", "price"];
+  // Démo : seulement les 2 questions qui parlent le plus à l'écran (à qui vendre, à quel prix).
+  const tail: Step[] = demo ? ["audience", "price"] : ["audience", "market", "supply", "channel", "price"];
   const plan: Step[] = [...head, ...ideaStep, ...productSteps, ...(logged ? [] : ["account" as Step]), ...profile, ...tail];
   const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
