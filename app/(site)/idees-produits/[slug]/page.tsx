@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Section";
 import { PageHero } from "@/components/site/PageHero";
 import { IDEA_PAGES } from "@/lib/content/product-ideas";
 import { NICHES } from "@/lib/niches";
+import { productSlug } from "@/lib/content/product-pages";
 
 export function generateStaticParams() {
   return IDEA_PAGES.map((p) => ({ slug: p.slug }));
@@ -46,7 +47,7 @@ export default async function IdeaPage({ params }: { params: Promise<{ slug: str
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {n.products.map(([name, brief]) => (
               <li key={name} className="surface flex flex-col rounded-card p-5">
-                <h3 className="text-lg font-semibold">{name}</h3>
+                <h3 className="text-lg font-semibold"><Link href={`/vendre/${productSlug(name)}`} className="hover:text-accent">{name}</Link></h3>
                 <p className="mt-1 flex-1 text-[15px] text-fg-muted">{brief}.</p>
                 <Link href={quizLink(brief)} className="mt-4 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-accent hover:underline">Créer ma boutique avec ce produit <ArrowRight className="h-4 w-4" /></Link>
               </li>
