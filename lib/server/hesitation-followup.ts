@@ -42,8 +42,9 @@ export async function sendHesitationFollowups() {
   if (!reasons.size) return 0;
   const ids = [...reasons.keys()];
   const [users, paid, stores] = await Promise.all([
-    db().from("users").select("id, email, first_name, plan, discount_percent").in("id", ids),
-    db().from("revenue_events").select("user_id").in("user_id", ids).in("kind", ["new", "single"]),
+    db().from("users").select("id, email, first_name, plan, discount_percent, single_store_id").in("id", ids),
+    // A payé : abonnement (« new ») ou « Ma boutique » (paiement « payment » avec plan « single »), ou boutique débloquée.
+    db().from("revenue_events").select("user_id").in("user_id", ids).or("kind.eq.new,kind.eq.single,and(kind.eq.payment,plan.eq.single)"),
     db().from("stores").select("user_id, name").in("user_id", ids).order("created_at", { ascending: false }),
   ]).then((rs) => rs.map((r) => must(r) as Record<string, any>[]));
   const paidIds = new Set(paid.map((p) => p.user_id));
@@ -51,7 +52,7 @@ export async function sendHesitationFollowups() {
   for (const u of users) {
     const email = String(u.email ?? "");
     // Déjà abonné ou déjà payé, compte de test, évaluateur Shopify, ou réduction déjà proposée (mail perso) : rien.
-    if (!email || u.plan !== "free" || paidIds.has(u.id) || u.discount_percent != null || isOwnerEmail(email) || TEST.test(email) || /@shopify\.com$/i.test(email)) continue;
+    if (!email || u.plan !== "free" || u.single_store_id || paidIds.has(u.id) || u.discount_percent != null || isOwnerEmail(email) || TEST.test(email) || /@shopify\.com$/i.test(email)) continue;
     const { error: dup } = await db().from("webhook_events").insert({ id: `followup:${u.id}` });
     if (dup) continue;
     const until = new Date(now + DAYS * 86_400_000);
