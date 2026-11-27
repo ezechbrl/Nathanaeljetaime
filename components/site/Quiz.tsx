@@ -4,7 +4,7 @@
 // Profil (où il en est, objectif, temps), puis son idée ou une grande catégorie → un univers → un produit,
 // ses clients, et enfin les boutiques qu'il aime (cœur / croix) pour choisir le style.
 // Toujours un nombre pair de réponses, pour des grilles bien alignées sur téléphone.
-import { Banknote, BadgeCheck, BookOpen, Glasses, HandCoins, Languages, Map as MapIcon, Scissors, UserPlus, ArrowLeft, ArrowRight, Baby, BadgeEuro, Camera, CircleHelp, Coins, Crown, Factory, Globe, Hammer, Landmark, MapPin, Megaphone, MessageCircle, Package, PiggyBank, Search, ShoppingBag, Truck, Video, Wallet, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
+import { Banknote, BadgeCheck, BookOpen, Glasses, HandCoins, Languages, Map as MapIcon, Scissors, UserPlus, ArrowLeft, ArrowRight, RotateCcw, Baby, BadgeEuro, Camera, CircleHelp, Coins, Crown, Factory, Globe, Hammer, Landmark, MapPin, Megaphone, MessageCircle, Package, PiggyBank, Search, ShoppingBag, Truck, Video, Wallet, Bike, Check, Clock, Compass, Flame, Gem, GraduationCap, Home, Hourglass, Lightbulb, Palette, PawPrint, PenLine, Rocket, Shuffle, Sparkles, Sprout, Store, Target, Timer, TrendingUp, User, UserRound, Users, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
@@ -118,7 +118,7 @@ const LEVEL_TEXT: Record<string, string> = {
 };
 
 type Step = "level" | "goal" | "income" | "time" | "budget" | "shopify" | "idea" | "big" | "sub" | "product" | "account" | "audience" | "market" | "supply" | "channel" | "price" | "style";
-const STATE_KEY = "vg-quiz-state2";
+const STATE_KEY = "vg-quiz-state3";
 
 // `preset` : la description ou le lien déjà donnés sur l'accueil. Le quiz ne redemande pas le produit.
 // `demo` : version courte pour les vidéos (quelques questions, rien n'est gardé ni compté dans les stats).
@@ -194,6 +194,17 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
   const afterAccount: Step = plan[plan.indexOf("account") + 1] ?? "level";
   useEffect(() => { if (step === "account" && logged) setHistory((h) => [...h.slice(0, -1), afterAccount]); }, [step, logged, afterAccount]);
   const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
+  // Recommencer le quiz depuis le début (toutes les réponses effacées).
+  const restart = () => {
+    setLevel(null); setGoal(null); setTime(null); setBudget(null); setShopify(null);
+    setHasIdea(preset ? true : demo ? false : null); setIdea(preset && !preset.isLink ? preset.text : "");
+    setBig(null); setNiche(null); setProduct(null); setAudience(null); setMarket(null); setSupply(null); setChannel(null); setPrice(null);
+    setIncome(2000); setSupplierUrl(""); setError("");
+    try { localStorage.removeItem(STATE_KEY); } catch { /* stockage indisponible */ }
+    setHistory(["income"]);
+  };
+  // Réponse gardée d'une ancienne version du quiz (question qui n'existe plus) : on repart du début.
+  useEffect(() => { if (step !== "account" && !plan.includes(step)) restart(); }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
   const productName = (hasIdea ? idea.trim() : n?.products.find((p) => p[1] === product)?.[0] ?? "").slice(0, 60);
   const supplierOk = /^https?:\/\/\S+\.\S+/.test(supplierUrl.trim());
   const chosen = preset?.isLink ? "Produit du lien fourni" : hasIdea ? idea.trim() : product;
@@ -270,6 +281,7 @@ export function Quiz({ onFinish, skipHref, preset, demo = false }: { onFinish: (
         {history.length > 1
           ? <button type="button" onClick={back} className="inline-flex items-center gap-1.5 hover:text-white"><ArrowLeft className="h-4 w-4" /> Retour</button>
           : skipHref ? <a href={skipHref} className="underline underline-offset-4 hover:text-white">J'ai déjà mon produit</a> : <span />}
+        {history.length > 1 && <button type="button" onClick={restart} className="inline-flex items-center gap-1.5 hover:text-white"><RotateCcw className="h-3.5 w-3.5" /> Recommencer</button>}
         <span>{step === "account" ? "Ton compte" : questions.length - qIndex <= 3 ? (questions.length - qIndex === 1 ? "Dernière question 🎉" : `Plus que ${questions.length - qIndex} questions 🔥`) : `Question ${qIndex + 1} sur ${questions.length}`}</span>
       </div>
 

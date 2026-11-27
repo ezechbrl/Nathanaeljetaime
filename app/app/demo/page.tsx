@@ -28,7 +28,7 @@ export default function DemoPage() {
   return (
     <div className="min-h-dvh">
       {/* Sortir de la démo (sinon il faut relancer l'application). */}
-      <Link href="/ventes" className="fixed left-3 top-[max(env(safe-area-inset-top),12px)] z-50 grid h-9 w-9 place-items-center rounded-full bg-black/40 text-white/70 backdrop-blur hover:bg-black/60 hover:text-white" aria-label="Quitter la démo"><X className="h-4 w-4" /></Link>
+      <Link href="/ventes" className="fixed bottom-24 left-3 z-50 grid h-9 w-9 place-items-center rounded-full bg-black/50 text-white/70 backdrop-blur hover:bg-black/70 hover:text-white" aria-label="Quitter la démo"><X className="h-4 w-4" /></Link>
       {phase === "quiz" && (
         <>
           {/* Réglage discret avant de filmer : la boutique montrée à la fin. */}
