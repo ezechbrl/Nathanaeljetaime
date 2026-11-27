@@ -6,21 +6,23 @@ import { Container } from "@/components/ui/Section";
 import { PageHero } from "@/components/site/PageHero";
 import { IDEA_PAGES } from "@/lib/content/product-ideas";
 import { PRODUCT_PAGES, productSlug } from "@/lib/content/product-pages";
+import { EXTRA_PRODUCTS } from "@/lib/content/product-pages-extra";
 import { NICHES } from "@/lib/niches";
 
 // Une page par produit du quiz : pourquoi il plaît, l'idée de vidéo, le point de vigilance (propres au produit),
 // puis à qui le vendre, à quel prix et où trouver ses clients (conseils de son univers).
 function find(slug: string) {
-  const p = PRODUCT_PAGES.find((x) => productSlug(x.name) === slug);
+  const extra = EXTRA_PRODUCTS.find((x) => productSlug(x.name) === slug);
+  const p = PRODUCT_PAGES.find((x) => productSlug(x.name) === slug) ?? extra;
   if (!p) return null;
-  const niche = NICHES.find((n) => n.products.some(([name]) => name === p.name));
-  const brief = niche?.products.find(([name]) => name === p.name)?.[1];
+  const niche = extra ? NICHES.find((n) => n.id === extra.niche) : NICHES.find((n) => n.products.some(([name]) => name === p.name));
+  const brief = extra ? extra.brief : niche?.products.find(([name]) => name === p.name)?.[1];
   const idea = niche && IDEA_PAGES.find((i) => i.niche === niche.id);
   return niche && brief && idea ? { p, niche, brief, idea } : null;
 }
 
 export function generateStaticParams() {
-  return PRODUCT_PAGES.map((p) => ({ slug: productSlug(p.name) }));
+  return [...PRODUCT_PAGES, ...EXTRA_PRODUCTS].map((p) => ({ slug: productSlug(p.name) }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -39,7 +41,7 @@ export default async function SellProductPage({ params }: { params: Promise<{ sl
   const f = find(slug);
   if (!f) notFound();
   const { p, niche, brief, idea } = f;
-  const others = niche.products.filter(([name]) => name !== p.name);
+  const others = [...niche.products.map(([name]) => name), ...EXTRA_PRODUCTS.filter((x) => x.niche === niche.id).map((x) => x.name)].filter((name) => name !== p.name);
   const quiz = `/quiz?${new URLSearchParams({ mode: "describe", brief })}`;
   const faq = [
     { q: `Pourquoi vendre ce produit ?`, a: p.why },
@@ -84,7 +86,7 @@ export default async function SellProductPage({ params }: { params: Promise<{ sl
         <section className="mt-14">
           <h2 className="text-h2">D&apos;autres idées : {niche.label.toLowerCase()}</h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {others.map(([name]) => <Link key={name} href={`/vendre/${productSlug(name)}`} className="surface rounded-card p-4 text-[15px] transition-colors hover:text-accent">{name} →</Link>)}
+            {others.map((name) => <Link key={name} href={`/vendre/${productSlug(name)}`} className="surface rounded-card p-4 text-[15px] transition-colors hover:text-accent">{name} →</Link>)}
           </div>
           <p className="mt-4 text-sm"><Link href={`/idees-produits/${idea.slug}`} className="text-accent hover:underline">Toutes les idées {niche.label.toLowerCase()} →</Link> · <Link href="/idees-produits" className="text-accent hover:underline">Les 72 idées de produits →</Link></p>
         </section>

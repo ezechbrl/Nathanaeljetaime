@@ -7,6 +7,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { IDEA_PAGES } from "@/lib/content/product-ideas";
 import { NICHES } from "@/lib/niches";
 import { productSlug } from "@/lib/content/product-pages";
+import { EXTRA_PRODUCTS } from "@/lib/content/product-pages-extra";
 
 export function generateStaticParams() {
   return IDEA_PAGES.map((p) => ({ slug: p.slug }));
@@ -53,6 +54,13 @@ export default async function IdeaPage({ params }: { params: Promise<{ slug: str
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="mt-10">
+          <h2 className="text-xl font-semibold">Encore plus d&apos;idées</h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {EXTRA_PRODUCTS.filter((x) => x.niche === n.id).map((x) => <Link key={x.name} href={`/vendre/${productSlug(x.name)}`} className="rounded-full border border-white/15 px-4 py-2 text-sm hover:border-white/40 hover:text-accent">{x.name}</Link>)}
+          </div>
         </section>
 
         <section className="mt-14">
