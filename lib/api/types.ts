@@ -197,6 +197,8 @@ export type OwnerPeriod = OwnerCounts & {
 };
 export type OwnerStats = {
   mrr: number;
+  monthCollected?: number; // encaissé ce mois-ci (centimes), abonnements + « Ma boutique »
+  monthSales?: number;
   arr: number;
   subscribers: { total: number; starter: number; pro: number };
   customers?: { email: string; plan: string; stores: { id: string; name: string; status: string }[] }[];

@@ -260,6 +260,8 @@ function OfferNote({ offer }: { offer: Offer }) {
   return <> · {offer.lastCallAt ? "2 mails envoyés (12 h + dernière heure)" : offer.reminderAt ? "mail de 12 h envoyé · dernier à 23 h" : "mail de rappel à 12 h"}</>;
 }
 
+// Objectif d'Ezechiel : encaisser 100 € par mois (abonnements + « Ma boutique »).
+const MONTH_GOAL = 100;
 // Paliers de revenu mensuel à atteindre (en euros), pour voir le prochain objectif.
 const MILESTONES = [100, 500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000];
 
@@ -281,6 +283,22 @@ function MoneyHero({ s }: { s: OwnerStats }) {
   const lastSale = s.recent.find((r) => r.kind === "new" || r.kind === "payment");
   return (
     <Card className="relative overflow-hidden bg-[linear-gradient(160deg,#ffffff,#effcf5)]">
+      {/* Objectif du mois : tout ce qui a été encaissé depuis le 1er (abonnements + « Ma boutique »). */}
+      {s.monthCollected !== undefined && (() => {
+        const got = s.monthCollected / 100;
+        const pct = Math.min(1, got / MONTH_GOAL);
+        const month = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", month: "long" }).format(new Date());
+        return (
+          <div className="mb-4 rounded-[14px] border border-[#cdeedd] bg-white/70 p-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-[13px] font-semibold text-[#111]">Objectif de {month} : {eur(MONTH_GOAL * 100)}</span>
+              <span className="text-[13px] font-bold tabular-nums text-[#0a8f5f]">{eur(s.monthCollected)} {got >= MONTH_GOAL ? "✓" : ""}</span>
+            </div>
+            <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-[#e6f4ec]"><div className="h-full rounded-full bg-[linear-gradient(90deg,#14b886,#00876a)]" style={{ width: `${Math.max(3, pct * 100)}%` }} /></div>
+            <p className="mt-1 text-[11.5px] text-[#616161]">{got >= MONTH_GOAL ? "Objectif atteint 🎉" : `Encore ${eur(Math.max(0, MONTH_GOAL * 100 - s.monthCollected))} ce mois-ci`} · {s.monthSales ?? 0} vente{(s.monthSales ?? 0) > 1 ? "s" : ""}</p>
+          </div>
+        );
+      })()}
       <div className="flex items-start justify-between gap-3">
         <span className="text-[13px] font-medium text-[#0a8f5f]">Revenu mensuel (MRR)</span>
         <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", TONES.green)}>{s.subscribers.total} abonné{s.subscribers.total > 1 ? "s" : ""}</span>

@@ -181,6 +181,11 @@ export const GET = route(async () => {
     }),
   ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 5); // les 5 derniers comptes (plus de liste d'attente)
   const monthCancels = events.filter((e) => e.kind === "cancel" && inLast(30)(e as Dated)).length;
+  // Encaissé ce mois-ci (mois calendaire, heure de Paris) : abonnements et « Ma boutique », sans les comptes de test.
+  const ym = (d: string | Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit" }).format(new Date(d));
+  const thisMonth = ym(new Date());
+  const monthCollected = sum(events.filter((e) => e.kind === "payment" && ym(e.created_at as string) === thisMonth));
+  const monthSales = events.filter((e) => e.kind === "payment" && ym(e.created_at as string) === thisMonth).length;
 
   const sources = Object.entries(waitlist.reduce<Record<string, number>>((m, w) => ((m[w.ref || "direct"] = (m[w.ref || "direct"] ?? 0) + 1), m), {}))
     .map(([ref, count]) => ({ ref, count })).sort((a, b) => b.count - a.count);
@@ -237,6 +242,8 @@ export const GET = route(async () => {
     hesitations,
     deviceToken: owner.newDeviceToken ?? null,
     mrr,
+    monthCollected,
+    monthSales,
     arr: mrr * 12,
     subscribers: { total: active.length, starter: active.filter((s) => s.plan === "pro").length, pro: active.filter((s) => s.plan === "agency").length },
     arpu: active.length ? Math.round(mrr / active.length) : 0,
