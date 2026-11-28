@@ -10,39 +10,9 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
-    slug: "boutique-shopify-cle-en-main",
-    title: "Boutique Shopify clé en main : ce que c'est, ce que ça coûte, comment bien choisir",
-    excerpt: "Une boutique Shopify clé en main, c'est une boutique déjà construite que tu n'as plus qu'à lancer. Ce qu'elle doit contenir, les vrais coûts, les pièges à éviter et comment en avoir une en quelques minutes avec l'IA.",
-    category: "Shopify",
-    date: "2026-11-28",
-    readingMinutes: 6,
-    sections: [
-      { paragraphs: [
-        "Créer une boutique Shopify de zéro demande du temps : choisir un thème, écrire les textes, préparer les photos, créer les pages, régler les couleurs. Une boutique « clé en main », c'est une boutique où tout ce travail est déjà fait. Tu la relis, tu la relies à ton compte Shopify, et tu peux commencer à vendre.",
-        "Mais derrière ce mot, on trouve des offres très différentes. Voici comment t'y retrouver.",
-      ] },
-      { heading: "Ce qu'une vraie boutique clé en main doit contenir", paragraphs: [
-        "Une boutique clé en main sérieuse ne se limite pas à un thème joli. Elle doit être prête à recevoir des clients :",
-      ], list: ["Un nom et une identité cohérente (couleurs, police, style)", "Une page d'accueil qui explique en une phrase ce que tu vends et pour qui", "Des fiches produit complètes : photos, description utile, prix, variantes", "Les pages qui rassurent : contact, livraison, retours, FAQ", "Les pages obligatoires : conditions générales de vente, mentions légales, confidentialité", "Un affichage propre sur téléphone, où se trouve la plupart des visiteurs"] },
-      { heading: "Combien ça coûte ?", paragraphs: [
-        "Il y a deux coûts à ne pas confondre. D'abord celui de la création de la boutique, qui dépend de qui la fait : un freelance, une agence, une boutique toute faite vendue en ligne ou un outil d'IA. Ensuite celui de Shopify lui-même : l'abonnement à la plateforme, les éventuels frais sur les paiements et les applications payantes. Ces tarifs changent : vérifie-les toujours sur le site officiel de Shopify.",
-        "Chez Vigenia, l'aperçu de ta boutique est gratuit. Pour la débloquer, tu peux payer une seule fois (offre « Ma boutique », 39 €) ou prendre un abonnement si tu veux créer et retoucher plusieurs boutiques (Starter à 29 € par mois, Pro à 59 € par mois). L'abonnement Shopify reste à part, à payer à Shopify.",
-      ] },
-      { heading: "Les pièges à éviter", paragraphs: [
-        "Certaines offres de boutiques clé en main promettent des revenus rapides. Méfie-toi : aucune boutique ne garantit des ventes, et une promesse de gains est souvent le signe d'une offre qui gagne surtout de l'argent en te vendant la boutique.",
-      ], list: ["Une boutique « déjà rentable » sans preuve vérifiable", "Des avis ou des chiffres de vente inventés affichés sur la boutique", "Des produits de marque ou sous licence, donc des contrefaçons", "Une boutique copiée sur des centaines d'autres, avec les mêmes textes", "Aucun accès réel à ta boutique : elle doit être à toi, sur ton compte Shopify"] },
-      { heading: "Clé en main ne veut pas dire « rien à faire »", paragraphs: [
-        "Même avec une boutique parfaite, c'est toi qui la fais vivre : commander un échantillon pour vérifier ton produit, relire les textes pour qu'ils te ressemblent, régler les paiements et la livraison, puis surtout faire connaître la boutique, par exemple avec des vidéos courtes sur TikTok ou Instagram. La boutique clé en main te fait gagner du temps sur la construction, pour que tu en passes plus à trouver tes clients.",
-      ] },
-      { heading: "Avoir sa boutique Shopify clé en main avec l'IA", paragraphs: [
-        "Avec Vigenia, tu réponds à quelques questions ou tu colles le lien d'un produit (par exemple AliExpress). L'IA crée l'aperçu de ta boutique en quelques minutes : nom, design, textes, photos, fiche produit et pages importantes. Tu le regardes gratuitement, puis tu décides si tu veux la débloquer et l'installer sur ton compte Shopify.",
-      ], list: ["Aperçu gratuit, sans carte bancaire", "La boutique est installée sur ton propre compte Shopify : elle est à toi", "Tu peux la retoucher avant de la publier"] },
-    ],
-  },
-  {
     slug: "combien-coute-shopify",
-    title: "Combien coûte Shopify ? Tous les frais à prévoir avant de te lancer",
-    excerpt: "Le prix de Shopify ne se résume pas à l'abonnement. Abonnement, frais de paiement, applications, thème, domaine : la liste complète des frais à prévoir, et comment garder un budget de départ raisonnable.",
+    title: "Prix Shopify : combien coûte vraiment une boutique Shopify ? Tous les frais",
+    excerpt: "Prix Shopify : le coût d'une boutique ne se résume pas à l'abonnement. Abonnement, frais de paiement, applications, thème, domaine : la liste complète des frais à prévoir, et comment garder un budget de départ raisonnable.",
     category: "Shopify",
     date: "2026-11-28",
     readingMinutes: 5,

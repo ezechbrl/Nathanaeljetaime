@@ -7,6 +7,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { LightRays } from "@/components/ui/LightRays";
 import { FinalCta } from "@/components/site/FinalCta";
 import { POSTS } from "@/lib/content/blog";
+import { KeyGuides } from "@/components/site/KeyGuides";
 import { formatDate } from "@/lib/format";
 
 export function generateStaticParams() {
@@ -62,6 +63,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <p className="mt-1 text-sm text-fg-muted">Quelques questions (2 min), aperçu gratuit de ta boutique Shopify.</p>
             </Link>
           </div>
+          <KeyGuides exclude={`/blog/${post.slug}`} />
         </Container>
       </article>
       <Container className="mt-24 max-w-[760px]">

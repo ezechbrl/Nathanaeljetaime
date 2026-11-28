@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Section";
 import { PageHero } from "@/components/site/PageHero";
+import { KeyGuides } from "@/components/site/KeyGuides";
 import { GLOSSARY, termSlug } from "@/lib/content/glossary";
 
 const find = (slug: string) => GLOSSARY.find((t) => termSlug(t.term) === slug);
@@ -51,6 +52,7 @@ export default async function TermPage({ params }: { params: Promise<{ slug: str
           <Link href="/quiz" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[linear-gradient(180deg,#14b886,#00876a)] glow-hover px-5 py-3 text-sm font-semibold text-white">Voir l&apos;aperçu gratuit <ArrowRight className="h-4 w-4" /></Link>
         </div>
         <p className="mt-8 text-sm"><Link href="/lexique" className="text-accent hover:underline">← Tout le lexique</Link></p>
+        <KeyGuides />
       </Container>
     </>
   );

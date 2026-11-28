@@ -7,6 +7,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { IDEA_PAGES } from "@/lib/content/product-ideas";
 import { PRODUCT_PAGES, productSlug } from "@/lib/content/product-pages";
 import { EXTRA_PRODUCTS } from "@/lib/content/product-pages-extra";
+import { KeyGuides } from "@/components/site/KeyGuides";
 import { NICHES } from "@/lib/niches";
 
 // Une page par produit du quiz : pourquoi il plaît, l'idée de vidéo, le point de vigilance (propres au produit),
@@ -90,6 +91,7 @@ export default async function SellProductPage({ params }: { params: Promise<{ sl
           </div>
           <p className="mt-4 text-sm"><Link href={`/idees-produits/${idea.slug}`} className="text-accent hover:underline">Toutes les idées {niche.label.toLowerCase()} →</Link> · <Link href="/idees-produits" className="text-accent hover:underline">Les 72 idées de produits →</Link></p>
         </section>
+        <KeyGuides />
       </Container>
     </>
   );

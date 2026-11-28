@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Section";
 import { PageHero } from "@/components/site/PageHero";
+import { KeyGuides } from "@/components/site/KeyGuides";
 import { QUESTIONS, questionSlug } from "@/lib/content/questions";
 
 const find = (slug: string) => QUESTIONS.find((x) => questionSlug(x.q) === slug);
@@ -57,6 +58,7 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
             <p className="mt-4 text-sm"><Link href="/questions" className="text-accent hover:underline">Toutes les questions →</Link></p>
           </section>
         )}
+        <KeyGuides />
       </Container>
     </>
   );

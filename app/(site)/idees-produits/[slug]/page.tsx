@@ -7,6 +7,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { IDEA_PAGES } from "@/lib/content/product-ideas";
 import { NICHES } from "@/lib/niches";
 import { productSlug } from "@/lib/content/product-pages";
+import { KeyGuides } from "@/components/site/KeyGuides";
 import { EXTRA_PRODUCTS } from "@/lib/content/product-pages-extra";
 
 export function generateStaticParams() {
@@ -85,6 +86,7 @@ export default async function IdeaPage({ params }: { params: Promise<{ slug: str
             {others.map((o) => <Link key={o.slug} href={`/idees-produits/${o.slug}`} className="surface rounded-card p-4 text-[15px] transition-colors hover:text-accent">{o.h1} →</Link>)}
           </div>
         </section>
+        <KeyGuides />
       </Container>
     </>
   );
