@@ -24,9 +24,10 @@ const PERIODS = [
   { id: "yesterday", label: "Hier", vs: "vs avant-hier" },
   { id: "week", label: "7 jours", vs: "vs les 7 jours d'avant" },
   { id: "month", label: "30 jours", vs: "vs les 30 jours d'avant" },
+  { id: "all", label: "Depuis le début", vs: "" },
 ] as const;
 type PeriodId = (typeof PERIODS)[number]["id"];
-const PLAN_NAME: Record<string, string> = { pro: "Starter", agency: "Pro" };
+const PLAN_NAME: Record<string, string> = { pro: "Starter", agency: "Pro", single: "Ma boutique" };
 const eur = (cents: number) => formatMoney(cents, "EUR");
 const pct = (n: number) => `${(n * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
 const VAPID = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -301,12 +302,10 @@ function MoneyHero({ s }: { s: OwnerStats }) {
       })()}
       {/* Les chiffres de paiement, chacun dans sa case. */}
       {s.money && (
-        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="mb-4 grid grid-cols-2 gap-2">
           {[
-            ["Aujourd'hui", eur(s.money.todayCollected), `${s.money.todaySales} paiement${s.money.todaySales > 1 ? "s" : ""}`],
             ["Abonnements", String(s.subscribers.total), `${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`],
             ["Ma boutique", String(s.money.singles), `dont ${s.money.monthSingles} ce mois-ci`],
-            ["Depuis le début", eur(s.money.totalCollected), `${s.money.totalSales} paiement${s.money.totalSales > 1 ? "s" : ""}`],
           ].map(([label, value, sub]) => (
             <div key={label} className="rounded-[14px] border border-[#cdeedd] bg-white/80 p-3">
               <p className="text-[11.5px] font-medium text-[#616161]">{label}</p>
@@ -369,6 +368,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
   const p = s.periods[period];
   const q = p.prev;
   const vs = PERIODS.find((x) => x.id === period)!.vs;
+  const cmp = period !== "all"; // pas de comparaison pour « Depuis le début »
   const conv = (c: { signups: number; visits: number }) => (c.visits ? c.signups / c.visits : 0);
 
   const aff = s.affiliates.reduce((t, a) => ({ clicks: t.clicks + a.clicks, signups: t.signups + a.signups, customers: t.customers + a.customers, commission: t.commission + a.commission }), { clicks: 0, signups: 0, customers: 0, commission: 0 });
@@ -378,9 +378,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
   return (
     <div className="space-y-3 pb-10">
-      <div role="tablist" aria-label="Période" className="sticky top-[max(env(safe-area-inset-top),8px)] z-20 grid grid-cols-4 rounded-full bg-[#121514]/95 p-1 shadow-lg backdrop-blur">
+      <div role="tablist" aria-label="Période" className="sticky top-[max(env(safe-area-inset-top),8px)] z-20 grid grid-cols-5 rounded-full bg-[#121514]/95 p-1 shadow-lg backdrop-blur">
         {PERIODS.map((x) => (
-          <button key={x.id} type="button" role="tab" aria-selected={period === x.id} onClick={() => setPeriod(x.id)} className={cn("rounded-full py-2 text-[13px] font-medium transition-colors", period === x.id ? "bg-white text-[#111]" : "text-white/75")}>
+          <button key={x.id} type="button" role="tab" aria-selected={period === x.id} onClick={() => setPeriod(x.id)} className={cn("rounded-full px-1 py-2 text-[12px] font-medium leading-tight transition-colors sm:text-[13px]", period === x.id ? "bg-white text-[#111]" : "text-white/75")}>
             {x.label}
           </button>
         ))}
@@ -396,7 +396,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
       {metric === "signups" && <Chart title="Inscrits" total={String(p.signups)} points={chart("signups")} color="#2563eb" format={(n) => plural(n, "inscrit")} short={compact} />}
       {metric === "revenue" && <Chart title="Revenus" total={eur(p.revenue)} points={chart("revenue")} color="#0a8f5f" format={eur} short={euroShort} money />}
       {metric === "visits" && <Chart title="Visites" total={String(p.visits)} points={chart("visits")} color="#f59e0b" format={(n) => plural(n, "visiteur")} short={compact} />}
-      <p className="px-1 text-xs text-white/60">Flèches : {vs} · vrais visiteurs seulement (sans robots ni passages Shopify)</p>
+      <p className="px-1 text-xs text-white/60">{cmp ? `Flèches : ${vs} · ` : ""}vrais visiteurs seulement (sans robots ni passages Shopify)</p>
 
       {/* Puis l'argent : objectif du mois, cases de paiement, revenu mensuel et prochain palier */}
       <MoneyHero s={s} />
@@ -404,17 +404,17 @@ function Dashboard({ s }: { s: OwnerStats }) {
       {/* Les chiffres clés de la période, tous à la même taille */}
       <div className="grid grid-cols-2 gap-3">
         {/* Visites et inscrits d'abord */}
-        <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={q.visits} />
-        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint="Comptes créés" cur={p.signups} prev={q.signups} />
+        <Metric icon={Eye} color="amber" label="Visiteurs" value={String(p.visits)} hint="Vraies visites" cur={p.visits} prev={cmp ? q.visits : undefined} />
+        <Metric icon={UserPlus} color="blue" label="Inscrits" value={String(p.signups)} hint="Comptes créés" cur={p.signups} prev={cmp ? q.signups : undefined} />
         <Live count={s.liveNow} />
-        <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={Math.round(conv(q) * 1000)} />
-        <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={q.stores} />
-        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page de paiement" cur={p.checkouts} prev={q.checkouts} />
+        <Metric icon={Percent} color="violet" label="Visiteurs → inscrits" value={p.visits ? pct(conv(p)) : "—"} hint="Taux de conversion" cur={Math.round(conv(p) * 1000)} prev={cmp ? Math.round(conv(q) * 1000) : undefined} />
+        <Metric icon={ShoppingBag} color="pink" label="Aperçus créés" value={String(p.stores)} hint="Boutiques générées" cur={p.stores} prev={cmp ? q.stores : undefined} />
+        <Metric icon={BadgeCheck} color="amber" label="Paiement ouvert" value={String(p.checkouts)} hint="Ont vu la page de paiement" cur={p.checkouts} prev={cmp ? q.checkouts : undefined} />
         {/* Puis l'argent de la période */}
-        <Metric icon={Wallet} color="green" label="Encaissé" value={eur(p.revenue)} hint={plural(p.sales, "paiement")} cur={p.revenue} prev={q.revenue} />
-        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} hint="Premiers abonnements" cur={p.newSubs} prev={q.newSubs} />
-        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" cur={p.sales} prev={q.sales} />
-        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} hint={`Taux sur 30 j : ${pct(s.churn)}`} cur={p.cancels} prev={q.cancels} inverse />
+        <Metric icon={Wallet} color="green" label="Encaissé" value={eur(p.revenue)} hint={plural(p.sales, "paiement")} cur={p.revenue} prev={cmp ? q.revenue : undefined} />
+        <Metric icon={TrendingUp} color="violet" label="Nouveaux abonnés" value={`+${p.newSubs}`} hint="Premiers abonnements" cur={p.newSubs} prev={cmp ? q.newSubs : undefined} />
+        <Metric icon={Receipt} color="green" label="Ventes" value={String(p.sales)} hint="Paiements reçus" cur={p.sales} prev={cmp ? q.sales : undefined} />
+        <Metric icon={TrendingDown} color="red" label="Désabonnements" value={p.cancels ? `−${p.cancels}` : "0"} hint={`Taux sur 30 j : ${pct(s.churn)}`} cur={p.cancels} prev={cmp ? q.cancels : undefined} inverse />
         <Metric icon={Users} color="blue" label="Abonnés actifs" value={String(s.subscribers.total)} hint={`${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`} />
         <Metric icon={Gauge} color="violet" label="Panier moyen" value={eur(s.arpu)} hint="Par abonné et par mois" />
         <Metric icon={CalendarRange} color="green" label="ARR" value={eur(s.arr)} hint="Sur un an, au rythme actuel" />
@@ -602,7 +602,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
             {s.recent.map((r, i) => (
               <li key={i} className="flex items-center gap-3 py-3">
                 <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", r.kind === "cancel" ? "bg-[#fee8e5] text-[#b42318]" : r.kind === "new" ? "bg-[#d9f7e8] text-[#0a6b48]" : "bg-[#f1f1f1] text-[#444]")}>
-                  {r.kind === "new" ? "Nouveau" : r.kind === "payment" ? "Paiement" : "Arrêt"}
+                  {r.kind === "new" ? "Nouvel abonné" : r.kind === "payment" ? (r.plan === "single" ? "Achat unique" : "Renouvellement") : "Arrêt"}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate">{PLAN_NAME[r.plan ?? ""] ?? r.plan}{r.email && <span className="text-[#8a8a8a]"> · {r.email}</span>}</span>

@@ -21,13 +21,13 @@ function planLabel(k: string) {
 export function Checkouts() {
   const [d, setD] = useState<api.CheckoutPerson[] | null>(null);
   const [error, setError] = useState("");
-  // Seulement ceux qui n'ont pas payé, les 5 plus récents.
-  useEffect(() => { api.cachedOwner("checkouts", api.getOwnerCheckouts, (r) => setD(r.people.filter((p) => !p.paid).slice(0, 5)), (e) => setError(e.message)); }, []);
+  // Seulement ceux qui n'ont pas payé, les 4 plus récents.
+  useEffect(() => { api.cachedOwner("checkouts", api.getOwnerCheckouts, (r) => setD(r.people.filter((p) => !p.paid).slice(0, 4)), (e) => setError(e.message)); }, []);
   const totals: Record<string, number> = {};
   for (const p of d ?? []) for (const [k, n] of Object.entries(p.plans)) { const plan = k.split(":")[0]; totals[plan] = (totals[plan] ?? 0) + n; }
   return (
     <section className="min-w-0 overflow-hidden rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5">
-      <h2 className="flex items-center gap-2 text-[17px] font-semibold"><span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#fef3c7] text-[#b45309]"><CreditCard className="h-4 w-4" /></span>Ont voulu payer <span className="font-normal text-[#8a8a8a]">· les 5 derniers sans payer</span></h2>
+      <h2 className="flex items-center gap-2 text-[17px] font-semibold"><span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#fef3c7] text-[#b45309]"><CreditCard className="h-4 w-4" /></span>Ont voulu payer <span className="font-normal text-[#8a8a8a]">· les 4 derniers sans payer</span></h2>
       {error && <p className="mt-2 text-sm text-[#d72c0d]">{error}</p>}
       {!d && !error && <p className="mt-2 text-sm text-[#8a8a8a]">Chargement…</p>}
       {d && !d.length && <p className="mt-2 text-sm text-[#8a8a8a]">Personne n'a ouvert la page de paiement sans payer cette semaine.</p>}

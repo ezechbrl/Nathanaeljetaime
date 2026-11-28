@@ -210,7 +210,7 @@ export type OwnerStats = {
   conversion: number; // abonnés payants / comptes créés (0 à 1)
   liveNow: number; // visiteurs sur le site dans les 2 dernières minutes
   totals: { waitlist: number; accounts: number };
-  periods: { today: OwnerPeriod; yesterday: OwnerPeriod; week: OwnerPeriod; month: OwnerPeriod };
+  periods: { today: OwnerPeriod; yesterday: OwnerPeriod; week: OwnerPeriod; month: OwnerPeriod; all: OwnerPeriod };
   sources: { ref: string; count: number }[];
   affiliates: { code: string; name: string; clicks: number; signups: number; customers: number; commission: number; rate: number }[];
   shopifyAffiliation: { configured: boolean; trials: number; paid: number; pending: number; approved: number; currency: string; recent: { label: string; state: string | null; payout: number; at: string | null }[] };

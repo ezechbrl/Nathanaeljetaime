@@ -224,7 +224,11 @@ export async function syncSubscription(sub: Stripe.Subscription) {
   if (was === "free" && plan !== "free" && info) {
     const offer = sub.metadata?.offer;
     await notifyOwner(`💰 Nouvelle vente Vigenia${sub.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount ?? 0, "EUR")}/${interval === "year" ? "an" : "mois"}${offer === "waitlist" ? " avec le prix spécial" : ""}`));
-    if (sub.livemode && before?.stripe_subscription_id !== sub.id) await logRevenue({ user_id: userId, kind: "new", plan, amount_cents: amount ?? 0, currency: "EUR", external_id: `new:${sub.id}` });
+    if (sub.livemode && before?.stripe_subscription_id !== sub.id) {
+      await logRevenue({ user_id: userId, kind: "new", plan, amount_cents: amount ?? 0, currency: "EUR", external_id: `new:${sub.id}` });
+      // La facture payée arrive souvent juste avant : son paiement a été noté avec l'ancien plan (« free »).
+      await db().from("revenue_events").update({ plan }).eq("user_id", userId).eq("kind", "payment").eq("plan", "free");
+    }
   } else if (was !== "free" && plan === "free") {
     await notifyOwner("Abonné parti", `${user?.email ?? "Un client"} a arrêté son abonnement Vigenia.`);
     if (sub.livemode && !before?.test && before?.plan && before.plan !== "free") await logRevenue({ user_id: userId, kind: "cancel", plan: before.plan, external_id: `cancel:${sub.id}` });

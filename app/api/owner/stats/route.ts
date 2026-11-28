@@ -91,7 +91,17 @@ export const GET = route(async () => {
     const k = n - 1 - i;
     return { label: shortDay(D[k]), cur: (d: string) => parisDay(d) === D[k], prev: (d: string) => parisDay(d) === D[k + n] };
   });
-  const WINDOWS: Record<"today" | "yesterday" | "week" | "month", Win> = {
+  // « Depuis le début » : un point par jour depuis le premier compte (ou par semaine si plus de 60 jours).
+  const firstAt = [...realUsers, ...events].map((r) => r.created_at as string).sort()[0] ?? new Date().toISOString();
+  const allDays = Math.max(1, Math.ceil((Date.now() - new Date(firstAt).getTime()) / DAY) + 1);
+  const allBuckets: Win["buckets"] = allDays <= 60
+    ? Array.from({ length: allDays }, (_, i) => { const k = allDays - 1 - i; return { label: shortDay(D[k]), cur: (d: string) => parisDay(d) === D[k], prev: () => false }; })
+    : Array.from({ length: Math.ceil(allDays / 7) }, (_, i) => {
+        const start = new Date(firstAt).getTime() + i * 7 * DAY, end = start + 7 * DAY;
+        return { label: new Date(start).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), cur: (d: string) => { const x = new Date(d).getTime(); return x >= start && x < end; }, prev: () => false };
+      });
+  const WINDOWS: Record<"today" | "yesterday" | "week" | "month" | "all", Win> = {
+    all: { cur: () => true, prev: () => false, buckets: allBuckets },
     // Aujourd'hui est comparé à hier à la même heure, pour que la comparaison soit juste.
     today: { cur: (d) => parisDay(d) === D[0], prev: (d) => parisDay(d) === D[1] && parisHM(d) <= nowHM, buckets: hourly(D[0], D[1], true) },
     yesterday: { cur: (d) => parisDay(d) === D[1], prev: (d) => parisDay(d) === D[2], buckets: hourly(D[1], D[2], false) },
@@ -273,6 +283,14 @@ export const GET = route(async () => {
     funnel,
     signups,
     errors: { day: errors.filter((e) => inLast(1)(e as Dated)).length, month: errors.length, recent: errors.slice(0, 5).map((e) => ({ path: e.path, status: e.status, message: e.message, at: e.created_at })) },
-    recent: events.filter((e) => e.kind !== "checkout").slice(0, 12).map((e) => ({ kind: e.kind, plan: e.plan, amount: toEur(Number(e.amount_cents), e.currency), email: e.users?.email ?? null, at: e.created_at })),
+    // Dernières ventes : une ligne par paiement (le « new » qui l'accompagne n'est pas une 2e vente).
+    // Le paiement d'un abonnement est enregistré avec plan « free » : on prend l'offre du « new » de ce client.
+    recent: events.filter((e) => e.kind === "payment" || e.kind === "cancel").slice(0, 12).map((e) => {
+      const plan = e.kind === "payment" && (!e.plan || e.plan === "free")
+        ? ((events.find((n) => n.kind === "new" && n.user_id === e.user_id)?.plan as string | undefined) ?? (subs.find((x) => x.user_id === e.user_id)?.plan as string | undefined) ?? e.plan)
+        : e.plan;
+      const first = e.kind === "payment" && plan !== "single" && !events.some((o) => o.kind === "payment" && o.user_id === e.user_id && String(o.created_at) < String(e.created_at));
+      return { kind: e.kind === "payment" && plan !== "single" && first ? "new" : e.kind, plan, amount: toEur(Number(e.amount_cents), e.currency), email: e.users?.email ?? null, at: e.created_at };
+    }),
   });
 });

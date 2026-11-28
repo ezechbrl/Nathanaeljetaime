@@ -163,9 +163,11 @@ export function Quiz({ onFinish, skipHref, preset, demo = false, demoProducts, o
   const head: Step[] = demo ? ["income", "goal"] : ["income"];
   const ideaStep: Step[] = preset || demo ? [] : ["idea"];
   const productSteps: Step[] = demoProducts?.length ? ["product"] : preset || hasIdea ? [] : ["big", "sub", "product"];
-  const profile: Step[] = demo ? [] : ["level", "budget", "shopify"];
+  // Profil retiré le 28 nov. : ces 3 questions juste après le compte faisaient partir des gens (8 arrêts sur « level » en 7 jours).
+  const profile: Step[] = [];
   // Démo : seulement les 2 questions qui parlent le plus à l'écran (à qui vendre, à quel prix).
-  const tail: Step[] = demo ? ["audience", "price"] : ["audience", "market", "supply", "channel", "price"];
+  // Seulement les questions qui changent vraiment la boutique : à qui, où, à quel prix.
+  const tail: Step[] = demo ? ["audience", "price"] : ["audience", "market", "price"];
   const plan: Step[] = [...head, ...ideaStep, ...productSteps, ...(logged ? [] : ["account" as Step]), ...profile, ...tail];
   const questions: Step[] = plan.filter((x) => x !== "account");
   const index = plan.indexOf(step);
@@ -208,7 +210,14 @@ export function Quiz({ onFinish, skipHref, preset, demo = false, demoProducts, o
     setHistory(["income"]);
   };
   // Réponse gardée d'une ancienne version du quiz (question qui n'existe plus) : on repart du début.
-  useEffect(() => { if (step !== "account" && !plan.includes(step)) restart(); }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Questions retirées : on avance à la suivante au lieu de tout recommencer (quiz commencé avant la mise à jour).
+  const MOVED: Partial<Record<Step, Step>> = { level: "audience", budget: "audience", shopify: "audience", supply: "price", channel: "price" };
+  useEffect(() => {
+    if (step === "account" || plan.includes(step)) return;
+    const to = MOVED[step];
+    if (to && plan.includes(to)) setHistory((h) => [...h.slice(0, -1), to]);
+    else restart();
+  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
   const productName = (hasIdea ? idea.trim() : n?.products.find((p) => p[1] === product)?.[0] ?? "").slice(0, 60);
   const supplierOk = /^https?:\/\/\S+\.\S+/.test(supplierUrl.trim());
   const chosen = preset?.isLink ? "Produit du lien fourni" : hasIdea ? idea.trim() : product;
