@@ -1,12 +1,11 @@
 "use client";
 
-import { Plus, Receipt, Trash2 } from "lucide-react";
+import { Receipt, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import * as api from "@/lib/api/client";
 
 const PERIOD: Record<api.OwnerCost["period"], string> = { month: "par mois", year: "par an", usage: "à l'usage", once: "une fois" };
 const money = (cents: number, cur: string) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: cur, minimumFractionDigits: cents % 100 ? 2 : 0 }).format(cents / 100);
-const EMPTY = { name: "", what: "", amount: "", currency: "EUR" as const, period: "month" as const, method: "", essential: false };
 type Draft = { id?: string; name: string; what: string; amount: string; currency: "EUR" | "USD"; period: api.OwnerCost["period"]; method: string; essential: boolean };
 
 // Ventes : ce que tu paies pour faire tourner Vigenia, avec le moyen de paiement. Modifiable ici.
@@ -43,7 +42,6 @@ export function Costs({ mrr }: { mrr: number }) {
     <section className="min-w-0 overflow-hidden rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className="grid h-7 w-7 place-items-center rounded-[9px] bg-[#fee2e2] text-[#b91c1c]"><Receipt className="h-3.5 w-3.5" /></span>Ce que tu paies</h2>
-        <button type="button" onClick={() => setEdit({ ...EMPTY })} className="inline-flex items-center gap-1 rounded-full bg-[#f4f4f5] px-3 py-1.5 text-[12px] font-medium"><Plus className="h-3.5 w-3.5" /> Ajouter</button>
       </div>
       {error && <p className="mt-2 text-sm text-[#d72c0d]">{error}</p>}
       {!list && !error && <p className="mt-2 text-sm text-[#8a8a8a]">Chargement…</p>}
@@ -69,7 +67,7 @@ export function Costs({ mrr }: { mrr: number }) {
               </li>
             ))}
           </ul>
-          <p className="mt-1 text-[11px] text-[#8a8a8a]">Mis à jour à chaque topo (8 h et 20 h) avec les reçus reçus par e-mail. Touche une ligne pour la modifier.</p>
+
         </>
       )}
       {edit && (
