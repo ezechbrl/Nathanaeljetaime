@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Plus, Receipt, Trash2 } from "lucide-react";
+import { Plus, Receipt, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import * as api from "@/lib/api/client";
 
@@ -20,7 +20,6 @@ export function Costs({ mrr }: { mrr: number }) {
   // Total fixe par mois, par devise (l'année est divisée par 12 ; « à l'usage » n'est pas compté).
   const fixed: Record<string, number> = {};
   for (const c of list ?? []) if (c.amount_cents && (c.period === "month" || c.period === "year")) fixed[c.currency] = (fixed[c.currency] ?? 0) + (c.period === "year" ? c.amount_cents / 12 : c.amount_cents);
-  const unknown = (list ?? []).filter((c) => c.amount_cents == null && c.period !== "usage").length;
 
   async function save() {
     if (!edit || !edit.name.trim()) return;
@@ -43,42 +42,34 @@ export function Costs({ mrr }: { mrr: number }) {
   return (
     <section className="min-w-0 overflow-hidden rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-[17px] font-semibold"><span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#fee2e2] text-[#b91c1c]"><Receipt className="h-4 w-4" /></span>Ce que tu paies</h2>
+        <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className="grid h-7 w-7 place-items-center rounded-[9px] bg-[#fee2e2] text-[#b91c1c]"><Receipt className="h-3.5 w-3.5" /></span>Ce que tu paies</h2>
         <button type="button" onClick={() => setEdit({ ...EMPTY })} className="inline-flex items-center gap-1 rounded-full bg-[#f4f4f5] px-3 py-1.5 text-[12px] font-medium"><Plus className="h-3.5 w-3.5" /> Ajouter</button>
       </div>
       {error && <p className="mt-2 text-sm text-[#d72c0d]">{error}</p>}
       {!list && !error && <p className="mt-2 text-sm text-[#8a8a8a]">Chargement…</p>}
       {list && (
         <>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-[14px] bg-[#fef2f2] p-3">
-              <p className="text-[11.5px] text-[#616161]">Dépenses fixes / mois</p>
-              <p className="mt-0.5 text-[1.2rem] font-bold tabular-nums">{Object.keys(fixed).length ? Object.entries(fixed).map(([cur, c]) => money(Math.round(c), cur)).join(" + ") : "—"}</p>
-              <p className="text-[11px] text-[#8a8a8a]">{unknown ? `${unknown} montant${unknown > 1 ? "s" : ""} à remplir` : "sans les frais à l'usage"}</p>
-            </div>
-            <div className="rounded-[14px] bg-[#ecfdf5] p-3">
-              <p className="text-[11.5px] text-[#616161]">Ton MRR</p>
-              <p className="mt-0.5 text-[1.2rem] font-bold tabular-nums">{money(mrr, "EUR")}</p>
-              <p className="text-[11px] text-[#8a8a8a]">{fixed.EUR !== undefined && !fixed.USD ? `reste ${money(Math.round(mrr - fixed.EUR), "EUR")} / mois` : "dollars non convertis"}</p>
-            </div>
-          </div>
-          <ul className="mt-3 divide-y divide-[#eee]">
+          <p className="mt-2 text-[12.5px] text-[#616161]">Fixe par mois : <b className="text-[#d72c0d]">{Object.keys(fixed).length ? Object.entries(fixed).map(([cur, c]) => `−${money(Math.round(c), cur)}`).join(" ") : "—"}</b> · ton MRR : <b className="text-[#0a8f5f]">{money(mrr, "EUR")}</b></p>
+          <ul className="mt-2 divide-y divide-[#eee]">
             {list.map((c) => (
-              <li key={c.id} className="flex items-start gap-3 py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold">{c.name}</p>
-                  {c.what && <p className="mt-0.5 text-[12.5px] text-[#616161]">{c.what}</p>}
-                  <p className="mt-0.5 text-[12px] text-[#8a8a8a]">Payé avec : {c.method || "à remplir"}</p>
-                  {c.last_cents != null && c.last_at && <p className="mt-0.5 text-[12px] text-[#b45309]">Dernier paiement : {money(c.last_cents, c.last_currency || c.currency)} le {new Date(c.last_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}</p>}
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-[14px] font-semibold tabular-nums">{c.amount_cents != null ? money(c.amount_cents, c.currency) : "?"}</p>
-                  <p className="text-[11px] text-[#8a8a8a]">{PERIOD[c.period]}</p>
-                  <button type="button" aria-label="Modifier" onClick={() => setEdit({ id: c.id, name: c.name, what: c.what ?? "", amount: c.amount_cents != null ? String(c.amount_cents / 100).replace(".", ",") : "", currency: c.currency, period: c.period, method: c.method ?? "", essential: c.essential })} className="mt-1 inline-flex items-center gap-1 text-[11px] text-[#0a8f5f]"><Pencil className="h-3 w-3" /> Modifier</button>
-                </div>
+              <li key={c.id}>
+                <button type="button" onClick={() => setEdit({ id: c.id, name: c.name, what: c.what ?? "", amount: c.amount_cents != null ? String(c.amount_cents / 100).replace(".", ",") : "", currency: c.currency, period: c.period, method: c.method ?? "", essential: c.essential })} className="flex w-full items-center gap-3 py-2 text-left">
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13.5px] font-semibold">{c.name}</span>
+                    <span className="block truncate text-[11.5px] text-[#8a8a8a]">
+                      {c.last_cents != null && c.last_at ? `dernier : −${money(c.last_cents, c.last_currency || c.currency)} le ${new Date(c.last_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}` : "pas encore de paiement vu"}
+                      {c.method ? ` · ${c.method.replace("Carte se terminant par ", "carte ")}` : ""}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <span className="block text-[14px] font-bold tabular-nums text-[#d72c0d]">{c.amount_cents != null ? `−${money(c.amount_cents, c.currency)}` : c.period === "usage" ? "à l'usage" : "?"}</span>
+                    <span className="block text-[10.5px] text-[#8a8a8a]">{c.amount_cents != null ? PERIOD[c.period] : ""}</span>
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
+          <p className="mt-1 text-[11px] text-[#8a8a8a]">Mis à jour à chaque topo (8 h et 20 h) avec les reçus reçus par e-mail. Touche une ligne pour la modifier.</p>
         </>
       )}
       {edit && (
