@@ -11,6 +11,7 @@ import * as api from "@/lib/api/client";
 import { Journeys } from "./Journeys";
 import { QuizFunnel } from "./QuizFunnel";
 import { Checkouts } from "./Checkouts";
+import { Costs } from "./Costs";
 import { LiveNow } from "./LiveNow";
 import { ApiClientError } from "@/lib/api/errors";
 import type { OwnerStats } from "@/lib/api/types";
@@ -452,6 +453,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
 
       {/* Qui a ouvert la page de paiement, pour quelle offre, combien de fois. */}
       <Checkouts />
+
+      {/* Ce que tu paies (Vercel, IA, Stripe…) et avec quoi. */}
+      <Costs mrr={s.mrr} />
 
       {/* Grand tableau : d'où vient chaque inscrit, sa boutique et où il s'est arrêté. */}
       <Journeys />
