@@ -181,6 +181,9 @@ export const GLOSSARY: Term[] = [
   { term: "Live shopping", def: "Vente en direct en vidéo, où l'on présente des produits et répond aux questions en temps réel.", example: "Un live TikTok où tu montres ton produit et réponds aux commentaires.", tip: "Prépare un déroulé et annonce ton live à l'avance.", related: ["TikTok", "Engagement", "Communauté"] },
   { term: "Date limite de commande", def: "Dernière date à laquelle un client peut commander pour être livré avant un événement.", example: "« Commandez avant le 15 décembre pour recevoir avant Noël ».", tip: "Calcule-la avec les délais réels de préparation et de transport.", related: ["Délai de livraison", "Bandeau d'annonce"] },
   { term: "Charte graphique", def: "Document qui fixe les couleurs, polices, logo et style visuel d'une marque.", example: "Une page qui indique tes deux couleurs, ta police et ton logo.", tip: "Partage-la avec toute personne qui crée du contenu pour toi.", related: ["Identité visuelle", "Logo", "Marque"] },
+  // Passage SEO du 28 novembre
+  { term: "MOQ", def: "Quantité minimum de commande exigée par un fournisseur, surtout chez les fabricants sur Alibaba.", example: "Un fabricant accepte de vendre ton produit à partir de 100 unités.", tip: "Demande toujours si le MOQ peut être plus bas pour une première commande.", related: ["Fournisseur", "Grossiste", "Stock"] },
+  { term: "OEM", def: "Fabrication d'un produit existant avec ta marque, ton logo ou ton emballage, par le fabricant d'origine.", example: "Une gourde fabriquée par un fournisseur, mais avec ton logo gravé.", tip: "Valide toujours un échantillon personnalisé avant la grosse commande.", related: ["Marque blanche", "Packaging", "Sourcing"] },
 ];
 
 export const termSlug = (t: string) =>

@@ -37,6 +37,12 @@ export const POSTS: BlogPost[] = [
       ] },
       { heading: "6. Ce qui n'est pas Shopify mais qu'il faut prévoir", paragraphs: [
       ], list: ["Un ou deux échantillons de ton produit, pour vérifier la qualité et le délai", "Un petit budget pour te faire connaître, si tu choisis la publicité", "La création de la boutique elle-même, si tu ne la fais pas seul", "Une petite réserve pour les imprévus : colis perdu, remboursement"] },
+      { heading: "Questions fréquentes sur le prix de Shopify", paragraphs: [
+        "Shopify a-t-il une version gratuite ? Shopify propose en général une période d'essai, puis un abonnement payant. Il n'y a pas de formule gratuite pour vendre durablement : vérifie les offres du moment sur le site officiel.",
+        "Combien coûte Shopify par mois au total ? L'abonnement, plus les frais sur chaque paiement, plus les applications payantes que tu choisis. Le domaine se paie une fois par an. Avec un thème gratuit et peu d'applications, le total reste proche de l'abonnement.",
+        "Pourquoi le prix change selon les pays ? Shopify affiche ses tarifs selon la devise et les taxes de chaque pays. En France, la TVA s'ajoute aux prix hors taxes : regarde toujours le prix TTC sur la page officielle.",
+        "Combien coûte une agence pour créer une boutique Shopify ? Ça dépend du travail demandé : une agence ou un freelance fait un devis selon le nombre de pages, les textes, les photos et les réglages. Demande plusieurs devis. Avec Vigenia, l'aperçu est gratuit et la boutique se débloque dès 39 €.",
+      ] },
       { heading: "Comment garder un budget de départ raisonnable", paragraphs: [
         "Commence avec la formule de base, un thème gratuit, peu d'applications et un seul produit bien présenté. Trouve tes premiers clients avec des vidéos courtes gratuites avant de payer de la publicité. Et calcule ta marge avec tous ces frais avant de fixer ton prix.",
         "Pour gagner du temps sur la création, Vigenia crée l'aperçu de ta boutique Shopify gratuitement en quelques minutes. Tu ne paies que si tu veux la débloquer : 39 € une fois avec « Ma boutique », ou un abonnement si tu veux plusieurs boutiques. L'abonnement Shopify, lui, se paie directement à Shopify.",

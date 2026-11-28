@@ -619,4 +619,6 @@ export const EXTRA_PRODUCTS: ExtraProduct[] = [
   { niche: "gaming", name: "Boîte de rangement pour cartes à collectionner", brief: "Boîte compartimentée pour ranger et protéger des cartes", why: "Les collectionneurs veulent protéger leurs cartes.", video: "Ranger des cartes par séries dans les compartiments.", watch: "Ne montre aucune carte sous licence dans ta publicité sans autorisation." },
   { niche: "voyage", name: "Sac isotherme repas", brief: "Petit sac pour emporter un repas en voyage ou au travail", why: "Manger sain en déplacement sans dépenser à chaque repas.", video: "Ranger une boîte repas et une boisson dans le sac.", watch: "Annonce la durée de fraîcheur testée." },
   { niche: "voyage", name: "Organiseur de chargeurs", brief: "Pochette pour ranger chargeurs, câbles et batterie", why: "Retrouver tout de suite ses câbles en voyage.", video: "Ouvrir la pochette et montrer chaque câble à sa place.", watch: "Montre les dimensions avec une batterie à côté." },
+  // Passage SEO du 28 novembre
+
 ];
