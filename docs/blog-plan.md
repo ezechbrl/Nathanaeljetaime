@@ -19,6 +19,8 @@ Quand la liste est finie, elle choisit un nouveau sujet et l'ajoute ici.
 | ven. 27 nov. (en plus) | Livraison gratuite : bonne idée ou piège ? | livraison gratuite boutique en ligne | livraison-gratuite-boutique-en-ligne |
 | ven. 27 nov. (en plus) | Politique de retour d'une boutique en ligne | politique de retour boutique en ligne | politique-de-retour-boutique-en-ligne |
 | ven. 27 nov. (en plus) | Idées de produits à vendre pour Noël | produits à vendre Noël | idees-produits-noel-boutique-en-ligne |
+| sam. 28 nov. (en plus) | Boutique Shopify clé en main | boutique shopify clé en main | boutique-shopify-cle-en-main |
+| sam. 28 nov. (en plus) | Combien coûte Shopify ? | shopify prix / combien coûte shopify | combien-coute-shopify |
 | ven. 27 nov. | Délais de livraison en dropshipping : comment les annoncer et rassurer tes clients | délais livraison dropshipping | delais-livraison-dropshipping |
 | dim. 29 nov. | Obtenir des avis clients sur sa boutique en ligne (sans tricher) | avis clients boutique en ligne | obtenir-avis-clients-boutique-en-ligne |
 | lun. 30 nov. | Photos produit au téléphone : faire de belles photos pour sa boutique | photos produit boutique en ligne | photos-produit-telephone-boutique |

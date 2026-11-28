@@ -10,6 +10,70 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "boutique-shopify-cle-en-main",
+    title: "Boutique Shopify clé en main : ce que c'est, ce que ça coûte, comment bien choisir",
+    excerpt: "Une boutique Shopify clé en main, c'est une boutique déjà construite que tu n'as plus qu'à lancer. Ce qu'elle doit contenir, les vrais coûts, les pièges à éviter et comment en avoir une en quelques minutes avec l'IA.",
+    category: "Shopify",
+    date: "2026-11-28",
+    readingMinutes: 6,
+    sections: [
+      { paragraphs: [
+        "Créer une boutique Shopify de zéro demande du temps : choisir un thème, écrire les textes, préparer les photos, créer les pages, régler les couleurs. Une boutique « clé en main », c'est une boutique où tout ce travail est déjà fait. Tu la relis, tu la relies à ton compte Shopify, et tu peux commencer à vendre.",
+        "Mais derrière ce mot, on trouve des offres très différentes. Voici comment t'y retrouver.",
+      ] },
+      { heading: "Ce qu'une vraie boutique clé en main doit contenir", paragraphs: [
+        "Une boutique clé en main sérieuse ne se limite pas à un thème joli. Elle doit être prête à recevoir des clients :",
+      ], list: ["Un nom et une identité cohérente (couleurs, police, style)", "Une page d'accueil qui explique en une phrase ce que tu vends et pour qui", "Des fiches produit complètes : photos, description utile, prix, variantes", "Les pages qui rassurent : contact, livraison, retours, FAQ", "Les pages obligatoires : conditions générales de vente, mentions légales, confidentialité", "Un affichage propre sur téléphone, où se trouve la plupart des visiteurs"] },
+      { heading: "Combien ça coûte ?", paragraphs: [
+        "Il y a deux coûts à ne pas confondre. D'abord celui de la création de la boutique, qui dépend de qui la fait : un freelance, une agence, une boutique toute faite vendue en ligne ou un outil d'IA. Ensuite celui de Shopify lui-même : l'abonnement à la plateforme, les éventuels frais sur les paiements et les applications payantes. Ces tarifs changent : vérifie-les toujours sur le site officiel de Shopify.",
+        "Chez Vigenia, l'aperçu de ta boutique est gratuit. Pour la débloquer, tu peux payer une seule fois (offre « Ma boutique », 39 €) ou prendre un abonnement si tu veux créer et retoucher plusieurs boutiques (Starter à 29 € par mois, Pro à 59 € par mois). L'abonnement Shopify reste à part, à payer à Shopify.",
+      ] },
+      { heading: "Les pièges à éviter", paragraphs: [
+        "Certaines offres de boutiques clé en main promettent des revenus rapides. Méfie-toi : aucune boutique ne garantit des ventes, et une promesse de gains est souvent le signe d'une offre qui gagne surtout de l'argent en te vendant la boutique.",
+      ], list: ["Une boutique « déjà rentable » sans preuve vérifiable", "Des avis ou des chiffres de vente inventés affichés sur la boutique", "Des produits de marque ou sous licence, donc des contrefaçons", "Une boutique copiée sur des centaines d'autres, avec les mêmes textes", "Aucun accès réel à ta boutique : elle doit être à toi, sur ton compte Shopify"] },
+      { heading: "Clé en main ne veut pas dire « rien à faire »", paragraphs: [
+        "Même avec une boutique parfaite, c'est toi qui la fais vivre : commander un échantillon pour vérifier ton produit, relire les textes pour qu'ils te ressemblent, régler les paiements et la livraison, puis surtout faire connaître la boutique, par exemple avec des vidéos courtes sur TikTok ou Instagram. La boutique clé en main te fait gagner du temps sur la construction, pour que tu en passes plus à trouver tes clients.",
+      ] },
+      { heading: "Avoir sa boutique Shopify clé en main avec l'IA", paragraphs: [
+        "Avec Vigenia, tu réponds à quelques questions ou tu colles le lien d'un produit (par exemple AliExpress). L'IA crée l'aperçu de ta boutique en quelques minutes : nom, design, textes, photos, fiche produit et pages importantes. Tu le regardes gratuitement, puis tu décides si tu veux la débloquer et l'installer sur ton compte Shopify.",
+      ], list: ["Aperçu gratuit, sans carte bancaire", "La boutique est installée sur ton propre compte Shopify : elle est à toi", "Tu peux la retoucher avant de la publier"] },
+    ],
+  },
+  {
+    slug: "combien-coute-shopify",
+    title: "Combien coûte Shopify ? Tous les frais à prévoir avant de te lancer",
+    excerpt: "Le prix de Shopify ne se résume pas à l'abonnement. Abonnement, frais de paiement, applications, thème, domaine : la liste complète des frais à prévoir, et comment garder un budget de départ raisonnable.",
+    category: "Shopify",
+    date: "2026-11-28",
+    readingMinutes: 5,
+    sections: [
+      { paragraphs: [
+        "Quand on cherche « Shopify prix », on tombe d'abord sur le prix de l'abonnement. Mais pour connaître le vrai budget d'une boutique, il faut compter tous les frais. Voici la liste complète, sans chiffres inventés : les tarifs de Shopify changent selon les pays et les périodes, donc vérifie toujours les montants à jour sur le site officiel de Shopify.",
+      ] },
+      { heading: "1. L'abonnement Shopify", paragraphs: [
+        "Shopify fonctionne avec un abonnement mensuel ou annuel, avec plusieurs formules. Plus la formule est élevée, plus tu as de fonctions et de comptes collaborateurs. Pour débuter seul, la formule de base suffit en général. Shopify propose souvent une période d'essai ou un premier mois à prix réduit : regarde les offres du moment avant de t'inscrire.",
+      ] },
+      { heading: "2. Les frais sur les paiements", paragraphs: [
+        "À chaque vente, une petite part du paiement est prise par la solution de paiement. Le pourcentage dépend de ta formule et du moyen de paiement utilisé. Ces frais comptent dans ta marge : intègre-les dans ton calcul de prix.",
+      ] },
+      { heading: "3. Les applications", paragraphs: [
+        "Beaucoup d'applications Shopify sont gratuites ou ont une version gratuite, d'autres sont payantes chaque mois. Elles s'additionnent vite. Au début, n'installe que ce dont tu as vraiment besoin : avis clients, e-mails, et éventuellement une application de dropshipping.",
+      ] },
+      { heading: "4. Le thème", paragraphs: [
+        "Shopify propose des thèmes gratuits, largement suffisants pour démarrer. Les thèmes payants s'achètent en une fois. Un thème payant ne fait pas vendre à lui seul : la clarté de ta fiche produit compte bien plus.",
+      ] },
+      { heading: "5. Le nom de domaine", paragraphs: [
+        "Un nom de domaine à toi (par exemple taboutique.fr) se paie chaque année. Tu peux l'acheter directement dans Shopify ou ailleurs puis le connecter. C'est un petit budget qui rend ta boutique bien plus crédible.",
+      ] },
+      { heading: "6. Ce qui n'est pas Shopify mais qu'il faut prévoir", paragraphs: [
+      ], list: ["Un ou deux échantillons de ton produit, pour vérifier la qualité et le délai", "Un petit budget pour te faire connaître, si tu choisis la publicité", "La création de la boutique elle-même, si tu ne la fais pas seul", "Une petite réserve pour les imprévus : colis perdu, remboursement"] },
+      { heading: "Comment garder un budget de départ raisonnable", paragraphs: [
+        "Commence avec la formule de base, un thème gratuit, peu d'applications et un seul produit bien présenté. Trouve tes premiers clients avec des vidéos courtes gratuites avant de payer de la publicité. Et calcule ta marge avec tous ces frais avant de fixer ton prix.",
+        "Pour gagner du temps sur la création, Vigenia crée l'aperçu de ta boutique Shopify gratuitement en quelques minutes. Tu ne paies que si tu veux la débloquer : 39 € une fois avec « Ma boutique », ou un abonnement si tu veux plusieurs boutiques. L'abonnement Shopify, lui, se paie directement à Shopify.",
+      ] },
+    ],
+  },
+  {
     slug: "obtenir-avis-clients-boutique-en-ligne",
     title: "Obtenir des avis clients sur sa boutique en ligne (sans tricher)",
     excerpt: "Les avis rassurent les visiteurs, mais une boutique qui démarre n'en a pas. Comment obtenir tes premiers vrais avis, les afficher, répondre aux avis négatifs, et ce qui est interdit.",
