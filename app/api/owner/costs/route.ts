@@ -6,7 +6,7 @@ import { db, must } from "@/lib/server/supabase";
 // Ventes : ce que le fondateur paie pour faire tourner Vigenia (abonnements, services à l'usage).
 export const GET = route(async () => {
   await requireOwner();
-  const costs = must(await db().from("owner_costs").select("id, name, what, amount_cents, currency, period, method, essential, sort").order("sort").order("created_at"));
+  const costs = must(await db().from("owner_costs").select("id, name, what, amount_cents, currency, period, method, essential, sort, last_cents, last_currency, last_at").order("sort").order("created_at"));
   return json({ costs });
 });
 

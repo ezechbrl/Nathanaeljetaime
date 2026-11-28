@@ -205,9 +205,9 @@ export type LivePerson = { id: string; doing: string; email: string | null; sour
 export const getOwnerLive = () => request<{ people: LivePerson[] }>("/api/owner/live", { headers: ownerHeaders() });
 export const getOwnerQuiz = () => request<{ started: number; finished: number; stops: Record<string, number> }>("/api/owner/quiz", { headers: ownerHeaders() });
 export type CheckoutPerson = { userId: string; email: string; discount: number | null; opens: number; plans: Record<string, number>; first: string; last: string; paid: boolean; stores: { id: string; name: string; status: string }[]; hesitation: { reason: string; details: string | null } | null };
-export type OwnerCost = { id: string; name: string; what: string | null; amount_cents: number | null; currency: "EUR" | "USD"; period: "month" | "year" | "usage" | "once"; method: string | null; essential: boolean };
+export type OwnerCost = { id: string; name: string; what: string | null; amount_cents: number | null; currency: "EUR" | "USD"; period: "month" | "year" | "usage" | "once"; method: string | null; essential: boolean; last_cents?: number | null; last_currency?: string | null; last_at?: string | null };
 export const getOwnerCosts = () => request<{ costs: OwnerCost[] }>("/api/owner/costs", { headers: ownerHeaders() });
-export const saveOwnerCost = (c: Omit<OwnerCost, "id"> & { id?: string }) => request<{ cost: OwnerCost }>("/api/owner/costs", { method: "POST", headers: ownerHeaders(), json: c });
+export const saveOwnerCost = (c: Omit<OwnerCost, "id" | "last_cents" | "last_currency" | "last_at"> & { id?: string }) => request<{ cost: OwnerCost }>("/api/owner/costs", { method: "POST", headers: ownerHeaders(), json: c });
 export const deleteOwnerCost = (id: string) => request<{ ok: boolean }>(`/api/owner/costs?id=${encodeURIComponent(id)}`, { method: "DELETE", headers: ownerHeaders() });
 export const getOwnerCheckouts = () => request<{ people: CheckoutPerson[] }>("/api/owner/checkouts", { headers: ownerHeaders() });
 export const fillQuizPhotos = () => request<{ made: number; have: number; total: number }>("/api/owner/quiz-photos", { method: "POST", headers: ownerHeaders() });

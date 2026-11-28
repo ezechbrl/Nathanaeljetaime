@@ -454,9 +454,6 @@ function Dashboard({ s }: { s: OwnerStats }) {
       {/* Qui a ouvert la page de paiement, pour quelle offre, combien de fois. */}
       <Checkouts />
 
-      {/* Ce que tu paies (Vercel, IA, Stripe…) et avec quoi. */}
-      <Costs mrr={s.mrr} />
-
       {/* Grand tableau : d'où vient chaque inscrit, sa boutique et où il s'est arrêté. */}
       <Journeys />
 
@@ -623,6 +620,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
           </ul>
         ) : <p className="mt-2 text-sm text-[#8a8a8a]">Pas encore de vente. Elles apparaîtront ici dès le premier abonné.</p>}
       </Card>
+
+      {/* Tout à la fin : ce que tu paies (Vercel, Anthropic, fal.ai, Claude) et avec quoi. */}
+      <Costs mrr={s.mrr} />
 
       <p className="px-1 text-xs text-white/50">En euros, hors paiements de test. L'argent viré sur ton compte : Stripe → Soldes → Virements.</p>
     </div>

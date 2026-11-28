@@ -66,9 +66,10 @@ export function Costs({ mrr }: { mrr: number }) {
             {list.map((c) => (
               <li key={c.id} className="flex items-start gap-3 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold">{c.name}{c.essential && <span className="ml-1.5 rounded-full bg-[#e8f7f0] px-1.5 py-0.5 text-[10px] font-semibold text-[#0a6e4a]">nécessaire</span>}</p>
+                  <p className="text-[14px] font-semibold">{c.name}</p>
                   {c.what && <p className="mt-0.5 text-[12.5px] text-[#616161]">{c.what}</p>}
                   <p className="mt-0.5 text-[12px] text-[#8a8a8a]">Payé avec : {c.method || "à remplir"}</p>
+                  {c.last_cents != null && c.last_at && <p className="mt-0.5 text-[12px] text-[#b45309]">Dernier paiement : {money(c.last_cents, c.last_currency || c.currency)} le {new Date(c.last_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}</p>}
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-[14px] font-semibold tabular-nums">{c.amount_cents != null ? money(c.amount_cents, c.currency) : "?"}</p>
@@ -90,7 +91,6 @@ export function Costs({ mrr }: { mrr: number }) {
             <select className={input} value={edit.period} onChange={(e) => setEdit({ ...edit, period: e.target.value as Draft["period"] })}>{Object.entries(PERIOD).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
           </div>
           <input className={input} placeholder="Payé avec (ex. carte de maman, carte Visa…)" value={edit.method} onChange={(e) => setEdit({ ...edit, method: e.target.value })} />
-          <label className="flex items-center gap-2 text-[13px]"><input type="checkbox" checked={edit.essential} onChange={(e) => setEdit({ ...edit, essential: e.target.checked })} /> Nécessaire pour Vigenia</label>
           <div className="flex items-center gap-2">
             <button type="button" disabled={busy} onClick={save} className="rounded-full bg-[#0a8f5f] px-4 py-2 text-[13px] font-semibold text-white disabled:opacity-60">Enregistrer</button>
             <button type="button" onClick={() => setEdit(null)} className="rounded-full px-3 py-2 text-[13px] text-[#616161]">Annuler</button>
