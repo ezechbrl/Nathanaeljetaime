@@ -5,7 +5,7 @@
 :root {
   color-scheme: dark;
   /* Vert émeraude frais (plus clair et plus bleuté) : fond profond, accents menthe. */
-  --bg: 21 24 23;            /* #151817 : gris très foncé */
+  --bg: 14 14 14;            /* #151817 : gris très foncé */
   --bg-2: 20 20 20;
   --bg-3: 30 30 30;
   --fg: 245 245 245;
@@ -26,6 +26,8 @@
 @layer base {
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   html { background: #151817; }
+  /* Jamais de défilement sur les côtés (téléphone) : rien ne dépasse de l'écran. */
+  html, body { overflow-x: clip; max-width: 100%; }
   body { position: relative; min-height: 100dvh; @apply font-sans text-fg antialiased; font-feature-settings: "ss01", "cv11"; }
   ::selection { background: rgb(var(--brand-leaf) / 0.35); }
   :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 2px; border-radius: 6px; }
@@ -181,3 +183,15 @@
 /* Petites étoiles du fond : elles scintillent doucement. */
 @keyframes twinkle { 0%, 100% { opacity: .25; transform: scale(.7); } 50% { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { [class*="animation:twinkle"] { animation: none !important; opacity: .6; } }
+
+/* ===== Style plus sobre (demandé le 28/11 : « moins IA », noir et blanc, le vert seulement sur les boutons) =====
+   Tout est ici, à la fin du fichier : supprimer ce bloc rend l'ancien style. */
+.glow-hover:hover, .glow-hover:focus-visible, .glow-hover:active { box-shadow: 0 0 0 1px rgb(255 255 255 / .35); }
+.glow-frame { background: rgb(255 255 255 / 0.12); animation: none; box-shadow: 0 20px 60px -30px rgb(0 0 0 / 0.8); }
+.glow-frame:focus-within { box-shadow: 0 0 0 1px rgb(255 255 255 / .25); }
+@keyframes cta-glow { 0%, 100% { box-shadow: none; } }
+.serif-accent { background: none; }
+.mark-green { background: none; color: #fff; }
+.underline-green { text-decoration-color: rgb(255 255 255 / .45); }
+.ink-green { color: #fff; }
+.eyebrow { border-color: rgb(255 255 255 / 0.14); background: rgb(255 255 255 / 0.04); }

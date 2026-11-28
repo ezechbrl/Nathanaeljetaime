@@ -39,7 +39,7 @@ export function Hero() {
               </span>
               <ArrowRight className="h-5 w-5 shrink-0 text-[#3dff9a] transition-transform group-hover:translate-x-0.5" />
             </a>
-            <a href="/classements/meilleurs-produits-a-vendre-noel" className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/20 px-4 py-2 text-[13px] text-white/85 hover:border-white/35">🎄 Tier list : les 32 meilleurs produits à vendre pour Noël →</a>
+            <a href="/classements/meilleurs-produits-a-vendre-noel" className="mx-auto mt-3 flex w-fit items-center gap-2 rounded-full border border-white/15 bg-black/20 px-4 py-2 text-[13px] text-white/85 hover:border-white/35">🎄 Tier list : les 15 meilleurs produits à vendre pour Noël →</a>
           </Reveal>
         )}
         {/* Petits arguments vérifiables (pas de prix ici : il vient plus tard) (pas de « moins cher du marché » qu'on ne peut pas prouver) */}
