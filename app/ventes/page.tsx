@@ -162,10 +162,10 @@ function Chart({ title, total, points, format, color, short, money = false }: {
   const h = hover;
   const id = title.replace(/\W/g, "");
   return (
-    <Card className="flex h-[300px] flex-col">
+    <Card className="flex h-[380px] flex-col">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-[15px] font-semibold">{title}</h2>
-        <span className="text-[1.25rem] font-semibold tabular-nums">{total}</span>
+        <h2 className="text-[17px] font-semibold">{title}</h2>
+        <span className="text-[2.1rem] font-bold leading-none tracking-[-0.03em] tabular-nums">{total}</span>
       </div>
       <div className="relative mt-2 flex-1">
         {h !== null && (
@@ -301,11 +301,9 @@ function MoneyHero({ s }: { s: OwnerStats }) {
       })()}
       {/* Les chiffres de paiement, chacun dans sa case. */}
       {s.money && (
-        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {[
             ["Aujourd'hui", eur(s.money.todayCollected), `${s.money.todaySales} paiement${s.money.todaySales > 1 ? "s" : ""}`],
-            ["Ce mois-ci", eur(s.monthCollected ?? 0), `objectif ${eur(MONTH_GOAL * 100)}`],
-            ["Revenu mensuel (MRR)", eur(s.mrr), "abonnements actifs"],
             ["Abonnements", String(s.subscribers.total), `${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`],
             ["Ma boutique", String(s.money.singles), `dont ${s.money.monthSingles} ce mois-ci`],
             ["Depuis le début", eur(s.money.totalCollected), `${s.money.totalSales} paiement${s.money.totalSales > 1 ? "s" : ""}`],
@@ -389,10 +387,7 @@ function Dashboard({ s }: { s: OwnerStats }) {
       </div>
       {/* En direct : qui est sur le site et ce qu'il fait, mis à jour toutes les 10 secondes. */}
       <LiveNow />
-      {/* L'argent d'abord : revenu mensuel et prochain palier */}
-      <MoneyHero s={s} />
-
-      {/* Puis le graphique : Revenus (par défaut), Inscrits ou Visites */}
+      {/* Le graphique en premier : Revenus (par défaut), Inscrits ou Visites */}
       <div className="grid grid-cols-3 rounded-full bg-black/25 p-1">
         {([["revenue", "Revenus"], ["signups", "Inscrits"], ["visits", "Visites"]] as const).map(([k, l]) => (
           <button key={k} type="button" onClick={() => setMetric(k)} className={cn("rounded-full py-1.5 text-[13px] font-medium", metric === k ? "bg-white text-[#111]" : "text-white/75")}>{l}</button>
@@ -402,6 +397,9 @@ function Dashboard({ s }: { s: OwnerStats }) {
       {metric === "revenue" && <Chart title="Revenus" total={eur(p.revenue)} points={chart("revenue")} color="#0a8f5f" format={eur} short={euroShort} money />}
       {metric === "visits" && <Chart title="Visites" total={String(p.visits)} points={chart("visits")} color="#f59e0b" format={(n) => plural(n, "visiteur")} short={compact} />}
       <p className="px-1 text-xs text-white/60">Flèches : {vs} · vrais visiteurs seulement (sans robots ni passages Shopify)</p>
+
+      {/* Puis l'argent : objectif du mois, cases de paiement, revenu mensuel et prochain palier */}
+      <MoneyHero s={s} />
 
       {/* Les chiffres clés de la période, tous à la même taille */}
       <div className="grid grid-cols-2 gap-3">
@@ -429,15 +427,15 @@ function Dashboard({ s }: { s: OwnerStats }) {
       {/* Clients qui paient : toujours visibles, avec leurs boutiques. */}
       {!!s.customers?.length && (
         <Card>
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><Wallet className="h-3.5 w-3.5" /></span>Tes clients</h2>
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold"><span className={cn("grid h-7 w-7 place-items-center rounded-[9px]", TONES.green)}><Wallet className="h-3.5 w-3.5" /></span>Tes clients <span className="font-normal text-[#8a8a8a]">· {s.customers.length} · {s.customers.filter((c) => c.stores.some((st) => st.shopify)).length} sur Shopify</span></h2>
           <ul className="mt-1 divide-y divide-[#eee] text-sm">
             {s.customers.map((c) => (
               <li key={c.email} className="py-2.5">
-                <span className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate font-medium">{c.email}</span><span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", TONES.green)}>{c.plan === "agency" ? "Pro" : "Starter"}</span></span>
+                <span className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate font-medium">{c.email}</span><span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", TONES.green)}>{c.plan === "agency" ? "Pro" : c.plan === "single" ? "Ma boutique" : "Starter"}</span></span>
                 <span className="mt-1.5 flex flex-wrap gap-1.5">
                   {c.stores.length ? c.stores.map((st) => (
                     <Link key={st.id} href={`/ventes/boutique/${st.id}`} className="inline-flex items-center gap-1 rounded-full bg-[#e8f7f0] px-2 py-0.5 text-[11px] font-medium text-[#0a6e4a] hover:bg-[#d3f0e3]">
-                      Voir « {st.name} » · {st.status === "ready" ? "complète" : st.status === "locked" ? "aperçu" : st.status === "failed" ? "échec" : "en cours"} →
+                      Voir « {st.name} » · {st.status === "ready" ? "complète" : st.status === "locked" ? "aperçu" : st.status === "failed" ? "échec" : "en cours"} · {st.shopify ? "Shopify relié ✓" : "pas encore sur Shopify"} →
                     </Link>
                   )) : <span className="text-xs text-[#8a8a8a]">Aucune boutique pour l'instant</span>}
                 </span>

@@ -230,16 +230,19 @@ export const GET = route(async () => {
     recent: impact.slice(0, 5).map((a) => ({ label: trackerLabel(a.tracker), state: a.state as string | null, payout: Number(a.payout_cents), at: a.event_at as string | null })),
   };
 
+  // Clients qui paient : abonnés actifs + acheteurs « Ma boutique » (paiement unique, plan single).
+  const singleBuyers = [...new Set(events.filter((e) => e.kind === "payment" && e.plan === "single").map((e) => e.user_id as string))].filter((id) => !active.some((a) => a.user_id === id));
+  const customerIds = [...active.map((a) => a.user_id as string), ...singleBuyers];
   // Clients qui paient (leurs boutiques), départs et hésitations : lus en même temps.
   const [customerStores, departRows, hesRows] = await Promise.all([
-    active.length ? db().from("stores").select("id, name, status, user_id").in("user_id", active.map((a) => a.user_id)).order("created_at", { ascending: false }).then((r) => must(r) as Record<string, any>[]) : Promise.resolve([] as Record<string, any>[]),
+    customerIds.length ? db().from("stores").select("id, name, status, user_id, shop_connection_id").in("user_id", customerIds).order("created_at", { ascending: false }).then((r) => must(r) as Record<string, any>[]) : Promise.resolve([] as Record<string, any>[]),
     db().from("cancel_feedback").select("email, reason, wish, details, created_at").order("created_at", { ascending: false }).limit(10).then((r) => r.data ?? []),
     db().from("hesitations").select("email, reason, details, created_at").order("created_at", { ascending: false }).limit(30).then((r) => r.data ?? []),
   ]);
-  const customers = active.map((a) => ({
-    email: (users.find((u) => u.id === a.user_id)?.email as string | undefined) ?? "",
-    plan: a.plan as string,
-    stores: customerStores.filter((x) => x.user_id === a.user_id).map((x) => ({ id: x.id as string, name: x.name as string, status: x.status as string })),
+  const customers = [...active.map((a) => ({ id: a.user_id as string, plan: a.plan as string })), ...singleBuyers.map((id) => ({ id, plan: "single" }))].map((c) => ({
+    email: (users.find((u) => u.id === c.id)?.email as string | undefined) ?? (events.find((e) => e.user_id === c.id) as any)?.users?.email ?? "",
+    plan: c.plan,
+    stores: customerStores.filter((x) => x.user_id === c.id).map((x) => ({ id: x.id as string, name: x.name as string, status: x.status as string, shopify: !!x.shop_connection_id })),
   }));
   const departures = departRows.map((d) => ({ email: d.email as string, reason: d.reason as string | null, wish: d.wish as string | null, details: d.details as string | null, at: d.created_at as string }));
   const hesitations = hesRows

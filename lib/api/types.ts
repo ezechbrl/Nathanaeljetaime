@@ -202,7 +202,7 @@ export type OwnerStats = {
   money?: { todayCollected: number; todaySales: number; totalCollected: number; totalSales: number; singles: number; monthSingles: number }; // centimes
   arr: number;
   subscribers: { total: number; starter: number; pro: number };
-  customers?: { email: string; plan: string; stores: { id: string; name: string; status: string }[] }[];
+  customers?: { email: string; plan: string; stores: { id: string; name: string; status: string; shopify?: boolean }[] }[];
   departures?: { email: string; reason: string | null; wish: string | null; details: string | null; at: string }[];
   hesitations?: { email: string; reason: string; details: string | null; at: string }[];
   arpu: number; // revenu mensuel moyen par abonné (centimes)
