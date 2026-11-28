@@ -610,10 +610,17 @@ export default function SalesApp() {
   const [testing, setTesting] = useState<"idle" | "sent">("idle");
   const notif = useNotifications();
 
+  // Affichage immédiat : les derniers chiffres gardés sur l'appareil, remplacés dès que les nouveaux arrivent.
+  useEffect(() => {
+    try { const raw = localStorage.getItem("vg-owner-stats"); if (raw) setStats((cur) => cur ?? (JSON.parse(raw) as OwnerStats)); } catch {}
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setStats(await api.getOwnerStats());
+      const fresh = await api.getOwnerStats();
+      setStats(fresh);
+      try { localStorage.setItem("vg-owner-stats", JSON.stringify(fresh)); } catch {}
       setError(null);
       try { localStorage.setItem("vg-owner", "1"); } catch {} // pour ouvrir Ventes directement (voir app/app/layout)
     } catch (e) {

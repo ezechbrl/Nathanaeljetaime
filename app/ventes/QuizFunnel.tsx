@@ -19,7 +19,7 @@ const STEPS: [string, string][] = [
 export function QuizFunnel() {
   const [d, setD] = useState<{ started: number; finished: number; stops: Record<string, number> } | null>(null);
   const [error, setError] = useState("");
-  useEffect(() => { api.getOwnerQuiz().then(setD, (e) => setError((e as Error).message)); }, []);
+  useEffect(() => { api.cachedOwner("quiz", api.getOwnerQuiz, setD, (e) => setError(e.message)); }, []);
   const max = d ? Math.max(1, ...Object.values(d.stops)) : 1;
   return (
     <section className="min-w-0 overflow-hidden rounded-[18px] bg-white p-4 text-[#111] shadow-[0_10px_30px_-18px_rgb(0_0_0/0.6)] sm:p-5">

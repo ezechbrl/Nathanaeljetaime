@@ -25,12 +25,14 @@ export default function DemoPage() {
   const store = ready.find((s) => s.id === pick) ?? null;
   // Produits proposés dans le quiz de la démo : ceux de tes vraies boutiques, avec leur photo produit.
   const [products, setProducts] = useState<DemoProduct[]>([]);
+  // Produits gardés sur l'appareil : affichés tout de suite, puis remplacés par la version à jour.
+  useEffect(() => { try { const c = JSON.parse(localStorage.getItem("vg-demo-products") ?? "[]") as DemoProduct[]; if (c.length) setProducts((cur) => (cur.length ? cur : c)); } catch {} }, []);
   useEffect(() => {
     let alive = true;
     Promise.all(ready.map(async (s) => {
       const photo = await api.listAssets(s.id).then((r) => r.assets.find((a) => a.kind === "product")?.url ?? r.assets[0]?.url, () => undefined);
       return { id: s.id, name: s.plan?.product?.title || s.name, hint: `Boutique ${s.name}`, photo: photo ?? s.teaser?.image ?? undefined };
-    })).then((list) => { if (alive) setProducts(list); });
+    })).then((list) => { if (alive && list.length) { setProducts(list); try { localStorage.setItem("vg-demo-products", JSON.stringify(list)); } catch {} } });
     return () => { alive = false; };
   }, [ready]);
 
@@ -48,7 +50,7 @@ export default function DemoPage() {
               {ready.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
-          <Quiz key={`${run}-${products.length}`} demo demoProducts={products} onDemoPick={setPick} onFinish={async () => { setPhase("build"); }} />
+          <Quiz key={run} demo demoProducts={products} onDemoPick={setPick} onFinish={async () => { setPhase("build"); }} />
         </>
       )}
       {phase === "build" && <Build store={store} photo={products.find((x) => x.id === pick)?.photo} onDone={() => setPhase("done")} />}

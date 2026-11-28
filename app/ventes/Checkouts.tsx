@@ -21,7 +21,7 @@ function planLabel(k: string) {
 export function Checkouts() {
   const [d, setD] = useState<api.CheckoutPerson[] | null>(null);
   const [error, setError] = useState("");
-  useEffect(() => { api.getOwnerCheckouts().then((r) => setD(r.people), (e) => setError((e as Error).message)); }, []);
+  useEffect(() => { api.cachedOwner("checkouts", api.getOwnerCheckouts, (r) => setD(r.people), (e) => setError(e.message)); }, []);
   const totals: Record<string, number> = {};
   for (const p of d ?? []) for (const [k, n] of Object.entries(p.plans)) { const plan = k.split(":")[0]; totals[plan] = (totals[plan] ?? 0) + n; }
   return (

@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { json, route } from "@/lib/server/http";
 import { isOwnerEmail, requireOwner } from "@/lib/server/owner";
 import { LAUNCH_OFFER } from "@/lib/content/pricing";
@@ -37,7 +38,8 @@ export const GET = route(async () => {
   // Parrainages Shopify (Impact) relus aussi à l'ouverture de Ventes, au plus toutes les 10 min.
   if (impactConfigured()) {
     const { error: recent } = await db().from("webhook_events").insert({ id: `impact-sync:${Math.floor(Date.now() / 600_000)}` });
-    if (!recent) await syncImpact().catch((e) => console.warn("Impact", (e as Error).message));
+    // En arrière-plan : l'ouverture de Ventes n'attend plus la synchro Impact.
+    if (!recent) after(() => syncImpact().catch((e) => console.warn("Impact", (e as Error).message)));
   }
   const since = new Date(Date.now() - 30 * DAY).toISOString();
   const since60 = new Date(Date.now() - 61 * DAY).toISOString(); // 30 jours + les 30 d'avant, pour comparer
@@ -215,22 +217,19 @@ export const GET = route(async () => {
     recent: impact.slice(0, 5).map((a) => ({ label: trackerLabel(a.tracker), state: a.state as string | null, payout: Number(a.payout_cents), at: a.event_at as string | null })),
   };
 
-  // Clients qui paient : leurs boutiques, pour les ouvrir depuis Ventes (support), même s'ils sont anciens.
-  const customerStores = active.length
-    ? (must(await db().from("stores").select("id, name, status, user_id").in("user_id", active.map((a) => a.user_id)).order("created_at", { ascending: false })) as Record<string, any>[])
-    : [];
+  // Clients qui paient (leurs boutiques), départs et hésitations : lus en même temps.
+  const [customerStores, departRows, hesRows] = await Promise.all([
+    active.length ? db().from("stores").select("id, name, status, user_id").in("user_id", active.map((a) => a.user_id)).order("created_at", { ascending: false }).then((r) => must(r) as Record<string, any>[]) : Promise.resolve([] as Record<string, any>[]),
+    db().from("cancel_feedback").select("email, reason, wish, details, created_at").order("created_at", { ascending: false }).limit(10).then((r) => r.data ?? []),
+    db().from("hesitations").select("email, reason, details, created_at").order("created_at", { ascending: false }).limit(30).then((r) => r.data ?? []),
+  ]);
   const customers = active.map((a) => ({
     email: (users.find((u) => u.id === a.user_id)?.email as string | undefined) ?? "",
     plan: a.plan as string,
     stores: customerStores.filter((x) => x.user_id === a.user_id).map((x) => ({ id: x.id as string, name: x.name as string, status: x.status as string })),
   }));
-
-  // Réponses au questionnaire de départ (les 10 dernières).
-  const departures = ((await db().from("cancel_feedback").select("email, reason, wish, details, created_at").order("created_at", { ascending: false }).limit(10)).data ?? [])
-    .map((d) => ({ email: d.email as string, reason: d.reason as string | null, wish: d.wish as string | null, details: d.details as string | null, at: d.created_at as string }));
-
-  // « Qu'est-ce qui te fait hésiter ? » sur l'aperçu (les 15 dernières réponses, sans les comptes de test).
-  const hesitations = ((await db().from("hesitations").select("email, reason, details, created_at").order("created_at", { ascending: false }).limit(30)).data ?? [])
+  const departures = departRows.map((d) => ({ email: d.email as string, reason: d.reason as string | null, wish: d.wish as string | null, details: d.details as string | null, at: d.created_at as string }));
+  const hesitations = hesRows
     .filter((h) => !/^ezechiel\.barrellon/i.test(h.email ?? "") && h.email !== "zouzou.barrellon@gmail.com" && !/@shopify\.com$/i.test(h.email ?? ""))
     .slice(0, 15)
     .map((h) => ({ email: h.email as string, reason: h.reason as string, details: h.details as string | null, at: h.created_at as string }));

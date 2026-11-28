@@ -210,7 +210,7 @@ function Today({ data }: { data: JourneysData }) {
 export function Journeys({ wide = false }: { wide?: boolean }) {
   const [data, setData] = useState<JourneysData | null>(null);
   const [error, setError] = useState("");
-  useEffect(() => { api.getOwnerJourneys().then(setData, (e) => setError((e as Error).message)); }, []);
+  useEffect(() => { api.cachedOwner("journeys", api.getOwnerJourneys, setData, (e) => setError(e.message)); }, []);
   // Ventes (téléphone) : les 5 derniers. Grand tableau : les 30 derniers.
   const rows = data ? data.rows.slice(0, wide ? 30 : 5) : [];
 

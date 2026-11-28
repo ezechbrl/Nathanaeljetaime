@@ -207,3 +207,8 @@ export const getOwnerQuiz = () => request<{ started: number; finished: number; s
 export type CheckoutPerson = { userId: string; email: string; discount: number | null; opens: number; plans: Record<string, number>; first: string; last: string; paid: boolean; stores: { id: string; name: string; status: string }[]; hesitation: { reason: string; details: string | null } | null };
 export const getOwnerCheckouts = () => request<{ people: CheckoutPerson[] }>("/api/owner/checkouts", { headers: ownerHeaders() });
 export const fillQuizPhotos = () => request<{ made: number; have: number; total: number }>("/api/owner/quiz-photos", { method: "POST", headers: ownerHeaders() });
+// Ventes : renvoie tout de suite la dernière réponse gardée sur l'appareil (si elle existe), puis la nouvelle.
+export function cachedOwner<T>(key: string, load: () => Promise<T>, onData: (d: T) => void, onError: (e: Error) => void) {
+  try { const raw = localStorage.getItem(`vg-cache-${key}`); if (raw) onData(JSON.parse(raw) as T); } catch { /* rien en cache */ }
+  load().then((d) => { onData(d); try { localStorage.setItem(`vg-cache-${key}`, JSON.stringify(d)); } catch { /* stockage plein */ } }, (e) => onError(e as Error));
+}
