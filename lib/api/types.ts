@@ -199,6 +199,7 @@ export type OwnerStats = {
   mrr: number;
   monthCollected?: number; // encaissé ce mois-ci (centimes), abonnements + « Ma boutique »
   monthSales?: number;
+  money?: { todayCollected: number; todaySales: number; totalCollected: number; totalSales: number; singles: number; monthSingles: number }; // centimes
   arr: number;
   subscribers: { total: number; starter: number; pro: number };
   customers?: { email: string; plan: string; stores: { id: string; name: string; status: string }[] }[];

@@ -260,8 +260,8 @@ function OfferNote({ offer }: { offer: Offer }) {
   return <> · {offer.lastCallAt ? "2 mails envoyés (12 h + dernière heure)" : offer.reminderAt ? "mail de 12 h envoyé · dernier à 23 h" : "mail de rappel à 12 h"}</>;
 }
 
-// Objectif d'Ezechiel : encaisser 100 € par mois (abonnements + « Ma boutique »).
-const MONTH_GOAL = 100;
+// Objectif d'Ezechiel : encaisser 200 € par mois (abonnements + « Ma boutique »), depuis le 28 nov. 2026.
+const MONTH_GOAL = 200;
 // Paliers de revenu mensuel à atteindre (en euros), pour voir le prochain objectif.
 const MILESTONES = [100, 500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000, 100_000];
 
@@ -299,6 +299,25 @@ function MoneyHero({ s }: { s: OwnerStats }) {
           </div>
         );
       })()}
+      {/* Les chiffres de paiement, chacun dans sa case. */}
+      {s.money && (
+        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {[
+            ["Aujourd'hui", eur(s.money.todayCollected), `${s.money.todaySales} paiement${s.money.todaySales > 1 ? "s" : ""}`],
+            ["Ce mois-ci", eur(s.monthCollected ?? 0), `objectif ${eur(MONTH_GOAL * 100)}`],
+            ["Revenu mensuel (MRR)", eur(s.mrr), "abonnements actifs"],
+            ["Abonnements", String(s.subscribers.total), `${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`],
+            ["Ma boutique", String(s.money.singles), `dont ${s.money.monthSingles} ce mois-ci`],
+            ["Depuis le début", eur(s.money.totalCollected), `${s.money.totalSales} paiement${s.money.totalSales > 1 ? "s" : ""}`],
+          ].map(([label, value, sub]) => (
+            <div key={label} className="rounded-[14px] border border-[#cdeedd] bg-white/80 p-3">
+              <p className="text-[11.5px] font-medium text-[#616161]">{label}</p>
+              <p className="mt-0.5 text-[1.35rem] font-bold leading-tight tabular-nums text-[#111]">{value}</p>
+              <p className="text-[11px] text-[#8a8a8a]">{sub}</p>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="flex items-start justify-between gap-3">
         <span className="text-[13px] font-medium text-[#0a8f5f]">Revenu mensuel (MRR)</span>
         <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", TONES.green)}>{s.subscribers.total} abonné{s.subscribers.total > 1 ? "s" : ""}</span>

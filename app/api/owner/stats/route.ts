@@ -188,6 +188,19 @@ export const GET = route(async () => {
   const thisMonth = ym(new Date());
   const monthCollected = sum(events.filter((e) => e.kind === "payment" && ym(e.created_at as string) === thisMonth));
   const monthSales = events.filter((e) => e.kind === "payment" && ym(e.created_at as string) === thisMonth).length;
+  // Aujourd'hui (heure de Paris), depuis le début, et nombre d'achats « Ma boutique » (paiement unique).
+  const ymd = (d: string | Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(d));
+  const todayParis = ymd(new Date());
+  const payments = events.filter((e) => e.kind === "payment");
+  const todayPays = payments.filter((e) => ymd(e.created_at as string) === todayParis);
+  const money = {
+    todayCollected: sum(todayPays),
+    todaySales: todayPays.length,
+    totalCollected: sum(payments),
+    totalSales: payments.length,
+    singles: payments.filter((e) => e.plan === "single").length,
+    monthSingles: payments.filter((e) => e.plan === "single" && ym(e.created_at as string) === thisMonth).length,
+  };
 
   const sources = Object.entries(waitlist.reduce<Record<string, number>>((m, w) => ((m[w.ref || "direct"] = (m[w.ref || "direct"] ?? 0) + 1), m), {}))
     .map(([ref, count]) => ({ ref, count })).sort((a, b) => b.count - a.count);
@@ -243,6 +256,7 @@ export const GET = route(async () => {
     mrr,
     monthCollected,
     monthSales,
+    money,
     arr: mrr * 12,
     subscribers: { total: active.length, starter: active.filter((s) => s.plan === "pro").length, pro: active.filter((s) => s.plan === "agency").length },
     arpu: active.length ? Math.round(mrr / active.length) : 0,
