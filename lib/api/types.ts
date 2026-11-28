@@ -196,7 +196,8 @@ export type OwnerPeriod = OwnerCounts & {
   devices: { name: string; count: number }[];
 };
 export type OwnerStats = {
-  mrr: number;
+  mrr: number; // sans les abonnements dont l'arrêt est programmé
+  endingSubs?: { amount: number; until: string | null }[]; // arrêts programmés (centimes par mois, date de fin)
   monthCollected?: number; // encaissé ce mois-ci (centimes), abonnements + « Ma boutique »
   monthSales?: number;
   money?: { todayCollected: number; todaySales: number; totalCollected: number; totalSales: number; singles: number; monthSingles: number }; // centimes

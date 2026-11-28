@@ -210,6 +210,11 @@ export async function syncSubscription(sub: Stripe.Subscription) {
 
   // Arrêt programmé depuis l'espace Stripe : on garde la réponse à l'enquête de résiliation de Stripe.
   const why = sub.cancellation_details;
+  // Arrêt programmé sans réponse à l'enquête : on prévient quand même le fondateur (une seule fois).
+  if (sub.cancel_at_period_end && !before?.cancel_at_period_end && !why?.feedback && !why?.comment && sub.livemode) {
+    const { error: seen } = await db().from("webhook_events").insert({ id: `notify:ending:${sub.id}` });
+    if (!seen) await notifyOwner("👋 Un client arrête son abonnement", `${user?.email ?? "Un client"} a programmé l'arrêt de son abonnement : il reste payé jusqu'à la fin de la période.`).catch(() => {});
+  }
   if (sub.cancel_at_period_end && !before?.cancel_at_period_end && (why?.feedback || why?.comment)) {
     try {
       await db().from("cancel_feedback").insert({ user_id: userId, email: user?.email ?? null, plan: before?.plan ?? plan, reason: why.feedback ? `stripe:${why.feedback}` : null, wish: null, details: why.comment || null });
@@ -223,7 +228,9 @@ export async function syncSubscription(sub: Stripe.Subscription) {
   const info = PLANS.find((p) => p.id === plan);
   if (was === "free" && plan !== "free" && info) {
     const offer = sub.metadata?.offer;
-    await notifyOwner(`💰 Nouvelle vente Vigenia${sub.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount ?? 0, "EUR")}/${interval === "year" ? "an" : "mois"}${offer === "waitlist" ? " avec le prix spécial" : ""}`));
+    // Stripe envoie souvent 2 événements presque en même temps (abonnement créé puis mis à jour) : une seule notification.
+    const { error: seen } = await db().from("webhook_events").insert({ id: `notify:new:${sub.id}` });
+    if (!seen) await notifyOwner(`💰 Nouvelle vente Vigenia${sub.livemode ? "" : " (test)"}`, saleMessage(user?.email ?? "Un client", info.name, `${formatMoney(amount ?? 0, "EUR")}/${interval === "year" ? "an" : "mois"}${offer === "waitlist" ? " avec le prix spécial" : ""}`));
     if (sub.livemode && before?.stripe_subscription_id !== sub.id) {
       await logRevenue({ user_id: userId, kind: "new", plan, amount_cents: amount ?? 0, currency: "EUR", external_id: `new:${sub.id}` });
       // La facture payée arrive souvent juste avant : son paiement a été noté avec l'ancien plan (« free »).

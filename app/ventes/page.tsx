@@ -304,7 +304,7 @@ function MoneyHero({ s }: { s: OwnerStats }) {
       {s.money && (
         <div className="mb-4 grid grid-cols-2 gap-2">
           {[
-            ["Abonnements", String(s.subscribers.total), `${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro`],
+            ["Abonnements", String(s.subscribers.total), `${s.subscribers.starter} Starter · ${s.subscribers.pro} Pro${s.endingSubs?.length ? ` · ${s.endingSubs.length} s'arrête` : ""}`],
             ["Ma boutique", String(s.money.singles), `dont ${s.money.monthSingles} ce mois-ci`],
           ].map(([label, value, sub]) => (
             <div key={label} className="rounded-[14px] border border-[#cdeedd] bg-white/80 p-3">
@@ -323,6 +323,11 @@ function MoneyHero({ s }: { s: OwnerStats }) {
       <p className="mt-1.5 text-[13px] text-[#616161]">
         soit <b className="text-[#111]">{eur(s.arr)}</b> sur un an · {lastSale ? <>dernière vente {ago(lastSale.at)}</> : "pas encore de vente"}
       </p>
+      {!!s.endingSubs?.length && (
+        <p className="mt-1 text-[12px] text-[#b45309]">
+          Arrêt programmé : {s.endingSubs.map((e) => `${eur(e.amount)}/mois jusqu'au ${e.until ? new Date(e.until).toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) : "?"}`).join(", ")} (pas compté dans le MRR)
+        </p>
+      )}
       <div className="mt-4">
         <div className="flex justify-between text-[11.5px] text-[#616161]">
           <span>{prevStep ? `Palier ${eur(prevStep * 100)} atteint ✓` : "Premier palier"}</span>

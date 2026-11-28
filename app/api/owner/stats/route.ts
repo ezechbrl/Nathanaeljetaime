@@ -71,7 +71,10 @@ export const GET = route(async () => {
   const realVisits: Record<string, any>[] = visits.filter((v) => !v.excluded).map((v) => ({ ...v, created_at: v.first_seen as string }));
   const active = subs.filter((s) => s.status === "active" && (s.shopify_subscription_id || s.stripe_subscription_id) && !s.test && s.plan !== "free");
   const monthly = (s: Record<string, any>) => toEur(Number(s.amount_cents ?? 0), s.currency) / (s.interval === "year" ? 12 : 1);
-  const mrr = Math.round(active.reduce((t, s) => t + monthly(s), 0));
+  // MRR = abonnements qui vont continuer. Ceux qui ont programmé leur arrêt sont comptés à part (encore payés jusqu'à la fin de la période).
+  const ending = active.filter((s) => s.cancel_at_period_end);
+  const mrr = Math.round(active.filter((s) => !s.cancel_at_period_end).reduce((t, s) => t + monthly(s), 0));
+  const endingSubs = ending.map((s) => ({ amount: Math.round(monthly(s)), until: s.current_period_end as string | null }));
   const sum = (rows: Record<string, any>[]) => rows.reduce((t, e) => t + toEur(Number(e.amount_cents), e.currency), 0);
 
   // ---- Périodes (heure de Paris) : aujourd'hui, hier, 7 jours, 30 jours, chacune comparée à celle d'avant ----
@@ -267,12 +270,13 @@ export const GET = route(async () => {
     hesitations,
     deviceToken: owner.newDeviceToken ?? null,
     mrr,
+    endingSubs,
     monthCollected,
     monthSales,
     money,
     arr: mrr * 12,
-    subscribers: { total: active.length, starter: active.filter((s) => s.plan === "pro").length, pro: active.filter((s) => s.plan === "agency").length },
-    arpu: active.length ? Math.round(mrr / active.length) : 0,
+    subscribers: { total: active.length - ending.length, starter: active.filter((s) => s.plan === "pro" && !s.cancel_at_period_end).length, pro: active.filter((s) => s.plan === "agency" && !s.cancel_at_period_end).length },
+    arpu: active.length - ending.length ? Math.round(mrr / (active.length - ending.length)) : 0,
     churn: active.length + monthCancels ? monthCancels / (active.length + monthCancels) : 0,
     conversion: realUsers.length ? active.length / realUsers.length : 0,
     totals: { waitlist: waitlist.length, accounts: realUsers.length },
